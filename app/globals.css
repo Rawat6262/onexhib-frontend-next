@@ -122,3 +122,53 @@ body {
   @apply bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100;
   font-family: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Public landing-page utilities.
+
+   Every class here is prefixed .ox- and used only by components/public/*, so
+   nothing in the authenticated app can be affected by anything below.
+   ───────────────────────────────────────────────────────────────────────────*/
+
+/* Horizontal discovery rails. CSS scroll-snap instead of a carousel library:
+   no JavaScript, no hydration cost, and native momentum scrolling on touch. */
+.ox-rail {
+  scrollbar-width: none;              /* Firefox */
+  -ms-overflow-style: none;           /* legacy Edge */
+  overscroll-behavior-x: contain;     /* don't trigger browser back-swipe */
+}
+.ox-rail::-webkit-scrollbar { display: none; }
+
+/* Scroll-driven reveal, progressively enhanced.
+
+   Browsers without scroll-driven animations (Safari, Firefox today) simply
+   never apply the rule, so content renders fully visible — the content is in
+   the HTML either way, which is what matters for crawling. The
+   prefers-reduced-motion guard means the animation is opt-out by default for
+   anyone who has asked for less motion. Zero JavaScript in every case. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .ox-reveal {
+      animation: ox-reveal-in linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 55%;
+    }
+  }
+}
+
+@keyframes ox-reveal-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Shared card hover. Kept as one class so the transition timing is identical
+   across exhibition, company and product cards. */
+.ox-card {
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ox-card { transition: none; }
+}
+@media (hover: hover) {
+  .ox-card:hover { transform: translateY(-3px); }
+}

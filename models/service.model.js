@@ -1,9 +1,5 @@
 import axios from "axios";
 
-export const getServices = () => axios.get("/api/get/service");
-
-export const addService = (formData) => axios.post("/api/add/service", formData);
-
 export const getAdminExhibitionServices = () => axios.get("/api/getexhibitionservice");
 
 export const addExhibitionService = (formData) =>

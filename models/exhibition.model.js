@@ -63,8 +63,6 @@ export const featureExhibition = (id) =>
 export const unfeatureExhibition = (id) =>
   axios.put(`/api/admin/exhibition/${id}/unfeature`, {}, { withCredentials: true });
 
-export const deleteAllExhibitions = () => axios.delete("/api/admin/deleteallexhibition");
-
 export const uploadExhibitionsExcel = (file, onProgress) =>
   new Promise((resolve, reject) => {
     const formData = new FormData();

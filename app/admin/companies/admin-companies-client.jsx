@@ -9,7 +9,7 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 
 import { toast } from "sonner";
-import { getAdminCompaniesPage, deleteAllCompanies } from "@/models/company.model";
+import { getAdminCompaniesPage } from "@/models/company.model";
 import { getAdminExhibitionsPage } from "@/models/exhibition.model";
 import { getPageNumbers } from "@/lib/paginate";
 
@@ -26,7 +26,6 @@ export default function AdminCompaniesClient() {
   const [productCount, setProductCount] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [showForm, setShowForm] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const [search, setSearch] = useState("");
@@ -62,23 +61,6 @@ export default function AdminCompaniesClient() {
     fetchCompanies(currentPage);
   }, [currentPage, fetchCompanies]);
 
-  // ✅ Delete all companies
-  const handleDeleteAllCompanies = async () => {
-    try {
-      setLoading(true);
-      const { data } = await deleteAllCompanies();
-      toast.success(data.message || "All companies deleted successfully");
-      setShowDeleteConfirm(false);
-      setCurrentPage(1);
-      fetchCompanies(1);
-    } catch (err) {
-      console.error("❌ Error deleting companies:", err);
-      toast.error("Failed to delete companies");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   // The backend has no search endpoint, so this only filters the companies
   // already loaded for the current page — not the full collection.
   const filteredCompanies = useMemo(() => {
@@ -111,42 +93,7 @@ export default function AdminCompaniesClient() {
         {/* Header */}
         <div className="w-full flex flex-col sm:flex-row gap-3 sm:gap-0 justify-between items-center px-4 sm:px-8 py-4 sm:h-20 border-b border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 rounded-t-lg">
           <h1 className="font-bold text-2xl sm:text-3xl tracking-wide">Company Dashboard</h1>
-          <button
-            onClick={() => setShowDeleteConfirm(true)}
-            className="h-10 w-full sm:w-48 border border-red-500 text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950 rounded-md font-semibold transition-colors"
-          >
-            Delete All Company
-          </button>
         </div>
-
-        {/* Delete Confirmation Modal */}
-        {showDeleteConfirm && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50 px-4">
-            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg p-6 w-full max-w-sm">
-              <h2 className="text-xl font-bold mb-4 text-center">
-                Are you sure?
-              </h2>
-              <p className="text-gray-600 dark:text-gray-400 text-center mb-6">
-                This will permanently delete all companies. This action cannot be undone.
-              </p>
-              <div className="flex justify-center gap-4">
-                <button
-                  onClick={() => setShowDeleteConfirm(false)}
-                  className="px-4 py-2 border-2 border-gray-400 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleDeleteAllCompanies}
-                  className="px-4 py-2 border-2 border-red-500 text-red-500 dark:text-red-400 rounded-md hover:bg-red-100 dark:hover:bg-red-950 transition-colors"
-                  disabled={loading}
-                >
-                  {loading ? "Deleting..." : "Confirm Delete"}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Summary Cards */}
         <div className="w-full px-3 sm:px-4 mt-6 grid grid-cols-3 gap-3 sm:gap-6">

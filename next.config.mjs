@@ -9,6 +9,45 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // cookie changes are needed, and the Flutter app is unaffected.
 const BACKEND_URL = (process.env.BACKEND_URL || "").replace(/\/+$/, "");
 
+
+// Content-Security-Policy, shipped in REPORT-ONLY mode.
+//
+// Report-Only cannot break the page: the browser evaluates the policy, logs any
+// violation to the console, and loads the resource anyway. This is a measurement
+// pass — browse the app, collect the violations, then tighten and enforce.
+//
+// Each source below is here because something in the app actually needs it:
+//   style-src  'unsafe-inline'  react-select injects <style> at runtime, and
+//                               CompanyPopupForm/ExcelUploadModal embed raw CSS
+//   style-src  fonts.googleapis CompanyPopupForm's CSS @imports Inter from Google
+//   font-src   fonts.gstatic    the font files that @import then pulls
+//              (Poppins itself is self-hosted by next/font and needs only 'self')
+//   img/media  res.cloudinary   uploaded images and video rendered as raw <img>/
+//                               <video>, bypassing next/image
+//   img/media  blob:            URL.createObjectURL previews in the upload forms
+//   connect-src 'self'          every API call is a relative /api/* path that the
+//                               rewrite proxies, so no external origin is needed
+//
+// script-src keeps 'unsafe-inline' because Next.js emits inline bootstrap and
+// RSC-payload scripts. Removing it requires per-request nonces from middleware,
+// which would opt every page out of static prerendering — a real cost to the
+// three public pages. That trade-off is a separate decision, not a silent one.
+const CSP_REPORT_ONLY = [
+  "default-src 'self'",
+  "base-uri 'self'",
+  "object-src 'none'",
+  "frame-ancestors 'self'",
+  "form-action 'self'",
+  "script-src 'self' 'unsafe-inline'",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "font-src 'self' data: https://fonts.gstatic.com",
+  "img-src 'self' data: blob: https://res.cloudinary.com",
+  "media-src 'self' blob: https://res.cloudinary.com",
+  "connect-src 'self'",
+  "worker-src 'self' blob:",
+  "manifest-src 'self'",
+].join("; ");
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Other lockfiles exist above this directory; pin the trace root so builds
@@ -16,10 +55,7 @@ const nextConfig = {
   outputFileTracingRoot: __dirname,
 
   // The Express API sends helmet headers; the frontend sent none. These are the
-  // equivalents that are safe to apply globally. A Content-Security-Policy is
-  // deliberately NOT set here — Next needs per-request nonces for its inline
-  // scripts, and a wrong CSP breaks the app silently, so it belongs in its own
-  // change with real browser testing.
+  // equivalents that are safe to apply globally.
   poweredByHeader: false,
 
   async headers() {
@@ -34,6 +70,8 @@ const nextConfig = {
           { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
           // Ignored over plain HTTP; takes effect once served over HTTPS.
           { key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains" },
+          // Report-only: logs violations, blocks nothing. See CSP_REPORT_ONLY above.
+          { key: "Content-Security-Policy-Report-Only", value: CSP_REPORT_ONLY },
         ],
       },
     ];

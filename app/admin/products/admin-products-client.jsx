@@ -9,7 +9,7 @@ import { useState, useMemo, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 
 import { toast } from "sonner";
-import { getAdminProductsPage, deleteAllProducts } from "@/models/product.model";
+import { getAdminProductsPage } from "@/models/product.model";
 import { getPageNumbers } from "@/lib/paginate";
 
 // Modals are only needed once opened, so their code (and for the location
@@ -47,20 +47,6 @@ export default function AdminProductsClient() {
     fetchProducts(currentPage);
   }, [currentPage, fetchProducts]);
 
-  // ✅ Delete all products
-  const handleDeleteAll = async () => {
-    try {
-      if (!window.confirm("Are you sure you want to delete all products?")) return;
-      await deleteAllProducts();
-      toast.success("All products deleted successfully");
-      setCurrentPage(1);
-      fetchProducts(1);
-    } catch (err) {
-      console.error("❌ Error deleting products:", err.message);
-      toast.error("Failed to delete products");
-    }
-  };
-
   // The backend has no search endpoint, so this only filters the products
   // already loaded for the current page — not the full collection.
   const filteredProducts = useMemo(() => {
@@ -88,12 +74,6 @@ export default function AdminProductsClient() {
         {/* Header */}
         <div className="w-full flex flex-col sm:flex-row gap-3 sm:gap-0 justify-between items-center px-4 sm:px-8 py-4 sm:h-20 border-b border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 rounded-t-lg">
           <h1 className="font-bold text-2xl sm:text-3xl tracking-wide">Product Dashboard</h1>
-          <button
-            onClick={handleDeleteAll}
-            className="h-10 w-full sm:w-48 border border-red-500 text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950 rounded-md font-semibold transition-colors"
-          >
-            Delete All Products
-          </button>
         </div>
 
         {/* Summary Card */}

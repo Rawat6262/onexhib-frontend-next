@@ -12,7 +12,6 @@ import { toast } from "sonner";
 import {
   getAdminExhibitionsPage,
   getExhibitionsByMonthYear,
-  deleteAllExhibitions,
   featureExhibition,
   unfeatureExhibition,
 } from "@/models/exhibition.model";
@@ -40,7 +39,6 @@ export default function AdminOrganisersClient() {
   const [products, setProducts] = useState(0);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
-  const [showOrganiser, setShowOrganiser] = useState(false); // for delete confirmation modal
   const [showModal, setShowModal] = useState(false);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -137,21 +135,6 @@ export default function AdminOrganisersClient() {
     }
   };
 
-  // Delete all exhibitions
-  const handleDeleteAll = async () => {
-    try {
-      setLoading(true);
-      await deleteAllExhibitions();
-      setShowOrganiser(false);
-      setCurrentPage(1);
-      fetchExhibitions(1);
-    } catch (error) {
-      console.error("Error deleting exhibitions:", error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   // The backend has no search endpoint, so this only filters the exhibitions
   // already loaded for the current page — not the full collection.
   const filteredData = useMemo(() => {
@@ -177,41 +160,7 @@ export default function AdminOrganisersClient() {
         {/* Header */}
         <div className="w-full flex flex-col sm:flex-row gap-3 sm:gap-0 justify-between items-center px-4 sm:px-8 py-4 sm:h-20 border-b border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 rounded-t-lg">
           <h1 className="flex-1 font-bold text-2xl sm:text-3xl tracking-wide">SEM GROUP</h1>
-          <button
-            onClick={() => setShowOrganiser(true)}
-            className="h-10 w-full sm:w-64 border-2 border-red-500 text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950 rounded-md font-semibold transition-colors"
-          >
-            Delete ALL Exhibition
-          </button>
         </div>
-
-        {/* Delete Confirmation Modal */}
-        {showOrganiser && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50 px-4">
-            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg p-6 w-full max-w-sm">
-              <h2 className="text-xl font-bold mb-4 text-center">
-                Are you sure?
-              </h2>
-              <p className="text-gray-600 dark:text-gray-400 text-center mb-6">
-                This action will permanently delete all exhibitions. This cannot be undone.
-              </p>
-              <div className="flex justify-center gap-4">
-                <button
-                  onClick={() => setShowOrganiser(false)}
-                  className="px-4 py-2 border-2 border-gray-400 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleDeleteAll}
-                  className="px-4 py-2 border-2 border-red-500 text-red-500 dark:text-red-400 rounded-md hover:bg-red-100 dark:hover:bg-red-950 transition-colors"
-                >
-                  Confirm Delete
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Summary Cards */}
         <div className="w-full px-3 sm:px-4 mt-6 grid grid-cols-3 gap-3 sm:gap-6">

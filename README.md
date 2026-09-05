@@ -137,16 +137,16 @@ dataset once, on demand.
 
 ---
 
-## Known issues (pre-existing, not introduced by the migration)
+## Backend endpoints that did not exist
 
-These are broken identically in the original Vite app — verified by calling
-Express directly, bypassing this frontend.
+Found during the migration by calling Express directly. All three failed
+identically in the original Vite app — none were caused by the migration.
 
-| Feature | Cause |
+| Feature | Resolution |
 |---|---|
-| **"Resend OTP"** on `/verify-otp` | `POST /api/resend-otp` is not defined in the backend |
-| **"Delete All"** on the three admin lists | `/api/admin/deleteall{exhibition,company,product}` are commented out in `Route/Route.js` |
-| `getServices` / `addService` in `models/service.model.js` | `/api/get/service` and `/api/add/service` do not exist; nothing calls these wrappers |
+| **"Resend OTP"** on `/verify-otp` | **Fixed in the backend.** `resendOtp` added to `Controller/webAuth.controller.js` and registered as `POST /api/resend-otp`. Reuses the existing `pendingSignups` store and `sendOtpEmail`, resets the verify attempt counter, and throttles to one resend per 30s. **Requires a backend deploy to take effect.** |
+| **"Delete All"** on the three admin lists | **Buttons removed from the frontend.** `/api/admin/deleteall{exhibition,company,product}` remain commented out at `Route/Route.js:304–306` by deliberate choice; the buttons that called them are gone, along with their confirmation modals. |
+| `getServices` / `addService` | **Wrappers removed** from `models/service.model.js`. `/api/get/service` and `/api/add/service` were never defined and nothing called them. |
 
 Not carried over from the Vite app, all unreachable there:
 `views/dashboard/DashboardView.jsx`, `views/service/ServiceDashboardView.jsx`,
@@ -154,9 +154,35 @@ Not carried over from the Vite app, all unreachable there:
 `views/company/CompanyView.jsx` (routed at `/api/Company`, which has no `:id`
 segment, so its `useParams()` lookup could never resolve).
 
+## Content-Security-Policy
+
+A CSP ships in **`Content-Security-Policy-Report-Only`** mode (`next.config.mjs`).
+Report-Only cannot break the page — the browser evaluates the policy, logs
+violations to the console, and loads the resource anyway.
+
+To move it to enforcing:
+
+1. Browse every page and flow with the console open, signed in, and collect any
+   `Report Only` violations.
+2. Add whatever legitimately appears; drop anything unused.
+3. Rename the header key to `Content-Security-Policy`.
+
+`script-src` currently keeps `'unsafe-inline'` because Next.js emits inline
+bootstrap and RSC-payload scripts. Removing it needs per-request nonces from
+middleware, which opts every page out of static prerendering — a real cost to the
+three public pages. **Until that changes, the CSP is not meaningful protection
+against injected inline scripts;** its value is in `object-src`, `base-uri`,
+`form-action`, `frame-ancestors` and the tightened `img`/`font`/`connect` sources.
+
+Known quirk found while writing the policy: `components/popups/CompanyPopupForm.jsx`
+`@import`s the Inter typeface from Google Fonts inside a raw `<style>` block, so
+that popup loads a whole second font family at runtime. That is why
+`fonts.googleapis.com` / `fonts.gstatic.com` appear in the policy at all — every
+other font is self-hosted by `next/font`. Removing that `@import` would let both
+sources be dropped.
+
 ## Follow-ups
 
-- Content-Security-Policy (needs nonces + browser testing)
 - Public exhibition/company/product pages — the actual SEO opportunity
 - Redirects from the old `/api/*` page URLs, if any are live
 - ~2.2 MB of unreferenced images in `public/` (`bg.png` and friends) can be

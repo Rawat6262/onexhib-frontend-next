@@ -11,7 +11,9 @@ import { PUBLIC_ROUTES, publicPageMetadata } from "@/lib/seo";
 import { breadcrumbNode, companyNode, graph, itemListNode } from "@/lib/jsonld";
 import { companyPath, exhibitionPath, productPath } from "@/lib/routes";
 import { idFromSlug, isCanonicalSlug } from "@/lib/slug";
-import { truncate } from "@/lib/format";
+import { formatDateRange, formatLocation, toIsoDate, truncate } from "@/lib/format";
+import { cityLandingPath } from "@/lib/routes";
+import { resolvePlaceLinks } from "@/lib/locations";
 import { getCompanyById, getExhibitionById, getProductsForCompany } from "@/lib/public-api";
 
 /**
@@ -57,7 +59,9 @@ export async function generateMetadata({ params }) {
     title: [company.name, company.nature].filter(Boolean).join(" — "),
     description,
     path: companyPath(company.name, company.id),
-    images: company.image ? [company.image.url] : undefined,
+    // A base64 data: URI is a valid <img> src but useless as og:image —
+    // crawlers need a fetchable URL — so inline images are left out here.
+    images: company.image && company.image.host !== "inline" ? [company.image.url] : undefined,
   });
 }
 
@@ -76,6 +80,16 @@ export default async function CompanyDetailPage({ params }) {
     getProductsForCompany(company.id),
     company.exhibitionId ? getExhibitionById(company.exhibitionId) : Promise.resolve(null),
   ]);
+
+  // Several companies have no `about` text, which left the page with little
+  // beyond a name. The exhibition it exhibits at is real, related data the
+  // record already points to — surfacing its dates and city gives the page
+  // something to say and gives the crawler a route into the location tier.
+  const exhibitionPlace = exhibition ? formatLocation(exhibition, { includeVenue: false }) : "";
+  const exhibitionDates = exhibition
+    ? formatDateRange(exhibition.startDate, exhibition.endDate)
+    : "";
+  const exhibitionCity = exhibition ? await resolvePlaceLinks(exhibition) : null;
 
   const path = companyPath(company.name, company.id);
   const trail = [
@@ -109,6 +123,7 @@ export default async function CompanyDetailPage({ params }) {
               fill
               priority
               sizes="112px"
+              unoptimized={!company.image.optimized}
               className="object-contain p-2"
             />
           </div>
@@ -167,7 +182,7 @@ export default async function CompanyDetailPage({ params }) {
           </dl>
 
           {exhibition ? (
-            <p className="mt-5 text-[15px] text-gray-600 dark:text-gray-400">
+            <p className="mt-5 text-[15px] leading-relaxed text-gray-600 dark:text-gray-400">
               Exhibiting at{" "}
               <Link
                 href={exhibitionPath(exhibition.name, exhibition.id)}
@@ -175,6 +190,28 @@ export default async function CompanyDetailPage({ params }) {
               >
                 {exhibition.name}
               </Link>
+              {exhibitionDates ? (
+                <>
+                  ,{" "}
+                  <time dateTime={toIsoDate(exhibition.startDate)}>{exhibitionDates}</time>
+                </>
+              ) : null}
+              {exhibitionPlace ? (
+                <>
+                  , in{" "}
+                  {exhibitionCity?.citySlug ? (
+                    <Link
+                      href={cityLandingPath(exhibitionCity.countrySlug, exhibitionCity.citySlug)}
+                      className="underline underline-offset-4 hover:text-[#131C55] dark:hover:text-white"
+                    >
+                      {exhibitionPlace}
+                    </Link>
+                  ) : (
+                    exhibitionPlace
+                  )}
+                </>
+              ) : null}
+              .
             </p>
           ) : null}
         </div>

@@ -9,10 +9,13 @@ import JsonLd from "@/components/seo/JsonLd";
 
 import { PUBLIC_ROUTES, publicPageMetadata } from "@/lib/seo";
 import { breadcrumbNode, eventNode, graph, itemListNode } from "@/lib/jsonld";
-import { companyPath, exhibitionPath } from "@/lib/routes";
+import { categoryLandingPath, cityLandingPath, companyPath, countryLandingPath, exhibitionPath } from "@/lib/routes";
+import { getExhibitionsInPlace, resolvePlaceLinks } from "@/lib/locations";
+import { resolveCategoryLink } from "@/lib/categories";
 import { idFromSlug, isCanonicalSlug } from "@/lib/slug";
 import { formatDateRange, formatLocation, toIsoDate, truncate } from "@/lib/format";
 import { getCompaniesForExhibition, getExhibitionById } from "@/lib/public-api";
+import ExhibitionCard from "@/components/public/ExhibitionCard";
 
 /**
  * Public exhibition detail: /exhibition/[slug]
@@ -74,7 +77,9 @@ export async function generateMetadata({ params }) {
     title: titleBits,
     description,
     path: exhibitionPath(exhibition.name, exhibition.id),
-    images: exhibition.image ? [exhibition.image.url] : undefined,
+    // A base64 data: URI is a valid <img> src but useless as og:image —
+    // crawlers need a fetchable URL — so inline images are left out here.
+    images: exhibition.image && exhibition.image.host !== "inline" ? [exhibition.image.url] : undefined,
   });
 }
 
@@ -88,7 +93,25 @@ export default async function ExhibitionDetailPage({ params }) {
     permanentRedirect(exhibitionPath(exhibition.name, exhibition.id));
   }
 
-  const companies = await getCompaniesForExhibition(exhibition.id);
+  // Three independent, fail-soft reads.
+  // `placeLinks` decides whether the location links point at an indexable
+  // landing page or at the noindex filter; `nearby`
+  // is what makes this page a hub rather than a dead end for a crawler.
+  const [companies, placeLinks, categoryLink, sameCity] = await Promise.all([
+    getCompaniesForExhibition(exhibition.id),
+    resolvePlaceLinks(exhibition),
+    resolveCategoryLink(exhibition.category),
+    exhibition.city && exhibition.country
+      ? getExhibitionsInPlace({ country: exhibition.country, city: exhibition.city })
+      : Promise.resolve([]),
+  ]);
+
+  // Related = other upcoming exhibitions in the same city. Same city is the
+  // only relationship the listing endpoints can actually express: category and
+  // venue are absent from their projection (see lib/public-api.js), so a
+  // "same category" or "same venue" section would need a backend change rather
+  // than 2,000 detail fetches.
+  const nearby = sameCity.filter((e) => e.id !== exhibition.id).slice(0, 4);
 
   const path = exhibitionPath(exhibition.name, exhibition.id);
   const dates = formatDateRange(exhibition.startDate, exhibition.endDate);
@@ -135,11 +158,24 @@ export default async function ExhibitionDetailPage({ params }) {
 
       <header className="grid gap-8 lg:grid-cols-[1.4fr_1fr]">
         <div>
+          {/* The category is a link when its industry page exists, and plain
+              text otherwise — the long tail of one-off categories has no page
+              to point at. */}
           {exhibition.category ? (
-            <p className="inline-flex items-center gap-1.5 rounded-full bg-[#131C55]/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#131C55] dark:bg-blue-400/10 dark:text-blue-300">
-              <Tag size={12} aria-hidden="true" />
-              {exhibition.category}
-            </p>
+            categoryLink ? (
+              <Link
+                href={categoryLandingPath(categoryLink.slug)}
+                className="inline-flex items-center gap-1.5 rounded-full bg-[#131C55]/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#131C55] transition hover:bg-[#131C55]/20 motion-reduce:transition-none dark:bg-blue-400/10 dark:text-blue-300 dark:hover:bg-blue-400/20"
+              >
+                <Tag size={12} aria-hidden="true" />
+                {categoryLink.label} exhibitions
+              </Link>
+            ) : (
+              <p className="inline-flex items-center gap-1.5 rounded-full bg-[#131C55]/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#131C55] dark:bg-blue-400/10 dark:text-blue-300">
+                <Tag size={12} aria-hidden="true" />
+                {exhibition.category}
+              </p>
+            )
           ) : null}
 
           <h1 className="mt-3 text-3xl font-bold leading-tight tracking-tight text-gray-900 sm:text-4xl dark:text-white">
@@ -180,12 +216,30 @@ export default async function ExhibitionDetailPage({ params }) {
           </dl>
 
           <div className="mt-6 flex flex-wrap gap-3">
-            {cityOnly && exhibition.city ? (
+            {/* Descriptive anchors that name the destination, and an indexable
+                landing page whenever the city clears the threshold — falling
+                back to the noindex filter only for the long tail of cities
+                that have no page of their own. */}
+            {exhibition.city ? (
               <Link
-                href={`${PUBLIC_ROUTES.exhibitions}?city=${encodeURIComponent(exhibition.city)}`}
+                href={
+                  placeLinks.citySlug
+                    ? cityLandingPath(placeLinks.countrySlug, placeLinks.citySlug)
+                    : `${PUBLIC_ROUTES.exhibitions}?city=${encodeURIComponent(exhibition.city)}`
+                }
                 className="inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-900 transition hover:border-[#131C55] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:hover:border-gray-500"
               >
+                <MapPin size={16} aria-hidden="true" />
                 More exhibitions in {exhibition.city}
+              </Link>
+            ) : null}
+
+            {placeLinks.countrySlug && exhibition.country ? (
+              <Link
+                href={countryLandingPath(placeLinks.countrySlug)}
+                className="inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-900 transition hover:border-[#131C55] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:hover:border-gray-500"
+              >
+                Exhibitions in {exhibition.country}
               </Link>
             ) : null}
 
@@ -203,16 +257,17 @@ export default async function ExhibitionDetailPage({ params }) {
           </div>
         </div>
 
-        {/* Only Cloudinary images reach this point; anything else is filtered
-            out in lib/public-api.js and the block simply does not render. */}
+        {/* Null only when the record has no usable image URL at all; the
+            block then simply does not render. See lib/public-api.js. */}
         {exhibition.image ? (
           <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-800">
             <Image
               src={exhibition.image.url}
-              alt={`${exhibition.name} exhibition banner`}
+              alt={[exhibition.name, cityOnly].filter(Boolean).join(" — ")}
               fill
               priority
               sizes="(min-width: 1024px) 420px, 100vw"
+              unoptimized={!exhibition.image.optimized}
               className="object-cover"
             />
           </div>
@@ -231,6 +286,38 @@ export default async function ExhibitionDetailPage({ params }) {
             </section>
           ))}
         </div>
+      ) : null}
+
+      {nearby.length ? (
+        <section aria-labelledby="nearby-heading" className="mt-14">
+          <h2
+            id="nearby-heading"
+            className="flex items-center gap-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white"
+          >
+            <MapPin size={22} className="text-gray-400" aria-hidden="true" />
+            Other exhibitions in {exhibition.city}
+          </h2>
+          <p className="mt-2 text-[15px] text-gray-600 dark:text-gray-400">
+            More trade shows and business events coming up in the same city.
+          </p>
+          <ul className="mt-6 grid list-none gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {nearby.map((related) => (
+              <li key={related.id}>
+                <ExhibitionCard exhibition={related} className="h-full" />
+              </li>
+            ))}
+          </ul>
+          {placeLinks.citySlug ? (
+            <p className="mt-5 text-[15px]">
+              <Link
+                href={cityLandingPath(placeLinks.countrySlug, placeLinks.citySlug)}
+                className="font-semibold text-[#131C55] underline-offset-4 hover:underline dark:text-blue-300"
+              >
+                See all upcoming exhibitions in {exhibition.city}
+              </Link>
+            </p>
+          ) : null}
+        </section>
       ) : null}
 
       {companies.items.length ? (

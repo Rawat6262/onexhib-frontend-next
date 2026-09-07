@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { PUBLIC_ROUTES, SITE_NAME } from "@/lib/seo";
-import { exhibitionsScopePath } from "@/lib/routes";
+import { cityLandingPath, countryLandingPath, exhibitionsScopePath } from "@/lib/routes";
 
 /**
  * Public site footer.
@@ -11,17 +11,23 @@ import { exhibitionsScopePath } from "@/lib/routes";
  * and how link equity reaches them. Login and Signup are ordinary links too —
  * nothing here is behind JavaScript.
  *
- * The city links are passed in from the page rather than hardcoded, because
- * they are derived from live inventory. A city with no exhibitions simply never
- * appears instead of becoming an empty page.
+ * The location links are passed in from the layout rather than hardcoded,
+ * because they are derived from live inventory: a place only appears once it
+ * clears the quality threshold in lib/locations.js, so the footer can never
+ * link to a page that does not exist or is too thin to rank.
  */
-export default function PublicFooter({ cities = [] }) {
+export default function PublicFooter({ locations }) {
   const year = new Date().getFullYear();
+  const countries = locations?.countries || [];
+  const cities = countries
+    .flatMap((c) => c.cities)
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 6);
 
   return (
     <footer className="mt-20 border-t border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-900/40">
       <div className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
           <div className="lg:col-span-1">
             <Image
               src="/Dark.png"
@@ -43,14 +49,27 @@ export default function PublicFooter({ cities = [] }) {
             <FooterLink href={exhibitionsScopePath("previous")}>Past exhibitions</FooterLink>
             <FooterLink href={PUBLIC_ROUTES.companies}>Companies</FooterLink>
             <FooterLink href={PUBLIC_ROUTES.products}>Products</FooterLink>
+            <FooterLink href={PUBLIC_ROUTES.locations}>Exhibitions by location</FooterLink>
+            <FooterLink href={PUBLIC_ROUTES.categories}>Exhibitions by industry</FooterLink>
             <FooterLink href={PUBLIC_ROUTES.services}>Exhibition services</FooterLink>
           </FooterColumn>
 
           {cities.length ? (
             <FooterColumn title="Exhibitions by city">
-              {cities.slice(0, 6).map(({ city }) => (
-                <FooterLink key={city} href={`${PUBLIC_ROUTES.exhibitions}?city=${encodeURIComponent(city)}`}>
-                  Exhibitions in {city}
+              {cities.map((c) => (
+                <FooterLink key={`${c.countrySlug}/${c.slug}`} href={cityLandingPath(c.countrySlug, c.slug)}>
+                  Exhibitions in {c.city}
+                </FooterLink>
+              ))}
+              <FooterLink href={PUBLIC_ROUTES.locations}>All locations</FooterLink>
+            </FooterColumn>
+          ) : null}
+
+          {countries.length ? (
+            <FooterColumn title="Exhibitions by country">
+              {countries.slice(0, 6).map((c) => (
+                <FooterLink key={c.slug} href={countryLandingPath(c.slug)}>
+                  Exhibitions in {c.country}
                 </FooterLink>
               ))}
             </FooterColumn>

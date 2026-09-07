@@ -153,6 +153,47 @@ export default function ExhibitionServicesPage() {
 
       {SHOW_PROVIDER_LISTINGS ? <ProviderListings /> : null}
 
+      {/* WHY THERE ARE NO PER-SERVICE PAGES (/exhibition-services/printing etc)
+          A page for one of these seven categories would contain exactly what is
+          already on the card above it: a heading, one sentence, and a signup
+          CTA. Seven pages of that is seven thin pages competing with this one,
+          which is the doorway pattern rather than an SEO gain. The unlock is
+          real provider records — /api/getexhibitionservice currently returns a
+          single test row — not more pages over the same sentence.
+
+          What this section CAN do honestly is connect the services tier to the
+          exhibitions tier, which is the relationship a visitor here actually
+          has: they are preparing for a specific show. */}
+      <section aria-labelledby="planning-heading" className="mt-14">
+        <h2
+          id="planning-heading"
+          className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white"
+        >
+          Preparing for a specific exhibition?
+        </h2>
+        <p className="mt-2 max-w-2xl text-[15px] leading-relaxed text-gray-600 dark:text-gray-400">
+          Most of these services are booked against one show and one stand. Find the exhibition
+          first — each listing carries its dates, venue and the companies already taking part.
+        </p>
+        <ul className="mt-5 flex list-none flex-wrap gap-2.5">
+          <li>
+            <Link href={PUBLIC_ROUTES.exhibitions} className={planningLink}>
+              Upcoming exhibitions worldwide
+            </Link>
+          </li>
+          <li>
+            <Link href={PUBLIC_ROUTES.locations} className={planningLink}>
+              Exhibitions by city and country
+            </Link>
+          </li>
+          <li>
+            <Link href={PUBLIC_ROUTES.categories} className={planningLink}>
+              Exhibitions by industry
+            </Link>
+          </li>
+        </ul>
+      </section>
+
       <section className="mt-14 overflow-hidden rounded-3xl bg-gradient-to-br from-[#131C55] to-[#0E1B6B] px-6 py-12 sm:px-10">
         <h2 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
           Offer services to exhibitors?
@@ -231,3 +272,6 @@ async function ProviderListings() {
     </section>
   );
 }
+
+const planningLink =
+  "ox-card inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-800 hover:border-[#131C55]/40 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 dark:text-gray-200 dark:hover:border-gray-600";

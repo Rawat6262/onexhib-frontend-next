@@ -15,6 +15,8 @@ import SearchBar from "@/components/public/SearchBar";
 import Section from "@/components/public/Section";
 import Rail, { RailItem } from "@/components/public/Rail";
 import ExhibitionCard from "@/components/public/ExhibitionCard";
+import FeaturedSlider from "@/components/public/FeaturedSlider";
+import HeroShowcase from "@/components/public/HeroShowcase";
 import CompanyCard from "@/components/public/CompanyCard";
 import ProductCard from "@/components/public/ProductCard";
 import CountsStrip from "@/components/public/CountsStrip";
@@ -23,14 +25,16 @@ import Faq from "@/components/public/Faq";
 import HomeJsonLd from "@/components/seo/HomeJsonLd";
 
 import { PUBLIC_ROUTES, publicPageMetadata } from "@/lib/seo";
-import { exhibitionsScopePath } from "@/lib/routes";
+import { categoryLandingPath, cityLandingPath, countryLandingPath, exhibitionsScopePath } from "@/lib/routes";
+import { getLocationIndex } from "@/lib/locations";
+import { getCategoryIndex } from "@/lib/categories";
 import {
   getCompanies,
   getCounts,
+  getFeaturedExhibitions,
   getOngoingExhibitions,
   getPreviousExhibitions,
   getProducts,
-  getUpcomingCities,
   getUpcomingExhibitions,
 } from "@/lib/public-api";
 
@@ -64,11 +68,17 @@ export const revalidate = 300;
 export default async function HomePage() {
   // One parallel round of requests. Every fetcher fails soft, so a slow or
   // unreachable backend degrades individual sections instead of the page.
-  const [ongoing, upcoming, previous, cities, companies, products, counts] = await Promise.all([
+  const [featured, ongoing, upcoming, previous, locations, industries, companies, products, counts] = await Promise.all([
+    getFeaturedExhibitions({ limit: 8 }),
     getOngoingExhibitions({ limit: 8 }),
     getUpcomingExhibitions({ limit: 8 }),
     getPreviousExhibitions({ limit: 1 }), // archive count only, per the plan
-    getUpcomingCities({ max: 10 }),
+    // The full facet index, not the 100-record sample: these links point at
+    // real indexable landing pages, so they must reflect the whole catalogue.
+    getLocationIndex(),
+    // Shares the location index's catalogue walk, so this is a cache read
+    // rather than a second pass over 2,000 records.
+    getCategoryIndex(),
     getCompanies({ page: 1, limit: 8 }),
     getProducts({ page: 1, limit: 8 }),
     getCounts(),
@@ -78,7 +88,23 @@ export default async function HomePage() {
     <>
       <HomeJsonLd upcomingCount={upcoming.total} />
 
-      <Hero counts={counts} upcomingTotal={upcoming.total} />
+      <Hero counts={counts} upcoming={upcoming} />
+
+      {/* ── Featured ────────────────────────────────────────────── */}
+      {/* Rendered only when the curated set is non-empty - an empty-state box
+          directly under the hero would be worse than no section at all. */}
+      {featured.items.length ? (
+        <Section
+          id="featured"
+          title="Featured exhibitions"
+          intro="A curated selection of the trade shows worth planning around."
+          cta="All upcoming exhibitions"
+          ctaHref={PUBLIC_ROUTES.exhibitions}
+          className="mt-16 sm:mt-20"
+        >
+          <FeaturedSlider items={featured.items} />
+        </Section>
+      ) : null}
 
       {/* ── Ongoing ─────────────────────────────────────────────────────── */}
       <Section
@@ -125,27 +151,80 @@ export default async function HomePage() {
       </Section>
 
       {/* ── Location discovery ──────────────────────────────────────────── */}
-      {cities.length ? (
+      {/* These link to /exhibitions-in/... landing pages, not to the noindex
+          ?city= filter. That is the point of the whole location tier: the
+          anchor text a crawler reads here ("Exhibitions in Berlin") now lands
+          on a page that is allowed to rank for exactly that phrase. */}
+      {locations.countries.length ? (
         <Section
           id="locations"
-          title="Find exhibitions by city"
-          intro="Jump straight to the business events happening where you are, or where you are heading."
+          title="Find exhibitions by city and country"
+          intro="Trade shows cluster around a handful of exhibition centres. Jump straight to the business events happening where you are, or where you are heading."
+          cta="All exhibition locations"
+          ctaHref={PUBLIC_ROUTES.locations}
           className="mt-16 sm:mt-20"
         >
-          <ul className="flex list-none flex-wrap gap-2.5">
-            {cities.map(({ city, state, count }) => (
-              <li key={city}>
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+            Top cities
+          </h3>
+          <ul className="mt-3 flex list-none flex-wrap gap-2.5">
+            {topCities(locations, 12).map((c) => (
+              <li key={`${c.countrySlug}/${c.slug}`}>
                 <Link
-                  href={`${PUBLIC_ROUTES.exhibitions}?city=${encodeURIComponent(city)}`}
+                  href={cityLandingPath(c.countrySlug, c.slug)}
                   className="ox-card group flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-800 hover:border-[#131C55]/40 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 dark:text-gray-200 dark:hover:border-gray-600"
                 >
                   <MapPin size={15} className="text-gray-400" aria-hidden="true" />
-                  <span>Exhibitions in {city}</span>
-                  {state && state !== city ? (
-                    <span className="text-gray-400 dark:text-gray-500">· {state}</span>
-                  ) : null}
+                  <span>Exhibitions in {c.city}</span>
                   <span className="rounded-md bg-gray-100 px-1.5 py-0.5 text-xs font-semibold text-gray-600 dark:bg-gray-800 dark:text-gray-400">
-                    {count}
+                    {c.count}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+
+          <h3 className="mt-8 text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+            Top countries
+          </h3>
+          <ul className="mt-3 flex list-none flex-wrap gap-2">
+            {locations.countries.slice(0, 12).map((c) => (
+              <li key={c.slug}>
+                <Link
+                  href={countryLandingPath(c.slug)}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3.5 py-1.5 text-[13px] font-medium text-gray-600 transition hover:border-[#131C55]/40 hover:text-[#131C55] motion-reduce:transition-none dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:border-gray-600 dark:hover:text-white"
+                >
+                  Exhibitions in {c.country}
+                  <span className="text-gray-400 dark:text-gray-600">{c.count}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </Section>
+      ) : null}
+
+      {/* ── Industry discovery ───────────────────────────────────────────── */}
+      {/* Renders only once the API projects `category`; until then the whole
+          tier is absent rather than empty. */}
+      {industries.categories.length ? (
+        <Section
+          id="industries"
+          title="Find exhibitions by industry"
+          intro="Most trade shows are organised around a sector. Jump to the events in yours."
+          cta="All industries"
+          ctaHref={PUBLIC_ROUTES.categories}
+          className="mt-16 sm:mt-20"
+        >
+          <ul className="flex list-none flex-wrap gap-2.5">
+            {industries.categories.slice(0, 12).map((c) => (
+              <li key={c.slug}>
+                <Link
+                  href={categoryLandingPath(c.slug)}
+                  className="ox-card flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-800 hover:border-[#131C55]/40 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 dark:text-gray-200 dark:hover:border-gray-600"
+                >
+                  <span>{c.label} exhibitions</span>
+                  <span className="rounded-md bg-gray-100 px-1.5 py-0.5 text-xs font-semibold text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+                    {c.count}
                   </span>
                 </Link>
               </li>
@@ -220,11 +299,25 @@ export default async function HomePage() {
 /* ────────────────────────────────────────────────────────────────────────── */
 
 /**
+ * The busiest cities across every country in the index.
+ *
+ * The index is grouped by country, so the cities have to be flattened before
+ * they can be ranked globally — otherwise "top cities" would silently mean
+ * "cities of the largest country".
+ */
+function topCities(locations, max) {
+  return locations.countries
+    .flatMap((c) => c.cities)
+    .sort((a, b) => b.count - a.count || a.city.localeCompare(b.city))
+    .slice(0, max);
+}
+
+/**
  * The one <h1> on the page. It names the product and the job it does in a
  * single line, so a first-time visitor arriving from search knows within a
  * second what OneXhib is — not generic SaaS phrasing.
  */
-function Hero({ counts, upcomingTotal }) {
+function Hero({ counts, upcoming }) {
   return (
     <section className="relative overflow-hidden border-b border-gray-200 dark:border-gray-800">
       {/* Lightweight brand wash. A CSS gradient rather than an image: public/bg.png
@@ -234,46 +327,60 @@ function Hero({ counts, upcomingTotal }) {
         className="pointer-events-none absolute inset-0 bg-gradient-to-br from-[#131C55]/[0.07] via-transparent to-[#0E1B6B]/[0.05] dark:from-[#131C55]/25 dark:to-transparent"
       />
 
-      <div className="relative mx-auto w-full max-w-6xl px-4 pb-14 pt-14 sm:px-6 sm:pb-20 sm:pt-20">
-        <p className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white/70 px-3 py-1 text-xs font-medium text-gray-600 backdrop-blur dark:border-gray-700 dark:bg-gray-900/70 dark:text-gray-300">
-          <Compass size={13} aria-hidden="true" />
-          Exhibition discovery worldwide
-        </p>
+      {/* Soft radial accent behind the showcase panel, so the right side of the
+          band is not flat colour even on the widest viewports. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -right-24 -top-24 h-[28rem] w-[28rem] rounded-full bg-[radial-gradient(circle,rgba(19,28,85,0.10),transparent_65%)] dark:bg-[radial-gradient(circle,rgba(76,99,210,0.18),transparent_65%)]"
+      />
 
-        <h1 className="mt-5 max-w-3xl text-4xl font-bold leading-[1.1] tracking-tight text-gray-900 sm:text-5xl lg:text-6xl dark:text-white">
-          Discover exhibitions,
-          <br className="hidden sm:block" /> exhibitors and products
-        </h1>
+      {/* Two columns from lg up: the copy no longer runs out halfway across the
+          band and leaves the right half empty. Below lg it is one column and the
+          showcase removes itself — see HeroShowcase. */}
+      <div className="relative mx-auto grid w-full max-w-6xl items-center gap-12 px-4 pb-14 pt-14 sm:px-6 sm:pb-20 sm:pt-20 lg:grid-cols-[1.05fr_0.95fr] lg:gap-10">
+        <div className="min-w-0">
+          <p className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white/70 px-3 py-1 text-xs font-medium text-gray-600 backdrop-blur dark:border-gray-700 dark:bg-gray-900/70 dark:text-gray-300">
+            <Compass size={13} aria-hidden="true" />
+            Exhibition discovery worldwide
+          </p>
 
-        <p className="mt-5 max-w-2xl text-base leading-relaxed text-gray-600 sm:text-lg dark:text-gray-400">
-          OneXhib brings exhibitions and trade shows from around the world into one place — with
-          their dates, venues and categories, the companies exhibiting at them, and the products
-          those companies bring.
-        </p>
+          <h1 className="mt-5 text-4xl font-bold leading-[1.1] tracking-tight text-gray-900 sm:text-5xl lg:text-[3.05rem] dark:text-white">
+            Discover exhibitions,
+            <br className="hidden sm:block" /> exhibitors and products
+          </h1>
 
-        <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-          <Link
-            href={PUBLIC_ROUTES.exhibitions}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#131C55] px-6 py-3.5 text-[15px] font-semibold text-white shadow-sm transition hover:bg-[#0E1B6B] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none"
-          >
-            Explore exhibitions
-            <ArrowRight size={17} aria-hidden="true" />
-          </Link>
-          <Link
-            href="/signup"
-            className="inline-flex items-center justify-center rounded-xl border border-gray-300 bg-white px-6 py-3.5 text-[15px] font-semibold text-gray-900 transition hover:border-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:hover:border-gray-500"
-          >
-            Create account
-          </Link>
+          <p className="mt-5 max-w-xl text-base leading-relaxed text-gray-600 sm:text-lg dark:text-gray-400">
+            OneXhib brings exhibitions and trade shows from around the world into one place — with
+            their dates, venues and categories, the companies exhibiting at them, and the products
+            those companies bring.
+          </p>
+
+          <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+            <Link
+              href={PUBLIC_ROUTES.exhibitions}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#131C55] px-6 py-3.5 text-[15px] font-semibold text-white shadow-sm transition hover:bg-[#0E1B6B] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none"
+            >
+              Explore exhibitions
+              <ArrowRight size={17} aria-hidden="true" />
+            </Link>
+            <Link
+              href="/signup"
+              className="inline-flex items-center justify-center rounded-xl border border-gray-300 bg-white px-6 py-3.5 text-[15px] font-semibold text-gray-900 transition hover:border-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:hover:border-gray-500"
+            >
+              Create account
+            </Link>
+          </div>
+
+          <div className="mt-8 max-w-xl">
+            <SearchBar />
+          </div>
+
+          <div className="mt-10">
+            <CountsStrip counts={counts} upcoming={upcoming.total} />
+          </div>
         </div>
 
-        <div className="mt-8 max-w-xl">
-          <SearchBar />
-        </div>
-
-        <div className="mt-10">
-          <CountsStrip counts={counts} upcoming={upcomingTotal} />
-        </div>
+        <HeroShowcase items={upcoming.items} total={upcoming.total} />
       </div>
     </section>
   );

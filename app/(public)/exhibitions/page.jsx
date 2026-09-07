@@ -10,7 +10,8 @@ import JsonLd from "@/components/seo/JsonLd";
 
 import { PUBLIC_ROUTES, publicPageMetadata, pageMetadata, NOINDEX_FOLLOW } from "@/lib/seo";
 import { breadcrumbNode, graph, itemListNode } from "@/lib/jsonld";
-import { exhibitionPath } from "@/lib/routes";
+import { cityLandingPath, countryLandingPath, exhibitionPath } from "@/lib/routes";
+import { resolvePlaceLinks } from "@/lib/locations";
 import {
   EXHIBITION_SCOPES,
   getExhibitions,
@@ -89,18 +90,34 @@ export async function generateMetadata({ searchParams }) {
   const canonical =
     scope === "upcoming" ? PUBLIC_ROUTES.exhibitions : `${PUBLIC_ROUTES.exhibitions}?scope=${scope}`;
 
-  // A filtered, searched or paged view canonicalises back to its clean scope
-  // and is kept out of the index, while its links stay followable.
+  // A filtered, searched or paged view is kept out of the index while its
+  // links stay followable.
+  //
+  // WHERE ITS CANONICAL POINTS was the weak part of this and is now fixed. A
+  // city filter used to canonicalise to the unfiltered /exhibitions — a
+  // different page with different content, which is the "canonicalising
+  // unrelated pages together" mistake and something Google is entitled to
+  // ignore. When a city or country has a real landing page, the filter now
+  // points there instead: same place, same records, an actual duplicate. Only
+  // the long tail with no landing page still falls back to the scope.
   if (search || city || country || page > 1) {
     const label = search
       ? `Exhibitions matching “${search}”`
       : city || country
         ? `Exhibitions in ${city || country}`
         : `${meta.heading} — page ${page}`;
+
+    let target = canonical;
+    if (!search && (city || country)) {
+      const links = await resolvePlaceLinks({ country, city });
+      if (links.citySlug) target = cityLandingPath(links.countrySlug, links.citySlug);
+      else if (links.countrySlug && !city) target = countryLandingPath(links.countrySlug);
+    }
+
     return pageMetadata({
       title: label,
       description: meta.description,
-      path: canonical,
+      path: target,
       robots: NOINDEX_FOLLOW,
     });
   }
@@ -123,6 +140,11 @@ export default async function ExhibitionsPage({ searchParams }) {
       : getExhibitions(scope, { page, limit: PER_PAGE, city, state, country }),
     getUpcomingCities({ max: 14 }),
   ]);
+
+  // A page number past the end used to return 200 with an empty grid, which
+  // Search Console reports as a soft 404 and which wastes crawl budget on URLs
+  // that hold nothing. An out-of-range page is a 404.
+  if (page > 1 && !isSearch && !result.items.length) notFound();
 
   const filterLabel = [city, state, country].filter(Boolean).join(", ");
   const heading = isSearch

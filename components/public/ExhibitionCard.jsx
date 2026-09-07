@@ -29,11 +29,21 @@ export default function ExhibitionCard({ exhibition, priority = false, className
     <article
       className={`ox-card group relative flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white hover:border-[#131C55]/30 hover:shadow-lg dark:border-gray-800 dark:bg-gray-900 dark:hover:border-gray-600 ${className}`}
     >
+      {/* Alt text names the event and where it is, because that is what the
+          image is of and what someone who cannot see it needs. "exhibition
+          banner" described the file, not the content. Empty for the branded
+          placeholder — it carries no information the heading does not. */}
       <CardMedia
         image={image}
-        alt={image ? `${name} exhibition banner` : ""}
+        alt={image ? [name, place].filter(Boolean).join(" — ") : ""}
         label={name}
         priority={priority}
+        // Letterbox rather than crop. Nearly every image in this catalogue is
+        // a logo or a portrait poster, not a 16:10 banner, and object-cover was
+        // beheading them — "InnoTrans" lost its top, "WeddFair" both edges. A
+        // cropped wordmark is worse for a reader and worse as an image result.
+        fit="contain"
+        bg="bg-white dark:bg-gray-100"
       />
 
       {isFeatured ? (

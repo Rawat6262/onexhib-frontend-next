@@ -1,3 +1,5 @@
+import { notFound } from "next/navigation";
+
 import Breadcrumbs from "@/components/public/Breadcrumbs";
 import CompanyCard from "@/components/public/CompanyCard";
 import EmptyState from "@/components/public/EmptyState";
@@ -52,6 +54,10 @@ export async function generateMetadata({ searchParams }) {
 export default async function CompaniesPage({ searchParams }) {
   const page = readPage(await searchParams);
   const { items, total, totalPages } = await getCompanies({ page, limit: PER_PAGE });
+  // A page number past the end used to return 200 with an empty grid, which
+  // Search Console reports as a soft 404 and which wastes crawl budget on URLs
+  // that hold nothing. An out-of-range page is a 404.
+  if (page > 1 && !items.length) notFound();
 
   const trail = [
     { name: "Home", path: "/" },

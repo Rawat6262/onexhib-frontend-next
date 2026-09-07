@@ -22,6 +22,11 @@ const BACKEND_URL = (process.env.BACKEND_URL || "").replace(/\/+$/, "");
 //   style-src  fonts.googleapis CompanyPopupForm's CSS @imports Inter from Google
 //   font-src   fonts.gstatic    the font files that @import then pulls
 //              (Poppins itself is self-hosted by next/font and needs only 'self')
+//   img-src    https:          record images are hotlinked from whatever host
+//                               the organiser supplied (Google's thumbnail
+//                               cache, exhibitor sites, ...). See toPublicImage
+//                               in lib/public-api.js. Narrowing this to hosts we
+//                               own would blank out nearly every listing.
 //   img/media  res.cloudinary   uploaded images and video rendered as raw <img>/
 //                               <video>, bypassing next/image
 //   img/media  blob:            URL.createObjectURL previews in the upload forms
@@ -41,7 +46,7 @@ const CSP_REPORT_ONLY = [
   "script-src 'self' 'unsafe-inline'",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' data: https://fonts.gstatic.com",
-  "img-src 'self' data: blob: https://res.cloudinary.com",
+  "img-src 'self' data: blob: https:",
   "media-src 'self' blob: https://res.cloudinary.com",
   "connect-src 'self'",
   "worker-src 'self' blob:",
@@ -91,6 +96,10 @@ const nextConfig = {
   },
 
   images: {
+    // Only hosts we serve ourselves. Third-party record images are rendered
+    // with `unoptimized`, which bypasses this list entirely — deliberately, so
+    // /_next/image never becomes an open resize proxy for arbitrary URLs.
+    // Mirrors OPTIMISABLE_IMAGE_HOSTS in lib/public-api.js.
     remotePatterns: [
       { protocol: "https", hostname: "res.cloudinary.com" },
     ],

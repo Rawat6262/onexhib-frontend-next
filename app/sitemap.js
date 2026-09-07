@@ -1,5 +1,14 @@
 import { SITE_URL, PUBLIC_ROUTES } from "@/lib/seo";
-import { companyPath, exhibitionPath, productPath } from "@/lib/routes";
+import {
+  categoryLandingPath,
+  cityLandingPath,
+  companyPath,
+  countryLandingPath,
+  exhibitionPath,
+  productPath,
+} from "@/lib/routes";
+import { getLocationIndex } from "@/lib/locations";
+import { getCategoryIndex } from "@/lib/categories";
 import {
   getCompanies,
   getExhibitions,
@@ -89,6 +98,7 @@ async function buildAllUrls() {
     { url: `${SITE_URL}${PUBLIC_ROUTES.exhibitions}`, changeFrequency: "daily", priority: 0.9 },
     { url: `${SITE_URL}${PUBLIC_ROUTES.exhibitions}?scope=ongoing`, changeFrequency: "daily", priority: 0.8 },
     { url: `${SITE_URL}${PUBLIC_ROUTES.exhibitions}?scope=previous`, changeFrequency: "weekly", priority: 0.5 },
+    { url: `${SITE_URL}${PUBLIC_ROUTES.locations}`, changeFrequency: "weekly", priority: 0.8 },
     { url: `${SITE_URL}${PUBLIC_ROUTES.companies}`, changeFrequency: "weekly", priority: 0.8 },
     { url: `${SITE_URL}${PUBLIC_ROUTES.products}`, changeFrequency: "weekly", priority: 0.8 },
     { url: `${SITE_URL}${PUBLIC_ROUTES.services}`, changeFrequency: "monthly", priority: 0.7 },
@@ -96,7 +106,14 @@ async function buildAllUrls() {
     { url: `${SITE_URL}/delete-account`, changeFrequency: "yearly", priority: 0.3 },
   ].map((entry) => ({ lastModified: now, ...entry }));
 
-  const [upcoming, ongoing, previous, companies, products] = await Promise.all([
+  const [locations, categories, upcoming, ongoing, previous, companies, products] = await Promise.all([
+    // Only places that clear the quality threshold in lib/locations.js have a
+    // page, so this adds ~96 URLs, not one per city in the data.
+    getLocationIndex(),
+    // Same contract: only categories over MIN_CATEGORY have a page, and the
+    // index is empty until the API projects `category`, so nothing is listed
+    // here that would 404.
+    getCategoryIndex(),
     collect((page) => getUpcomingExhibitions({ page, limit: PAGE_SIZE }), BUDGET.upcoming),
     collect((page) => getOngoingExhibitions({ page, limit: PAGE_SIZE }), BUDGET.ongoing),
     collect((page) => getExhibitions("previous", { page, limit: PAGE_SIZE }), BUDGET.previous),
@@ -104,8 +121,45 @@ async function buildAllUrls() {
     collect((page) => getProducts({ page, limit: PAGE_SIZE }), BUDGET.products),
   ]);
 
+  // Country pages rank above their cities: a country page links to every one
+  // of its cities, so crawling it first is the cheaper path into the set.
+  const locationEntries = [
+    ...locations.countries.map((c) => ({
+      url: `${SITE_URL}${countryLandingPath(c.slug)}`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.8,
+    })),
+    ...locations.countries.flatMap((c) =>
+      c.cities.map((city) => ({
+        url: `${SITE_URL}${cityLandingPath(city.countrySlug, city.slug)}`,
+        lastModified: now,
+        changeFrequency: "weekly",
+        priority: 0.7,
+      }))
+    ),
+  ];
+
+  // The industry hub is listed only when it has industries to show — it is
+  // noindex while empty (see the hub page), and a sitemap should never contain
+  // a URL that tells crawlers not to index it.
+  const categoryEntries = (
+    categories.categories.length
+      ? [{ url: `${SITE_URL}${PUBLIC_ROUTES.categories}`, priority: 0.8 }]
+      : []
+  )
+    .map((e) => ({ lastModified: now, changeFrequency: "weekly", ...e }))
+    .concat(categories.categories.map((c) => ({
+      url: `${SITE_URL}${categoryLandingPath(c.slug)}`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.8,
+    })));
+
   const entries = [
     ...staticEntries,
+    ...locationEntries,
+    ...categoryEntries,
     ...exhibitionEntries(ongoing, "daily", 0.9),
     ...exhibitionEntries(upcoming, "weekly", 0.8),
     ...exhibitionEntries(previous, "yearly", 0.4),

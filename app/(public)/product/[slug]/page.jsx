@@ -11,7 +11,8 @@ import { breadcrumbNode, graph, productNode } from "@/lib/jsonld";
 import { companyPath, exhibitionPath, productPath } from "@/lib/routes";
 import { idFromSlug, isCanonicalSlug } from "@/lib/slug";
 import { formatPrice, truncate } from "@/lib/format";
-import { getCompanyById, getExhibitionById, getProductById } from "@/lib/public-api";
+import { getCompanyById, getExhibitionById, getProductById, getProductsForCompany } from "@/lib/public-api";
+import ProductCard from "@/components/public/ProductCard";
 
 /**
  * Public product detail: /product/[slug]
@@ -50,7 +51,9 @@ export async function generateMetadata({ params }) {
     title: [product.name, product.category].filter(Boolean).join(" — "),
     description,
     path: productPath(product.name, product.id),
-    images: product.image ? [product.image.url] : undefined,
+    // A base64 data: URI is a valid <img> src but useless as og:image —
+    // crawlers need a fetchable URL — so inline images are left out here.
+    images: product.image && product.image.host !== "inline" ? [product.image.url] : undefined,
   });
 }
 
@@ -65,10 +68,16 @@ export default async function ProductDetailPage({ params }) {
 
   // product.createdBy is the company; product.exhibitionid the exhibition.
   // Both fail soft to null, so a missing reference just hides its link.
-  const [company, exhibition] = await Promise.all([
+  const [company, exhibition, siblings] = await Promise.all([
     product.companyId ? getCompanyById(product.companyId) : Promise.resolve(null),
     product.exhibitionId ? getExhibitionById(product.exhibitionId) : Promise.resolve(null),
+    // The company's other products. Real data the record already points at, and
+    // the only related-content relationship products have: there is no product
+    // category filter in the API, so "similar products" would be guesswork.
+    product.companyId ? getProductsForCompany(product.companyId) : Promise.resolve({ items: [] }),
   ]);
+
+  const alsoFrom = siblings.items.filter((p) => p.id !== product.id).slice(0, 4);
 
   const path = productPath(product.name, product.id);
   const priceLabel = formatPrice(product.price, product.unit);
@@ -96,10 +105,11 @@ export default async function ProductDetailPage({ params }) {
             <div className="relative aspect-square w-full">
               <Image
                 src={product.image.url}
-                alt={`${product.name} product image`}
+                alt={[product.name, product.category].filter(Boolean).join(" — ")}
                 fill
                 priority
                 sizes="(min-width: 1024px) 512px, 100vw"
+                unoptimized={!product.image.optimized}
                 className="object-cover"
               />
             </div>
@@ -167,6 +177,32 @@ export default async function ProductDetailPage({ params }) {
           ) : null}
         </div>
       </div>
+
+      {alsoFrom.length && company ? (
+        <section aria-labelledby="also-heading" className="mt-14">
+          <h2
+            id="also-heading"
+            className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white"
+          >
+            More products from {company.name}
+          </h2>
+          <ul className="mt-6 grid list-none gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {alsoFrom.map((other) => (
+              <li key={other.id}>
+                <ProductCard product={other} className="h-full" />
+              </li>
+            ))}
+          </ul>
+          <p className="mt-5 text-[15px]">
+            <Link
+              href={companyPath(company.name, company.id)}
+              className="font-semibold text-[#131C55] underline-offset-4 hover:underline dark:text-blue-300"
+            >
+              See everything {company.name} is showcasing
+            </Link>
+          </p>
+        </section>
+      ) : null}
     </article>
   );
 }

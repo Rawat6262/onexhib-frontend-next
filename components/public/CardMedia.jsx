@@ -3,10 +3,10 @@ import Image from "next/image";
 /**
  * Image slot for every public card, with the branded placeholder fallback.
  *
- * lib/public-api.js only ever returns Cloudinary-hosted images (see
- * toPublicImage there for the measurements behind that policy), so `image` is
- * null for most records today. Rather than leaving a hole, the fallback is a
- * deliberate brand mark: a navy field, a subtle grid, and the record's initials.
+ * `image` is null whenever the record has no usable image URL at all (see
+ * toPublicImage in lib/public-api.js). Rather than leaving a hole, the fallback
+ * is a deliberate brand mark: a navy field, a subtle grid, and the record's
+ * initials.
  * It is drawn in CSS/SVG, costs no request, and cannot 404.
  *
  * The initials make placeholders distinguishable from each other in a grid,
@@ -23,10 +23,16 @@ export default function CardMedia({
   aspect = "aspect-[16/10]",
   priority = false,
   className = "",
+  // Cards crop to fill; small slots (a 56px logo tile) letterbox instead, since
+  // cropping a wordmark to a square cuts half the name off. `fit` picks which,
+  // and `bg` is the field the letterboxing shows — navy is right behind a photo,
+  // wrong behind a logo drawn for a white page.
+  fit = "cover",
+  bg = "bg-[#131C55]",
 }) {
   return (
     <div
-      className={`relative ${aspect} w-full overflow-hidden bg-[#131C55] ${className}`}
+      className={`relative ${aspect} w-full overflow-hidden ${image ? bg : "bg-[#131C55]"} ${className}`}
     >
       {image ? (
         <Image
@@ -35,7 +41,11 @@ export default function CardMedia({
           fill
           sizes={sizes}
           priority={priority}
-          className="object-cover"
+          // Most record images are hotlinked from hosts we do not control, so
+          // they are not in remotePatterns and cannot go through the optimiser.
+          // See toPublicImage in lib/public-api.js.
+          unoptimized={!image.optimized}
+          className={fit === "contain" ? "object-contain p-1.5" : "object-cover"}
         />
       ) : (
         <Placeholder label={label} />

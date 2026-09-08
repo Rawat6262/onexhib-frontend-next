@@ -33,5 +33,8 @@
     "eslint-config-next": "^15.5.4",
     "tailwindcss": "^4.1.11",
     "tw-animate-css": "^1.3.6"
+  },
+  "overrides": {
+    "postcss": "^8.5.28"
   }
 }

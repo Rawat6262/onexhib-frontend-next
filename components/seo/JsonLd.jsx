@@ -1,46 +1,22 @@
-import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/seo";
-
 /**
- * Structured data for the public homepage.
+ * Renders a JSON-LD @graph into the page.
  *
- * Kept deliberately minimal: only facts already stated on the site or in the
- * codebase (name, URL, logo, support email). No invented founding dates,
- * addresses, ratings or social profiles — fabricated structured data is a real
- * risk of a manual action, not a shortcut.
+ * Generic on purpose: every public page builds its own graph from the node
+ * builders in lib/jsonld.js and hands it here, so there is exactly one place
+ * that writes a <script type="application/ld+json"> tag.
  */
-export default function JsonLd() {
-  const graph = {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "Organization",
-        "@id": `${SITE_URL}/#organization`,
-        name: SITE_NAME,
-        url: SITE_URL,
-        logo: `${SITE_URL}/Dark.png`,
-        contactPoint: {
-          "@type": "ContactPoint",
-          email: "onexhib@gmail.com",
-          contactType: "customer support",
-        },
-      },
-      {
-        "@type": "WebSite",
-        "@id": `${SITE_URL}/#website`,
-        url: SITE_URL,
-        name: SITE_NAME,
-        description: SITE_DESCRIPTION,
-        publisher: { "@id": `${SITE_URL}/#organization` },
-        inLanguage: "en",
-      },
-    ],
-  };
+export default function JsonLd({ graph }) {
+  if (!graph?.["@graph"]?.length) return null;
 
   return (
     <script
       type="application/ld+json"
-      // Fixed object built above, never user input.
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(graph) }}
+      // Serialised from objects this codebase builds, never from user input.
+      // The </script> escape guards against a record whose name or description
+      // contains markup breaking out of the script element.
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify(graph).replace(/</g, "\u003c"),
+      }}
     />
   );
 }

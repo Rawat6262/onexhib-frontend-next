@@ -55,7 +55,7 @@ const OtpInput = forwardRef(function OtpInput({ value, onChange }, ref) {
           value={digit}
           onChange={(e) => handleChange(index, e.target.value)}
           onKeyDown={(e) => handleKeyDown(index, e)}
-          className="w-9 h-9 sm:w-12 sm:h-12 text-center text-lg sm:text-xl font-bold rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-900 transition outline-none"
+          className="w-9 h-9 sm:w-12 sm:h-12 text-center text-lg sm:text-xl font-bold rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:border-[#131C55] focus:ring-2 focus:ring-[#131C55]/20 dark:focus:border-blue-400 dark:focus:ring-blue-400/20 transition outline-none"
         />
       ))}
     </div>

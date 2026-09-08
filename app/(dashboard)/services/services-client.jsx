@@ -1,16 +1,29 @@
 "use client";
 
 // Migrated from views/service/ServiceListView.jsx.
-// Behaviour, markup and classes are unchanged. The sidebar comes from
-// app/(dashboard)/layout.jsx and navigation uses next/navigation with the
-// new clean routes.
+// Behaviour is unchanged; the presentation now uses the shared primitives in
+// components/dashboard/ui.jsx so this screen matches the public site. The old
+// markup set font-serif on the page root (the site is Poppins) and used
+// blue-500/green-500/red-400 accents that appear nowhere on the public pages.
 import dynamic from "next/dynamic";
 import { useEffect, useState, useMemo } from "react";
+import { Pencil, Plus, Search, Trash2 } from "lucide-react";
 
 import {
   getAdminExhibitionServices,
   deleteExhibitionService,
 } from "@/models/service.model";
+import {
+  PageHeader,
+  Panel,
+  StatCard,
+  NoResults,
+  btnPrimary,
+  btnRow,
+  btnRowDanger,
+  inputBase,
+  pill,
+} from "@/components/dashboard/ui";
 
 // Modals are only needed once opened, so their code (and for the location
 // forms, country-state-city's ~2.3 MB dataset) is split out of this page's
@@ -85,229 +98,266 @@ export default function ServicesClient() {
   }, {});
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FFFFFF] dark:bg-gray-950 text-gray-900 dark:text-gray-100 font-serif">
+    <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
+      <PageHeader
+        title="Exhibition services"
+        intro="The service providers listed on your account, across the seven categories the platform supports."
+        actions={
+          <button type="button" className={btnPrimary} onClick={() => setShowModal(true)}>
+            <Plus size={16} aria-hidden="true" />
+            Add service
+          </button>
+        }
+      />
 
-      <div className="flex-1 w-full mt-8 flex flex-col border border-gray-300 dark:border-gray-700 md:mx-4 lg:mx-6 bg-white dark:bg-gray-900 rounded-lg shadow-md overflow-y-auto">
-        {/* Header */}
-        <div className="h-20 w-full flex flex-col sm:flex-row justify-between items-center px-8 border-b border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 rounded-t-lg">
-          <h1 className="flex-1 font-bold text-3xl tracking-wide">Services</h1>
-        </div>
+      {showModal && (
+        <ExhibitionServicePopupForm
+          onClose={() => {
+            setShowModal(false);
+            fetchServices();
+          }}
+        />
+      )}
 
-        {/* Summary Cards */}
-        <div className="w-full px-3 sm:px-4 mt-6 grid grid-cols-2 sm:flex sm:flex-wrap gap-3 sm:gap-4 justify-start">
-          <div className="h-20 sm:h-24 sm:w-48 rounded-xl flex flex-col justify-center items-center bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 shadow-sm px-2">
-            <p className="text-xs sm:text-lg font-medium text-gray-700 dark:text-gray-300 text-center">Total Services</p>
-            <p className="text-2xl sm:text-4xl font-bold text-gray-900 dark:text-gray-100">{services.length}</p>
-          </div>
-          {SERVICE_NAMES.map((name) => (
-            <div
-              key={name}
-              className="h-20 sm:h-24 sm:w-48 rounded-xl flex flex-col justify-center items-center bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 shadow-sm px-2 text-center"
-            >
-              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 leading-tight">{name}</p>
-              <p className="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400 mt-1">{serviceCounts[name] || 0}</p>
-            </div>
-          ))}
-        </div>
+      {/* Totals first, then the per-category breakdown. Same StatCard as the
+          organiser screen, so the two pages read as one product. */}
+      <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <StatCard label="services listed" value={services.length} accent />
+        {SERVICE_NAMES.map((name) => (
+          <StatCard key={name} label={name} value={serviceCounts[name] || 0} />
+        ))}
+      </div>
 
-        {/* Table Section */}
-        <div className="flex-1 w-full px-3 sm:px-4 mt-8 rounded-b-lg border border-t-0 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm pb-8 mb-8">
-          {/* Controls */}
-          <div className="py-4 w-full flex flex-col lg:flex-row justify-between gap-4 px-4 text-center">
-            <h2 className="font-bold text-2xl sm:text-3xl text-gray-800 dark:text-gray-100">Service Providers</h2>
-            <div className="flex flex-col sm:flex-row gap-4 justify-end">
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                  setCurrentPage(1);
-                }}
-                placeholder="Search Services"
-                className="h-10 w-full sm:w-64 border border-gray-400 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-md text-gray-700 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-500 px-3 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              />
-              <button
-                className="h-10 w-full sm:w-48 border-2 border-blue-500 text-blue-500 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-950 rounded-md font-semibold transition-colors"
-                onClick={() => setShowModal(true)}
-              >
-                + Add Service
-              </button>
-            </div>
-          </div>
-
-          {showModal && (
-            <ExhibitionServicePopupForm
-              onClose={() => {
-                setShowModal(false);
-                fetchServices();
-              }}
+      <Panel
+        title="Service providers"
+        count={`${filteredData.length} ${filteredData.length === 1 ? "provider" : "providers"}`}
+        toolbar={
+          <div className="relative sm:w-72">
+            <Search
+              size={16}
+              aria-hidden="true"
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
             />
-          )}
-
-          {/* List */}
-          <div className="flex-1 w-full mt-6">
-            {paginatedData.length === 0 ? (
-              <p className="p-6 text-center text-gray-600 dark:text-gray-400 italic">No services found</p>
-            ) : (
-              <>
-                {/* Card list — phones only */}
-                <div className="sm:hidden flex flex-col gap-3 px-4">
-                  {paginatedData.map((item, index) => (
-                    <div key={item._id || index} className="rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm p-4">
-                      <div className="flex items-center gap-3">
-                        {item.image?.url ? (
-                          <img
-                            src={item.image.url}
-                            alt={item.full_name}
-                            className="h-10 w-10 rounded-full object-cover border border-gray-300 dark:border-gray-700 shrink-0"
-                          />
-                        ) : (
-                          <div className="h-10 w-10 shrink-0 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-300 text-xs font-bold">
-                            {item.full_name?.charAt(0).toUpperCase()}
-                          </div>
-                        )}
-                        <div>
-                          <p className="font-semibold text-gray-900 dark:text-gray-100">
-                            {startIndex + index + 1}. {item.full_name}
-                          </p>
-                          <span className="inline-block mt-0.5 px-2 py-0.5 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 text-xs font-semibold rounded-full border border-blue-200 dark:border-blue-900">
-                            {item.service_name}
-                          </span>
-                        </div>
-                      </div>
-                      <dl className="mt-2 space-y-1 text-sm text-gray-600 dark:text-gray-400">
-                        <div className="flex gap-1">
-                          <dt className="font-medium text-gray-500 dark:text-gray-400">Location:</dt>
-                          <dd className="truncate">{[item.city, item.state, item.country].filter(Boolean).join(", ") || "—"}</dd>
-                        </div>
-                        <div className="flex gap-1">
-                          <dt className="font-medium text-gray-500 dark:text-gray-400">Mobile:</dt>
-                          <dd>{item.mobile_number || "—"}</dd>
-                        </div>
-                      </dl>
-                      <div className="flex items-center gap-2 mt-3">
-                        <button
-                          className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 border border-green-500 text-green-600 dark:text-green-400 rounded-md hover:bg-green-50 dark:hover:bg-green-950 transition text-sm font-medium"
-                          onClick={() => setEditingId(item._id)}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 border border-red-400 text-red-500 dark:text-red-400 rounded-md hover:bg-red-50 dark:hover:bg-red-950 transition text-sm font-medium"
-                          onClick={() => handleDelete(item._id)}
-                        >
-                          Delete
-                        </button>
-                      </div>
+            <input
+              type="search"
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setCurrentPage(1);
+              }}
+              placeholder="Search services"
+              aria-label="Search services"
+              className={`${inputBase} pl-9`}
+            />
+          </div>
+        }
+      >
+        {paginatedData.length === 0 ? (
+          <NoResults>
+            {search ? `No services match "${search}".` : "No services have been added yet."}
+          </NoResults>
+        ) : (
+          <>
+            {/* Card list — phones only */}
+            <ul className="list-none divide-y divide-gray-200 sm:hidden dark:divide-gray-800">
+              {paginatedData.map((item, index) => (
+                <li key={item._id || index} className="px-5 py-4">
+                  <div className="flex items-center gap-3">
+                    <Avatar item={item} />
+                    <div className="min-w-0">
+                      <p className="truncate font-semibold text-gray-900 dark:text-gray-100">
+                        {item.full_name}
+                      </p>
+                      <span className={`${pill} mt-1`}>{item.service_name}</span>
                     </div>
+                  </div>
+                  <dl className="mt-3 space-y-1 text-sm text-gray-600 dark:text-gray-400">
+                    <div className="flex gap-1.5">
+                      <dt className="text-gray-500 dark:text-gray-500">Location</dt>
+                      <dd className="truncate">
+                        {[item.city, item.state, item.country].filter(Boolean).join(", ") || "—"}
+                      </dd>
+                    </div>
+                    <div className="flex gap-1.5">
+                      <dt className="text-gray-500 dark:text-gray-500">Mobile</dt>
+                      <dd>{item.mobile_number || "—"}</dd>
+                    </div>
+                  </dl>
+                  <div className="mt-3 flex gap-2">
+                    <button type="button" className={btnRow} onClick={() => setEditingId(item._id)}>
+                      <Pencil size={14} aria-hidden="true" />
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      className={btnRowDanger}
+                      onClick={() => handleDelete(item._id)}
+                      disabled={deletingId === item._id}
+                    >
+                      <Trash2 size={14} aria-hidden="true" />
+                      Delete
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+
+            {/* Table — sm and up */}
+            <div className="hidden max-h-[70vh] overflow-auto overscroll-contain sm:block">
+              <table className="w-full min-w-[820px] text-left text-sm">
+                <thead>
+                  <tr className="border-b border-gray-200 dark:border-gray-800">
+                    {["#", "", "Name", "Service", "Location", "Mobile", ""].map((header, i) => (
+                      <th
+                        key={header || `col-${i}`}
+                        scope="col"
+                        className="sticky top-0 z-10 bg-gray-50 px-5 py-3 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:bg-gray-800/80 dark:text-gray-400"
+                      >
+                        {header}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
+                  {paginatedData.map((item, index) => (
+                    <tr
+                      key={item._id || index}
+                      className="transition hover:bg-gray-50 motion-reduce:transition-none dark:hover:bg-gray-800/50"
+                    >
+                      <td className="px-5 py-3.5 text-gray-500 dark:text-gray-400">
+                        {startIndex + index + 1}
+                      </td>
+                      <td className="py-3.5 pl-5 pr-0">
+                        <Avatar item={item} />
+                      </td>
+                      <td className="px-5 py-3.5 font-medium text-gray-900 dark:text-gray-100">
+                        {item.full_name}
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <span className={pill}>{item.service_name}</span>
+                      </td>
+                      <td className="px-5 py-3.5 text-gray-600 dark:text-gray-400">
+                        {[item.city, item.state, item.country].filter(Boolean).join(", ") || "—"}
+                      </td>
+                      <td className="px-5 py-3.5 text-gray-600 dark:text-gray-400">
+                        {item.mobile_number || "—"}
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <div className="flex justify-end gap-2">
+                          <button
+                            type="button"
+                            className={btnRow}
+                            onClick={() => setEditingId(item._id)}
+                          >
+                            <Pencil size={14} aria-hidden="true" />
+                            Edit
+                          </button>
+                          <button
+                            type="button"
+                            className={btnRowDanger}
+                            onClick={() => handleDelete(item._id)}
+                            disabled={deletingId === item._id}
+                          >
+                            <Trash2 size={14} aria-hidden="true" />
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
                   ))}
-                </div>
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
 
-                {/* Table — sm and up */}
-                <div className="hidden sm:block overflow-auto max-h-[70vh] overscroll-contain rounded-md text-left">
-                  <table className="w-full min-w-[700px] border-collapse border border-gray-300 dark:border-gray-700">
-                    <thead>
-                      <tr className="bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-b border-gray-300 dark:border-gray-700">
-                        {["#", "Image", "Full Name", "Service", "Location", "Mobile", "Action"].map((header) => (
-                          <th key={header} className="px-4 py-3 border-r border-gray-300 dark:border-gray-700 last:border-r-0 sticky top-0 z-10 bg-gray-200 dark:bg-gray-800 shadow-[inset_-1px_-1px_0_0_#d1d5db] dark:shadow-[inset_-1px_-1px_0_0_#374151] last:shadow-[inset_0_-1px_0_0_#d1d5db] dark:last:shadow-[inset_0_-1px_0_0_#374151]">
-                            {header}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {paginatedData.map((item, index) => (
-                        <tr
-                          key={item._id || index}
-                          className={index % 2 === 0 ? "bg-white dark:bg-gray-900" : "bg-gray-50 dark:bg-gray-800"}
-                        >
-                          <td className="px-4 py-3 border border-gray-300 dark:border-gray-700">{startIndex + index + 1}</td>
+        {/* Mounted only while editing, exactly as before: the popup takes
+            {serviceId, onClose} and fetches on mount, so it must not render
+            with a null id. */}
+        {editingId && (
+          <ServiceEditPopup
+            serviceId={editingId}
+            onClose={() => {
+              setEditingId(null);
+              fetchServices();
+            }}
+          />
+        )}
 
-                          <td className="px-4 py-3 border border-gray-300 dark:border-gray-700">
-                            {item.image?.url ? (
-                              <img
-                                src={item.image.url}
-                                alt={item.full_name}
-                                className="h-10 w-10 rounded-full object-cover border border-gray-300 dark:border-gray-700"
-                              />
-                            ) : (
-                              <div className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-300 text-xs font-bold">
-                                {item.full_name?.charAt(0).toUpperCase()}
-                              </div>
-                            )}
-                          </td>
-
-                          <td className="px-4 py-3 border border-gray-300 dark:border-gray-700 font-medium">{item.full_name}</td>
-
-                          <td className="px-4 py-3 border border-gray-300 dark:border-gray-700">
-                            <span className="px-2 py-1 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 text-xs font-semibold rounded-full border border-blue-200 dark:border-blue-900">
-                              {item.service_name}
-                            </span>
-                          </td>
-
-                          <td className="px-4 py-3 border border-gray-300 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-400">
-                            {[item.city, item.state, item.country].filter(Boolean).join(", ")}
-                          </td>
-
-                          <td className="px-4 py-3 border border-gray-300 dark:border-gray-700 text-sm">{item.mobile_number}</td>
-
-                          <td className="px-4 py-3 border border-gray-300 dark:border-gray-700">
-                            <div className="flex gap-2">
-                              <button
-                                className="flex items-center gap-1 px-3 py-1 border border-green-500 text-green-600 dark:text-green-400 rounded-md hover:bg-green-50 dark:hover:bg-green-950 transition text-sm font-medium"
-                                onClick={() => setEditingId(item._id)}
-                              >
-                                Edit
-                              </button>
-                              <button
-                                className="flex items-center gap-1 px-3 py-1 border border-red-400 text-red-500 dark:text-red-400 rounded-md hover:bg-red-50 dark:hover:bg-red-950 transition text-sm font-medium"
-                                onClick={() => handleDelete(item._id)}
-                              >
-                                Delete
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </>
-            )}
-          </div>
-
-          {editingId && (
-            <ServiceEditPopup
-              serviceId={editingId}
-              onClose={() => {
-                setEditingId(null);
-                fetchServices();
-              }}
-            />
-          )}
-
-          {/* Pagination */}
-          <div className="mt-6 flex justify-center gap-4 items-center">
+        <div className="flex flex-col items-center justify-between gap-3 border-t border-gray-200 px-5 py-4 sm:flex-row dark:border-gray-800">
+          <p className="text-[13px] text-gray-500 dark:text-gray-400">
+            Showing{" "}
+            <span className="font-medium text-gray-700 dark:text-gray-300">
+              {filteredData.length === 0 ? 0 : startIndex + 1}–
+              {Math.min(startIndex + itemsPerPage, filteredData.length)}
+            </span>{" "}
+            of{" "}
+            <span className="font-medium text-gray-700 dark:text-gray-300">
+              {filteredData.length}
+            </span>
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-1">
             <button
+              type="button"
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
-              className="px-4 py-2 border-2 border-blue-500 text-blue-500 dark:text-blue-400 rounded-md hover:bg-blue-100 dark:hover:bg-blue-950 disabled:opacity-50"
+              className={pageBtn}
+              aria-label="Previous page"
             >
-              Previous
+              ‹
             </button>
-            <span className="text-gray-700 dark:text-gray-300 font-semibold">
-              Page {currentPage} of {totalPages}
-            </span>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                type="button"
+                onClick={() => handlePageChange(page)}
+                aria-current={page === currentPage ? "page" : undefined}
+                className={page === currentPage ? pageBtnActive : pageBtn}
+              >
+                {page}
+              </button>
+            ))}
             <button
+              type="button"
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="px-4 py-2 border-2 border-blue-500 text-blue-500 dark:text-blue-400 rounded-md hover:bg-blue-100 dark:hover:bg-blue-950 disabled:opacity-50"
+              className={pageBtn}
+              aria-label="Next page"
             >
-              Next
+              ›
             </button>
           </div>
         </div>
-      </div>
+      </Panel>
     </div>
   );
 }
+
+/** Provider avatar, falling back to an initial on the brand navy. */
+function Avatar({ item }) {
+  if (item.image?.url) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element -- provider images are
+      // arbitrary remote URLs, not in next.config remotePatterns.
+      <img
+        src={item.image.url}
+        alt=""
+        className="h-9 w-9 shrink-0 rounded-full border border-gray-200 object-cover dark:border-gray-700"
+      />
+    );
+  }
+  return (
+    <div
+      aria-hidden="true"
+      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#131C55] text-xs font-bold text-white"
+    >
+      {item.full_name?.charAt(0).toUpperCase() || "?"}
+    </div>
+  );
+}
+
+const pageBtn =
+  "flex h-8 w-8 items-center justify-center rounded-lg border border-gray-300 text-sm text-gray-600 transition hover:border-[#131C55] hover:text-[#131C55] disabled:cursor-not-allowed disabled:opacity-40 motion-reduce:transition-none dark:border-gray-700 dark:text-gray-300 dark:hover:border-gray-500 dark:hover:text-white";
+
+const pageBtnActive =
+  "flex h-8 w-8 items-center justify-center rounded-lg border border-[#131C55] bg-[#131C55] text-sm font-medium text-white";

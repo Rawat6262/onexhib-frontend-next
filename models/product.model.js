@@ -11,8 +11,6 @@ export const getProductDetail = (productId) => fetch(`/api/product/detail/${prod
 export const getAdminProductsPage = ({ page = 1, limit = 50 } = {}) =>
   axios.get("/api/admin/product", { params: { page, limit } });
 
-export const deleteAllProducts = () => axios.delete("/api/admin/deleteallproduct");
-
 export const updateProduct = (productId, payload) =>
   fetch(`/api/admin/updateproduct/${productId}`, {
     method: "PUT",

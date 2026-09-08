@@ -7,8 +7,6 @@ import axios from "axios";
 export const getAdminCompaniesPage = ({ page = 1, limit = 50 } = {}) =>
   axios.get("/api/admin/company", { params: { page, limit } });
 
-export const deleteAllCompanies = () => axios.delete("/api/admin/deleteallcompany");
-
 export const getCompanyDetail = (companyId) => fetch(`/api/companydetail/${companyId}`);
 
 export const updateCompany = (companyId, payload) =>

@@ -3,9 +3,21 @@
 import dynamic from "next/dynamic";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { Pencil, Plus, Search } from "lucide-react";
 
 import { getExhibitions } from "@/models/exhibition.model";
 import { getPageNumbers } from "@/lib/paginate";
+import {
+  PageHeader,
+  Panel,
+  StatCard,
+  NoResults,
+  btnPrimary,
+  btnSecondary,
+  btnRow,
+  inputBase,
+  pill,
+} from "@/components/dashboard/ui";
 
 // Modals are only needed once opened, so their code (and for the location
 // forms, country-state-city's ~2.3 MB dataset) is split out of this page's
@@ -18,9 +30,12 @@ const ExhibitionUploadModal = dynamic(() => import("@/components/popups/Exhibiti
 /**
  * Migrated from views/organiser/OrganiserView.jsx.
  *
- * Unchanged: data fetching, search, pagination, all popups and every class.
- * Changed: the sidebar is no longer rendered here (app/(dashboard)/layout.jsx
- * owns it), and navigation targets use the new clean routes.
+ * Unchanged: data fetching, search, pagination and every popup.
+ * Changed: the shell comes from app/(dashboard)/layout.jsx, and the
+ * presentation now uses the shared primitives in components/dashboard/ui.jsx
+ * so this screen matches the public site. The old markup carried font-serif on
+ * the page root (the site is Poppins), a hardcoded "SEM GROUP" title left over
+ * from a demo, and blue-500/green-500 accents used nowhere else in the product.
  */
 export default function OrganiserClient() {
   const [isOpen, setIsOpen] = useState(false);
@@ -72,234 +87,229 @@ export default function OrganiserClient() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FFFFFF] dark:bg-gray-950 text-gray-900 dark:text-gray-100 font-serif">
-      <div className="flex-1 w-full mt-8 flex flex-col border border-gray-300 dark:border-gray-700 md:mx-4 lg:mx-6 bg-white dark:bg-gray-900 rounded-lg shadow-md overflow-y-auto">
-        {/* Header */}
-        <div className="h-20 w-full flex flex-col sm:flex-row justify-between items-center px-8 border-b border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 rounded-t-lg">
-          <h1 className="flex-1 font-bold text-3xl tracking-wide">SEM GROUP</h1>
-          <button
-            onClick={() => setorganiser(true)}
-            className="h-10 w-full sm:w-64 border-2 border-blue-500 text-blue-500 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-950 rounded-md font-semibold transition-colors"
-          >
-            View Organiser Details
-          </button>
-          {showorganiser && <OrganiserPopup Cl={() => setorganiser(false)} data={id} />}
-        </div>
+    <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
+      <PageHeader
+        title="Your exhibitions"
+        intro="The exhibitions you have listed. Add one at a time, or import a batch from a spreadsheet."
+        actions={
+          <>
+            <button type="button" className={btnSecondary} onClick={() => setorganiser(true)}>
+              Organiser details
+            </button>
+            <button type="button" className={btnSecondary} onClick={() => setIsOpen(true)}>
+              Upload Excel
+            </button>
+            <button type="button" className={btnPrimary} onClick={() => setShowModal(true)}>
+              <Plus size={16} aria-hidden="true" />
+              Add exhibition
+            </button>
+          </>
+        }
+      />
 
-        {/* Summary Cards */}
-        <div className="w-full px-3 sm:px-4 mt-6 grid grid-cols-2 sm:flex sm:flex-wrap gap-3 sm:gap-6 justify-start">
-          {[{ title: "Exhibitions", value: exhibitions.length }, { title: "Companies", value: 1 }].map(
-            (card) => (
-              <div
-                key={card.title}
-                className="h-20 sm:h-24 sm:w-48 rounded-xl flex flex-col justify-center items-center bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 shadow-sm px-2"
-              >
-                <p className="text-xs sm:text-lg font-medium text-gray-700 dark:text-gray-300 text-center">{card.title}</p>
-                <p className="text-2xl sm:text-4xl font-bold text-gray-900 dark:text-gray-100">{card.value}</p>
-              </div>
-            )
-          )}
-        </div>
+      {showorganiser && <OrganiserPopup Cl={() => setorganiser(false)} data={id} />}
+      <ExhibitionUploadModal isOpen={isOpen} onClose={() => setIsOpen(false)} onSuccess={fetchExhibitions} />
+      {showModal && (
+        <ExhibitionPopupForm
+          onClose={() => {
+            setShowModal(false);
+            fetchExhibitions();
+          }}
+        />
+      )}
 
-        {/* Table Section */}
-        <div className="flex-1 w-full px-3 sm:px-4 mt-8 rounded-b-lg border border-t-0 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm pb-8 mb-8">
-          {/* Controls */}
-          <div className="py-4 w-full flex flex-col lg:flex-row justify-between gap-4 px-4 text-center">
-            <h2 className="font-bold text-2xl sm:text-3xl text-gray-800 dark:text-gray-100">Exhibition List</h2>
-            <div className="flex flex-col sm:flex-row gap-4 justify-end">
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                  setCurrentPage(1);
-                }}
-                placeholder="Search Exhibitions"
-                className="h-10 w-full sm:w-64 border border-gray-400 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-md text-gray-700 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-500 px-3 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              />
-              <button
-                className="h-10 w-full sm:w-48 border-2 border-blue-500 text-blue-500 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-950 rounded-md font-semibold transition-colors"
-                onClick={() => setIsOpen(true)}
-              >
-                Upload Excel
-              </button>
-              <button
-                className="h-10 w-full sm:w-48 border-2 border-blue-500 text-blue-500 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-950 rounded-md font-semibold transition-colors"
-                onClick={() => setShowModal(true)}
-              >
-                + Add Exhibition
-              </button>
-
-              <ExhibitionUploadModal
-                isOpen={isOpen}
-                onClose={() => setIsOpen(false)}
-                onSuccess={fetchExhibitions}
-              />
-            </div>
-          </div>
-
-          {showModal && (
-            <ExhibitionPopupForm
-              onClose={() => {
-                setShowModal(false);
-                fetchExhibitions();
-              }}
-            />
-          )}
-
-          {/* List */}
-          <div className="flex-1 w-full mt-6">
-            {paginatedData.length === 0 ? (
-              <p className="p-6 text-center text-gray-600 dark:text-gray-400 italic">No data found</p>
-            ) : (
-              <>
-                {/* Card list — phones only */}
-                <div className="sm:hidden flex flex-col gap-3 px-4">
-                  {paginatedData.map((item, index) => (
-                    <div key={item._id || index} className="rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm p-4">
-                      <p className="font-semibold text-gray-900 dark:text-gray-100">
-                        {startIndex + index + 1}. {item.exhibition_name}
-                      </p>
-                      <dl className="mt-2 space-y-1 text-sm text-gray-600 dark:text-gray-400">
-                        <div className="flex gap-1">
-                          <dt className="font-medium text-gray-500 dark:text-gray-400">Category:</dt>
-                          <dd>{item.category || "—"}</dd>
-                        </div>
-                        <div className="flex gap-1">
-                          <dt className="font-medium text-gray-500 dark:text-gray-400">Address:</dt>
-                          <dd className="truncate">{item.exhibition_address || "—"}</dd>
-                        </div>
-                      </dl>
-                      <div className="flex items-center gap-2 mt-3">
-                        <button
-                          className="flex-1 border-2 border-blue-500 text-blue-500 dark:text-blue-400 rounded-md px-3 py-1.5 hover:bg-blue-100 dark:hover:bg-blue-950 transition-colors"
-                          onClick={() => router.push(`/exhibitions/${item._id}`)}
-                        >
-                          View
-                        </button>
-                        <button
-                          className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 border border-green-500 text-green-500 dark:text-green-400 rounded-md hover:bg-green-100 dark:hover:bg-green-950 transition"
-                          onClick={() => setEditingId(item._id)}
-                        >
-                          Edit
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Table — sm and up */}
-                <div className="hidden sm:block overflow-auto max-h-[70vh] overscroll-contain rounded-md text-left">
-                  <table className="w-full min-w-[700px] border-collapse border border-gray-300 dark:border-gray-700">
-                    <thead>
-                      <tr className="bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-b border-gray-300 dark:border-gray-700">
-                        {["#", "Exhibition Name", "Address", "Category", "Action"].map((header) => (
-                          <th
-                            key={header}
-                            className="px-4 py-3 border-r border-gray-300 dark:border-gray-700 last:border-r-0 sticky top-0 z-10 bg-gray-200 dark:bg-gray-800 shadow-[inset_-1px_-1px_0_0_#d1d5db] dark:shadow-[inset_-1px_-1px_0_0_#374151] last:shadow-[inset_0_-1px_0_0_#d1d5db] dark:last:shadow-[inset_0_-1px_0_0_#374151]"
-                          >
-                            {header}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {paginatedData.map((item, index) => (
-                        <tr
-                          key={item._id || index}
-                          className={index % 2 === 0 ? "bg-white dark:bg-gray-900" : "bg-gray-50 dark:bg-gray-800"}
-                        >
-                          <td className="px-4 py-3 border border-gray-300 dark:border-gray-700">
-                            {startIndex + index + 1}
-                          </td>
-                          <td className="px-4 py-3 border border-gray-300 dark:border-gray-700">
-                            {item.exhibition_name}
-                          </td>
-                          <td className="px-4 py-3 border border-gray-300 dark:border-gray-700">
-                            {item.exhibition_address}
-                          </td>
-                          <td className="px-4 py-3 border border-gray-300 dark:border-gray-700">
-                            {item.category}
-                          </td>
-                          <td className="px-4 py-3 border border-gray-300 dark:border-gray-700 flex gap-2">
-                            <button
-                              className="border-2 border-blue-500 text-blue-500 dark:text-blue-400 rounded-md px-3 py-1 hover:bg-blue-100 dark:hover:bg-blue-950 transition-colors"
-                              onClick={() => router.push(`/exhibitions/${item._id}`)}
-                            >
-                              View
-                            </button>
-                            <button
-                              className="flex items-center gap-1 px-3 py-1 border border-green-500 text-green-500 dark:text-green-400 rounded-md hover:bg-green-100 dark:hover:bg-green-950 transition"
-                              onClick={() => setEditingId(item._id)}
-                            >
-                              Edit
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </>
-            )}
-          </div>
-
-          <ExhibitionEditPopup
-            open={Boolean(editingId)}
-            exhibitionId={editingId}
-            onClose={() => setEditingId(null)}
-          />
-
-          {/* Pagination Controls */}
-          <div className="mt-6 px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Showing{" "}
-              <span className="font-medium text-gray-700 dark:text-gray-300">
-                {filteredData.length === 0 ? 0 : startIndex + 1}–
-                {Math.min(startIndex + itemsPerPage, filteredData.length)}
-              </span>{" "}
-              of <span className="font-medium text-gray-700 dark:text-gray-300">{filteredData.length}</span> exhibitions
-            </p>
-            <div className="flex gap-1 items-center flex-wrap justify-center">
-              <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="w-8 h-8 flex items-center justify-center rounded-md border border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed text-sm"
-                aria-label="Previous page"
-              >
-                ‹
-              </button>
-              {getPageNumbers(currentPage, totalPages).map((page, i) =>
-                page === "..." ? (
-                  <span key={`dots-${i}`} className="w-8 h-8 flex items-center justify-center text-gray-400 dark:text-gray-500 text-sm">
-                    …
-                  </span>
-                ) : (
-                  <button
-                    key={page}
-                    onClick={() => handlePageChange(page)}
-                    className={`w-8 h-8 flex items-center justify-center rounded-md border text-sm font-medium transition-colors ${
-                      page === currentPage
-                        ? "bg-blue-600 border-blue-600 text-white"
-                        : "border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-                    }`}
-                  >
-                    {page}
-                  </button>
-                )
-              )}
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="w-8 h-8 flex items-center justify-center rounded-md border border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed text-sm"
-                aria-label="Next page"
-              >
-                ›
-              </button>
-            </div>
-          </div>
-        </div>
+      <div className="mt-8 grid grid-cols-2 gap-4 sm:max-w-md">
+        <StatCard label="exhibitions listed" value={exhibitions.length} />
+        <StatCard label="showing after search" value={filteredData.length} accent />
       </div>
+
+      <Panel
+        title="Exhibition list"
+        count={`${filteredData.length} ${filteredData.length === 1 ? "exhibition" : "exhibitions"}`}
+        toolbar={
+          <div className="relative sm:w-72">
+            <Search
+              size={16}
+              aria-hidden="true"
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+            />
+            <input
+              type="search"
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setCurrentPage(1);
+              }}
+              placeholder="Search exhibitions"
+              aria-label="Search exhibitions"
+              className={`${inputBase} pl-9`}
+            />
+          </div>
+        }
+      >
+        {paginatedData.length === 0 ? (
+          <NoResults>
+            {search ? `No exhibitions match "${search}".` : "You have not added any exhibitions yet."}
+          </NoResults>
+        ) : (
+          <>
+            {/* Card list — phones only */}
+            <ul className="list-none divide-y divide-gray-200 sm:hidden dark:divide-gray-800">
+              {paginatedData.map((item, index) => (
+                <li key={item._id || index} className="px-5 py-4">
+                  <p className="font-semibold text-gray-900 dark:text-gray-100">
+                    {item.exhibition_name}
+                  </p>
+                  {item.category ? <p className={`${pill} mt-1.5`}>{item.category}</p> : null}
+                  <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                    {item.exhibition_address || "No address given"}
+                  </p>
+                  <div className="mt-3 flex gap-2">
+                    <button
+                      type="button"
+                      className={btnRow}
+                      onClick={() => router.push(`/exhibitions/${item._id}`)}
+                    >
+                      View
+                    </button>
+                    <button type="button" className={btnRow} onClick={() => setEditingId(item._id)}>
+                      <Pencil size={14} aria-hidden="true" />
+                      Edit
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+
+            {/* Table — sm and up. Row dividers rather than a border on every
+                cell: the public site has no gridlines anywhere, and the boxed
+                table was the loudest element on the page. */}
+            <div className="hidden max-h-[70vh] overflow-auto overscroll-contain sm:block">
+              <table className="w-full min-w-[700px] text-left text-sm">
+                <thead>
+                  <tr className="border-b border-gray-200 dark:border-gray-800">
+                    {["#", "Exhibition", "Address", "Category", ""].map((header) => (
+                      <th
+                        key={header || "actions"}
+                        scope="col"
+                        className="sticky top-0 z-10 bg-gray-50 px-5 py-3 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:bg-gray-800/80 dark:text-gray-400"
+                      >
+                        {header}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
+                  {paginatedData.map((item, index) => (
+                    <tr
+                      key={item._id || index}
+                      className="transition hover:bg-gray-50 motion-reduce:transition-none dark:hover:bg-gray-800/50"
+                    >
+                      <td className="px-5 py-3.5 text-gray-500 dark:text-gray-400">
+                        {startIndex + index + 1}
+                      </td>
+                      <td className="px-5 py-3.5 font-medium text-gray-900 dark:text-gray-100">
+                        {item.exhibition_name}
+                      </td>
+                      <td className="px-5 py-3.5 text-gray-600 dark:text-gray-400">
+                        {item.exhibition_address || "—"}
+                      </td>
+                      <td className="px-5 py-3.5">
+                        {item.category ? <span className={pill}>{item.category}</span> : "—"}
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <div className="flex justify-end gap-2">
+                          <button
+                            type="button"
+                            className={btnRow}
+                            onClick={() => router.push(`/exhibitions/${item._id}`)}
+                          >
+                            View
+                          </button>
+                          <button
+                            type="button"
+                            className={btnRow}
+                            onClick={() => setEditingId(item._id)}
+                          >
+                            <Pencil size={14} aria-hidden="true" />
+                            Edit
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
+
+        <ExhibitionEditPopup
+          open={Boolean(editingId)}
+          exhibitionId={editingId}
+          onClose={() => setEditingId(null)}
+        />
+
+        <div className="flex flex-col items-center justify-between gap-3 border-t border-gray-200 px-5 py-4 sm:flex-row dark:border-gray-800">
+          <p className="text-[13px] text-gray-500 dark:text-gray-400">
+            Showing{" "}
+            <span className="font-medium text-gray-700 dark:text-gray-300">
+              {filteredData.length === 0 ? 0 : startIndex + 1}–
+              {Math.min(startIndex + itemsPerPage, filteredData.length)}
+            </span>{" "}
+            of{" "}
+            <span className="font-medium text-gray-700 dark:text-gray-300">
+              {filteredData.length}
+            </span>
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-1">
+            <button
+              type="button"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className={pageBtn}
+              aria-label="Previous page"
+            >
+              ‹
+            </button>
+            {getPageNumbers(currentPage, totalPages).map((page, i) =>
+              page === "..." ? (
+                <span
+                  key={`dots-${i}`}
+                  className="flex h-8 w-8 items-center justify-center text-sm text-gray-400"
+                >
+                  …
+                </span>
+              ) : (
+                <button
+                  key={page}
+                  type="button"
+                  onClick={() => handlePageChange(page)}
+                  aria-current={page === currentPage ? "page" : undefined}
+                  className={page === currentPage ? pageBtnActive : pageBtn}
+                >
+                  {page}
+                </button>
+              )
+            )}
+            <button
+              type="button"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className={pageBtn}
+              aria-label="Next page"
+            >
+              ›
+            </button>
+          </div>
+        </div>
+      </Panel>
     </div>
   );
 }
+
+const pageBtn =
+  "flex h-8 w-8 items-center justify-center rounded-lg border border-gray-300 text-sm text-gray-600 transition hover:border-[#131C55] hover:text-[#131C55] disabled:cursor-not-allowed disabled:opacity-40 motion-reduce:transition-none dark:border-gray-700 dark:text-gray-300 dark:hover:border-gray-500 dark:hover:text-white";
+
+const pageBtnActive =
+  "flex h-8 w-8 items-center justify-center rounded-lg border border-[#131C55] bg-[#131C55] text-sm font-medium text-white";

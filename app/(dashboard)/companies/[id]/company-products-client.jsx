@@ -108,7 +108,7 @@ export default function CompanyProductsClient({ id }) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 font-serif">
+    <div className="min-h-screen flex flex-col bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
 
       <main className="flex-1 mt-2 md:mx-4 lg:mx-6 p-4 sm:p-6">
         <div className="bg-white dark:bg-gray-900 rounded-lg shadow-md border border-gray-300 dark:border-gray-700 p-4 sm:p-6">
@@ -125,7 +125,7 @@ export default function CompanyProductsClient({ id }) {
 
     {/* Delete Company */}
     <button
-      className="px-4 py-2 border border-red-600 text-red-600 dark:text-red-400 bg-white dark:bg-gray-900 rounded-md font-semibold
+      className="px-4 py-2 border border-red-600 text-red-600 dark:text-red-400 bg-white dark:bg-gray-900 rounded-lg font-semibold
                  hover:bg-red-600 hover:text-white transition-colors"
       onClick={()=>deletecompany()  }
     >
@@ -135,8 +135,8 @@ export default function CompanyProductsClient({ id }) {
     {/* Download Brochure */}
     <button
       onClick={handleBrochureDownload}
-      className="px-4 py-2 border border-blue-600 text-blue-600 dark:text-blue-400 bg-white dark:bg-gray-900 rounded-md font-semibold
-                 hover:bg-blue-600 hover:text-white transition-colors"
+      className="px-4 py-2 border border-[#131C55] text-[#131C55] dark:text-blue-300 bg-white dark:bg-gray-900 rounded-lg font-semibold
+                 hover:bg-[#131C55] hover:text-white transition-colors"
     >
       Download Brochure
     </button>
@@ -189,16 +189,16 @@ export default function CompanyProductsClient({ id }) {
                     setCurrentPage(1);
                   }}
                   placeholder="Search Products"
-                  className="h-10 w-full sm:w-64 border border-gray-400 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-md px-3 text-gray-700 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500"
+                  className="h-10 w-full sm:w-64 border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800 rounded-lg px-3 text-gray-700 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500"
                 />
                 <button
-                  className="h-10 w-full sm:w-48 border border-blue-600 text-blue-600 dark:text-blue-400 bg-white dark:bg-gray-900 hover:bg-blue-600 hover:text-white rounded-md font-semibold transition-colors"
+                  className="h-10 w-full sm:w-48 border border-[#131C55] text-[#131C55] dark:text-blue-300 bg-white dark:bg-gray-900 hover:bg-[#131C55] hover:text-white rounded-lg font-semibold transition-colors"
                   onClick={() => setShowForm(true)}
                 >
                   + Add Product
                 </button>
                 <button
-                  className="h-10 w-full sm:w-48 border border-blue-600 text-blue-600 dark:text-blue-400 bg-white dark:bg-gray-900 hover:bg-blue-600 hover:text-white rounded-md font-semibold transition-colors"
+                  className="h-10 w-full sm:w-48 border border-[#131C55] text-[#131C55] dark:text-blue-300 bg-white dark:bg-gray-900 hover:bg-[#131C55] hover:text-white rounded-lg font-semibold transition-colors"
                   onClick={() => setShowUploadModal(true)}
                 >
                   Upload Excel
@@ -267,7 +267,7 @@ const router = useRouter();
       {/* Card list — phones only */}
       <div className="sm:hidden flex flex-col gap-3">
         {paginatedData.map((item, index) => (
-          <div key={item._id || index} className="rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm p-4">
+          <div key={item._id || index} className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-4">
             <p className="font-semibold text-gray-900 dark:text-gray-100">
               {startIndex + index + 1}. {item.product_name}
             </p>
@@ -284,7 +284,7 @@ const router = useRouter();
             <div className="flex items-center gap-2 mt-3">
               <button
                 onClick={() => router.push(`/products/${item._id}`)}
-                className="flex-1 border border-blue-500 text-blue-500 dark:text-blue-400 rounded-md px-3 py-1.5 hover:bg-blue-100 dark:hover:bg-blue-950 transition-colors"
+                className="flex-1 border border-[#131C55] text-[#131C55] dark:text-blue-300 rounded-lg px-3 py-1.5 hover:bg-[#131C55]/5 dark:hover:bg-blue-400/10 transition-colors"
               >
                 View
               </button>
@@ -293,13 +293,13 @@ const router = useRouter();
                   setSelectedProductId(item._id);
                   setEditOpen(true);
                 }}
-                className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 border border-green-500 text-green-500 dark:text-green-400 rounded-md hover:bg-green-100 dark:hover:bg-green-950 transition"
+                className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 border border-gray-300 text-gray-700 dark:border-gray-700 dark:text-gray-300 rounded-lg hover:border-[#131C55] hover:text-[#131C55] dark:hover:border-gray-500 transition"
               >
                 Edit
               </button>
               <button
                 onClick={() => onDelete(item._id)}
-                className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 border border-red-500 text-red-500 dark:text-red-400 rounded-md hover:bg-red-100 dark:hover:bg-red-950 transition"
+                className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 border border-red-500 text-red-500 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-950 transition"
               >
                 Delete
               </button>
@@ -309,10 +309,10 @@ const router = useRouter();
       </div>
 
       {/* Table — sm and up */}
-      <div className="hidden sm:block overflow-auto max-h-[70vh] overscroll-contain rounded-md">
+      <div className="hidden sm:block overflow-auto max-h-[70vh] overscroll-contain rounded-lg">
         <table className="w-full min-w-[700px] border-collapse border border-gray-300 dark:border-gray-700">
           <thead>
-            <tr className="bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
+            <tr className="bg-gray-50 dark:bg-gray-800/80 text-gray-500 dark:text-gray-400">
               {["#", "Product Name", "Category", "Price", "Action"].map(
                 (header) => (
                   <th
@@ -350,7 +350,7 @@ const router = useRouter();
                 <td className="px-4 py-3 border border-gray-300 dark:border-gray-700 flex justify-center gap-4">
                   <button
                     onClick={() => router.push(`/products/${item._id}`)}
-                    className="border border-blue-500 text-blue-500 dark:text-blue-400 rounded-md px-3 py-1 hover:bg-blue-100 dark:hover:bg-blue-950 transition-colors"
+                    className="border border-[#131C55] text-[#131C55] dark:text-blue-300 rounded-lg px-3 py-1 hover:bg-[#131C55]/5 dark:hover:bg-blue-400/10 transition-colors"
                   >
                     View
                   </button>
@@ -360,13 +360,13 @@ const router = useRouter();
                       setSelectedProductId(item._id);
                       setEditOpen(true);
                     }}
-                    className="flex items-center gap-1 px-3 py-1 border border-green-500 text-green-500 dark:text-green-400 rounded-md hover:bg-green-100 dark:hover:bg-green-950 transition"
+                    className="flex items-center gap-1 px-3 py-1 border border-gray-300 text-gray-700 dark:border-gray-700 dark:text-gray-300 rounded-lg hover:border-[#131C55] hover:text-[#131C55] dark:hover:border-gray-500 transition"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => onDelete(item._id)}
-                    className="flex items-center gap-1 px-3 py-1 border border-red-500 text-red-500 dark:text-red-400 rounded-md hover:bg-red-100 dark:hover:bg-red-950 transition"
+                    className="flex items-center gap-1 px-3 py-1 border border-red-500 text-red-500 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-950 transition"
                   >
                     Delete
                   </button>
@@ -397,7 +397,7 @@ function Pagination({ currentPage, totalPages, setCurrentPage }) {
       <button
         onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
         disabled={currentPage === 1}
-        className="w-8 h-8 flex items-center justify-center rounded-md border border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed text-sm"
+        className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed text-sm"
         aria-label="Previous page"
       >
         ‹
@@ -409,9 +409,9 @@ function Pagination({ currentPage, totalPages, setCurrentPage }) {
           <button
             key={page}
             onClick={() => setCurrentPage(page)}
-            className={`w-8 h-8 flex items-center justify-center rounded-md border text-sm font-medium transition-colors ${
+            className={`w-8 h-8 flex items-center justify-center rounded-lg border text-sm font-medium transition-colors ${
               page === currentPage
-                ? "bg-blue-600 border-blue-600 text-white"
+                ? "bg-[#131C55] border-[#131C55] text-white"
                 : "border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
             }`}
           >
@@ -422,7 +422,7 @@ function Pagination({ currentPage, totalPages, setCurrentPage }) {
       <button
         onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
         disabled={currentPage === totalPages}
-        className="w-8 h-8 flex items-center justify-center rounded-md border border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed text-sm"
+        className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed text-sm"
         aria-label="Next page"
       >
         ›

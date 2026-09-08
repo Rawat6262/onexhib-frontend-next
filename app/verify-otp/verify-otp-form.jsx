@@ -92,7 +92,7 @@ export default function VerifyOtpForm({ initialEmail = "" }) {
       <div className="text-center space-y-2">
         <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Verify Your Email</h1>
         <p className="text-sm text-gray-500 dark:text-gray-400">We sent a 6-digit OTP to</p>
-        <p className="text-sm font-semibold text-blue-600 dark:text-blue-400 break-all">{email}</p>
+        <p className="text-sm font-semibold text-[#131C55] dark:text-blue-300 break-all">{email}</p>
       </div>
 
       <OtpInput ref={otpRef} value={otp} onChange={setOtp} />
@@ -100,7 +100,7 @@ export default function VerifyOtpForm({ initialEmail = "" }) {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full py-3 text-lg rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold hover:from-blue-700 hover:to-purple-700 shadow-lg transition duration-200 disabled:opacity-60"
+        className="w-full py-3 text-lg rounded-xl bg-[#131C55] text-white font-semibold hover:bg-[#0E1B6B] shadow-sm transition disabled:opacity-60 motion-reduce:transition-none"
       >
         {isSubmitting ? "Verifying..." : "Verify OTP"}
       </button>
@@ -111,7 +111,7 @@ export default function VerifyOtpForm({ initialEmail = "" }) {
           <button
             type="button"
             onClick={handleResend}
-            className="text-blue-600 dark:text-blue-400 font-semibold hover:underline"
+            className="text-[#131C55] dark:text-blue-300 font-semibold underline-offset-4 hover:underline"
           >
             Resend OTP
           </button>
@@ -125,7 +125,7 @@ export default function VerifyOtpForm({ initialEmail = "" }) {
       <div className="text-center">
         <Link
           href="/signup"
-          className="text-sm text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:underline transition"
+          className="text-sm text-gray-400 dark:text-gray-500 hover:text-[#131C55] dark:hover:text-gray-300 hover:underline transition motion-reduce:transition-none"
         >
           ← Back to Signup
         </Link>

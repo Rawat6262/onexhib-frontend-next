@@ -2,16 +2,17 @@
 
 import { useState, useMemo, useEffect } from "react";
 import Select from "react-select";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { toast } from "sonner";
 import { signup } from "@/models/auth.model";
-import AuthCard from "@/components/auth/AuthCard";
+import AuthCard, { authInput, authLabel, authLink, authPrimaryBtn } from "@/components/auth/AuthCard";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i;
 const PASSWORD_RE = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&^_-]{8,}$/;
 
-export default function SignupForm() {
+export default function SignupForm({ stats }) {
   const [form, setForm] = useState({
     first_name: "",
     last_name: "",
@@ -174,10 +175,18 @@ export default function SignupForm() {
   };
 
   return (
-    <AuthCard wide formProps={{ onSubmit: handleSubmit }}>
-      <h1 className="text-2xl font-bold text-center text-gray-800 dark:text-gray-100">
-        Create your OneXhib account
-      </h1>
+    <AuthCard wide formProps={{ onSubmit: handleSubmit }} stats={stats}>
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl dark:text-white">
+          Create your account
+        </h1>
+        <p className="mt-2 text-[15px] text-gray-600 dark:text-gray-400">
+          List exhibitions as an organiser, or offer services to exhibitors.{" "}
+          <Link href="/login" className={authLink}>
+            Already have an account?
+          </Link>
+        </p>
+      </div>
 
       {/* PERSONAL */}
       <div className="grid md:grid-cols-2 gap-6">
@@ -226,9 +235,14 @@ export default function SignupForm() {
       </div>
 
       <div>
+        <label className={authLabel} htmlFor="address">
+          Address
+        </label>
         <textarea
-          className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg p-3"
-          placeholder="Address"
+          id="address"
+          rows={3}
+          className={authInput}
+          placeholder="Street, area, postcode"
           name="address"
           value={form.address}
           onChange={handleChange}
@@ -236,11 +250,8 @@ export default function SignupForm() {
         {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address}</p>}
       </div>
 
-      <button
-        disabled={isSubmitting}
-        className="w-full py-3 rounded-xl bg-indigo-600 text-white font-bold disabled:opacity-60"
-      >
-        {isSubmitting ? "Submitting..." : "Submit"}
+      <button type="submit" disabled={isSubmitting} className={authPrimaryBtn}>
+        {isSubmitting ? "Creating account…" : "Create account"}
       </button>
     </AuthCard>
   );
@@ -248,12 +259,9 @@ export default function SignupForm() {
 
 const InputField = ({ label, error, ...props }) => (
   <div>
-    <label className="block mb-1 font-semibold text-gray-800 dark:text-gray-200">{label}</label>
-    <input
-      {...props}
-      className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg px-3 py-2"
-    />
-    {error && <p className="text-red-500 text-xs">{error}</p>}
+    <label className={authLabel}>{label}</label>
+    <input {...props} className={authInput} />
+    {error && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{error}</p>}
   </div>
 );
 
@@ -263,7 +271,9 @@ const selectStyles = (isDark) => ({
   control: (base, state) => ({
     ...base,
     backgroundColor: isDark ? "#1f2937" : "#fff",
-    borderColor: state.isFocused ? "#6366f1" : isDark ? "#374151" : "#d1d5db",
+    borderColor: state.isFocused ? (isDark ? "#60a5fa" : "#131C55") : isDark ? "#374151" : "#d1d5db",
+    borderRadius: 12,
+    minHeight: 42,
     boxShadow: "none",
   }),
   singleValue: (base) => ({ ...base, color: isDark ? "#f3f4f6" : "#111827" }),
@@ -283,7 +293,7 @@ const SelectField = ({ label, options, value, onChange }) => {
   const { resolvedTheme } = useTheme();
   return (
     <div>
-      <label className="block mb-1 font-semibold text-gray-800 dark:text-gray-200">{label}</label>
+      <label className={authLabel}>{label}</label>
       <Select
         instanceId={`select-${label}`}
         options={options}

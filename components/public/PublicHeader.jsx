@@ -1,43 +1,27 @@
-import Link from "next/link";
-import AppHeader, { PUBLIC_NAV, mobileLink } from "@/components/layout/AppHeader";
+import AppHeader, { PUBLIC_NAV } from "@/components/layout/AppHeader";
+import HeaderAuthControls, {
+  HeaderAuthMobileLinks,
+} from "@/components/layout/HeaderAuthControls";
 
 /**
- * Public site header — the signed-out configuration of the shared AppHeader.
+ * Public site header.
  *
- * All the chrome (logo, nav, theme toggle, mobile disclosure) now lives in
+ * All the chrome (logo, nav, theme toggle, mobile disclosure) lives in
  * AppHeader so the dashboard renders exactly the same bar rather than a
- * lookalike that drifts. This file supplies only what is specific to being
- * signed out: the Login and Sign up links.
+ * lookalike that drifts. This file supplies the right-hand controls, which are
+ * now auth-aware: a signed-in visitor browsing the public catalogue keeps their
+ * account menu and a link back to their dashboard, instead of being shown a
+ * "Login" button that made it look like the session had ended.
  *
- * Still a Server Component shipping no JavaScript for navigation.
+ * Still a Server Component, and the page stays statically prerendered - only
+ * the controls themselves are a client island. See HeaderAuthControls.
  */
 export default function PublicHeader() {
   return (
     <AppHeader
       nav={PUBLIC_NAV}
-      right={
-        <>
-          <Link
-            href="/login"
-            className="hidden rounded-lg px-3 py-2 text-sm font-semibold text-gray-700 transition hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none sm:block dark:text-gray-300 dark:hover:text-white"
-          >
-            Login
-          </Link>
-          <Link
-            href="/signup"
-            className="rounded-lg bg-[#131C55] px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-[#0E1B6B] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none sm:px-4"
-          >
-            Sign up
-          </Link>
-        </>
-      }
-      mobileExtra={
-        <li className="pt-1 sm:hidden">
-          <Link href="/login" className={mobileLink}>
-            Login
-          </Link>
-        </li>
-      }
+      right={<HeaderAuthControls />}
+      mobileExtra={<HeaderAuthMobileLinks />}
     />
   );
 }

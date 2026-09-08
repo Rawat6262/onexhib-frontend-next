@@ -9,8 +9,11 @@ import { ROLES } from "@/lib/auth";
 // here; admins have their own shell under /admin.
 export default function DashboardLayout({ children }) {
   const items = [
-    { label: "Organiser", href: "/organiser", icon: <Users size={16} /> },
-    { label: "Services", href: "/services", icon: <Briefcase size={16} /> },
+    { label: "My exhibitions", href: "/organiser", icon: <Users size={16} /> },
+    // "My services", not "Services": the header directly above carries a
+    // public "Services" link to /exhibition-services, and two identical
+    // labels one row apart is what sent signed-in users to the public page.
+    { label: "My services", href: "/services", icon: <Briefcase size={16} /> },
   ];
 
   return (

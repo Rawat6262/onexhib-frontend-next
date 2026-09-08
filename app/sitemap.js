@@ -102,6 +102,9 @@ async function buildAllUrls() {
     { url: `${SITE_URL}${PUBLIC_ROUTES.companies}`, changeFrequency: "weekly", priority: 0.8 },
     { url: `${SITE_URL}${PUBLIC_ROUTES.products}`, changeFrequency: "weekly", priority: 0.8 },
     { url: `${SITE_URL}${PUBLIC_ROUTES.services}`, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${SITE_URL}/about`, changeFrequency: "yearly", priority: 0.5 },
+    { url: `${SITE_URL}/contact`, changeFrequency: "yearly", priority: 0.5 },
+    { url: `${SITE_URL}/terms`, changeFrequency: "yearly", priority: 0.3 },
     { url: `${SITE_URL}/privacy-policy`, changeFrequency: "yearly", priority: 0.3 },
     { url: `${SITE_URL}/delete-account`, changeFrequency: "yearly", priority: 0.3 },
   ].map((entry) => ({ lastModified: now, ...entry }));

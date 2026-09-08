@@ -54,19 +54,19 @@ export default function ProductDetailClient({ id }) {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
         <div className="flex-1 p-6 md:p-10">
           <div className="max-w-5xl mx-auto animate-pulse">
-            <div className="h-4 w-40 bg-gray-200 dark:bg-gray-800 rounded mb-6" />
+            <div className="h-4 w-40 bg-gray-50 dark:bg-gray-800/80 rounded mb-6" />
             <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 p-6 sm:p-10">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                <div className="aspect-square bg-gray-200 dark:bg-gray-800 rounded-2xl" />
+                <div className="aspect-square bg-gray-50 dark:bg-gray-800/80 rounded-2xl" />
                 <div className="space-y-4">
-                  <div className="h-3 w-20 bg-gray-200 dark:bg-gray-800 rounded" />
-                  <div className="h-8 w-3/4 bg-gray-200 dark:bg-gray-800 rounded" />
-                  <div className="h-6 w-24 bg-gray-200 dark:bg-gray-800 rounded-full" />
-                  <div className="h-6 w-32 bg-gray-200 dark:bg-gray-800 rounded" />
+                  <div className="h-3 w-20 bg-gray-50 dark:bg-gray-800/80 rounded" />
+                  <div className="h-8 w-3/4 bg-gray-50 dark:bg-gray-800/80 rounded" />
+                  <div className="h-6 w-24 bg-gray-50 dark:bg-gray-800/80 rounded-full" />
+                  <div className="h-6 w-32 bg-gray-50 dark:bg-gray-800/80 rounded" />
                   <div className="space-y-2 pt-4">
-                    <div className="h-3 bg-gray-200 dark:bg-gray-800 rounded" />
-                    <div className="h-3 bg-gray-200 dark:bg-gray-800 rounded" />
-                    <div className="h-3 w-2/3 bg-gray-200 dark:bg-gray-800 rounded" />
+                    <div className="h-3 bg-gray-50 dark:bg-gray-800/80 rounded" />
+                    <div className="h-3 bg-gray-50 dark:bg-gray-800/80 rounded" />
+                    <div className="h-3 w-2/3 bg-gray-50 dark:bg-gray-800/80 rounded" />
                   </div>
                 </div>
               </div>

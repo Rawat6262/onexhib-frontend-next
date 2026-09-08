@@ -118,7 +118,7 @@ export default function ExhibitionManageClient({ id }) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FFFFFF] dark:bg-gray-950 text-gray-900 dark:text-gray-100 font-serif">
+    <div className="min-h-screen flex flex-col bg-[#FFFFFF] dark:bg-gray-950 text-gray-900 dark:text-gray-100">
       <div className="flex-1 w-full mt-8 flex flex-col border border-gray-300 dark:border-gray-700 md:mx-4 lg:mx-6 bg-white dark:bg-gray-900 rounded-lg shadow-md overflow-y-auto">
         {/* Header */}
         <div className="w-full flex flex-col sm:flex-row gap-3 sm:gap-0 justify-between items-center px-4 sm:px-8 py-4 sm:h-20 border-b border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 rounded-t-lg">
@@ -127,14 +127,14 @@ export default function ExhibitionManageClient({ id }) {
           </h1>
           <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
             <button
-              className="h-10 w-full sm:w-48 border border-blue-500 text-blue-500 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-950 rounded-md font-semibold transition-colors"
+              className="h-10 w-full sm:w-48 border border-[#131C55] text-[#131C55] dark:text-blue-300 hover:bg-[#131C55]/5 dark:hover:bg-blue-400/10 rounded-lg font-semibold transition-colors"
               onClick={() => setDetails(true)}
             >
               Exhibition Details
             </button>
             {showdetail && <ExhibitionPopup onClose={() => setDetails(false)} exhibitionId={id} />}
             <button
-              className="h-10 w-full sm:w-48 border border-red-500 text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950 rounded-md font-semibold transition-colors"
+              className="h-10 w-full sm:w-48 border border-red-500 text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950 rounded-lg font-semibold transition-colors"
               onClick={deleteExhibition}
             >
               Delete Exhibition
@@ -172,24 +172,24 @@ export default function ExhibitionManageClient({ id }) {
                   setCurrentPage(1);
                 }}
                 placeholder="Search by name, email, phone or #..."
-                className="h-10 w-full sm:w-64 border border-gray-400 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-md text-gray-700 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-500 px-3 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="h-10 w-full sm:w-64 border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800 rounded-lg text-gray-700 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-500 px-3 focus:outline-none focus:ring-1 focus:ring-[#131C55]/20"
               />
 
               <button
                 onClick={() => setShowFormnew(true)}
-                className="h-10 w-full sm:w-48 border border-blue-500 text-blue-500 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-950 rounded-md font-semibold transition-colors"
+                className="h-10 w-full sm:w-48 border border-[#131C55] text-[#131C55] dark:text-blue-300 hover:bg-[#131C55]/5 dark:hover:bg-blue-400/10 rounded-lg font-semibold transition-colors"
               >
                 + Add News
               </button>
               <button
                 onClick={() => setShowForm(true)}
-                className="h-10 w-full sm:w-48 border border-blue-500 text-blue-500 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-950 rounded-md font-semibold transition-colors"
+                className="h-10 w-full sm:w-48 border border-[#131C55] text-[#131C55] dark:text-blue-300 hover:bg-[#131C55]/5 dark:hover:bg-blue-400/10 rounded-lg font-semibold transition-colors"
               >
                 + Add Company
               </button>
               <button
                 onClick={() => setShowUploadModal(true)}
-                className="h-10 w-full sm:w-48 border border-blue-500 text-blue-500 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-950 rounded-md font-semibold transition-colors"
+                className="h-10 w-full sm:w-48 border border-[#131C55] text-[#131C55] dark:text-blue-300 hover:bg-[#131C55]/5 dark:hover:bg-blue-400/10 rounded-lg font-semibold transition-colors"
               >
                 Upload Excel
               </button>
@@ -220,7 +220,7 @@ export default function ExhibitionManageClient({ id }) {
                 {/* Card list — phones only */}
                 <div className="sm:hidden flex flex-col gap-3 px-4">
                   {paginatedCompanies.map((c, index) => (
-                    <div key={c._id || index} className="rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm p-4">
+                    <div key={c._id || index} className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-4">
                       <p className="font-semibold text-gray-900 dark:text-gray-100">
                         {startIndex + index + 1}. {c.company_name}
                       </p>
@@ -237,13 +237,13 @@ export default function ExhibitionManageClient({ id }) {
                       <div className="flex items-center gap-2 mt-3">
                         <button
                           onClick={() => router.push(`/companies/${c._id}`)}
-                          className="flex-1 border border-blue-500 text-blue-500 dark:text-blue-400 rounded-md px-3 py-1.5 hover:bg-blue-100 dark:hover:bg-blue-950 transition-colors"
+                          className="flex-1 border border-[#131C55] text-[#131C55] dark:text-blue-300 rounded-lg px-3 py-1.5 hover:bg-[#131C55]/5 dark:hover:bg-blue-400/10 transition-colors"
                         >
                           View
                         </button>
                         <button
                           onClick={() => setEditingId(c._id)}
-                          className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 border border-green-500 text-green-500 dark:text-green-400 rounded-md hover:bg-green-100 dark:hover:bg-green-950 transition"
+                          className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 border border-gray-300 text-gray-700 dark:border-gray-700 dark:text-gray-300 rounded-lg hover:border-[#131C55] hover:text-[#131C55] dark:hover:border-gray-500 transition"
                         >
                           Edit
                         </button>
@@ -253,14 +253,14 @@ export default function ExhibitionManageClient({ id }) {
                 </div>
 
                 {/* Table — sm and up */}
-                <div className="hidden sm:block overflow-auto max-h-[70vh] overscroll-contain rounded-md text-left">
+                <div className="hidden sm:block overflow-auto max-h-[70vh] overscroll-contain rounded-lg text-left">
                   <table className="w-full min-w-[700px] border-collapse border border-gray-300 dark:border-gray-700">
                     <thead>
-                      <tr className="bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-b border-gray-300 dark:border-gray-700 text-center">
+                      <tr className="bg-gray-50 dark:bg-gray-800/80 text-gray-500 dark:text-gray-400 border-b border-gray-300 dark:border-gray-700 text-center">
                         {["#", "Company Name", "Email", "Phone", "Action"].map((header) => (
                           <th
                             key={header}
-                            className="px-4 py-3 border-r border-gray-300 dark:border-gray-700 last:border-r-0 sticky top-0 z-10 bg-gray-200 dark:bg-gray-800 shadow-[inset_-1px_-1px_0_0_#d1d5db] dark:shadow-[inset_-1px_-1px_0_0_#374151] last:shadow-[inset_0_-1px_0_0_#d1d5db] dark:last:shadow-[inset_0_-1px_0_0_#374151] text-center"
+                            className="px-4 py-3 border-r border-gray-300 dark:border-gray-700 last:border-r-0 sticky top-0 z-10 bg-gray-50 dark:bg-gray-800/80 shadow-[inset_-1px_-1px_0_0_#d1d5db] dark:shadow-[inset_-1px_-1px_0_0_#374151] last:shadow-[inset_0_-1px_0_0_#d1d5db] dark:last:shadow-[inset_0_-1px_0_0_#374151] text-center"
                           >
                             {header}
                           </th>
@@ -288,13 +288,13 @@ export default function ExhibitionManageClient({ id }) {
                           <td className="px-4 py-3 border border-gray-300 dark:border-gray-700 flex justify-center gap-4">
                             <button
                               onClick={() => router.push(`/companies/${c._id}`)}
-                              className="border border-blue-500 text-blue-500 dark:text-blue-400 rounded-md px-3 py-1 hover:bg-blue-100 dark:hover:bg-blue-950 transition-colors"
+                              className="border border-[#131C55] text-[#131C55] dark:text-blue-300 rounded-lg px-3 py-1 hover:bg-[#131C55]/5 dark:hover:bg-blue-400/10 transition-colors"
                             >
                               View
                             </button>
                             <button
                               onClick={() => setEditingId(c._id)}
-                              className="flex items-center gap-1 px-3 py-1 border border-green-500 text-green-500 dark:text-green-400 rounded-md hover:bg-green-100 dark:hover:bg-green-950 transition"
+                              className="flex items-center gap-1 px-3 py-1 border border-gray-300 text-gray-700 dark:border-gray-700 dark:text-gray-300 rounded-lg hover:border-[#131C55] hover:text-[#131C55] dark:hover:border-gray-500 transition"
                             >
                               Edit
                             </button>
@@ -319,7 +319,7 @@ export default function ExhibitionManageClient({ id }) {
             <button
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
-              className="px-4 py-2 border border-blue-500 text-blue-500 dark:text-blue-400 rounded-md hover:bg-blue-100 dark:hover:bg-blue-950 disabled:opacity-50"
+              className="px-4 py-2 border border-[#131C55] text-[#131C55] dark:text-blue-300 rounded-lg hover:bg-[#131C55]/5 dark:hover:bg-blue-400/10 disabled:opacity-50"
             >
               Previous
             </button>
@@ -329,7 +329,7 @@ export default function ExhibitionManageClient({ id }) {
             <button
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="px-4 py-2 border border-blue-500 text-blue-500 dark:text-blue-400 rounded-md hover:bg-blue-100 dark:hover:bg-blue-950 disabled:opacity-50"
+              className="px-4 py-2 border border-[#131C55] text-[#131C55] dark:text-blue-300 rounded-lg hover:bg-[#131C55]/5 dark:hover:bg-blue-400/10 disabled:opacity-50"
             >
               Next
             </button>

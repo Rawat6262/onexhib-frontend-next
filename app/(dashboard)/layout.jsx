@@ -1,7 +1,7 @@
 "use client";
 
 import { Users, Briefcase } from "lucide-react";
-import SidebarShell from "@/components/layout/SidebarShell";
+import AppShell from "@/components/layout/AppShell";
 import RequireAuth from "@/components/auth/RequireAuth";
 import { ROLES } from "@/lib/auth";
 
@@ -9,13 +9,13 @@ import { ROLES } from "@/lib/auth";
 // here; admins have their own shell under /admin.
 export default function DashboardLayout({ children }) {
   const items = [
-    { label: "Organiser", href: "/organiser", icon: <Users size={20} /> },
-    { label: "Services", href: "/services", icon: <Briefcase size={20} /> },
+    { label: "Organiser", href: "/organiser", icon: <Users size={16} /> },
+    { label: "Services", href: "/services", icon: <Briefcase size={16} /> },
   ];
 
   return (
     <RequireAuth roles={[ROLES.ORGANISER, ROLES.EXHIBITION_SERVICE, ROLES.ADMIN]}>
-      <SidebarShell items={items}>{children}</SidebarShell>
+      <AppShell items={items}>{children}</AppShell>
     </RequireAuth>
   );
 }

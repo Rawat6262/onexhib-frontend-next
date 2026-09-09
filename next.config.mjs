@@ -43,12 +43,18 @@ const CSP_REPORT_ONLY = [
   "object-src 'none'",
   "frame-ancestors 'self'",
   "form-action 'self'",
-  "script-src 'self' 'unsafe-inline'",
+  // googletagmanager serves gtag.js; it is listed unconditionally rather than
+  // only when NEXT_PUBLIC_GA_ID is set, because a header that changes shape
+  // between environments is a header nobody can reason about. With no GA ID
+  // configured the script is never requested, so the allowance costs nothing.
+  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' data: https://fonts.gstatic.com",
   "img-src 'self' data: blob: https:",
   "media-src 'self' blob: https://res.cloudinary.com",
-  "connect-src 'self'",
+  // GA4 beacons go to google-analytics.com; the region endpoints on
+  // analytics.google.com are used for some consent-mode traffic.
+  "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://www.googletagmanager.com",
   "worker-src 'self' blob:",
   "manifest-src 'self'",
 ].join("; ");

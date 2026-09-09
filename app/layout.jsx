@@ -1,7 +1,18 @@
 import { Poppins } from "next/font/google";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import Providers from "./providers";
+import ConsentGate from "@/components/analytics/ConsentGate";
+import ConsentBanner from "@/components/analytics/ConsentBanner";
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/seo";
 import "./globals.css";
+
+/**
+ * Analytics is opt-in per environment: with no NEXT_PUBLIC_GA_ID set, nothing
+ * is rendered, no script is fetched and no banner appears. That keeps local
+ * development and preview builds out of the production property without
+ * needing a separate code path.
+ */
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
 
 // The Vite app loaded Poppins via two <link> tags in index.html; next/font
 // self-hosts it instead, which removes the render-blocking request.
@@ -39,6 +50,12 @@ export const metadata = {
     description: SITE_DESCRIPTION,
   },
   formatDetection: { telephone: false },
+  // Google Search Console ownership, when verifying by meta tag. Left out
+  // entirely unless the token is set, so no empty tag ships. The DNS and
+  // HTML-file methods need nothing here.
+  ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+    ? { verification: { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION } }
+    : {}),
 };
 
 export const viewport = {
@@ -58,7 +75,16 @@ export default function RootLayout({ children }) {
     // (The old index.html hardcoded class="dark" here — deliberately dropped.)
     <html lang="en" suppressHydrationWarning className={poppins.variable}>
       <body>
+        {/* Consent defaults must be on the dataLayer before gtag.js loads, so
+            ConsentGate is ordered ahead of GoogleAnalytics deliberately. */}
+        {GA_ID ? <ConsentGate /> : null}
         <Providers>{children}</Providers>
+        {GA_ID ? (
+          <>
+            <ConsentBanner />
+            <GoogleAnalytics gaId={GA_ID} />
+          </>
+        ) : null}
       </body>
     </html>
   );

@@ -17,6 +17,7 @@ import Rail, { RailItem } from "@/components/public/Rail";
 import ExhibitionCard from "@/components/public/ExhibitionCard";
 import FeaturedSlider from "@/components/public/FeaturedSlider";
 import HeroShowcase from "@/components/public/HeroShowcase";
+import AiSearchLauncher from "@/components/public/AiSearchLauncher";
 import CompanyCard from "@/components/public/CompanyCard";
 import ProductCard from "@/components/public/ProductCard";
 import CountsStrip from "@/components/public/CountsStrip";
@@ -371,9 +372,13 @@ function Hero({ counts, upcoming }) {
             </Link>
           </div>
 
+          {/* Sits under the keyword search: the two are alternatives, and
+              showing them together is what makes the AI option discoverable. */}
           <div className="mt-8 max-w-xl">
             <SearchBar />
           </div>
+
+          <AiSearchLauncher />
 
           <div className="mt-10">
             <CountsStrip counts={counts} upcoming={upcoming.total} />

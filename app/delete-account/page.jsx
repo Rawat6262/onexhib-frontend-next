@@ -1,5 +1,7 @@
 import Link from "next/link";
 import LegalPageLayout, { Section } from "@/components/legal/LegalPageLayout";
+import JsonLd from "@/components/seo/JsonLd";
+import { breadcrumbNode, graph } from "@/lib/jsonld";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
@@ -13,6 +15,15 @@ export const metadata = pageMetadata({
 
 // Server Component: static content, navigation buttons replaced with <Link>s.
 export default function DeleteAccountPage() {
+  // This page keeps its standalone chrome rather than moving into (public):
+  // app-store account-deletion policies require it to be reachable directly,
+  // without navigating a site shell. But it IS indexable, so it still needs
+  // structured data - emitted here since there is no ProsePage to attach it.
+  const trail = [
+    { name: "Home", path: "/" },
+    { name: "Delete Your Account", path: "/delete-account" },
+  ];
+
   return (
     <LegalPageLayout
       title="Delete Your Account"
@@ -26,6 +37,8 @@ export default function DeleteAccountPage() {
         </Link>
       }
     >
+      <JsonLd graph={graph(breadcrumbNode(trail))} />
+
       <Section title="Overview">
         <p>
           If you would like to delete your OneXhib account and associated personal account

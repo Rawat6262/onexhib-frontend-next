@@ -6,9 +6,11 @@ import {
   countryLandingPath,
   exhibitionPath,
   productPath,
+  blogPostPath,
 } from "@/lib/routes";
 import { getLocationIndex } from "@/lib/locations";
 import { getCategoryIndex } from "@/lib/categories";
+import { getAllPosts } from "@/lib/blog";
 import {
   getCompanies,
   getExhibitions,
@@ -102,9 +104,35 @@ async function buildAllUrls() {
     { url: `${SITE_URL}${PUBLIC_ROUTES.companies}`, changeFrequency: "weekly", priority: 0.8 },
     { url: `${SITE_URL}${PUBLIC_ROUTES.products}`, changeFrequency: "weekly", priority: 0.8 },
     { url: `${SITE_URL}${PUBLIC_ROUTES.services}`, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${SITE_URL}/about`, changeFrequency: "yearly", priority: 0.5 },
+    { url: `${SITE_URL}/contact`, changeFrequency: "yearly", priority: 0.5 },
+    { url: `${SITE_URL}/terms`, changeFrequency: "yearly", priority: 0.3 },
     { url: `${SITE_URL}/privacy-policy`, changeFrequency: "yearly", priority: 0.3 },
     { url: `${SITE_URL}/delete-account`, changeFrequency: "yearly", priority: 0.3 },
   ].map((entry) => ({ lastModified: now, ...entry }));
+
+  // Blog. The hub is listed only when it has posts — it is noindex while empty
+  // (see app/(public)/blog/page.jsx), and a sitemap should never contain a URL
+  // that tells crawlers not to index it. Each post carries its own publication
+  // date as lastModified rather than the build time, so a crawler is not told
+  // that every article changed on every deploy.
+  const posts = getAllPosts();
+  const blogEntries = posts.length
+    ? [
+        {
+          url: `${SITE_URL}${PUBLIC_ROUTES.blog}`,
+          lastModified: new Date(posts[0].published),
+          changeFrequency: "weekly",
+          priority: 0.7,
+        },
+        ...posts.map((p) => ({
+          url: `${SITE_URL}${blogPostPath(p.slug)}`,
+          lastModified: new Date(p.updated || p.published),
+          changeFrequency: "monthly",
+          priority: 0.6,
+        })),
+      ]
+    : [];
 
   const [locations, categories, upcoming, ongoing, previous, companies, products] = await Promise.all([
     // Only places that clear the quality threshold in lib/locations.js have a
@@ -158,6 +186,7 @@ async function buildAllUrls() {
 
   const entries = [
     ...staticEntries,
+    ...blogEntries,
     ...locationEntries,
     ...categoryEntries,
     ...exhibitionEntries(ongoing, "daily", 0.9),

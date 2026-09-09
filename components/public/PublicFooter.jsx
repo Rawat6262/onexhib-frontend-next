@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { PUBLIC_ROUTES, SITE_NAME } from "@/lib/seo";
 import { cityLandingPath, countryLandingPath, exhibitionsScopePath } from "@/lib/routes";
+import { isBlogEmpty } from "@/lib/blog";
 
 /**
  * Public site footer.
@@ -18,6 +19,7 @@ import { cityLandingPath, countryLandingPath, exhibitionsScopePath } from "@/lib
  */
 export default function PublicFooter({ locations }) {
   const year = new Date().getFullYear();
+  const hasPosts = !isBlogEmpty();
   const countries = locations?.countries || [];
   const cities = countries
     .flatMap((c) => c.cities)
@@ -27,7 +29,7 @@ export default function PublicFooter({ locations }) {
   return (
     <footer className="mt-20 border-t border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-900/40">
       <div className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-6">
           <div className="lg:col-span-1">
             <Image
               src="/Dark.png"
@@ -75,10 +77,20 @@ export default function PublicFooter({ locations }) {
             </FooterColumn>
           ) : null}
 
+          <FooterColumn title="Company">
+            <FooterLink href="/about">About OneXhib</FooterLink>
+            {/* Rendered only when there is something to read: the hub is
+                noindex while empty, and a site-wide link into a noindex page
+                would spend crawl budget on a dead end. */}
+            {hasPosts ? <FooterLink href={PUBLIC_ROUTES.blog}>Blog</FooterLink> : null}
+            <FooterLink href="/contact">Contact</FooterLink>
+            <FooterLink href="/terms">Terms of use</FooterLink>
+            <FooterLink href="/privacy-policy">Privacy policy</FooterLink>
+          </FooterColumn>
+
           <FooterColumn title="Account">
             <FooterLink href="/login">Login</FooterLink>
             <FooterLink href="/signup">Create an account</FooterLink>
-            <FooterLink href="/privacy-policy">Privacy policy</FooterLink>
             <FooterLink href="/delete-account">Delete account</FooterLink>
           </FooterColumn>
         </div>

@@ -3,17 +3,24 @@ import JsonLd from "@/components/seo/JsonLd";
 import { breadcrumbNode, graph } from "@/lib/jsonld";
 
 /**
- * Shell for the site's prose pages: About, Contact, Terms.
+ * Shell for the site's prose pages: About, Contact, Terms, Privacy Policy.
  *
- * WHY THESE LIVE IN (public) AND NOT ALONGSIDE THE PRIVACY POLICY
- * /privacy-policy and /delete-account predate the public site and render their
- * own standalone chrome (components/legal/LegalPageLayout.jsx) - centred logo,
- * no site header, no footer. That was right when they were the only public
- * URLs. It is wrong for trust pages: the whole point of an About or Contact
- * page is to look unmistakably like the same company as the rest of the site,
- * and to be reachable from the footer that carries every other public link.
+ * WHY THESE LIVE IN (public)
+ * /privacy-policy and /delete-account predated the public site and rendered
+ * their own standalone chrome (components/legal/LegalPageLayout.jsx) - centred
+ * logo, no site header, no footer. That was right when they were the only
+ * public URLs. It is wrong for a trust page: the whole point of an About,
+ * Contact or Privacy page is to look unmistakably like the same company as the
+ * rest of the site, to be reachable from the footer that carries every other
+ * public link, and to carry the same structured data.
  *
- * So these use the normal public layout - shared header, shared footer,
+ * /privacy-policy has since moved here for exactly that reason - it was the one
+ * indexable page emitting no JSON-LD at all, because this shell is what
+ * attaches it. /delete-account deliberately stays standalone: app-store
+ * account-deletion policies require it to be reachable without navigating a
+ * site shell, so it emits its own BreadcrumbList in place instead.
+ *
+ * These use the normal public layout - shared header, shared footer,
  * breadcrumbs - and the same measure and type scale as the legal pages
  * (max-w-3xl) so the two families still read as siblings.
  *

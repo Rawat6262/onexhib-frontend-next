@@ -1,6 +1,7 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import createMDX from "@next/mdx";
+import { duplicateExhibitionRedirects } from "./lib/duplicate-redirects.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -87,6 +88,17 @@ const nextConfig = {
         ],
       },
     ];
+  },
+
+  /**
+   * Permanent redirects for exhibition records removed as duplicates.
+   *
+   * The list is generated from the deletion backups rather than written by
+   * hand - see lib/duplicate-redirects.mjs for the provenance and for why the
+   * source matches on the record id instead of a fixed slug.
+   */
+  async redirects() {
+    return duplicateExhibitionRedirects();
   },
 
   async rewrites() {

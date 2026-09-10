@@ -161,6 +161,39 @@ body {
   to   { opacity: 1; transform: none; }
 }
 
+/* Chart growth for the blog's data panels.
+
+   Both animate `transform`, never `width`/`height` — scaling is composited,
+   whereas animating a box dimension relayouts the row every frame. The element
+   holds its final size in the layout throughout, so the charts contribute no
+   CLS.
+
+   transform-origin differs: bars grow from the left edge, columns from the
+   baseline, matching how each is read.
+
+   Behind prefers-reduced-motion like every other motion here. With the guard
+   unmet the rule never applies and the chart is simply drawn at full size —
+   the correct static presentation, not a degraded one. */
+@media (prefers-reduced-motion: no-preference) {
+  .ox-bar {
+    transform-origin: left center;
+    animation: ox-bar-in 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .ox-col {
+    transform-origin: bottom center;
+    animation: ox-col-in 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+
+@keyframes ox-bar-in {
+  from { transform: scaleX(0); opacity: 0.4; }
+  to   { transform: scaleX(1); opacity: 1; }
+}
+@keyframes ox-col-in {
+  from { transform: scaleY(0); opacity: 0.4; }
+  to   { transform: scaleY(1); opacity: 1; }
+}
+
 /* Shared card hover. Kept as one class so the transition timing is identical
    across exhibition, company and product cards. */
 .ox-card {

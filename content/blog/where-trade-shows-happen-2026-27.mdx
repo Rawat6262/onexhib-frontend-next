@@ -1,11 +1,22 @@
 export const meta = {
   slug: "where-trade-shows-happen-2026-27",
   title: "Where the world's trade shows actually happen",
+  // No absolute count here on purpose. This string is the card blurb on /blog
+  // AND the page's meta description, and /blog renders the LIVE upcoming total
+  // in its hero - so a fixed number here contradicts the figure directly above
+  // it the moment the catalogue moves (it read 2,134 at publication and 2,017
+  // once 58 duplicate records were removed). The body keeps its 2,134 count
+  // under a dated snapshot line, which is where a historical figure belongs.
   description:
-    "Which countries, cities and venues host the most exhibitions in the 2026–27 season, based on the 2,134 upcoming events listed on OneXhib.",
+    "Which countries, cities and venues host the most exhibitions in the 2026–27 season, counted from the upcoming events listed on OneXhib.",
   published: "2026-09-09",
   readingMinutes: 4,
+  // Drives the card chip and the /blog filtering copy.
+  category: "Market Data",
+  // Which live distribution this post's cover is drawn from. See PostCover.
+  cover: "geography",
   tags: ["Industry data", "Planning"],
+  featured: true,
 };
 
 If you are deciding where to exhibit next year, it helps to know where the events

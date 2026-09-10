@@ -47,17 +47,21 @@ import {
  * whole point: this content exists to be indexed.
  *
  * Positioning is worldwide, not India-first, because that is what the catalogue
- * actually is: 2,178 upcoming exhibitions spread across roughly forty
- * countries, the largest being Indonesia, Germany and China, with India at 137.
- * Copy that claimed an Indian focus would misrepresent the inventory and would
- * be competing for queries the data cannot satisfy. India remains a strong
+ * actually is: 2,017 upcoming exhibitions spread across 66 countries, the
+ * largest being Germany, Poland and China, with India fourth at 144. Copy that
+ * claimed an Indian focus would misrepresent the inventory and would be
+ * competing for queries the data cannot satisfy. India remains a strong
  * filtered view at /exhibitions?country=India.
  */
 
 export const metadata = publicPageMetadata({
-  title: "OneXhib — discover exhibitions, trade shows and exhibitors worldwide",
+  // app/layout.jsx appends " · OneXhib" via the title template, so this title
+  // must not repeat the brand: it previously rendered as
+  // "OneXhib — ... worldwide · OneXhib", 78 characters with the name twice,
+  // which truncates in search results and wastes the most valuable pixels.
+  title: "Exhibitions, trade shows and exhibitors worldwide",
   description:
-    "Browse upcoming and ongoing exhibitions and trade shows worldwide. Find business events by city and country, see the companies exhibiting, and discover the products they showcase.",
+    "Browse upcoming and ongoing exhibitions and trade shows worldwide. Find events by city and country, and see the companies exhibiting at each one.",
   path: "/",
 });
 

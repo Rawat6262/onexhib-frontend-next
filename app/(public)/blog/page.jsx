@@ -8,6 +8,7 @@ import BlogHero from "@/components/blog/BlogHero";
 import DiscoverGrid from "@/components/blog/DiscoverGrid";
 import DataBars from "@/components/blog/DataBars";
 import SeasonCurve from "@/components/blog/SeasonCurve";
+import SeoDestinations from "@/components/blog/SeoDestinations";
 import { FeaturedPostCard, PostCard } from "@/components/blog/PostCards";
 import { graph, itemListNode, breadcrumbNode } from "@/lib/jsonld";
 import { getAllPosts, getFeaturedPost, isBlogEmpty } from "@/lib/blog";
@@ -84,6 +85,35 @@ export default async function BlogIndexPage() {
 
       <div className="mx-auto w-full max-w-6xl px-4 pt-6 sm:px-6">
         <Breadcrumbs trail={trail} />
+      </div>
+
+      {/* ---------------- What this is ----------------
+
+          Plain description of the source and the scope, placed before the
+          articles so a first-time reader knows what they are reading before
+          they read it. The links are the ones a reader following the sentence
+          would actually want next, not extra anchors for their own sake. */}
+      <div className="mx-auto w-full max-w-3xl px-4 pt-8 sm:px-6">
+        <p className="ox-reveal text-[16px] leading-relaxed text-gray-600 dark:text-gray-400">
+          OneXhib brings exhibition information together in one place — the shows, the
+          companies exhibiting at them, and the products and services around them. These
+          articles use that catalogue to answer practical questions: where exhibitions
+          happen, when the season peaks, and which industries are represented. When an
+          article raises something worth acting on, you can carry straight on into the
+          live listings — by{" "}
+          <Link href={PUBLIC_ROUTES.locations} className={inlineLink}>
+            location
+          </Link>
+          ,{" "}
+          <Link href={PUBLIC_ROUTES.categories} className={inlineLink}>
+            industry
+          </Link>
+          , or the{" "}
+          <Link href={PUBLIC_ROUTES.exhibitions} className={inlineLink}>
+            full exhibition catalogue
+          </Link>
+          .
+        </p>
       </div>
 
       {/* ---------------- Lead story ----------------
@@ -215,9 +245,26 @@ export default async function BlogIndexPage() {
           <DiscoverGrid counts={data.counts} upcomingTotal={data.upcomingTotal} />
         </Section>
       </div>
+
+      {/* ---------------- SEO destinations ---------------- */}
+      <Section
+        id="destinations"
+        title="Explore exhibitions across OneXhib"
+        intro="Looking for more than an article? Every country, city and industry below has its own page of live listings."
+        className="py-14 sm:py-16"
+      >
+        <SeoDestinations
+          countries={data.featuredCountries}
+          industries={data.topIndustries}
+          cities={data.featuredCities}
+        />
+      </Section>
     </>
   );
 }
+
+const inlineLink =
+  "font-semibold text-[#131C55] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:text-blue-300 dark:focus-visible:outline-blue-300";
 
 /** Panel frame for a data block. */
 function Panel({ icon: Icon, title, note, children, className = "" }) {

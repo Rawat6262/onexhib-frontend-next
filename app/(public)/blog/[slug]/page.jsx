@@ -10,7 +10,7 @@ import DiscoverGrid from "@/components/blog/DiscoverGrid";
 import { blogPostingNode, breadcrumbNode, graph } from "@/lib/jsonld";
 import { formatPostDate, getAllPosts, getPost, getPostsExcept } from "@/lib/blog";
 import { getBlogData } from "@/lib/blog-data";
-import { blogPostPath, countryLandingPath } from "@/lib/routes";
+import { blogPostPath, categoryLandingPath, countryLandingPath } from "@/lib/routes";
 import { PUBLIC_ROUTES, publicPageMetadata } from "@/lib/seo";
 
 /**
@@ -30,8 +30,13 @@ export function generateStaticParams() {
   return getAllPosts().map((p) => ({ slug: p.slug }));
 }
 
-export function generateMetadata({ params }) {
-  const post = getPost(params.slug);
+// `params` is a Promise in Next 15 and must be awaited before its properties
+// are read - the same `await params` the other dynamic routes in this app
+// already use. Reading it synchronously still works during a prerender, so a
+// production build hides the mistake; `next dev` renders on demand and throws.
+export async function generateMetadata({ params }) {
+  const { slug } = await params;
+  const post = getPost(slug);
   if (!post) return {};
   return publicPageMetadata({
     title: post.title,
@@ -40,8 +45,14 @@ export function generateMetadata({ params }) {
   });
 }
 
+/** Pill link used by the contextual aside. One class, so a country chip and
+ *  an industry chip cannot drift apart visually. */
+const chip =
+  "inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-[13px] font-medium text-gray-700 transition-colors hover:border-[#131C55]/30 hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:text-blue-300 dark:focus-visible:outline-blue-300";
+
 export default async function BlogPostPage({ params }) {
-  const post = getPost(params.slug);
+  const { slug } = await params;
+  const post = getPost(slug);
   if (!post) notFound();
 
   const path = blogPostPath(post.slug);
@@ -129,21 +140,40 @@ export default async function BlogPostPage({ params }) {
               Browse the data behind this article
             </h2>
             <p className="mt-1.5 text-[13px] leading-relaxed text-gray-500 dark:text-gray-400">
-              Every country named above has its own page of live listings.
+              Each country and industry below has its own page of live listings.
             </p>
-            <ul className="mt-4 flex flex-wrap gap-2">
+
+            <p className="mt-4 text-[12px] font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500">
+              By country
+            </p>
+            <ul className="mt-2 flex flex-wrap gap-2">
               {data.topCountries.map((c) => (
                 <li key={c.slug}>
-                  <Link
-                    href={countryLandingPath(c.slug)}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-[13px] font-medium text-gray-700 transition-colors hover:border-[#131C55]/30 hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:text-blue-300 dark:focus-visible:outline-blue-300"
-                  >
+                  <Link href={countryLandingPath(c.slug)} className={chip}>
                     {c.label}
                     <span className="tabular-nums text-gray-400 dark:text-gray-500">{c.count}</span>
                   </Link>
                 </li>
               ))}
             </ul>
+
+            {data.topIndustries.length ? (
+              <>
+                <p className="mt-5 text-[12px] font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500">
+                  By industry
+                </p>
+                <ul className="mt-2 flex flex-wrap gap-2">
+                  {data.topIndustries.map((c) => (
+                    <li key={c.slug}>
+                      <Link href={categoryLandingPath(c.slug)} className={chip}>
+                        {c.label}
+                        <span className="tabular-nums text-gray-400 dark:text-gray-500">{c.count}</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            ) : null}
           </aside>
         ) : null}
 

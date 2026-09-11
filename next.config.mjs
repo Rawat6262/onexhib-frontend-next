@@ -1,6 +1,5 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import createMDX from "@next/mdx";
 import { duplicateExhibitionRedirects } from "./lib/duplicate-redirects.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -134,18 +133,4 @@ const nextConfig = {
   },
 };
 
-/**
- * MDX is enabled for blog posts only.
- *
- * `pageExtensions` is deliberately NOT extended: a .mdx file must never become
- * a route by sitting in app/. Posts live in content/blog/ and are imported by
- * app/(public)/blog/[slug]/page.jsx, so routing, metadata and JSON-LD stay in
- * one reviewed place rather than being implied by a filename.
- *
- * No frontmatter plugin: remark-mdx-frontmatter pulls in `toml`, which carries
- * two unfixed high-severity advisories. MDX supports ESM exports natively, so
- * each post exports a `meta` object instead - same result, no dependency.
- */
-const withMDX = createMDX({});
-
-export default withMDX(nextConfig);
+export default nextConfig;

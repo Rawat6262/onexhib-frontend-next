@@ -28,6 +28,7 @@ import { PUBLIC_ROUTES } from "@/lib/seo";
 
 export const PUBLIC_NAV = [
   { href: PUBLIC_ROUTES.exhibitions, label: "Exhibitions" },
+  { href: `${PUBLIC_ROUTES.exhibitions}/monthly`, label: "Calendar" },
   { href: PUBLIC_ROUTES.companies, label: "Companies" },
   { href: PUBLIC_ROUTES.products, label: "Products" },
   { href: PUBLIC_ROUTES.services, label: "Services" },

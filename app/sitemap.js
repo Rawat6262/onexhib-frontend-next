@@ -11,6 +11,7 @@ import {
 import { getLocationIndex } from "@/lib/locations";
 import { getCategoryIndex } from "@/lib/categories";
 import { getAllPosts } from "@/lib/blog";
+import { getIndexableMonths, getThisWeekExhibitions, monthSlug } from "@/lib/discovery";
 import {
   getCompanies,
   getExhibitions,
@@ -103,13 +104,52 @@ async function buildAllUrls() {
     { url: `${SITE_URL}${PUBLIC_ROUTES.locations}`, changeFrequency: "weekly", priority: 0.8 },
     { url: `${SITE_URL}${PUBLIC_ROUTES.companies}`, changeFrequency: "weekly", priority: 0.8 },
     { url: `${SITE_URL}${PUBLIC_ROUTES.products}`, changeFrequency: "weekly", priority: 0.8 },
-    { url: `${SITE_URL}${PUBLIC_ROUTES.services}`, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${SITE_URL}${PUBLIC_ROUTES.exhibitions}/monthly`, changeFrequency: "weekly", priority: 0.7 },
     { url: `${SITE_URL}/about`, changeFrequency: "yearly", priority: 0.5 },
     { url: `${SITE_URL}/contact`, changeFrequency: "yearly", priority: 0.5 },
     { url: `${SITE_URL}/terms`, changeFrequency: "yearly", priority: 0.3 },
     { url: `${SITE_URL}/privacy-policy`, changeFrequency: "yearly", priority: 0.3 },
     { url: `${SITE_URL}/delete-account`, changeFrequency: "yearly", priority: 0.3 },
   ].map((entry) => ({ lastModified: now, ...entry }));
+
+  // Date-based discovery. Both follow the same rule as the blog hub: listed
+  // only while they hold something.
+  //
+  //  - /exhibitions/this-week is noindex on an empty week, so it is omitted
+  //    then rather than pointing a crawler at a page that refuses indexing.
+  //  - Month pages exist only above MIN_MONTH_EXHIBITIONS (lib/discovery.js),
+  //    and `dynamicParams = false` makes every other month a 404. Listing the
+  //    same qualifying set here keeps the sitemap and the router in agreement -
+  //    a sitemap full of 404s is worse than a short one.
+  //
+  // /exhibitions/this-week deliberately carries no lastModified beyond the
+  // build: its content turns over weekly by definition.
+  const [thisWeek, indexableMonths] = await Promise.all([
+    getThisWeekExhibitions(now),
+    getIndexableMonths(now),
+  ]);
+
+  const dateEntries = [
+    ...(thisWeek.length
+      ? [
+          {
+            url: `${SITE_URL}${PUBLIC_ROUTES.exhibitions}/this-week`,
+            lastModified: now,
+            changeFrequency: "daily",
+            priority: 0.8,
+          },
+        ]
+      : []),
+    ...indexableMonths.map((m) => {
+      const { year, month } = monthSlug(m.year, m.month);
+      return {
+        url: `${SITE_URL}${PUBLIC_ROUTES.exhibitions}/monthly/${year}/${month}`,
+        lastModified: now,
+        changeFrequency: "weekly",
+        priority: 0.6,
+      };
+    }),
+  ];
 
   // Blog. The hub is listed only when it has posts — it is noindex while empty
   // (see app/(public)/blog/page.jsx), and a sitemap should never contain a URL
@@ -186,6 +226,7 @@ async function buildAllUrls() {
 
   const entries = [
     ...staticEntries,
+    ...dateEntries,
     ...blogEntries,
     ...locationEntries,
     ...categoryEntries,

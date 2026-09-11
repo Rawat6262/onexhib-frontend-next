@@ -50,9 +50,9 @@ export const revalidate = 300;
  */
 const SHOW_PROVIDER_LISTINGS = false;
 
-const TITLE = "Exhibition services — printing, fabrication, furniture and staffing";
+const TITLE = "Exhibition services — printing, fabrication, staffing";
 const DESCRIPTION =
-  "The services exhibitors need to prepare for a trade show: stall fabrication, furniture and LED rental, printing, catalog printing, protocol staff and corporate gifting.";
+  "The services exhibitors need before a trade show: stall fabrication, furniture and LED rental, printing, protocol staff and corporate gifting.";
 
 /**
  * Descriptions of what each service category covers. These describe the

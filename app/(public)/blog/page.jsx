@@ -46,7 +46,7 @@ export const metadata = empty
   : publicPageMetadata({
       title: "Insights from the world of exhibitions",
       description:
-        "Data-led articles on exhibitions and trade shows — where they happen, when the season peaks, and how to plan around it. Counted from the exhibitions listed on OneXhib.",
+        "Data-led articles on exhibitions and trade shows: where they happen, when the season peaks, and how to plan around it. Counted from OneXhib listings.",
       path: PUBLIC_ROUTES.blog,
     });
 

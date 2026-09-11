@@ -56,7 +56,13 @@ export async function generateMetadata({ params }) {
       .join(" ") + " listed on OneXhib.";
 
   return publicPageMetadata({
-    title: [company.name, company.nature].filter(Boolean).join(" — "),
+    // The trade descriptor is dropped rather than the company's own name when
+    // the pair would truncate in search results — registered names run long
+    // ("... Private Limited") and the name is what people search for.
+    title:
+      [company.name, company.nature].filter(Boolean).join(" — ").length <= 50
+        ? [company.name, company.nature].filter(Boolean).join(" — ")
+        : company.name,
     description,
     path: companyPath(company.name, company.id),
     // A base64 data: URI is a valid <img> src but useless as og:image —

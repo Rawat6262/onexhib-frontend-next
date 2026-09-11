@@ -51,7 +51,7 @@ const readPage = (sp) => {
 function describe(facet, summary) {
   const title = `${facet.label} exhibitions and trade shows worldwide`;
   const description = summary
-    ? `${facet.count} upcoming ${facet.label.toLowerCase()} exhibitions and trade shows worldwide, running from ${summary.firstLabel} to ${summary.lastLabel}. See dates, locations and full details for every event.`
+    ? `${facet.count} upcoming ${facet.label.toLowerCase()} exhibitions and trade shows worldwide, running ${summary.firstLabel} to ${summary.lastLabel}. See dates and locations for every event.`
     : `Upcoming ${facet.label.toLowerCase()} exhibitions and trade shows worldwide, with dates, locations and full details for every event.`;
   return { title, description };
 }

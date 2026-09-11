@@ -32,9 +32,9 @@ import {
 export const revalidate = 300;
 
 export const metadata = publicPageMetadata({
-  title: "About OneXhib — the exhibition discovery platform",
+  title: "About the exhibition discovery platform",
   description:
-    "OneXhib is an exhibition and trade-show discovery platform connecting organisers, exhibitors and service providers. Founded in 2024 and based in Ludhiana, Punjab, India.",
+    "An exhibition and trade-show discovery platform connecting organisers, exhibitors and service providers. Founded 2024, based in Ludhiana, India.",
   path: "/about",
 });
 

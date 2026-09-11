@@ -25,9 +25,9 @@ import {
  */
 
 export const metadata = publicPageMetadata({
-  title: "Contact OneXhib",
+  title: "Contact us",
   description:
-    "Get in touch with OneXhib by email or phone. We are based in Ludhiana, Punjab, India.",
+    "Get in touch with the OneXhib team by email or phone. We are based in Ludhiana, Punjab, India, and reply to organiser and exhibitor enquiries.",
   path: "/contact",
 });
 

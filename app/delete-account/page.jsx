@@ -7,7 +7,7 @@ import { pageMetadata } from "@/lib/seo";
 export const metadata = pageMetadata({
   title: "Delete Your Account",
   description:
-    "How to request deletion of your OneXhib account, what data is removed, and what is retained.",
+    "How to request deletion of your OneXhib account, what data is removed, what is retained, and how long the process takes.",
   path: "/delete-account",
   // Required to be publicly reachable by app-store account-deletion policies.
   robots: { index: true, follow: true },

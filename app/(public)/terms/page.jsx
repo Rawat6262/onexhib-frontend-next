@@ -37,7 +37,7 @@ const LAST_UPDATED_LABEL = "8 September 2026";
 export const metadata = publicPageMetadata({
   title: "Terms of Use",
   description:
-    "The terms that apply when you browse OneXhib or list exhibitions, companies, products or services on it.",
+    "The terms that apply when you browse OneXhib or list exhibitions, companies, products or services on it, including acceptable use and governing law.",
   path: "/terms",
 });
 

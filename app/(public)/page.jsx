@@ -21,6 +21,7 @@ import CompanyCard from "@/components/public/CompanyCard";
 import ProductCard from "@/components/public/ProductCard";
 import CountsStrip from "@/components/public/CountsStrip";
 import SponsorBanners from "@/components/public/SponsorBanners";
+import AiSearchBand from "@/components/public/AiSearchBand";
 import EmptyState from "@/components/public/EmptyState";
 import Faq from "@/components/public/Faq";
 import HomeJsonLd from "@/components/seo/HomeJsonLd";
@@ -28,7 +29,8 @@ import HomeJsonLd from "@/components/seo/HomeJsonLd";
 import { PUBLIC_ROUTES, publicPageMetadata } from "@/lib/seo";
 import { categoryLandingPath, cityLandingPath, countryLandingPath, exhibitionsScopePath } from "@/lib/routes";
 import { getLocationIndex } from "@/lib/locations";
-import { getBanners } from "@/lib/newsroom";
+import { getBanners, getNews } from "@/lib/newsroom";
+import { getThisWeekExhibitions } from "@/lib/discovery";
 import { getCategoryIndex } from "@/lib/categories";
 import {
   getCompanies,
@@ -74,7 +76,7 @@ export const revalidate = 300;
 export default async function HomePage() {
   // One parallel round of requests. Every fetcher fails soft, so a slow or
   // unreachable backend degrades individual sections instead of the page.
-  const [featured, ongoing, upcoming, previous, locations, industries, companies, products, counts, banners] = await Promise.all([
+  const [featured, ongoing, upcoming, previous, locations, industries, companies, products, counts, banners, thisWeek, news] = await Promise.all([
     getFeaturedExhibitions({ limit: 8 }),
     getOngoingExhibitions({ limit: 8 }),
     getUpcomingExhibitions({ limit: 8 }),
@@ -91,6 +93,12 @@ export default async function HomePage() {
     // Empty today, so SponsorBanners renders nothing and the page closes up
     // around it — no placeholder frame, no reserved space.
     getBanners(),
+    // The current Monday-to-Sunday window, read from the public scope
+    // endpoints (see lib/discovery.js for why not /api/exhibitions/thisweek).
+    getThisWeekExhibitions(),
+    // Quality-gated, so the section stays hidden while the feed holds only
+    // test records.
+    getNews(),
   ]);
 
   return (
@@ -103,6 +111,8 @@ export default async function HomePage() {
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
         <SponsorBanners banners={banners} />
       </div>
+
+      <AiSearchBand />
 
       {/* ── Featured ────────────────────────────────────────────── */}
       {/* Rendered only when the curated set is non-empty - an empty-state box
@@ -117,6 +127,28 @@ export default async function HomePage() {
           className="mt-16 sm:mt-20"
         >
           <FeaturedSlider items={featured.items} />
+        </Section>
+      ) : null}
+
+      {/* ── This week ───────────────────────────────────────────────────── */}
+      {/* Rendered only when the week holds something - an empty rail under a
+          "this week" heading reads as broken rather than quiet. */}
+      {thisWeek.length ? (
+        <Section
+          id="this-week"
+          title="Exhibitions this week"
+          intro="Opening between now and Sunday, worldwide."
+          cta="See the full week"
+          ctaHref={`${PUBLIC_ROUTES.exhibitions}/this-week`}
+          className="mt-16 sm:mt-20"
+        >
+          <Rail>
+            {thisWeek.slice(0, 8).map((exhibition) => (
+              <RailItem key={exhibition.id}>
+                <ExhibitionCard exhibition={exhibition} className="h-full" />
+              </RailItem>
+            ))}
+          </Rail>
         </Section>
       ) : null}
 
@@ -294,6 +326,43 @@ export default async function HomePage() {
       <WhyOneXhib archiveTotal={previous.total} />
       <ForBusinesses />
       <HowItWorks />
+
+      {/* ── Industry news ───────────────────────────────────────────────── */}
+      {/* Hidden entirely while the feed holds nothing publishable, which is the
+          case today — the two records in it are admin test rows. lib/newsroom.js
+          filters them, so this section appears on its own when real news lands
+          rather than needing a code change. */}
+      {news.items.length ? (
+        <Section
+          id="news"
+          title="Industry news"
+          intro="Announcements from across the exhibition world."
+          cta="All news"
+          ctaHref="/news"
+          className="mt-16 sm:mt-20"
+        >
+          <ul className="grid list-none grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {news.items.slice(0, 3).map((article) => (
+              <li
+                key={article.id}
+                className="ox-card flex flex-col rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900"
+              >
+                {article.category ? (
+                  <span className="line-clamp-1 text-[11px] font-semibold uppercase tracking-wide text-[#131C55] dark:text-blue-300">
+                    {article.category}
+                  </span>
+                ) : null}
+                <h3 className="mt-1.5 line-clamp-2 text-base font-semibold leading-snug text-gray-900 dark:text-gray-50">
+                  {article.title}
+                </h3>
+                <p className="mt-2 line-clamp-3 text-[15px] leading-relaxed text-gray-600 dark:text-gray-400">
+                  {article.description}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </Section>
+      ) : null}
 
       {/* ── FAQ ─────────────────────────────────────────────────────────── */}
       <Section

@@ -55,7 +55,7 @@ export async function generateMetadata({ params, searchParams }) {
   const summary = dateSummary(facet.dates);
   const canonical = countryLandingPath(facet.slug);
 
-  const title = `Exhibitions in ${facet.country} — upcoming trade shows and events`;
+  const title = `Exhibitions in ${facet.country} — upcoming trade shows`;
   const description = summary
     ? `${facet.count} upcoming exhibitions and trade shows across ${facet.country}, from ${summary.firstLabel} to ${summary.lastLabel}. Browse by city, with dates and full details for every event.`
     : `Upcoming exhibitions and trade shows across ${facet.country}, with dates and full details for every event.`;

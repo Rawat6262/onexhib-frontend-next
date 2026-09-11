@@ -59,7 +59,7 @@ const SCOPE_META = {
     title: "Past exhibitions and trade show archive",
     heading: "Past exhibitions",
     description:
-      "An archive of exhibitions and trade shows that have already taken place, with their dates, venues and locations — useful for researching an event before its next edition.",
+      "An archive of exhibitions and trade shows that have already taken place, with their dates, venues and locations — useful when researching an event.",
     intro: "Exhibitions that have already taken place, most recent first.",
   },
 };

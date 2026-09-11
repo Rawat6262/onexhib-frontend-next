@@ -61,7 +61,24 @@ export async function generateMetadata({ params }) {
 
   // Built from real fields, so every exhibition gets a genuinely unique title
   // and description rather than a template with the name swapped in.
-  const titleBits = [exhibition.name, place].filter(Boolean).join(" — ");
+  //
+  // The place suffix is shortened rather than the name. A long official name
+  // plus "City, State, Country" ran past 100 characters on the worst records
+  // (measured: 110 for Food2China Expo), which Google truncates mid-phrase.
+  // So the location degrades city+state+country -> city+country -> country ->
+  // nothing until the title fits, and the event's own name is never cut: the
+  // name is what someone searches for, the state rarely is.
+  const titleBudget = 60 - 10; // 10 = the " · OneXhib" the layout template appends
+  const placeForms = [
+    place,
+    formatLocation({ city: exhibition.city, country: exhibition.country }),
+    exhibition.country || "",
+    "",
+  ];
+  const fitting = placeForms.find(
+    (p) => [exhibition.name, p].filter(Boolean).join(" — ").length <= titleBudget
+  );
+  const titleBits = [exhibition.name, fitting ?? ""].filter(Boolean).join(" — ");
   const description =
     truncate(exhibition.about, 155) ||
     [

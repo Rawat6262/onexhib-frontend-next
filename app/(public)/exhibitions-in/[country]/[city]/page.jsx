@@ -61,7 +61,7 @@ const readPage = (sp) => {
  */
 function describe(facet, count, summary) {
   const where = `${facet.city}, ${facet.country}`;
-  const title = `Exhibitions in ${facet.city} — upcoming trade shows and events`;
+  const title = `Exhibitions in ${facet.city} — upcoming trade shows`;
   const description = summary
     ? `${count} upcoming exhibitions and trade shows in ${where}, running from ${summary.firstLabel} to ${summary.lastLabel}. See dates and full details for every event.`
     : `Upcoming exhibitions and trade shows in ${where}, with dates and full details for every event.`;

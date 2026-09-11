@@ -25,7 +25,7 @@ import { getLocationIndex, MIN_CITY, MIN_COUNTRY } from "@/lib/locations";
 export const revalidate = 3600;
 
 export const metadata = publicPageMetadata({
-  title: "Exhibitions by country and city — where trade shows are held",
+  title: "Where trade shows are held — by country and city",
   description:
     "Find exhibitions and trade shows by location. Browse the countries and cities with the most upcoming business events, each with dates and full details.",
   path: PUBLIC_ROUTES.locations,

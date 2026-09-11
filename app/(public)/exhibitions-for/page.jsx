@@ -22,7 +22,7 @@ export const revalidate = 3600;
 
 const TITLE = "Exhibitions by industry — trade shows by sector";
 const DESCRIPTION =
-  "Find exhibitions and trade shows by industry, from technology and manufacturing to textiles, agriculture and healthcare. Each sector lists its upcoming events with dates and locations.";
+  "Find exhibitions and trade shows by industry, from technology and manufacturing to textiles, agriculture and healthcare, each with dates and locations.";
 
 /**
  * Indexable only once it has industries to list.

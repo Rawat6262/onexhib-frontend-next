@@ -12,6 +12,7 @@ import { getLocationIndex } from "@/lib/locations";
 import { getCategoryIndex } from "@/lib/categories";
 import { getAllPosts } from "@/lib/blog";
 import { getIndexableMonths, getThisWeekExhibitions, monthSlug } from "@/lib/discovery";
+import { getNews } from "@/lib/newsroom";
 import {
   getCompanies,
   getExhibitions,
@@ -124,10 +125,17 @@ async function buildAllUrls() {
   //
   // /exhibitions/this-week deliberately carries no lastModified beyond the
   // build: its content turns over weekly by definition.
-  const [thisWeek, indexableMonths] = await Promise.all([
+  const [thisWeek, indexableMonths, news] = await Promise.all([
     getThisWeekExhibitions(now),
     getIndexableMonths(now),
+    // /news joins on the same terms: noindex while it has no publishable
+    // article, so it is listed only once it has one.
+    getNews(),
   ]);
+
+  const newsEntries = news.items.length
+    ? [{ url: `${SITE_URL}/news`, lastModified: now, changeFrequency: "weekly", priority: 0.6 }]
+    : [];
 
   const dateEntries = [
     ...(thisWeek.length
@@ -227,6 +235,7 @@ async function buildAllUrls() {
   const entries = [
     ...staticEntries,
     ...dateEntries,
+    ...newsEntries,
     ...blogEntries,
     ...locationEntries,
     ...categoryEntries,

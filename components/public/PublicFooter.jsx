@@ -55,6 +55,7 @@ export default function PublicFooter({ locations }) {
             <FooterLink href={PUBLIC_ROUTES.products}>Products</FooterLink>
             <FooterLink href={PUBLIC_ROUTES.locations}>Exhibitions by location</FooterLink>
             <FooterLink href={PUBLIC_ROUTES.categories}>Exhibitions by industry</FooterLink>
+            <FooterLink href="/news">Industry news</FooterLink>
             <FooterLink href={PUBLIC_ROUTES.services}>Exhibition services</FooterLink>
           </FooterColumn>
 

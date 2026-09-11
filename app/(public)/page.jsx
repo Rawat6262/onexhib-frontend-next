@@ -20,6 +20,7 @@ import HeroShowcase from "@/components/public/HeroShowcase";
 import CompanyCard from "@/components/public/CompanyCard";
 import ProductCard from "@/components/public/ProductCard";
 import CountsStrip from "@/components/public/CountsStrip";
+import SponsorBanners from "@/components/public/SponsorBanners";
 import EmptyState from "@/components/public/EmptyState";
 import Faq from "@/components/public/Faq";
 import HomeJsonLd from "@/components/seo/HomeJsonLd";
@@ -27,6 +28,7 @@ import HomeJsonLd from "@/components/seo/HomeJsonLd";
 import { PUBLIC_ROUTES, publicPageMetadata } from "@/lib/seo";
 import { categoryLandingPath, cityLandingPath, countryLandingPath, exhibitionsScopePath } from "@/lib/routes";
 import { getLocationIndex } from "@/lib/locations";
+import { getBanners } from "@/lib/newsroom";
 import { getCategoryIndex } from "@/lib/categories";
 import {
   getCompanies,
@@ -72,7 +74,7 @@ export const revalidate = 300;
 export default async function HomePage() {
   // One parallel round of requests. Every fetcher fails soft, so a slow or
   // unreachable backend degrades individual sections instead of the page.
-  const [featured, ongoing, upcoming, previous, locations, industries, companies, products, counts] = await Promise.all([
+  const [featured, ongoing, upcoming, previous, locations, industries, companies, products, counts, banners] = await Promise.all([
     getFeaturedExhibitions({ limit: 8 }),
     getOngoingExhibitions({ limit: 8 }),
     getUpcomingExhibitions({ limit: 8 }),
@@ -86,6 +88,9 @@ export default async function HomePage() {
     getCompanies({ page: 1, limit: 8 }),
     getProducts({ page: 1, limit: 8 }),
     getCounts(),
+    // Empty today, so SponsorBanners renders nothing and the page closes up
+    // around it — no placeholder frame, no reserved space.
+    getBanners(),
   ]);
 
   return (
@@ -93,6 +98,11 @@ export default async function HomePage() {
       <HomeJsonLd upcomingCount={upcoming.total} />
 
       <Hero counts={counts} upcoming={upcoming} />
+
+      {/* Renders nothing while there are no live banners - no empty frame. */}
+      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
+        <SponsorBanners banners={banners} />
+      </div>
 
       {/* ── Featured ────────────────────────────────────────────── */}
       {/* Rendered only when the curated set is non-empty - an empty-state box

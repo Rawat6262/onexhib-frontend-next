@@ -9,6 +9,7 @@ import { PUBLIC_ROUTES, publicPageMetadata } from "@/lib/seo";
 import { breadcrumbNode, graph, itemListNode } from "@/lib/jsonld";
 import { cityLandingPath, countryLandingPath } from "@/lib/routes";
 import { getLocationIndex, MIN_CITY, MIN_COUNTRY } from "@/lib/locations";
+import { getGeoCountryMap } from "@/lib/public-api";
 
 /**
  * The location hub: /exhibitions-in
@@ -32,7 +33,10 @@ export const metadata = publicPageMetadata({
 });
 
 export default async function LocationsHubPage() {
-  const { countries } = await getLocationIndex();
+  // The geo map is a lookup for flags only — it never decides which countries
+  // appear. getLocationIndex() owns that, gated on real exhibition inventory,
+  // so the ~250-entry reference list cannot turn into ~250 pages.
+  const [{ countries }, geo] = await Promise.all([getLocationIndex(), getGeoCountryMap()]);
 
   const trail = [
     { name: "Home", path: "/" },
@@ -83,7 +87,15 @@ export default async function LocationsHubPage() {
         <div className="mt-10 space-y-10">
           {countries.map((country) => (
             <section key={country.slug} aria-labelledby={`country-${country.slug}`}>
-              <h2 id={`country-${country.slug}`} className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+              <h2 id={`country-${country.slug}`} className="flex items-center gap-2.5 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+                {/* Flag from the backend country reference. Decorative: the
+                    country name sits right beside it, so a screen reader
+                    announcing the emoji would just repeat it. */}
+                {geo.get(country.name?.toLowerCase())?.flag ? (
+                  <span aria-hidden="true" className="text-2xl leading-none">
+                    {geo.get(country.name.toLowerCase()).flag}
+                  </span>
+                ) : null}
                 <Link
                   href={countryLandingPath(country.slug)}
                   className="underline-offset-4 hover:text-[#131C55] hover:underline dark:hover:text-blue-300"

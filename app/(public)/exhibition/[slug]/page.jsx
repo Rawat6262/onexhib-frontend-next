@@ -1,11 +1,13 @@
 import Link from "next/link";
 import Image from "next/image";
 import { notFound, permanentRedirect } from "next/navigation";
-import { CalendarDays, MapPin, Building2, FileText, Tag } from "lucide-react";
+import { CalendarDays, MapPin, Building2, Tag } from "lucide-react";
 
 import Breadcrumbs from "@/components/public/Breadcrumbs";
 import CompanyCard from "@/components/public/CompanyCard";
 import JsonLd from "@/components/seo/JsonLd";
+import BrochureLink from "@/components/exhibition/BrochureLink";
+import SaveButton from "@/components/exhibition/SaveButton";
 
 import { PUBLIC_ROUTES, publicPageMetadata } from "@/lib/seo";
 import { breadcrumbNode, eventNode, graph, itemListNode } from "@/lib/jsonld";
@@ -260,17 +262,9 @@ export default async function ExhibitionDetailPage({ params }) {
               </Link>
             ) : null}
 
-            {exhibition.brochure ? (
-              <a
-                href={exhibition.brochure}
-                target="_blank"
-                rel="noopener noreferrer nofollow"
-                className="inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-900 transition hover:border-[#131C55] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:hover:border-gray-500"
-              >
-                <FileText size={16} aria-hidden="true" />
-                Exhibition brochure
-              </a>
-            ) : null}
+            <BrochureLink href={exhibition.brochure} />
+
+            <SaveButton exhibitionId={exhibition.id} exhibitionName={exhibition.name} />
           </div>
         </div>
 

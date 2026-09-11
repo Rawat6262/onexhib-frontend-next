@@ -48,6 +48,8 @@ export default function PublicFooter({ locations }) {
           <FooterColumn title="Discover">
             <FooterLink href={PUBLIC_ROUTES.exhibitions}>All exhibitions</FooterLink>
             <FooterLink href={exhibitionsScopePath("ongoing")}>Ongoing exhibitions</FooterLink>
+            <FooterLink href={`${PUBLIC_ROUTES.exhibitions}/this-week`}>Exhibitions this week</FooterLink>
+            <FooterLink href={`${PUBLIC_ROUTES.exhibitions}/monthly`}>Exhibition calendar</FooterLink>
             <FooterLink href={exhibitionsScopePath("previous")}>Past exhibitions</FooterLink>
             <FooterLink href={PUBLIC_ROUTES.companies}>Companies</FooterLink>
             <FooterLink href={PUBLIC_ROUTES.products}>Products</FooterLink>

@@ -12,7 +12,7 @@ import {
 import Breadcrumbs from "@/components/public/Breadcrumbs";
 import JsonLd from "@/components/seo/JsonLd";
 
-import { PUBLIC_ROUTES, publicPageMetadata } from "@/lib/seo";
+import { PUBLIC_ROUTES, pageMetadata, NOINDEX_FOLLOW } from "@/lib/seo";
 import { breadcrumbNode, graph } from "@/lib/jsonld";
 import { SERVICE_CATEGORIES } from "@/lib/public-api";
 
@@ -90,10 +90,31 @@ const CATEGORY_DETAIL = {
   },
 };
 
-export const metadata = publicPageMetadata({
+/**
+ * NOINDEX WHILE THERE ARE NO PROVIDERS.
+ *
+ * /api/getexhibitionservice returns zero records, so this page is category
+ * explainers and nothing else — no inventory, no provider, nothing a visitor
+ * from search could act on. That is a thin page, and it was the thinnest
+ * indexable URL on the site.
+ *
+ * It stays published and linked, because the categories are genuinely useful
+ * context for an exhibitor and the page is a real destination from the header.
+ * It is simply kept out of the index, and app/sitemap.js no longer lists it, so
+ * the sitemap and the robots directive agree.
+ *
+ * TO REVERSE: when real providers exist, flip SHOW_PROVIDER_LISTINGS to true
+ * and swap NOINDEX_FOLLOW back to publicPageMetadata here, then restore the
+ * entry in app/sitemap.js. Nothing else needs to change.
+ *
+ * `follow` is deliberate: the links out of this page to the rest of the site
+ * should still be crawled.
+ */
+export const metadata = pageMetadata({
   title: TITLE,
   description: DESCRIPTION,
   path: PUBLIC_ROUTES.services,
+  robots: NOINDEX_FOLLOW,
 });
 
 export default function ExhibitionServicesPage() {

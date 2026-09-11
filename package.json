@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test:seo": "node tests/redirect-map.test.mjs"
+    "test:seo": "node tests/redirect-map.test.mjs && node tests/discovery.test.mjs"
   },
   "dependencies": {
     "@next/third-parties": "^15.5.25",

@@ -15,7 +15,7 @@ import { categoryLandingPath, cityLandingPath, companyPath, countryLandingPath, 
 import { getExhibitionsInPlace, resolvePlaceLinks } from "@/lib/locations";
 import { resolveCategoryLink } from "@/lib/categories";
 import { idFromSlug, isCanonicalSlug } from "@/lib/slug";
-import { formatDateRange, formatLocation, toIsoDate, truncate } from "@/lib/format";
+import { formatDateRange, formatLocation, toIsoDate } from "@/lib/format";
 import { getCompaniesForExhibition, getExhibitionById } from "@/lib/public-api";
 import ExhibitionCard from "@/components/public/ExhibitionCard";
 
@@ -53,6 +53,36 @@ async function load(slugParam) {
   return exhibition?.name ? exhibition : null;
 }
 
+/**
+ * Trim prose to a meta description that ends on a sentence, not mid-clause.
+ *
+ * truncate() in lib/format.js cuts at the last word and appends an ellipsis,
+ * which produced descriptions like "...Companies from across…" — a fragment
+ * that reads as broken text in a search result. It is still the right helper
+ * everywhere else (card blurbs, where a clipped phrase is expected), so it is
+ * left alone and this handles the meta description case only.
+ *
+ * A full stop past 60% of the budget wins: earlier than that and the
+ * description is so short it wastes the slot, so a clean word-boundary cut with
+ * an ellipsis is the better trade. Abbreviations are why the full stop must be
+ * followed by a space or end-of-string — "No. 1 Fuhua Road" should not end a
+ * sentence.
+ */
+function trimToSentence(text, max = 155) {
+  const clean = String(text || "").replace(/\s+/g, " ").trim();
+  if (!clean) return "";
+  if (clean.length <= max) return clean;
+
+  const window = clean.slice(0, max + 1);
+  let end = -1;
+  for (const m of window.matchAll(/[.!?](\s|$)/g)) end = m.index + 1;
+  if (end > max * 0.6) return window.slice(0, end).trim();
+
+  const cut = clean.slice(0, max);
+  const space = cut.lastIndexOf(" ");
+  return `${(space > max * 0.6 ? cut.slice(0, space) : cut).replace(/[,;:.\s]+$/, "")}…`;
+}
+
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const exhibition = await load(slug);
@@ -70,7 +100,21 @@ export async function generateMetadata({ params }) {
   // So the location degrades city+state+country -> city+country -> country ->
   // nothing until the title fits, and the event's own name is never cut: the
   // name is what someone searches for, the state rarely is.
-  const titleBudget = 60 - 10; // 10 = the " · OneXhib" the layout template appends
+  //
+  // THE BUDGET IS 60, NOT 50, AND THE DIFFERENCE MATTERS MORE THAN IT LOOKS.
+  // At 50 the ladder dropped the city on 1,062 of 1,982 upcoming exhibitions —
+  // more than half. Search Console caught it concretely: the query "Hundmesse
+  // Barmstedt 2026" reached "2. Barmstedter Hundemesse 2026 — Germany", whose
+  // title had lost the word the searcher actually typed. That record missed by
+  // a single character (51 against a 50 budget).
+  //
+  // 60 keeps the city on ~1,215 instead of ~920. The rendered title then runs
+  // to 70 characters, past the ~60 Google shows in full — a deliberate trade:
+  // a tail that truncates visually still carries the city as a relevance
+  // signal, whereas a short title that never mentions the city cannot rank for
+  // it at all. Raising it further keeps adding cities but stops buying
+  // relevance, so this is the ceiling rather than the maximum.
+  const titleBudget = 70 - 10; // 10 = the " · OneXhib" the layout template appends
   const placeForms = [
     place,
     formatLocation({ city: exhibition.city, country: exhibition.country }),
@@ -82,7 +126,7 @@ export async function generateMetadata({ params }) {
   );
   const titleBits = [exhibition.name, fitting ?? ""].filter(Boolean).join(" — ");
   const description =
-    truncate(exhibition.about, 155) ||
+    trimToSentence(exhibition.about, 155) ||
     [
       exhibition.name,
       dates ? `runs ${dates}` : null,

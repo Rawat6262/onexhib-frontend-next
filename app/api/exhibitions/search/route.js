@@ -1,9 +1,6 @@
 import { NextResponse } from "next/server";
-import {
-  EXHIBITION_SCOPES,
-  getExhibitions,
-  searchExhibitions,
-} from "@/lib/public-api";
+import { getExhibitions, searchExhibitions } from "@/lib/public-api";
+import { ALL_SCOPE, DEFAULT_SCOPE, resolveScope } from "@/lib/exhibition-scopes";
 
 /**
  * JSON endpoint behind the public exhibition search box.
@@ -31,26 +28,30 @@ import {
  * (only /monthly, /thisweek and /featured), so nothing is shadowed.
  *
  * Contract: GET /api/exhibitions/search?scope=upcoming&search=textile&limit=12
+ *
+ * `scope` accepts upcoming | ongoing | previous | all. `all` fans out across
+ * the three search endpoints and adds a `byScope` object giving each scope's
+ * own match count, so a caller can say where the matches are.
  */
 
 // Exhibition data changes independently of deploys; never prerender this.
 export const dynamic = "force-dynamic";
 
-const DEFAULT_SCOPE = "upcoming";
 const MAX_LIMIT = 24;
 const MAX_SEARCH_LENGTH = 100;
 
 export async function GET(request) {
   const params = request.nextUrl.searchParams;
 
-  // Unknown scopes fall back rather than erroring — this feeds a search box,
-  // and an empty-handed 400 is a worse experience than sensible defaults.
-  const requested = params.get("scope");
-  const scope = requested && requested in EXHIBITION_SCOPES ? requested : DEFAULT_SCOPE;
-
   // The backend interpolates `search` straight into a RegExp with no escaping,
   // so a long or pathological pattern is a real cost. Trim hard before sending.
   const search = (params.get("search") || "").trim().slice(0, MAX_SEARCH_LENGTH);
+
+  // Same rule as the /exhibitions page, from the same function, so the two
+  // entry points cannot drift: an unknown scope falls back rather than
+  // erroring, and an unscoped SEARCH widens to every scope instead of
+  // silently becoming upcoming-only.
+  const scope = resolveScope(params.get("scope"), search);
 
   const parsedLimit = Number(params.get("limit"));
   const limit = Number.isFinite(parsedLimit)
@@ -60,12 +61,15 @@ export async function GET(request) {
   // With no keyword there is nothing to search for, and the paginated listing
   // endpoint answers the same question far more cheaply than the unbounded
   // *search one. `search=` only reaches the backend when it has a value.
+  //
+  // `all` has no listing endpoint behind it, so an empty-keyword request for it
+  // falls back to the default scope rather than returning nothing.
   const result = search
     ? await searchExhibitions(scope, search, { limit })
-    : await getExhibitions(scope, { page: 1, limit });
+    : await getExhibitions(scope === ALL_SCOPE ? DEFAULT_SCOPE : scope, { page: 1, limit });
 
   return NextResponse.json(
-    { scope, search, total: result.total, items: result.items },
+    { scope, search, total: result.total, byScope: result.byScope, items: result.items },
     {
       headers: {
         // A JSON payload carries no meta tag, so the crawl directive has to be

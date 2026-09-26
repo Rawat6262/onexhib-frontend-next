@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { LogOut, ChevronDown } from "lucide-react";
+import { LogOut, ChevronDown, UserCircle } from "lucide-react";
 
 import { logout } from "@/models/auth.model";
 import { useAuth } from "@/components/auth/AuthProvider";
@@ -94,6 +95,20 @@ export default function AccountMenu() {
               <p className="truncate text-xs text-gray-500 dark:text-gray-400">{email}</p>
             ) : null}
           </div>
+          {/* Rendered only when an id exists, because the destination is built
+              from it — a link to /social/profile/undefined would 404. The id is
+              never shown as text; it only forms the href. */}
+          {user?._id ? (
+            <Link
+              href={`/social/profile/${encodeURIComponent(String(user._id))}`}
+              role="menuitem"
+              onClick={() => setOpen(false)}
+              className="flex w-full items-center gap-2.5 border-b border-gray-100 px-4 py-2.5 text-left text-sm font-medium text-gray-700 transition hover:bg-gray-50 motion-reduce:transition-none dark:border-gray-800 dark:text-gray-200 dark:hover:bg-gray-800"
+            >
+              <UserCircle size={16} aria-hidden="true" className="text-gray-400" />
+              My social profile
+            </Link>
+          ) : null}
           <button
             type="button"
             role="menuitem"

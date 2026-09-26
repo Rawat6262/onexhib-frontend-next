@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "test:seo": "node tests/redirect-map.test.mjs && node tests/discovery.test.mjs && node tests/search-scope.test.mjs",
-    "test:social": "node tests/social-model.test.mjs && node tests/safe-url.test.mjs && node tests/social-reaction.test.mjs && node tests/social-cursor.test.mjs && node tests/social-notification-copy.test.mjs"
+    "test:social": "node tests/social-model.test.mjs && node tests/safe-url.test.mjs && node tests/social-reaction.test.mjs && node tests/social-cursor.test.mjs && node tests/social-notification-copy.test.mjs && node tests/social-profile.test.mjs"
   },
   "dependencies": {
     "@next/third-parties": "^15.5.25",

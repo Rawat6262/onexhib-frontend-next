@@ -34,12 +34,27 @@ import axios from "axios";
 
 const id = (value) => encodeURIComponent(String(value));
 
-/** `{ limit, cursor }` with absent values omitted, so no empty query params. */
-function pageParams({ limit, cursor } = {}) {
+/**
+ * `{ limit, cursor }` as query params, with absent values omitted so no empty
+ * params are sent.
+ *
+ * `signal` rides in the same object and becomes axios config rather than a query
+ * param. It is here because cancellation is a per-request concern the caller must
+ * be able to express — a profile list has to abandon its in-flight page when the
+ * viewer navigates to a different person, or the previous person's response lands
+ * in the new list. Putting it in the page object keeps every function a one-liner
+ * instead of growing a third argument.
+ */
+function pageParams({ limit, cursor, signal } = {}) {
   const params = {};
   if (limit !== undefined && limit !== null && limit !== "") params.limit = limit;
   if (cursor) params.cursor = cursor;
-  return Object.keys(params).length ? { params } : undefined;
+
+  const config = {};
+  if (Object.keys(params).length) config.params = params;
+  if (signal) config.signal = signal;
+
+  return Object.keys(config).length ? config : undefined;
 }
 
 // --- FOLLOW (5) --------------------------------------------------------------
@@ -58,7 +73,14 @@ export const getFollowing = (userId, page) =>
 
 // --- PROFILE (2) -------------------------------------------------------------
 
-export const getSocialProfile = (userId) => axios.get(`/api/social/profile/${id(userId)}`);
+/**
+ * `config` is passed straight to axios, matching auth.model.js's
+ * `signup(payload, config)`. It exists so a caller can supply a `signal`: a
+ * profile page must abandon its in-flight request when the viewer navigates to a
+ * different person, or the previous person's response paints the new page.
+ */
+export const getSocialProfile = (userId, config) =>
+  axios.get(`/api/social/profile/${id(userId)}`, config);
 
 /** Only `bio` and `headline` are editable — the backend ignores anything else. */
 export const updateSocialProfile = (payload) => axios.put("/api/social/profile", payload);

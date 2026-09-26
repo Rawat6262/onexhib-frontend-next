@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { ThumbsUp, ThumbsDown, MessageSquare, Globe, Users } from "lucide-react";
+import { ThumbsUp, ThumbsDown, MessageSquare, Globe, Users, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 
 import InitialsAvatar from "@/components/social/InitialsAvatar";
 import PostMedia from "@/components/social/PostMedia";
@@ -35,8 +35,9 @@ import {
  * fetched its own author, or its own reaction state, would turn one feed request
  * into forty-one.
  */
-export default function PostCard({ post, isOwnPost = false, onPostChange }) {
+export default function PostCard({ post, isOwnPost = false, onPostChange, onEditRequest, onDeleteRequest }) {
   const [pending, setPending] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // A card can be unmounted mid-mutation — the feed is replaced by a refresh, or
   // the reader navigates away. Writing state afterwards is a React warning and a
@@ -129,8 +130,6 @@ export default function PostCard({ post, isOwnPost = false, onPostChange }) {
               </span>
             ) : null}
             {isOwnPost ? (
-              // A label, not a menu. Edit and Delete belong to 11E; rendering a
-              // menu whose items do nothing is worse than rendering none.
               <>
                 <span aria-hidden="true">·</span>
                 <span className="font-medium text-gray-600 dark:text-gray-400">Your post</span>
@@ -138,6 +137,28 @@ export default function PostCard({ post, isOwnPost = false, onPostChange }) {
             ) : null}
           </div>
         </div>
+
+        {/* OWNER ONLY. Rendered from isOwnPost, which compares the cached auth id
+            with post.author._id — a UI decision about affordances. The server pins
+            ownership into both mutations regardless, and answers 404 for a
+            stranger, so this is not the boundary. */}
+        {isOwnPost && onEditRequest && onDeleteRequest ? (
+          <OwnerMenu
+            open={menuOpen}
+            onOpenChange={setMenuOpen}
+            // Disabled while a reaction is in flight, so an owner cannot delete a
+            // post whose reaction response is still on its way back.
+            disabled={pending}
+            onEdit={() => {
+              setMenuOpen(false);
+              onEditRequest(post);
+            }}
+            onDelete={() => {
+              setMenuOpen(false);
+              onDeleteRequest(post);
+            }}
+          />
+        ) : null}
       </header>
 
       {post.title ? (
@@ -198,6 +219,74 @@ export default function PostCard({ post, isOwnPost = false, onPostChange }) {
         </span>
       </footer>
     </article>
+  );
+}
+
+/**
+ * Edit / Delete for your own post.
+ *
+ * A small disclosure rather than a new dependency: Radix has no menu package
+ * installed, and pulling one in for two items would be the only new dependency in
+ * the phase. Escape and outside-click close it, matching AccountMenu's existing
+ * behaviour, and the items are real buttons in a role="menu".
+ */
+function OwnerMenu({ open, onOpenChange, disabled, onEdit, onDelete }) {
+  const rootRef = useRef(null);
+
+  useEffect(() => {
+    if (!open) return undefined;
+    const onKey = (e) => e.key === "Escape" && onOpenChange(false);
+    const onClick = (e) => {
+      if (!rootRef.current?.contains(e.target)) onOpenChange(false);
+    };
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("mousedown", onClick);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("mousedown", onClick);
+    };
+  }, [open, onOpenChange]);
+
+  return (
+    <div ref={rootRef} className="relative shrink-0">
+      <button
+        type="button"
+        onClick={() => onOpenChange(!open)}
+        disabled={disabled}
+        aria-expanded={open}
+        aria-haspopup="menu"
+        aria-label="Post options"
+        className="rounded-lg p-1.5 text-gray-500 transition hover:bg-gray-100 hover:text-gray-900 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
+      >
+        <MoreHorizontal size={18} aria-hidden="true" />
+      </button>
+
+      {open ? (
+        <div
+          role="menu"
+          className="absolute right-0 top-full z-40 mt-1 w-40 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl dark:border-gray-800 dark:bg-gray-900"
+        >
+          <button
+            type="button"
+            role="menuitem"
+            onClick={onEdit}
+            className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-sm font-medium text-gray-700 transition hover:bg-gray-50 motion-reduce:transition-none dark:text-gray-200 dark:hover:bg-gray-800"
+          >
+            <Pencil size={15} aria-hidden="true" className="text-gray-400" />
+            Edit
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            onClick={onDelete}
+            className="flex w-full items-center gap-2.5 border-t border-gray-100 px-3 py-2.5 text-left text-sm font-medium text-red-600 transition hover:bg-red-50 motion-reduce:transition-none dark:border-gray-800 dark:text-red-400 dark:hover:bg-red-950/40"
+          >
+            <Trash2 size={15} aria-hidden="true" />
+            Delete
+          </button>
+        </div>
+      ) : null}
+    </div>
   );
 }
 

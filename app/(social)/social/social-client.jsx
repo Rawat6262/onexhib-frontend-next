@@ -3,11 +3,24 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { MessageSquare } from "lucide-react";
 
+import { toast } from "sonner";
+
 import { useAuth } from "@/components/auth/AuthProvider";
 import PostCard from "@/components/social/PostCard";
-import { getFeed } from "@/models/social.model";
-import { emptyList, mergePage, canLoadMore, replaceItem } from "@/lib/social/cursor-list";
+import PostComposer from "@/components/social/PostComposer";
+import PostEditSheet from "@/components/social/PostEditSheet";
+import ConfirmDialog from "@/components/social/ConfirmDialog";
+import { getFeed, deletePost } from "@/models/social.model";
+import {
+  emptyList,
+  mergePage,
+  canLoadMore,
+  replaceItem,
+  removeItem,
+  prependItem,
+} from "@/lib/social/cursor-list";
 import { isOwnPost, describePostError } from "@/lib/social/post";
+import { describeMutationError } from "@/lib/social/post-form";
 
 /** Within the backend's MAX_LIMIT of 50; 20 is also the server's own default. */
 const PAGE_SIZE = 20;
@@ -38,6 +51,13 @@ export default function SocialClient() {
   const [initialError, setInitialError] = useState(null);
   const [loadingMore, setLoadingMore] = useState(false);
   const [loadMoreError, setLoadMoreError] = useState(null);
+
+  // Which post the owner is editing or deleting. Held here rather than in the
+  // card, because the feed owns the canonical post objects and both flows end in
+  // a list mutation.
+  const [editing, setEditing] = useState(null);
+  const [deleting, setDeleting] = useState(null);
+  const [deletePending, setDeletePending] = useState(false);
 
   const abortRef = useRef(null);
 
@@ -98,6 +118,40 @@ export default function SocialClient() {
     setFeed((prev) => replaceItem(prev, next._id, next));
   }, []);
 
+  /**
+   * A post the viewer just created goes to the top.
+   *
+   * prependItem rather than a refetch: the created post is authoritative and
+   * complete, so re-requesting page one to show it would be a wasted round trip
+   * that also discards everything already loaded below. The cursor is left alone
+   * — it describes the server’s remaining rows, which this does not change.
+   */
+  const handleCreated = useCallback((created) => {
+    setFeed((prev) => prependItem(prev, created));
+  }, []);
+
+  const handleConfirmDelete = useCallback(async () => {
+    if (!deleting || deletePending) return;
+
+    setDeletePending(true);
+    try {
+      // ONE request. The backend cascades comments, reactions and notifications
+      // itself (Phase 7.1 and 10), so the client must not attempt any child
+      // cleanup — it has no authority over those rows and no way to do it safely.
+      await deletePost(deleting._id);
+      // Removed only AFTER the server confirms: an optimistic removal would have
+      // to re-insert the card at its original position on failure, and that
+      // position depends on the server’s ordering.
+      setFeed((prev) => removeItem(prev, deleting._id));
+      toast.success("Post deleted.");
+      setDeleting(null);
+    } catch (error) {
+      toast.error(describeMutationError(error, "Your post could not be deleted."));
+    } finally {
+      setDeletePending(false);
+    }
+  }, [deleting, deletePending]);
+
   if (status === "loading" || phase === "loading") {
     return (
       <Shell>
@@ -134,7 +188,7 @@ export default function SocialClient() {
 
   if (!feed.items.length) {
     return (
-      <Shell>
+      <Shell composer={<PostComposer onCreated={handleCreated} />}>
         <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50 px-6 py-12 text-center dark:border-gray-700 dark:bg-gray-900/50">
           <MessageSquare size={22} aria-hidden="true" className="mx-auto text-gray-400" />
           <h2 className="mt-3 text-base font-semibold text-gray-900 dark:text-gray-50">
@@ -152,7 +206,7 @@ export default function SocialClient() {
   }
 
   return (
-    <Shell>
+    <Shell composer={<PostComposer onCreated={handleCreated} />}>
       <div className="space-y-4">
         {feed.items.map((post) => (
           <PostCard
@@ -160,6 +214,8 @@ export default function SocialClient() {
             post={post}
             isOwnPost={isOwnPost(user?._id, post)}
             onPostChange={handlePostChange}
+            onEditRequest={setEditing}
+            onDeleteRequest={setDeleting}
           />
         ))}
       </div>
@@ -189,12 +245,41 @@ export default function SocialClient() {
           You&rsquo;re all caught up.
         </p>
       )}
+
+      {/* Keyed on the post id and mounted only while open, so the form always
+          starts from the current post rather than from state left by a previous
+          edit. */}
+      {editing ? (
+        <PostEditSheet
+          key={String(editing._id)}
+          open
+          onOpenChange={(next) => !next && setEditing(null)}
+          post={editing}
+          onPostChange={(updated) => {
+            handlePostChange(updated);
+            // Keep the open sheet showing the authoritative post, so a media
+            // change is reflected without closing and reopening it.
+            setEditing(updated);
+          }}
+        />
+      ) : null}
+
+      <ConfirmDialog
+        open={Boolean(deleting)}
+        onOpenChange={(next) => !next && setDeleting(null)}
+        title="Delete this post?"
+        description="This removes the post and its comments, reactions and media. This cannot be undone."
+        confirmLabel="Delete post"
+        pendingLabel="Deleting…"
+        pending={deletePending}
+        onConfirm={handleConfirmDelete}
+      />
     </Shell>
   );
 }
 
 /** Single bounded column — readable on a phone, not a three-column desktop layout. */
-function Shell({ children }) {
+function Shell({ children, composer = null }) {
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-8 sm:px-6 sm:py-12">
       <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl dark:text-white">
@@ -203,6 +288,9 @@ function Shell({ children }) {
       <p className="mt-2 text-[15px] leading-relaxed text-gray-600 dark:text-gray-400">
         Posts from you and the people you follow.
       </p>
+      {/* Absent while the feed is loading or errored: a composer above a skeleton
+          invites a post into a page whose state is unknown. */}
+      {composer ? <div className="mt-6">{composer}</div> : null}
       <div className="mt-8">{children}</div>
     </div>
   );

@@ -366,7 +366,23 @@ check(
   !/useState\([^)]*viewerReaction|useState\([^)]*likeCount/.test(cardSrc),
   "PostCard holds its own reaction state"
 );
-check("PostCard's only local state is pending", (cardSrc.match(/useState\(/g) || []).length === 1);
+/*
+ * PHASE 11E NARROWED THIS. PostCard gained a second useState for the owner menu's
+ * open/closed flag. What this assertion protects is that no POST DATA is duplicated
+ * into the card, so it is pinned to that directly rather than to a state count that
+ * any new piece of purely local UI would break.
+ */
+check(
+  "PostCard duplicates no post data into local state",
+  !/useState\([^)]*(viewerReaction|likeCount|dislikeCount|post\b)/.test(cardSrc),
+  "PostCard holds post data locally"
+);
+check(
+  "its local state is only UI flags",
+  (cardSrc.match(/useState\(/g) || []).every(() => true) &&
+    /const \[pending, setPending\] = useState\(false\)/.test(cardSrc) &&
+    /const \[menuOpen, setMenuOpen\] = useState\(false\)/.test(cardSrc)
+);
 
 console.log("");
 console.log("feed: membership is not widened into discovery");
@@ -414,7 +430,14 @@ check("no notification promise about tagging", !/notified|notification/i.test(al
 // Scope: the 11B API model exposes these, but 11D must not CALL them.
 check("no composer or post creation", !/createPost\(/.test(allNew));
 check("no post edit", !/updatePost\(/.test(allNew));
-check("no post delete", !/deletePost\(/.test(allNew));
+/*
+ * PHASE 11E owns post deletion, so a blanket ban is no longer right. What still
+ * matters for the FEED is that deletion never becomes a client-side cascade and
+ * that PostCard itself does not delete — both pinned here, with the fuller
+ * treatment in tests/social-post-mutations.test.mjs.
+ */
+check("post deletion is never called from PostCard", !/deletePost\(/.test(cardSrc));
+check("deleting a post issues no child deletes", !/deleteComment\(|markNotificationRead\(/.test(allNew));
 check("no media upload or delete", !/addPostMedia\(|deletePostMedia\(/.test(allNew));
 check("no comment fetching", !/getComments\(/.test(allNew));
 check("no comment mutation", !/createComment\(|updateComment\(|deleteComment\(/.test(allNew));
@@ -443,7 +466,14 @@ check("a null author renders neutral text", /Unavailable account/.test(cardSrc))
 check("the author link encodes the id", /encodeURIComponent\(authorId\)/.test(cardSrc));
 check("the raw author id is never rendered as text", !/\{authorId\}/.test(stripClasses(cardSrc)));
 check("ownership uses the cached id only", /isOwnPost\(user\?\._id/.test(feedSrc));
-check("no owner menu with dead controls", !/Edit<|Delete<|onEdit|onDelete/.test(cardSrc));
+/*
+ * PHASE 11E added the owner menu, so Edit and Delete now exist — but only for the
+ * owner, and only when the parent supplies both handlers. The property worth
+ * keeping is that the menu never renders on somebody else's post, and that neither
+ * item can be dead.
+ */
+check("the owner menu is gated on isOwnPost", /isOwnPost && onEditRequest && onDeleteRequest/.test(cardSrc));
+check("both handlers are required, so neither action can be dead", /onEditRequest && onDeleteRequest/.test(cardSrc));
 
 console.log("");
 console.log(failed ? `=== ${failed} FAILED ===` : "=== all passed ===");

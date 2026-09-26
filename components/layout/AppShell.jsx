@@ -7,6 +7,25 @@ import AppHeader, { PUBLIC_NAV, mobileLink } from "@/components/layout/AppHeader
 import AccountMenu from "@/components/layout/AccountMenu";
 
 /**
+ * Community sits in the SIGNED-IN header only, and this is the place that makes
+ * that true without a single conditional.
+ *
+ * Every social endpoint requires the uid cookie, so a Community link shown to a
+ * guest can only ever bounce them to /login. The obvious implementation — read
+ * `status` from useAuth() inside AppHeader — would be wrong for a different
+ * reason: AppHeader is deliberately NOT a client component, its mobile menu is a
+ * native <details>, and the public site ships zero JavaScript for navigation.
+ * Adding a hook there would opt every public page into a client bundle for a link
+ * those visitors must not see anyway.
+ *
+ * AppShell already solves it. Its only three consumers are (dashboard), (social)
+ * and admin, and all three wrap it in RequireAuth — so anything added to the nav
+ * here is authenticated by construction. PublicHeader renders AppHeader directly
+ * and never sees this entry.
+ */
+const COMMUNITY_NAV = [{ href: "/social", label: "Community" }];
+
+/**
  * The signed-in shell: same header as the public site, plus a workspace sub-nav.
  *
  * REPLACES SidebarShell, and the reasoning is worth keeping. The old shell was
@@ -30,7 +49,7 @@ export default function AppShell({ items = [], children }) {
   return (
     <div className="flex min-h-screen flex-col bg-white dark:bg-gray-950">
       <AppHeader
-        nav={PUBLIC_NAV}
+        nav={[...PUBLIC_NAV, ...COMMUNITY_NAV]}
         right={<AccountMenu />}
         mobileExtra={
           items.length ? (

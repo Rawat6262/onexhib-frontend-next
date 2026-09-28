@@ -13,7 +13,9 @@ export default function OrganiserDetailsView({Cl : onClose,data: organiserId }) 
       setLoading(true);
       setError("");
       const { data } = await getOrganiserById(organiserId);
-      setOrganiser(data);
+      // Phase 12B: the scoped endpoint wraps its six fields in { success, organiser },
+      // where the removed one answered with a bare (and far too large) document.
+      setOrganiser((data && data.organiser) || null);
     } catch (err) {
       console.error("Error fetching organiser:", err.message);
       setError("Failed to load organiser details.");

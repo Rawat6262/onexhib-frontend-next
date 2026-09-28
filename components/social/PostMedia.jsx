@@ -49,7 +49,7 @@ export default function PostMedia({ media }) {
             {item.type === "IMAGE" ? (
               <Image
                 src={item.url}
-                alt={mediaAlt(index, count)}
+                alt={mediaAlt(index, count, "IMAGE")}
                 fill
                 sizes="(min-width: 768px) 640px, 100vw"
                 unoptimized={!isOptimisableMedia(item.url)}
@@ -61,6 +61,9 @@ export default function PostMedia({ media }) {
                 poster={item.thumbnailUrl || undefined}
                 controls
                 preload="metadata"
+                // Without this the player has no accessible name: images carry alt
+                // text and a <video> carries none of its own.
+                aria-label={mediaAlt(index, count, "VIDEO")}
                 className="absolute inset-0 h-full w-full bg-black object-contain"
               />
             )}

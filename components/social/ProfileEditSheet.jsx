@@ -90,7 +90,9 @@ export default function ProfileEditSheet({ open, onOpenChange, profile, onSaved 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-full sm:max-w-md">
-        <form onSubmit={handleSubmit} className="flex h-full flex-col">
+        {/* aria-busy while saving, matching every other social form — this was the
+            only one without it. */}
+        <form onSubmit={handleSubmit} aria-busy={saving || undefined} className="flex h-full flex-col">
           <SheetHeader>
             <SheetTitle>Edit profile</SheetTitle>
             <SheetDescription>

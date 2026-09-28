@@ -239,8 +239,20 @@ check(
   describeRequestError(err(404, "Post not found."))
 );
 check("429 uses the server's wording", describeRequestError(err(429, "Too many follow requests.")) === "Too many follow requests.");
-check("429 without a message still explains", /wait/i.test(describeRequestError(err(429))));
+// EXACT equality, not a loose /wait/i match. Phase 11I aligned this fallback with
+// every other social helper, so the shared sentence is now the thing worth pinning —
+// a loose match let one helper drift to its own wording for six phases.
+check("429 without a message uses the SHARED social wording",
+  describeRequestError(err(429)) === "Too many requests. Please try again shortly.");
 check("400 shows the validation message", describeRequestError(err(400, "Bio too long.")) === "Bio too long.");
+// PHASE 11I: nothing asserted this either.
+check("a structured message object is not rendered",
+  describeRequestError({ response: { status: 400, data: { message: { nested: true } } } }, "fallback") === "fallback");
+check("an array message is not rendered",
+  describeRequestError({ response: { status: 400, data: { message: ["a"] } } }, "fallback") === "fallback");
+check("a structured 429 body falls back to the shared wording",
+  describeRequestError({ response: { status: 429, data: { message: { retryIn: 30 } } } })
+    === "Too many requests. Please try again shortly.");
 check("500 uses the caller's fallback", describeRequestError(err(500), "Could not load.") === "Could not load.");
 check("a network error (no response) uses the fallback", describeRequestError(new Error("Network Error"), "Could not load.") === "Could not load.");
 check("no axios internals leak", !/axios|stack|Error:/i.test(describeRequestError(err(500))));
@@ -398,6 +410,57 @@ check("no Authorization or Bearer handling", !/Authorization|Bearer/i.test(allNe
 check("no JWT decoding", !/\bjwt\b|decodeToken|atob\(/i.test(allNew));
 check("no cookie reading", !/document\.cookie/.test(allNew));
 check("no dangerouslySetInnerHTML", !/dangerouslySetInnerHTML/.test(allNew));
+// PHASE 11I: a bare /innerHTML/ grep does NOT match dangerouslySetInnerHTML, and
+// this suite had no case-insensitive form and no storage check at all.
+check("no innerHTML assignment, in any casing", !/innerhtml/i.test(allNew));
+check("no localStorage or sessionStorage", !/localStorage|sessionStorage/.test(allNew));
+
+console.log("");
+console.log("profile: the dead Overview tab was removed in 11I");
+
+// It existed to hold "Posts will appear here once posting is available" — true in
+// 11C, false from 11E — and it was the DEFAULT tab, so every profile visit opened on
+// a panel whose only content was a claim about a feature that had since shipped.
+check("no Overview tab remains", !/"overview"|Overview/.test(clientSrc));
+check("the false posting copy is gone", !/posting is available/.test(clientSrc));
+check("nothing else claims a feature is unavailable",
+  !/will appear here once|coming soon|not yet available/i.test(clientSrc));
+check("exactly two tabs remain",
+  /const TABS = Object\.freeze\(\[\s*\{ key: "followers", label: "Followers" \},\s*\{ key: "following", label: "Following" \},\s*\]\)/.test(clientSrc));
+// The default is DERIVED from the tab set, not written twice. A literal default is
+// how the removal left a setTab("overview") pointing at a tab that no longer existed.
+check("the default tab is derived from the tab set", /const DEFAULT_TAB = TABS\[0\]\.key;/.test(clientSrc));
+check("the initial state uses it", /useState\(DEFAULT_TAB\)/.test(clientSrc));
+check("the reset on a userId change uses it too", /setTab\(DEFAULT_TAB\);/.test(clientSrc));
+check("no tab key is written as a literal anywhere else",
+  (clientSrc.match(/setTab\("/g) || []).length === 0);
+check("the tab set is the single source — no second TABS array",
+  (clientSrc.match(/const TABS =/g) || []).length === 1);
+check("no Posts tab was added in its place — that is still deferred scope",
+  !/key: "posts"|getUserPosts\(/.test(clientSrc));
+check("the tablist is still keyboard reachable", /role="tablist"/.test(clientSrc) && /role="tab"/.test(clientSrc));
+check("each tab still controls a labelled panel",
+  /aria-controls=/.test(clientSrc) && /aria-labelledby=/.test(clientSrc));
+
+console.log("");
+console.log("profile: long content cannot overflow a 320px screen");
+
+// A website URL is ONE unbroken token, so break-words does not help it — it needs
+// break-all. The other three are prose and only need break-words.
+check("the website link can break mid-token", /break-all/.test(headerSrc));
+check("the website link is bounded by its container", /max-w-full/.test(headerSrc));
+check("the display name wraps", /<h1 className="break-words/.test(headerSrc));
+check("the headline wraps", /mt-1 break-words text-\[15px\] font-medium/.test(headerSrc));
+check("the bio wraps as well as preserving line breaks",
+  /whitespace-pre-line break-words/.test(headerSrc));
+check("the identity column can shrink inside its flex row", /min-w-0/.test(headerSrc));
+
+console.log("");
+console.log("profile: the edit form reports itself busy, like every other social form");
+
+check("the profile edit form has aria-busy",
+  /<form onSubmit=\{handleSubmit\} aria-busy=\{saving \|\| undefined\}/.test(
+    stripComments(await read("../components/social/ProfileEditSheet.jsx"))));
 check("no markdown or HTML parser", !/marked|markdown|html-react-parser|DOMPurify/i.test(allNew));
 check("no tag notification types", !/POST_TAG|COMMENT_TAG/.test(allNew));
 check("no avatar or cover upload", !/upload/i.test(allNew));

@@ -13,10 +13,21 @@ import { isSelfProfile, applyFollowerDelta, describeRequestError } from "@/lib/s
 /**
  * A Community profile, fetched against the viewer's own session.
  *
- * TABS, NOT ROUTES. Overview / Followers / Following are local state, so moving
- * between them costs no navigation and no re-fetch of the profile. There is no
- * Posts tab: post UI belongs to 11D, and a tab that renders nothing is worse than
- * an absent one.
+ * TABS, NOT ROUTES. Followers / Following are local state, so moving between them
+ * costs no navigation and no re-fetch of the profile.
+ *
+ * THERE IS NO POSTS TAB, AND NO LONGER AN OVERVIEW TAB EITHER. Overview existed in
+ * 11C to hold the line "Posts will appear here once posting is available" — true
+ * then, false from 11E onward, and it was the DEFAULT tab, so every profile visit
+ * opened on a panel whose only content was a claim about an unbuilt feature that had
+ * since been built. The header above already carries the name, headline, role,
+ * location, website, bio and counts, so the panel held nothing else.
+ *
+ * Removing the dead control was the fix rather than filling it: a profile posts list
+ * is real feature scope (it needs its own cursor list over
+ * GET /api/social/posts/user/:userId) and belongs to its own phase. Nothing is
+ * stranded by the removal — posts are reachable through the feed and their own
+ * detail route.
  *
  * REQUEST RACES. One AbortController per profile fetch, aborted when userId
  * changes or the component unmounts — so opening person A and quickly switching to
@@ -27,13 +38,29 @@ import { isSelfProfile, applyFollowerDelta, describeRequestError } from "@/lib/s
  * "not yours" and "not visible" alike; distinguishing them in the UI would undo
  * the concealment. So every 404 renders the same neutral state.
  */
+/*
+ * ONE source for the tab set, so the initial state, the reset on a userId change and
+ * the rendered tablist cannot disagree. Removing Overview in Phase 11I left a
+ * setTab("overview") behind that pointed at a tab which no longer existed — the
+ * tablist would have rendered with nothing selected and an empty panel. Deriving the
+ * default from TABS[0] makes that class of leftover impossible rather than fixing the
+ * one instance.
+ */
+const TABS = Object.freeze([
+  { key: "followers", label: "Followers" },
+  { key: "following", label: "Following" },
+]);
+const DEFAULT_TAB = TABS[0].key;
+
 export default function ProfileClient({ userId }) {
   const { user: cachedUser, status } = useAuth();
 
   const [profile, setProfile] = useState(null);
   const [phase, setPhase] = useState("loading");
   const [errorMessage, setErrorMessage] = useState(null);
-  const [tab, setTab] = useState("overview");
+  // Followers is the default now that Overview is gone — it is real content, and it
+  // is the tab a profile visit most often wants.
+  const [tab, setTab] = useState(DEFAULT_TAB);
   const [editing, setEditing] = useState(false);
 
   const abortRef = useRef(null);
@@ -65,7 +92,7 @@ export default function ProfileClient({ userId }) {
     // would decide isSelf from a null user and briefly show a Follow button on
     // your own profile.
     if (status === "loading") return undefined;
-    setTab("overview");
+    setTab(DEFAULT_TAB);
     load();
     return () => abortRef.current?.abort();
   }, [load, status]);
@@ -128,11 +155,6 @@ export default function ProfileClient({ userId }) {
   }
 
   const self = isSelfProfile(cachedUser?._id, profile.user?._id);
-  const TABS = [
-    { key: "overview", label: "Overview" },
-    { key: "followers", label: "Followers" },
-    { key: "following", label: "Following" },
-  ];
 
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-8 sm:px-6 sm:py-12">
@@ -172,14 +194,6 @@ export default function ProfileClient({ userId }) {
         aria-labelledby={`social-tab-${tab}`}
         className="mt-5"
       >
-        {tab === "overview" ? (
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            {self
-              ? "Your posts will appear here once posting is available."
-              : "Posts will appear here once posting is available."}
-          </p>
-        ) : null}
-
         {tab === "followers" ? (
           <UserList
             key={`followers-${userId}`}

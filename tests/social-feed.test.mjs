@@ -30,6 +30,7 @@ import {
 } from "../lib/social/post.js";
 import { emptyList, mergePage, canLoadMore, replaceItem } from "../lib/social/cursor-list.js";
 import { planReaction } from "../lib/social/reaction-machine.js";
+import fsMod from "node:fs";
 
 let failed = 0;
 function check(name, ok, detail = "") {
@@ -284,7 +285,19 @@ const err = (status, message) => ({ response: { status, data: message ? { messag
 check("404 -> post unavailable", describePostError(err(404)) === "This post isn't available.");
 check("404 does not distinguish gone from never-visible", describePostError(err(404, "Post not found.")) === "This post isn't available.");
 check("429 uses the server's wording", describePostError(err(429, "Too many reactions.")) === "Too many reactions.");
-check("429 without a message still explains", /shortly|wait/i.test(describePostError(err(429))));
+// EXACT, not an /shortly|wait/i alternation that would pass on either wording — the
+// whole social surface shares one rate-limit sentence as of Phase 11I.
+check("429 without a message uses the SHARED social wording",
+  describePostError(err(429)) === "Too many requests. Please try again shortly.");
+// PHASE 11I: nothing asserted this. A structured body must NOT be rendered — only a
+// string `message` is ever shown to a person.
+check("a structured message object is not rendered",
+  describePostError({ response: { status: 400, data: { message: { nested: true } } } }, "fallback") === "fallback");
+check("an array message is not rendered",
+  describePostError({ response: { status: 400, data: { message: ["a", "b"] } } }, "fallback") === "fallback");
+check("a structured 429 body falls back to the shared wording",
+  describePostError({ response: { status: 429, data: { message: { retryIn: 30 } } } })
+    === "Too many requests. Please try again shortly.");
 check("400 shows the validation message", describePostError(err(400, "reaction must be like or dislike.")).includes("reaction"));
 check("500 uses the caller's fallback", describePostError(err(500), "Feed failed.") === "Feed failed.");
 check("a network error uses the fallback", describePostError(new Error("Network Error"), "Feed failed.") === "Feed failed.");
@@ -408,11 +421,30 @@ console.log("");
 console.log("feed: content safety");
 
 check("no dangerouslySetInnerHTML anywhere", !/dangerouslySetInnerHTML/.test(allNew));
+// PHASE 11I closed three holes in this suite. It owns PostCard, PostMedia, the feed
+// client and lib/social/post.js, and checked none of the following — so a mutation
+// adding the forbidden user endpoint, a token read or a raw innerHTML assignment to
+// any of those four files would have passed here.
+check("no innerHTML assignment, in any casing", !/innerhtml/i.test(allNew));
+check("the unsafe /api/find/signup/:id endpoint is never used", !/find\/signup/.test(allNew));
+check("/api/finduser is never used", !/finduser/i.test(allNew));
+check("no localStorage or sessionStorage", !/localStorage|sessionStorage/.test(allNew));
 check("no HTML or markdown parser", !/marked|markdown|html-react-parser|DOMPurify/i.test(allNew));
 check("no user content reaches style or className", !/className=\{[^}]*post\.(title|description)|style=\{\{[^}]*post\./.test(allNew));
 check("media urls only reach src or poster", !/href=\{[^}]*item\.url/.test(mediaSrc));
 check("remotePatterns is not widened for social", !/remotePatterns|\*\*/.test(allNew));
 check("video never autoplays", !/autoPlay|autoplay/.test(mediaSrc));
+// PHASE 11I: a <video> had no accessible name at all — images carried alt text and
+// videos carried nothing, so a screen-reader user met an unlabelled player.
+check("video carries an accessible name", /aria-label=\{mediaAlt\(index, count, "VIDEO"\)\}/.test(mediaSrc));
+check("the image alt is explicit about its kind too",
+  /alt=\{mediaAlt\(index, count, "IMAGE"\)\}/.test(mediaSrc));
+check("a video is named a video, not an image", mediaAlt(1, 3, "VIDEO") === "Post video 2 of 3");
+check("a single video needs no position", mediaAlt(0, 1, "VIDEO") === "Post video");
+check("the default kind is still IMAGE, so older callers are unchanged",
+  mediaAlt(1, 3) === "Post image 2 of 3" && mediaAlt(0, 1) === "Post image");
+check("an unknown kind falls back to image rather than printing the kind",
+  mediaAlt(0, 1, "AUDIO") === "Post image");
 check("video has controls and lazy metadata", /controls/.test(mediaSrc) && /preload="metadata"/.test(mediaSrc));
 check("images carry alt text", /alt=\{mediaAlt\(/.test(mediaSrc));
 
@@ -499,6 +531,53 @@ check("ownership uses the cached id only", /isOwnPost\(user\?\._id/.test(feedSrc
  */
 check("the owner menu is gated on isOwnPost", /isOwnPost && onEditRequest && onDeleteRequest/.test(cardSrc));
 check("both handlers are required, so neither action can be dead", /onEditRequest && onDeleteRequest/.test(cardSrc));
+
+// ---------------------------------------------------------------------------
+console.log("");
+console.log("EVERY social route is noindex — enumerated from disk, not hardcoded");
+
+/*
+ * PHASE 11I ADDED THIS, AND IT CLOSED THE WORST HOLE IN THE SUITE.
+ *
+ * Three of the four social routes had a noindex assertion in their own phase's suite;
+ * app/(social)/social/page.jsx — the FEED — was read by no test at all. Deleting its
+ * `robots: NOINDEX_NOFOLLOW` was proven to break nothing, so a signed-in feed of
+ * FOLLOWERS-only posts could have become crawlable in silence.
+ *
+ * The route list is discovered from the filesystem so a FIFTH social route is covered
+ * the day it is created, rather than the day somebody remembers to add a check. The
+ * count is asserted too: a sweep over an empty list would otherwise pass for the
+ * worst possible reason.
+ */
+const routeDir = new URL("../app/(social)/", import.meta.url);
+const socialPages = [];
+(function walk(dir) {
+  for (const entry of fsMod.readdirSync(dir, { withFileTypes: true })) {
+    const child = new URL(entry.name + (entry.isDirectory() ? "/" : ""), dir);
+    if (entry.isDirectory()) walk(child);
+    else if (entry.name === "page.jsx") socialPages.push(child);
+  }
+})(routeDir);
+
+check("all four social routes were found", socialPages.length === 4, `found ${socialPages.length}`);
+
+for (const url of socialPages) {
+  const rel = decodeURIComponent(url.pathname).split("/app/")[1];
+  const src = stripComments(fsMod.readFileSync(url, "utf8"));
+  check(`${rel}: robots uses the shared NOINDEX_NOFOLLOW constant`,
+    /robots:\s*NOINDEX_NOFOLLOW/.test(src));
+  check(`${rel}: that constant comes from lib/seo`,
+    /NOINDEX_NOFOLLOW[\s\S]{0,40}from "@\/lib\/seo"/.test(src));
+  check(`${rel}: no index: true is set anywhere`, !/index:\s*true/.test(src));
+  check(`${rel}: no canonical`, !/canonical/.test(src));
+  check(`${rel}: no JSON-LD`, !/application\/ld\+json|jsonLd/.test(src));
+  check(`${rel}: no protected data is fetched during render`,
+    !/axios|models\/social\.model/.test(src));
+  check(`${rel}: no generateStaticParams`, !/generateStaticParams/.test(src));
+}
+
+check("no social route appears in the sitemap",
+  !/social/.test(fsMod.readFileSync(new URL("../app/sitemap.js", import.meta.url), "utf8")));
 
 console.log("");
 console.log(failed ? `=== ${failed} FAILED ===` : "=== all passed ===");

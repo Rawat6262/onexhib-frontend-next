@@ -44,13 +44,13 @@ export default function ProfileHeader({ profile, isSelf, onFollowChange, onEdit 
         <InitialsAvatar name={name} src={profile.avatarUrl || null} size="lg" />
 
         <div className="min-w-0 flex-1">
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl dark:text-white">
+          <h1 className="break-words text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl dark:text-white">
             {name}
           </h1>
 
           {/* Each line renders only when it has something to say — no blank labels. */}
           {profile.headline ? (
-            <p className="mt-1 text-[15px] font-medium text-gray-700 dark:text-gray-300">
+            <p className="mt-1 break-words text-[15px] font-medium text-gray-700 dark:text-gray-300">
               {profile.headline}
             </p>
           ) : null}
@@ -69,7 +69,7 @@ export default function ProfileHeader({ profile, isSelf, onFollowChange, onEdit 
                 // nofollow as well: a user-submitted URL is not an endorsement,
                 // matching how the site already treats organiser links.
                 rel="noopener noreferrer nofollow"
-                className="inline-flex items-center gap-1.5 text-sm text-[#131C55] underline-offset-4 hover:underline dark:text-blue-300"
+                className="inline-flex max-w-full items-baseline gap-1.5 break-all text-sm text-[#131C55] underline-offset-4 hover:underline dark:text-blue-300"
               >
                 <Globe size={14} aria-hidden="true" />
                 {website}
@@ -101,7 +101,7 @@ export default function ProfileHeader({ profile, isSelf, onFollowChange, onEdit 
       {profile.bio ? (
         // whitespace-pre-line keeps the author's line breaks. Rendered as TEXT —
         // no dangerouslySetInnerHTML, no markdown, no HTML parsing anywhere.
-        <p className="mt-4 whitespace-pre-line text-[15px] leading-relaxed text-gray-700 dark:text-gray-300">
+        <p className="mt-4 whitespace-pre-line break-words text-[15px] leading-relaxed text-gray-700 dark:text-gray-300">
           {profile.bio}
         </p>
       ) : null}

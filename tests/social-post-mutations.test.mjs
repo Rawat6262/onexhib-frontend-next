@@ -316,6 +316,20 @@ console.log("object URLs: created, revoked, never sent");
 
 check("previews come from createObjectURL", /URL\.createObjectURL/.test(picker));
 check("they are revoked", /URL\.revokeObjectURL/.test(picker));
+// PHASE 11I: the effect-shape regex below was the ONLY thing catching a removed
+// cleanup, and a mutation that broke the wrapper while leaving the revoke call
+// textually present tripped exactly one assertion. Two more pin the property itself.
+check("there is exactly ONE revocation site, so no path can forget",
+  (picker.match(/URL\.revokeObjectURL/g) || []).length === 1);
+check("revocation happens in a cleanup return, never during render",
+  /=>\s*\(\)\s*=>\s*\{[^}]*revokeObjectURL/.test(picker.replace(/\s+/g, " ")));
+check("the previews are derived, so the cleanup key changes with the file list",
+  /const previews = useMemo\(/.test(picker) && /\[files\]/.test(picker));
+// A second, independent signal: the cleanup must run through a real useEffect. If the
+// effect is ever demoted to a plain expression the revoke call still READS correctly
+// while never running, which is the quietest possible version of this leak.
+check("the cleanup is wired through useEffect, not a bare expression",
+  /useEffect\(/.test(picker));
 check(
   "revocation is an effect keyed on the derived previews, so it fires on change AND unmount",
   /useEffect\(\s*\(\)\s*=>\s*\(\)\s*=>\s*\{[\s\S]*?revokeObjectURL[\s\S]*?\},\s*\[previews\]\s*\)/.test(picker),
@@ -425,6 +439,12 @@ check("no cookie reading", !/document\.cookie/.test(allNew));
 check("no localStorage use", !/localStorage|sessionStorage/.test(allNew));
 check("no private Signup fields", !/\bpassword\b|\botp\b|pendingPassword|mobile_number|isapproved|qrCode/i.test(allNew));
 check("no dangerouslySetInnerHTML", !/dangerouslySetInnerHTML/.test(allNew));
+// PHASE 11I: this suite owns the composer, edit sheet, picker and shared fields and
+// checked neither of these. A raw innerHTML assignment, or the forbidden user lookup
+// added to any of them, would have passed.
+check("no innerHTML assignment, in any casing", !/innerhtml/i.test(allNew));
+check("the unsafe /api/find/signup/:id endpoint is never used", !/find\/signup/.test(allNew));
+check("/api/finduser is never used", !/finduser/i.test(allNew));
 check("no HTML or markdown parser", !/marked|markdown|html-react-parser|DOMPurify/i.test(allNew));
 check("no user text reaches style", !/style=\{\{[^}]*(title|description|name)/.test(allNew));
 check("remotePatterns is not widened", !/remotePatterns/.test(allNew));

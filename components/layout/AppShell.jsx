@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 
 import AppHeader, { PUBLIC_NAV, mobileLink } from "@/components/layout/AppHeader";
 import AccountMenu from "@/components/layout/AccountMenu";
+import NotificationProvider from "@/components/social/NotificationProvider";
+import NotificationBell from "@/components/social/NotificationBell";
 
 /**
  * Community sits in the SIGNED-IN header only, and this is the place that makes
@@ -47,10 +49,30 @@ export default function AppShell({ items = [], children }) {
   const pathname = usePathname();
 
   return (
+    /*
+     * ONE NotificationProvider PER AUTHENTICATED SHELL, and this is the place that
+     * makes that true. AppShell's only consumers are (dashboard), (social) and
+     * admin, each rendering it once inside RequireAuth — so an authenticated page
+     * has exactly one provider and therefore exactly one unread poll, while public
+     * pages never mount it and never poll for a session they do not have.
+     *
+     * It wraps the whole shell rather than just the header, because the badge and
+     * /social/notifications must read the SAME count: two providers would be two
+     * numbers that drift the moment one of them changed.
+     *
+     * The same reasoning that put Community in this nav applies to the bell — every
+     * social endpoint needs only a login, so any signed-in user has an inbox.
+     */
+    <NotificationProvider>
     <div className="flex min-h-screen flex-col bg-white dark:bg-gray-950">
       <AppHeader
         nav={[...PUBLIC_NAV, ...COMMUNITY_NAV]}
-        right={<AccountMenu />}
+        right={
+          <>
+            <NotificationBell />
+            <AccountMenu />
+          </>
+        }
         mobileExtra={
           items.length ? (
             <>
@@ -104,5 +126,6 @@ export default function AppShell({ items = [], children }) {
 
       <main className="flex-1">{children}</main>
     </div>
+    </NotificationProvider>
   );
 }

@@ -174,7 +174,14 @@ export const deleteComment = (commentId) =>
 export const getNotifications = (page) =>
   axios.get("/api/social/notifications", pageParams(page));
 
-export const getUnreadCount = () => axios.get("/api/social/notifications/unread-count");
+/**
+ * The viewer's unread total: `{ success, unreadCount }`. Index-only server-side.
+ *
+ * `config` is axios config, for the `signal` the badge provider needs so a poll in
+ * flight when the shell unmounts cannot resolve into a dead component.
+ */
+export const getUnreadCount = (config) =>
+  axios.get("/api/social/notifications/unread-count", config);
 
 /** Literal path — registered before /:notificationId/read so it is not shadowed. */
 export const markAllNotificationsRead = () =>

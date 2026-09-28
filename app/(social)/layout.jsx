@@ -1,6 +1,6 @@
 "use client";
 
-import { MessageSquare, UserCircle } from "lucide-react";
+import { MessageSquare, UserCircle, Bell } from "lucide-react";
 import AppShell from "@/components/layout/AppShell";
 import RequireAuth from "@/components/auth/RequireAuth";
 import { useAuth } from "@/components/auth/AuthProvider";
@@ -16,9 +16,9 @@ import { useAuth } from "@/components/auth/AuthProvider";
  * would be a working API the UI refuses to open.
  *
  * Same structure as (dashboard)/layout.jsx: RequireAuth wrapping AppShell, with
- * `items` becoming the horizontal workspace sub-nav. Notifications is still
- * absent — it arrives in 11G with the route it points at, because a sub-nav link
- * to a route that does not exist is a 404 with a signpost.
+ * `items` becoming the horizontal workspace sub-nav. Notifications joined it in
+ * Phase 11G, once the route it points at existed — a sub-nav link to a route that
+ * does not exist is a 404 with a signpost.
  *
  * My profile needs the signed-in user's id, which is only available client-side.
  * That costs nothing here: this layout is already a client component because
@@ -28,7 +28,16 @@ import { useAuth } from "@/components/auth/AuthProvider";
 export default function SocialLayout({ children }) {
   const { user } = useAuth();
 
-  const items = [{ label: "Feed", href: "/social", icon: <MessageSquare size={16} /> }];
+  const items = [
+    { label: "Feed", href: "/social", icon: <MessageSquare size={16} /> },
+    /*
+     * The route exists now, so the link is no longer a signposted 404. It carries NO
+     * unread count of its own: the badge in the header reads the shared provider, and
+     * a count here would either be a second request per navigation render or a second
+     * number that drifts from the bell's.
+     */
+    { label: "Notifications", href: "/social/notifications", icon: <Bell size={16} /> },
+  ];
   if (user?._id) {
     items.push({
       label: "My profile",

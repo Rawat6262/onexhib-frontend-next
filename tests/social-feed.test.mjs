@@ -445,18 +445,43 @@ check("no notification calls", !/getNotifications\(|getUnreadCount\(|markAllNoti
 check("no follow mutation from the feed", !/followUser\(|unfollowUser\(/.test(feedSrc));
 check("no user search", !/\/api\/search|searchUsers/.test(allNew));
 check("no polling", !/setInterval|setTimeout\([^)]*\d{4}/.test(allNew));
-check("no comment composer or detail navigation", !/CommentComposer|\/social\/posts\//.test(cardSrc));
+/*
+ * NARROWED IN 11F, NOT RELAXED. This banned "/social/posts/" because in 11D that
+ * route did not exist, so a link to it was a signposted 404. 11F built the route,
+ * and the comment count is now supposed to navigate there.
+ *
+ * The property it was really protecting is that the CARD owns no comment surface:
+ * comments belong to the detail route, not to an inline composer or a modal over
+ * the feed. That is what is asserted now, and it is the stronger of the two.
+ */
+check("the card renders no comment surface of its own",
+  !/CommentComposer|CommentList|CommentRow|Dialog|Sheet|Modal/.test(cardSrc));
 
 console.log("");
-console.log("feed: comment count is metadata only in 11D");
+console.log("feed: the comment count");
 
 check("commentCount is displayed", /commentCount/.test(cardSrc));
-check("it is clamped for display", /displayCount\(post\.commentCount\)/.test(cardSrc));
-check(
-  "it is not a link to a nonexistent post-detail route",
-  !/<Link[^>]*\/social\/posts\//.test(cardSrc),
-  "a link to post detail exists before 11F"
-);
+
+/*
+ * NARROWED IN 11F. The count moved into a CommentCount sub-component, so the
+ * literal `displayCount(post.commentCount)` became `displayCount(count)`. The real
+ * property is that the count is CLAMPED before it is rendered — never a raw field
+ * that could print a negative number or NaN from a bad response.
+ */
+check("the count is clamped before display", /displayCount\(count\)/.test(cardSrc));
+check("the raw field is never rendered directly",
+  !/>\s*\{post\.commentCount\}/.test(cardSrc) && !/\{post\.commentCount\}<\//.test(cardSrc));
+
+/*
+ * REPLACED IN 11F. This asserted the count was NOT a link, because the detail
+ * route did not exist yet. It does now, so the surviving requirement is that the
+ * count navigates to the post's own page with an ENCODED id — never to a hand-built
+ * URL, and never into a modal over the feed.
+ */
+check("the count links to the post's own page",
+  /<Link[\s\S]{0,300}\/social\/posts\//.test(cardSrc));
+check("the post id in that link is encoded",
+  /\/social\/posts\/\$\{encodeURIComponent\(String\(postId\)\)\}/.test(cardSrc));
 
 console.log("");
 console.log("feed: author handling");

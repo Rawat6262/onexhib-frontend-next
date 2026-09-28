@@ -107,7 +107,14 @@ export const getMyPosts = (page) => axios.get("/api/social/posts/me", pageParams
 export const getUserPosts = (userId, page) =>
   axios.get(`/api/social/posts/user/${id(userId)}`, pageParams(page));
 
-export const getPost = (postId) => axios.get(`/api/social/posts/${id(postId)}`);
+/**
+ * One post, canonical shape. Carries NO `viewerReaction` — only the feed attaches
+ * that. A caller needing it reads getPostReaction once; see lib/social/comment.js.
+ *
+ * `config` is axios config, for the `signal` a detail page needs to abandon this
+ * request when the viewer navigates to a different post.
+ */
+export const getPost = (postId, config) => axios.get(`/api/social/posts/${id(postId)}`, config);
 
 /** Editable: title, description, visibility, taggedUsers. Media is separate. */
 export const updatePost = (postId, payload) =>
@@ -139,9 +146,14 @@ export const setPostReaction = (postId, reaction) =>
 export const clearPostReaction = (postId) =>
   axios.delete(`/api/social/posts/${id(postId)}/reaction`);
 
-/** The viewer's own reaction plus live counts. The feed already embeds this. */
-export const getPostReaction = (postId) =>
-  axios.get(`/api/social/posts/${id(postId)}/reaction`);
+/**
+ * The viewer's own reaction plus live counts. The feed already embeds this, so a
+ * feed card must never call it — that would be one request per card.
+ *
+ * `config` is axios config, for a `signal`.
+ */
+export const getPostReaction = (postId, config) =>
+  axios.get(`/api/social/posts/${id(postId)}/reaction`, config);
 
 // --- COMMENTS (4) ------------------------------------------------------------
 

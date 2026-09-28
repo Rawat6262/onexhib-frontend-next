@@ -400,7 +400,20 @@ check("no notification calls", !/getNotifications\(|getUnreadCount\(|markAllNoti
 check("no user search", !/searchUsers|\/api\/search/.test(allNew));
 check("no follow mutation", !/followUser\(|unfollowUser\(/.test(allNew));
 check("no avatar or cover upload", !/avatarUrl.*upload|coverUrl.*upload|uploadAvatar/i.test(allNew));
-check("no post detail navigation", !/\/social\/posts\//.test(allNew));
+/*
+ * NARROWED IN 11F, NOT RELAXED. 11E banned "/social/posts/" because the detail
+ * route did not exist, so a link to it would have been a 404 with a signpost. 11F
+ * built the route and the comment count now links to it.
+ *
+ * The property this was really protecting is that the post MUTATION components own
+ * no navigation: the composer, the edit sheet, the picker and the shared fields must
+ * not move the user somewhere, because a create or an edit keeps them where they
+ * are. PostCard is excluded from this set precisely because its comment count is a
+ * link, which 11F made correct.
+ */
+const mutationOnly = [composer, editSheet, picker, fields].join("\n");
+check("the post mutation components navigate nowhere",
+  !/\/social\/posts\/|useRouter|router\.push|<Link/.test(mutationOnly));
 
 console.log("");
 console.log("security: nothing private, nothing unsafe");

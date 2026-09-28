@@ -35,7 +35,17 @@ import {
  * fetched its own author, or its own reaction state, would turn one feed request
  * into forty-one.
  */
-export default function PostCard({ post, isOwnPost = false, onPostChange, onEditRequest, onDeleteRequest }) {
+export default function PostCard({
+  post,
+  isOwnPost = false,
+  onPostChange,
+  onEditRequest,
+  onDeleteRequest,
+  // Defaults to true so the feed and the profile link to the detail page without
+  // passing anything. The detail page itself passes false: a link to the page you
+  // are already on is a control that does nothing.
+  linkComments = true,
+}) {
   const [pending, setPending] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -208,17 +218,52 @@ export default function PostCard({ post, isOwnPost = false, onPostChange, onEdit
           onClick={() => handleReaction("dislike")}
         />
 
-        {/* METADATA, NOT A CONTROL. There is no post-detail route until 11F, so a
-            button here would either do nothing or navigate to a 404. */}
-        <span className="ml-auto inline-flex items-center gap-1.5 px-2 text-sm text-gray-600 dark:text-gray-400">
-          <MessageSquare size={16} aria-hidden="true" />
-          {displayCount(post.commentCount)}
-          <span className="sr-only">
-            {displayCount(post.commentCount) === 1 ? "comment" : "comments"}
-          </span>
-        </span>
+        <CommentCount count={post.commentCount} postId={post._id} asLink={linkComments} />
       </footer>
     </article>
+  );
+}
+
+/**
+ * The comment count, as a link to the post's own page when there is one.
+ *
+ * A REAL LINK, NOT A MODAL AND NOT A BUTTON. The detail route owns comments, so
+ * this is navigation: a Link is middle-clickable, openable in a new tab and
+ * crawlable-by-nothing, all of which an onClick handler would have to reimplement.
+ *
+ * The accessible name says what activating it does, because "3" on its own tells a
+ * screen-reader user the number and not the destination. The visible number is
+ * aria-hidden inside the link so the count is not read twice.
+ */
+function CommentCount({ count, postId, asLink }) {
+  const n = displayCount(count);
+  const noun = n === 1 ? "comment" : "comments";
+
+  const inner = (
+    <>
+      <MessageSquare size={16} aria-hidden="true" />
+      <span aria-hidden="true">{n}</span>
+    </>
+  );
+
+  if (!asLink) {
+    // Metadata on the detail page itself.
+    return (
+      <span className="ml-auto inline-flex items-center gap-1.5 px-2 text-sm text-gray-600 dark:text-gray-400">
+        {inner}
+        <span className="sr-only">{`${n} ${noun}`}</span>
+      </span>
+    );
+  }
+
+  return (
+    <Link
+      href={`/social/posts/${encodeURIComponent(String(postId))}`}
+      aria-label={`${n} ${noun} — open this post`}
+      className="ml-auto inline-flex items-center gap-1.5 rounded-xl px-2 py-1.5 text-sm text-gray-600 transition hover:bg-gray-100 hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-blue-400"
+    >
+      {inner}
+    </Link>
   );
 }
 

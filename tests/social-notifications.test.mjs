@@ -97,21 +97,80 @@ const allNew = [provSrc, bellSrc, rowSrc, clientSrc, pageSrc, stateSrc].join("\n
 const allNewNoClasses = stripClasses(allNew);
 
 // ---------------------------------------------------------------------------
-console.log("types: exactly the four the deployed enum can send");
+console.log("types: exactly the six the backend enum can send");
 
-check("there are exactly four", NOTIFICATION_TYPES.length === 4);
-check("and they are these four",
-  NOTIFICATION_TYPES.join(",") === "FOLLOW,POST_LIKE,POST_DISLIKE,POST_COMMENT");
-check("POST_TAG is not an active type", !NOTIFICATION_TYPES.includes("POST_TAG"));
-check("COMMENT_TAG is not an active type", !NOTIFICATION_TYPES.includes("COMMENT_TAG"));
-check("no dormant copy exists for POST_TAG", notificationCopy({ type: "POST_TAG" }) === null);
-check("no dormant copy exists for COMMENT_TAG", notificationCopy({ type: "COMMENT_TAG" }) === null);
-check("a deferred type has no destination either",
-  notificationHref({ type: "POST_TAG", postId: "p1" }) === null);
-check("POST_TAG appears nowhere in 11G source", !/POST_TAG/.test(allNewNoClasses));
-check("COMMENT_TAG appears nowhere in 11G source", !/COMMENT_TAG/.test(allNewNoClasses));
-check("no tag wording at all", !/tagged|\btag\b/i.test(allNewNoClasses));
-check("nothing claims a tagged user was notified", !/notified/i.test(allNewNoClasses));
+/*
+ * PHASE 12H.1. The absence assertions that lived here are inverted, not deleted.
+ *
+ * WHY THIS LIST HAS TO BE EXACT, AND WHY A TEST SAYS SO. The unread badge counts
+ * every unread row the server has - getUnreadCount carries no type predicate - while
+ * an unknown type renders nothing at all. A type the backend sends and this list
+ * omits is therefore an unread count the reader can SEE but can never open, click or
+ * clear: a phantom badge. That was release blocker 2, and keeping the two lists
+ * agreed is what closes it.
+ *
+ * THE SKEW GUARD, AND ITS HONEST LIMIT. This asserts the frontend's six against a
+ * literal written here, NOT against the backend's enum read live. Reaching into the
+ * sibling backend repository would make this suite fail wherever that checkout does
+ * not exist - CI, a fresh clone, any contributor with only the frontend - so the
+ * guard is deliberately repository-local. The limitation is real: it catches a
+ * frontend change that drifts from the agreed contract, not a backend change made
+ * without updating this file. Closing that second gap needs a shared contract
+ * artifact, which is not in this phase's scope.
+ */
+const EXPECTED_TYPES = "FOLLOW,POST_LIKE,POST_DISLIKE,POST_COMMENT,POST_TAG,COMMENT_TAG";
+check("there are exactly six", NOTIFICATION_TYPES.length === 6, NOTIFICATION_TYPES.join(","));
+check("and they are exactly these six, in the backend's order",
+  NOTIFICATION_TYPES.join(",") === EXPECTED_TYPES, NOTIFICATION_TYPES.join(","));
+check("POST_TAG IS an active type", NOTIFICATION_TYPES.includes("POST_TAG"));
+check("COMMENT_TAG IS an active type", NOTIFICATION_TYPES.includes("COMMENT_TAG"));
+check("the four Phase 10 types are untouched",
+  ["FOLLOW", "POST_LIKE", "POST_DISLIKE", "POST_COMMENT"].every((t) => NOTIFICATION_TYPES.includes(t)));
+check("every known type has copy - none is listed but unrenderable",
+  NOTIFICATION_TYPES.every((type) => {
+    const c = notificationCopy({ type, actor: { _id: "a1", first_name: "A", last_name: "B" } });
+    return c && typeof c.action === "string" && c.action.length > 0;
+  }));
+
+/*
+ * The EXACT fragments, not merely "is non-null". A wrong-but-present string reads
+ * as a working notification while telling the reader the wrong thing - the kind of
+ * defect only an exact assertion catches. The copy suite owns these too; they are
+ * duplicated here because this is the suite that proves the row renders at all.
+ */
+check("POST_TAG copy is exactly \"tagged you in a post\"",
+  notificationCopy({ type: "POST_TAG" }).action === "tagged you in a post",
+  notificationCopy({ type: "POST_TAG" }).action);
+check("COMMENT_TAG copy is exactly \"tagged you in a comment\"",
+  notificationCopy({ type: "COMMENT_TAG" }).action === "tagged you in a comment",
+  notificationCopy({ type: "COMMENT_TAG" }).action);
+check("the two tag fragments are distinct from each other and from POST_COMMENT",
+  new Set(["POST_TAG", "COMMENT_TAG", "POST_COMMENT"]
+    .map((t) => notificationCopy({ type: t }).action)).size === 3);
+check("POST_TAG has a destination",
+  notificationHref({ type: "POST_TAG", postId: "p1" }) === "/social/posts/p1");
+check("COMMENT_TAG has a destination - the PARENT POST",
+  notificationHref({ type: "COMMENT_TAG", postId: "p1", commentId: "c1" }) === "/social/posts/p1");
+
+/*
+ * UNKNOWN-TYPE POLICY IS UNCHANGED by 12H.1: only the known list grew. A future
+ * seventh type still renders and navigates nowhere, which is what keeps a genuine
+ * skew visible rather than papered over by a generic line.
+ */
+check("an unknown seventh type still has no copy",
+  notificationCopy({ type: "POST_SHARE" }) === null);
+check("an unknown seventh type still has no destination",
+  notificationHref({ type: "POST_SHARE", postId: "p1" }) === null);
+check("there is still no generic fallback line",
+  !/New notification|Unknown notification/i.test(allNewNoClasses));
+
+// The tag wording lives in the copy module, never hard-coded into these components.
+check("no component hard-codes tag wording",
+  !/tagged you/i.test(allNewNoClasses));
+check("nothing claims a tagged user was notified in a component",
+  !/notified/i.test(allNewNoClasses));
+check("no component builds a comment anchor or comment route",
+  !/#comment|\/comments\/|scrollIntoView/.test(allNewNoClasses));
 
 // ---------------------------------------------------------------------------
 console.log("");
@@ -821,6 +880,175 @@ check("CRLF: a comment between two statements no longer blocks an adjacency matc
 check("block comments are still stripped on both line endings",
   !stripComments("/* gone */\r\nconst d = 4;\r\n").includes("gone")
   && !stripComments("/* gone */\nconst d = 4;\n").includes("gone"));
+
+// ─────────────────────────────────────────────────────────────────────────────
+console.log("");
+console.log("12H.1: a tag notification is renderable, clickable and clearable");
+
+/*
+ * THE PHANTOM-UNREAD REGRESSION. This is the assertion release blocker 2 existed
+ * for, so it is written as the full round trip rather than a type-list check.
+ *
+ * The badge counts every unread row the server has. Before 12H.1 a POST_TAG row
+ * was counted, stored by the list state, and then rendered as nothing - so the
+ * reader saw a number with no row behind it and no way to clear it except
+ * mark-all-read. The fix is NOT to exclude tag rows from the badge; it is to make
+ * them render, and that is what this proves end to end:
+ *
+ *   it survives into list state  ->  it produces copy  ->  it has a destination
+ *   ->  it counts as unread      ->  shouldMarkRead says to mark it
+ *   ->  applyReadAt clears it    ->  decrementUnread lowers the badge
+ */
+const TAG_ROWS = [
+  { _id: "t1", type: "POST_TAG", actor: { _id: "a1", first_name: "Asha", last_name: "Rao" },
+    postId: "p1", commentId: null, readAt: null, createdAt: "2026-02-01T00:00:00.000Z" },
+  { _id: "t2", type: "COMMENT_TAG", actor: { _id: "a1", first_name: "Asha", last_name: "Rao" },
+    postId: "p1", commentId: "c1", readAt: null, createdAt: "2026-02-02T00:00:00.000Z" },
+];
+
+for (const row of TAG_ROWS) {
+  const list = mergePage(emptyList(), { items: [row], nextCursor: null, hasMore: false }, "replace");
+  check(`${row.type}: survives into list state`,
+    list.items.length === 1 && list.items[0]._id === row._id);
+  check(`${row.type}: produces visible copy, so the row is not dropped`,
+    (() => { const c = notificationCopy(row); return !!c && c.text.includes("Asha Rao") && c.action.length > 0; })(),
+    JSON.stringify(notificationCopy(row)));
+  check(`${row.type}: has a destination the reader can open`,
+    notificationHref(row) === "/social/posts/p1", String(notificationHref(row)));
+  check(`${row.type}: counts as unread, exactly as the badge counts it`,
+    isUnread(row) === true);
+  check(`${row.type}: CAN REACH mark-one-read`, shouldMarkRead(row) === true);
+  check(`${row.type}: clears when marked, so the phantom cannot persist`,
+    applyReadAt(row, "2026-03-01T00:00:00.000Z").readAt === "2026-03-01T00:00:00.000Z"
+    && isUnread(applyReadAt(row, "2026-03-01T00:00:00.000Z")) === false);
+  check(`${row.type}: and the badge goes down with it`, decrementUnread(2) === 1);
+}
+
+check("the badge is NOT filtered by type - no workaround was used",
+  !/POST_TAG|COMMENT_TAG|type\s*===|\btype\b\s*!==/.test(stateSrc)
+  && !/POST_TAG|COMMENT_TAG/.test(provSrc),
+  "a type check reached the badge or state layer");
+
+/*
+ * THE ROW MUST NOT DECIDE BY TYPE. The round trip above is proved at the pure
+ * function level, so a component that quietly dropped tag rows on its own would
+ * still pass it - the badge would count them and nothing would render, which is the
+ * phantom bug again one layer up. NotificationRow's only gate is `if (!copy)`.
+ */
+check("NotificationRow drops a row ONLY when there is no copy",
+  (rowSrc.match(/return null;/g) || []).length === 1
+  && /if \(!copy\) return null;/.test(rowSrc),
+  "the row gained a second early return");
+check("NotificationRow names no notification type at all",
+  !/POST_TAG|COMMENT_TAG|POST_COMMENT|FOLLOW|TAG\$|notification\.type\s*===/.test(rowSrc));
+
+/*
+ * THE APPROVED OVERLAP. A post owner tagged in a comment on their own post gets
+ * BOTH rows. They are two facts, so both must survive and both must render; the
+ * frontend must not dedupe on actor, post, comment, time or adjacency.
+ */
+const OVERLAP = [
+  { _id: "o1", type: "POST_COMMENT", actor: { _id: "a1", first_name: "Asha", last_name: "Rao" },
+    postId: "p9", commentId: "c9", readAt: null, createdAt: "2026-02-03T00:00:01.000Z" },
+  { _id: "o2", type: "COMMENT_TAG", actor: { _id: "a1", first_name: "Asha", last_name: "Rao" },
+    postId: "p9", commentId: "c9", readAt: null, createdAt: "2026-02-03T00:00:00.000Z" },
+];
+const overlapList = mergePage(emptyList(), { items: OVERLAP, nextCursor: null, hasMore: false }, "replace");
+check("overlap: BOTH rows survive list state - identical actor, post and comment",
+  overlapList.items.length === 2, String(overlapList.items.length));
+check("overlap: both render, and say DIFFERENT things",
+  (() => {
+    const a = notificationCopy(OVERLAP[0]);
+    const b = notificationCopy(OVERLAP[1]);
+    return !!a && !!b && a.action !== b.action
+      && a.action === "commented on your post" && b.action === "tagged you in a comment";
+  })());
+check("overlap: both are independently markable",
+  shouldMarkRead(OVERLAP[0]) === true && shouldMarkRead(OVERLAP[1]) === true);
+check("overlap: nothing in the client dedupes by actor, post or comment",
+  !/dedupe|distinct|uniqueBy|seenActors|byPostId/i.test(clientSrc));
+
+/*
+ * FRONTEND-FIRST COMPATIBILITY, which the approved release order depends on. The
+ * new six-type frontend must work unchanged against a backend that still returns
+ * only the original four - nothing may REQUIRE a tag type to exist.
+ */
+const LEGACY_FOUR = ["FOLLOW", "POST_LIKE", "POST_DISLIKE", "POST_COMMENT"];
+check("frontend-first: every legacy type still renders exactly as before",
+  LEGACY_FOUR.every((type) => {
+    const c = notificationCopy({ type, actor: { _id: "a1", first_name: "Asha", last_name: "Rao" } });
+    return !!c && c.action.length > 0;
+  }));
+check("frontend-first: a legacy-only page is fully functional",
+  (() => {
+    const legacy = LEGACY_FOUR.map((type, i) => ({
+      _id: "l" + i, type, actor: { _id: "a1", first_name: "Asha", last_name: "Rao" },
+      postId: "p1", commentId: null, readAt: null, createdAt: "2026-01-0" + (i + 1) + "T00:00:00.000Z",
+    }));
+    const l = mergePage(emptyList(), { items: legacy, nextCursor: null, hasMore: false }, "replace");
+    return l.items.length === 4
+      && legacy.every((r) => notificationCopy(r) && shouldMarkRead(r) === true);
+  })());
+check("frontend-first: nothing imports or asserts a tag type at module load",
+  !/POST_TAG|COMMENT_TAG/.test(provSrc + bellSrc + rowSrc + clientSrc + stateSrc),
+  "a component now depends on a tag type existing");
+
+/* MARK-ALL-READ stays type-agnostic: it sends no type and reads the server's count. */
+check("mark-all-read sends no type and needs no tag handling",
+  !/POST_TAG|COMMENT_TAG/.test(clientSrc)
+  && /applyMarkAllRead\(data\.unreadCount\)/.test(clientSrc));
+
+/* POLLING AND VISIBILITY ARE UNTOUCHED BY 12H.1 - asserted, not assumed. */
+check("polling is still a 60s interval on the count alone",
+  POLL_INTERVAL_MS === 60000 && /setInterval\(refresh, POLL_INTERVAL_MS\)/.test(provSrc));
+check("visibility logic is unchanged",
+  /document\.visibilityState === "visible"/.test(provSrc)
+  && /removeEventListener\("visibilitychange", onVisibilityChange\)/.test(provSrc));
+check("the provider gained no tag awareness at all",
+  !/tag/i.test(provSrc));
+
+/* SECURITY: the copy is rendered as React text, never injected. */
+check("no HTML sink anywhere in the notification path",
+  !/dangerouslySetInnerHTML|innerHTML|DOMPurify|marked|html-react-parser/i.test(allNew));
+/*
+ * The COPY MODULE is included here explicitly. `allNew` is the components and the
+ * state helpers; a lookup added to the copy module itself would otherwise slip
+ * past, and that module is exactly where a tempting "fetch the missing actor"
+ * would go. The backend omits an absent actor deliberately - "Someone" is the
+ * answer, not a second request.
+ */
+const copyModuleSrc = stripComments(read("lib/social/notification-copy.js"));
+check("no secondary actor lookup was introduced",
+  !/getSocialProfile|findUser|\/api\/find|fetch\(|axios/.test(allNew + copyModuleSrc));
+check("the copy module stays pure - no network, no imports of the API model",
+  !/^import/m.test(copyModuleSrc) && !/models\/social/.test(copyModuleSrc));
+check("hrefs are still built with encodeURIComponent",
+  /encodeURIComponent/.test(copyModuleSrc));
+
+/*
+ * THE SKEW GUARD MUST BE A LITERAL. Replacing the expected list with
+ * NOTIFICATION_TYPES.join(",") would make it compare the value to itself and pass
+ * for any list at all - a tautology that looks like a guard. This asserts the
+ * guard is written as a hard-coded string in this file.
+ */
+const selfSrc = read("tests/social-notifications.test.mjs");
+/*
+ * Written as two narrow checks rather than one regex containing the expected
+ * string: a pattern that spells the literal out would also MATCH ITSELF in this
+ * file's own source, so it would pass no matter what the declaration said. The
+ * first check requires the declaration to open with a quote; the second forbids
+ * deriving it from the value under test.
+ */
+check("the six-type guard is declared as a quoted literal",
+  /^const EXPECTED_TYPES = "/m.test(selfSrc),
+  "EXPECTED_TYPES is no longer a plain string literal");
+// Built by concatenation on purpose: spelled out as one literal, the pattern would
+// appear in this very line and the negative check would match itself and always
+// fail - the same self-reference trap, inverted.
+const SELF_REF = new RegExp("EXPECTED_TYPES = " + "NOTIFICATION_TYPES");
+check("the guard is not derived from the value it checks",
+  !SELF_REF.test(selfSrc),
+  "EXPECTED_TYPES was made self-referential and now proves nothing");
 
 console.log("");
 console.log(failed ? `=== ${failed} FAILED ===` : "=== all passed ===");

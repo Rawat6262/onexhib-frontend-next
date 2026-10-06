@@ -3,10 +3,14 @@
  *
  * Two invariants matter most here.
  *
- * POST_TAG AND COMMENT_TAG DO NOT EXIST. Phase 10 deliberately ships no tag
- * notifications, so there must be no copy for them — not even unused. A ready
- * string is an invitation for someone to wire it up and assume the notification
- * arrives.
+ * THE SIX TYPES MATCH THE BACKEND EXACTLY. Phase 10 shipped four and withheld the
+ * two tag types; Phase 12G added them to the backend once block and mute existed to
+ * give a tagged recipient recourse, and Phase 12H.1 added the copy here. The lists
+ * must agree, because the badge counts every unread row the server has while an
+ * unknown type renders nothing — so a type the backend sends and this module omits
+ * becomes an unread count the reader can see but never open or clear. An UNKNOWN
+ * type still produces nothing, deliberately: a sentence nobody can act on is worse
+ * than a gap, and the gap keeps a real mismatch visible.
  *
  * UNREAD IS `readAt == null` AND NOTHING ELSE. The backend works hard to keep a
  * reaction switch from touching readAt/createdAt/updatedAt and a refollow from
@@ -34,13 +38,21 @@ const actor = { _id: "64f000000000000000000001", first_name: "Asha", last_name: 
 
 console.log("notification: the type set");
 
-check("exactly four active types", NOTIFICATION_TYPES.length === 4, NOTIFICATION_TYPES.join(","));
+/*
+ * PHASE 12H.1 widened this from four to six. The property is unchanged — the list
+ * is exact and ordered — so a seventh type, a removed one or a reordering all still
+ * fail. The order mirrors the backend's own enum, with the tag types appended.
+ */
+check("exactly six active types", NOTIFICATION_TYPES.length === 6, NOTIFICATION_TYPES.join(","));
 check(
-  "they are FOLLOW, POST_LIKE, POST_DISLIKE, POST_COMMENT",
-  NOTIFICATION_TYPES.join(",") === "FOLLOW,POST_LIKE,POST_DISLIKE,POST_COMMENT"
+  "they are FOLLOW, POST_LIKE, POST_DISLIKE, POST_COMMENT, POST_TAG, COMMENT_TAG",
+  NOTIFICATION_TYPES.join(",") === "FOLLOW,POST_LIKE,POST_DISLIKE,POST_COMMENT,POST_TAG,COMMENT_TAG",
+  NOTIFICATION_TYPES.join(",")
 );
-check("POST_TAG is NOT a type", !NOTIFICATION_TYPES.includes("POST_TAG"));
-check("COMMENT_TAG is NOT a type", !NOTIFICATION_TYPES.includes("COMMENT_TAG"));
+check("POST_TAG IS a type", NOTIFICATION_TYPES.includes("POST_TAG"));
+check("COMMENT_TAG IS a type", NOTIFICATION_TYPES.includes("COMMENT_TAG"));
+check("the four Phase 10 types all survive",
+  ["FOLLOW", "POST_LIKE", "POST_DISLIKE", "POST_COMMENT"].every((t) => NOTIFICATION_TYPES.includes(t)));
 
 console.log("");
 console.log("notification: copy for each active type");
@@ -50,6 +62,8 @@ const EXPECTED = {
   POST_LIKE: "Asha Rao liked your post",
   POST_DISLIKE: "Asha Rao disliked your post",
   POST_COMMENT: "Asha Rao commented on your post",
+  POST_TAG: "Asha Rao tagged you in a post",
+  COMMENT_TAG: "Asha Rao tagged you in a comment",
 };
 for (const type of NOTIFICATION_TYPES) {
   const c = notificationCopy({ type, actor });
@@ -59,21 +73,63 @@ for (const type of NOTIFICATION_TYPES) {
 }
 
 console.log("");
-console.log("notification: deferred tag types produce NOTHING");
+console.log("notification: tag types render, and navigate to the parent post");
 
-check("POST_TAG -> null", notificationCopy({ type: "POST_TAG", actor }) === null);
-check("COMMENT_TAG -> null", notificationCopy({ type: "COMMENT_TAG", actor }) === null);
-check("POST_TAG has no href", notificationHref({ type: "POST_TAG", actor, postId: "p1" }) === null);
-check("COMMENT_TAG has no href", notificationHref({ type: "COMMENT_TAG", actor, postId: "p1" }) === null);
+/*
+ * PHASE 12H.1 INVERTED THIS SECTION. The tag types now produce copy and an href.
+ * What replaces the old absence checks is the stronger property: the copy is EXACT,
+ * and the destination is the PARENT POST for both — there is no comment deep-link
+ * infrastructure in this app and 12H.1 deliberately invents none.
+ */
+check("POST_TAG copy is exactly \"tagged you in a post\"",
+  notificationCopy({ type: "POST_TAG", actor }).action === "tagged you in a post",
+  notificationCopy({ type: "POST_TAG", actor }).action);
+check("COMMENT_TAG copy is exactly \"tagged you in a comment\"",
+  notificationCopy({ type: "COMMENT_TAG", actor }).action === "tagged you in a comment",
+  notificationCopy({ type: "COMMENT_TAG", actor }).action);
+
+check("POST_TAG navigates to the parent post",
+  notificationHref({ type: "POST_TAG", actor, postId: "p1" }) === "/social/posts/p1");
+check("COMMENT_TAG navigates to the parent post too",
+  notificationHref({ type: "COMMENT_TAG", actor, postId: "p1", commentId: "c1" }) === "/social/posts/p1",
+  notificationHref({ type: "COMMENT_TAG", actor, postId: "p1", commentId: "c1" }));
+check("COMMENT_TAG does NOT fabricate a comment deep link",
+  !/c1|#|comments\//.test(
+    notificationHref({ type: "COMMENT_TAG", actor, postId: "p1", commentId: "c1" }) || ""));
+check("COMMENT_TAG does not require commentId to navigate",
+  notificationHref({ type: "COMMENT_TAG", actor, postId: "p1" }) === "/social/posts/p1");
+check("a tag row with no postId stays non-navigable, per the existing contract",
+  notificationHref({ type: "POST_TAG", actor, postId: null }) === null
+  && notificationHref({ type: "COMMENT_TAG", actor, postId: null, commentId: "c1" }) === null);
+
+/*
+ * UNKNOWN TYPES STILL PRODUCE NOTHING. The policy did not change in 12H.1 - only
+ * the list of known types did - so a seventh type the backend might one day send
+ * still renders and navigates nowhere.
+ */
+check("an unknown seventh type still has no copy",
+  notificationCopy({ type: "POST_SHARE", actor }) === null);
+check("an unknown seventh type still has no href",
+  notificationHref({ type: "POST_SHARE", actor, postId: "p1" }) === null);
 
 const src = await import("node:fs").then((fs) =>
   fs.readFileSync(new URL("../lib/social/notification-copy.js", import.meta.url), "utf8")
 );
-const live = src.replace(/\/\*[\s\S]*?\*\//g, "").split("\n").map((l) => l.replace(/\/\/.*$/, "")).join("\n");
-check("no POST_TAG string exists in live code", !/POST_TAG/.test(live));
-check("no COMMENT_TAG string exists in live code", !/COMMENT_TAG/.test(live));
-check("no 'tagged you' copy exists anywhere", !/tagged/i.test(src));
-check("nothing promises a tagged user is notified", !/will be notified|they will be|notified/i.test(src));
+/* CRLF-safe, matching the 12H.0/12H.0b helpers: an anchored // pattern silently
+   strips nothing on a Windows checkout. */
+const live = src
+  .replace(/\/\*[\s\S]*?\*\//g, "")
+  .split("\n")
+  .map((l) => l.replace(/\/\/.*/, "").replace(/\r$/, ""))
+  .join("\n");
+check("the tag copy lives in live code, not a comment",
+  /POST_TAG/.test(live) && /COMMENT_TAG/.test(live));
+check("no comment-anchor or comment route is constructed anywhere",
+  !/#comment|\/comments\/|scrollIntoView|getElementById/.test(live));
+check("no dangerous HTML sink in the copy module",
+  !/dangerouslySetInnerHTML|innerHTML|DOMPurify|marked|html-react-parser/i.test(src));
+check("no secondary actor lookup is performed",
+  !/fetch\(|axios|getSocialProfile|findUser/.test(live));
 
 console.log("");
 console.log("notification: deleted actor");

@@ -43,8 +43,53 @@ function check(name, ok, detail = "") {
 
 const read = (rel) =>
   import("node:fs").then((fs) => fs.readFileSync(new URL(rel, import.meta.url), "utf8"));
+/*
+ * Source with comments removed, so a grep matches CODE rather than the prose that
+ * describes it.
+ *
+ * THE `$` ANCHOR USED TO BE HERE AND SILENTLY DISABLED THIS HELPER ON WINDOWS.
+ * Git checks these files out CRLF under core.autocrlf, so after split("\n") each
+ * line still ends with a carriage return. In JavaScript `.` does not match one and
+ * `$` without /m means end of STRING, so the anchored pattern could never reach the
+ * end of such a line: nothing was replaced and EVERY line comment survived. The
+ * stripper became a no-op, and the source-text assertions below then matched the
+ * comments they were written to ignore.
+ *
+ * The anchor was simply unnecessary - `.` already stops at a line terminator - so an
+ * unanchored pattern strips to end-of-line on LF and CRLF alike. Dropping the
+ * trailing carriage return makes the output byte-identical on both platforms.
+ * Proved for both line endings by the assertion immediately below.
+ */
 const stripComments = (s) =>
-  s.replace(/\/\*[\s\S]*?\*\//g, "").split("\n").map((l) => l.replace(/\/\/.*$/, "")).join("\n");
+  s.replace(/\/\*[\s\S]*?\*\//g, "")
+    .split("\n")
+    .map((l) => l.replace(/\/\/.*/, "").replace(/\r$/, ""))
+    .join("\n");
+
+/*
+ * THE HELPER IS TESTED HERE, because when it broke it broke SILENTLY: a no-op
+ * stripper neither throws nor fails on its own, it just hands every assertion the
+ * comments it was meant to remove. Both line endings are asserted explicitly -
+ * on a LF checkout a CRLF-broken stripper passes by luck, which is exactly how this
+ * survived unnoticed.
+ *
+ * Kept deliberately small and local: this phase introduces no shared test utility,
+ * so each suite protects its own copy of the helper.
+ */
+{
+  const LF = 'const a = 1; // trailing\nconst b = 2;\n// whole line\nconst c = 3;\n';
+  const CRLF = LF.replace(/\n/g, "\r\n");
+  check("stripComments: LF strips line comments",
+    !stripComments(LF).includes("trailing") && !stripComments(LF).includes("whole line"));
+  check("stripComments: CRLF strips line comments",
+    !stripComments(CRLF).includes("trailing") && !stripComments(CRLF).includes("whole line"),
+    JSON.stringify(stripComments(CRLF)));
+  check("stripComments: CRLF and LF produce byte-identical output",
+    stripComments(CRLF) === stripComments(LF),
+    JSON.stringify(stripComments(CRLF)));
+  check("stripComments: surrounding code survives on both",
+    /const a = 1;/.test(stripComments(CRLF)) && /const c = 3;/.test(stripComments(LF)));
+}
 
 /**
  * Also remove className strings, for STRUCTURAL greps only.

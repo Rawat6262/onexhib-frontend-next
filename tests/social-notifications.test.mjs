@@ -53,8 +53,31 @@ function check(name, ok, detail = "") {
 const here = path.dirname(fileURLToPath(import.meta.url));
 /** path.join, not new URL: the route folders hold "(social)" and "[postId]". */
 const read = (rel) => fs.readFileSync(path.join(here, "..", rel), "utf8");
+/**
+ * Source with comments removed, so a grep matches CODE rather than the prose that
+ * describes it.
+ *
+ * THE `$` ANCHOR USED TO BE HERE, AND IT SILENTLY BROKE THIS HELPER ON WINDOWS.
+ * Git checks these files out CRLF under core.autocrlf, so after split("\n") every
+ * line still ends with "\r". In JavaScript `.` does not match a carriage return and
+ * `$` without /m means end of STRING, so `/\/\/.*$/` could never reach the end of a
+ * "\r"-terminated line - the replace matched nothing and EVERY line comment
+ * survived. The stripper quietly became a no-op, and four source-text adjacency
+ * assertions below then inspected the comments they were written to ignore.
+ *
+ * Nothing was wrong with the code those assertions describe. The anchor is simply
+ * unnecessary: `.` already stops at the line terminator, so an unanchored pattern
+ * strips to the end of the line on LF and CRLF alike. The trailing "\r" is dropped
+ * too, which keeps the output identical on both platforms.
+ *
+ * Verified in both directions by the LF/CRLF regression assertions at the end of
+ * this file; restoring the anchor fails them.
+ */
 const stripComments = (s) =>
-  s.replace(/\/\*[\s\S]*?\*\//g, "").split("\n").map((l) => l.replace(/\/\/.*$/, "")).join("\n");
+  s.replace(/\/\*[\s\S]*?\*\//g, "")
+    .split("\n")
+    .map((l) => l.replace(/\/\/.*/, "").replace(/\r$/, ""))
+    .join("\n");
 /** Tailwind writes `outline-offset-2`, which matches an /offset/ grep. */
 const stripClasses = (s) => s.replace(/className=(\{`[^`]*`\}|\{[^}]*\}|"[^"]*")/g, 'className=""');
 
@@ -746,6 +769,58 @@ check("AppHeader gained no notification code",
   !/Notification|unreadCount/.test(read("components/layout/AppHeader.jsx")));
 check("the bell sits in AppShell's existing right slot, beside AccountMenu",
   /<NotificationBell \/>\s*<AccountMenu \/>/.test(shellSrc));
+
+// ─────────────────────────────────────────────────────────────────────────────
+console.log("");
+console.log("harness: stripComments is line-ending agnostic");
+
+/*
+ * THE HELPER ITSELF IS NOW TESTED, because when it broke it broke SILENTLY. A
+ * no-op stripper does not throw and does not fail on its own; it just hands every
+ * assertion the prose it was supposed to remove, and four of them started
+ * inspecting comments instead of code. A helper that the whole file's source-text
+ * assertions depend on needs its own proof.
+ *
+ * Both line endings are asserted explicitly rather than relying on whatever git
+ * happened to check out: on a LF checkout a CRLF-broken stripper would pass by
+ * luck, which is exactly how this survived until Phase 12H-A.
+ */
+const LF_SRC = 'const a = 1; // trailing comment\nconst b = 2;\n// whole-line comment\nconst c = 3;\n';
+const CRLF_SRC = LF_SRC.replace(/\n/g, "\r\n");
+
+check("LF: a trailing line comment is stripped",
+  !stripComments(LF_SRC).includes("trailing comment"));
+check("LF: a whole-line comment is stripped",
+  !stripComments(LF_SRC).includes("whole-line comment"));
+check("LF: the code either side survives",
+  /const a = 1;/.test(stripComments(LF_SRC)) && /const c = 3;/.test(stripComments(LF_SRC)));
+
+check("CRLF: a trailing line comment is stripped",
+  !stripComments(CRLF_SRC).includes("trailing comment"),
+  JSON.stringify(stripComments(CRLF_SRC)));
+check("CRLF: a whole-line comment is stripped",
+  !stripComments(CRLF_SRC).includes("whole-line comment"));
+check("CRLF: the code either side survives",
+  /const a = 1;/.test(stripComments(CRLF_SRC)) && /const c = 3;/.test(stripComments(CRLF_SRC)));
+check("CRLF and LF strip to byte-identical output",
+  stripComments(CRLF_SRC) === stripComments(LF_SRC),
+  JSON.stringify(stripComments(CRLF_SRC)) + " vs " + JSON.stringify(stripComments(LF_SRC)));
+
+/*
+ * The adjacency property the four provider assertions rely on, stated directly:
+ * once a comment sits between two statements, only a working stripper can make
+ * them adjacent again. This is what the `$`-anchored version could not do on CRLF.
+ */
+const ADJACENT = "} else {\r\n        // Hidden: nothing is requested.\r\n        stop();\r\n";
+check("CRLF: a comment between two statements no longer blocks an adjacency match",
+  /else \{\s*stop\(\);/.test(stripComments(ADJACENT)),
+  JSON.stringify(stripComments(ADJACENT)));
+
+/* Block comments were never affected - asserted so a future edit cannot regress
+   them while fixing line comments. */
+check("block comments are still stripped on both line endings",
+  !stripComments("/* gone */\r\nconst d = 4;\r\n").includes("gone")
+  && !stripComments("/* gone */\nconst d = 4;\n").includes("gone"));
 
 console.log("");
 console.log(failed ? `=== ${failed} FAILED ===` : "=== all passed ===");

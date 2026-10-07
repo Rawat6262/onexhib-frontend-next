@@ -241,7 +241,20 @@ function NewOrganiserPopup({ onClose }) {
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800 shrink-0">
           <div className="flex items-center gap-4">
-            <Image src="/Dark.png" alt="OneXhib" width={112} height={34} className="w-28 h-auto" />
+            <Image
+              src="/Dark.png"
+              alt="OneXhib"
+              width={112}
+              height={34}
+              className="w-28 h-auto dark:hidden"
+            />
+            <Image
+              src="/Untitled-2-01 1.png"
+              alt="OneXhib"
+              width={124}
+              height={42}
+              className="hidden w-28 h-auto dark:block"
+            />
             <div>
               <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">Create account</h2>
               <p className="text-sm text-gray-500 dark:text-gray-400">Fill in your details to sign up</p>

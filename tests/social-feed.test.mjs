@@ -386,10 +386,20 @@ check("PostCard never fetches a profile", !/getSocialProfile/.test(cardSrc));
 check("PostCard never fetches users", !/getFollowers|getFollowing|Signupmodel|find\/signup/.test(cardSrc));
 check("PostCard makes no axios call directly", !/axios/.test(cardSrc));
 check(
-  "PostCard's only model imports are the two reaction mutations",
+  "PostCard's only model imports are the two reaction mutations and reportPost",
   (() => {
     const m = cardSrc.match(/from "@\/models\/social\.model"/g) || [];
-    return m.length === 1 && /setPostReaction, clearPostReaction/.test(cardSrc);
+    const imports = (cardSrc.match(/import \{([^}]*)\} from "@\/models\/social\.model"/g) || [])
+      .join(",")
+      .replace(/import \{|\} from "@\/models\/social\.model"/g, "")
+      .split(",")
+      .map((n) => n.trim())
+      .filter(Boolean)
+      .sort();
+    return m.length === 2
+      && /setPostReaction, clearPostReaction/.test(cardSrc)
+      && JSON.stringify(imports)
+        === JSON.stringify(["clearPostReaction", "reportPost", "setPostReaction"]);
   })(),
   "PostCard imports more than the reaction mutations"
 );
@@ -566,7 +576,18 @@ console.log("feed: author handling");
 check("the author comes from the post, not the cache", /post\.author/.test(cardSrc));
 check("a null author renders neutral text", /Unavailable account/.test(cardSrc));
 check("the author link encodes the id", /encodeURIComponent\(authorId\)/.test(cardSrc));
-check("the raw author id is never rendered as text", !/\{authorId\}/.test(stripClasses(cardSrc)));
+{
+  // A JSX child position is `>{authorId}` or `{authorId}<`; an attribute is
+  // `name={authorId}`. Only the first renders an ObjectId where a reader can see it.
+  const card = stripClasses(cardSrc);
+  check("the raw author id is never rendered as text",
+    !/>\s*\{authorId\}/.test(card) && !/\{authorId\}\s*</.test(card),
+    "authorId appears in a child position");
+  check("and where it IS used, it is a prop value or inside a template literal",
+    (card.match(/\{authorId\}/g) || []).length
+      === (card.match(/\w+=\{authorId\}/g) || []).length,
+    "an unattributed {authorId} exists");
+}
 check("ownership uses the cached id only", /isOwnPost\(user\?\._id/.test(feedSrc));
 /*
  * PHASE 11E added the owner menu, so Edit and Delete now exist — but only for the
@@ -604,7 +625,22 @@ const socialPages = [];
   }
 })(routeDir);
 
-check("all four social routes were found", socialPages.length === 4, `found ${socialPages.length}`);
+check("all five social routes were found", socialPages.length === 5, `found ${socialPages.length}`);
+check(
+  "and they are exactly the expected five",
+  JSON.stringify(
+    socialPages
+      .map((u) => decodeURIComponent(u.pathname).split("/app/")[1])
+      .sort()
+  ) === JSON.stringify([
+    "(social)/social/notifications/page.jsx",
+    "(social)/social/page.jsx",
+    "(social)/social/posts/[postId]/page.jsx",
+    "(social)/social/privacy/page.jsx",
+    "(social)/social/profile/[userId]/page.jsx",
+  ]),
+  JSON.stringify(socialPages.map((u) => decodeURIComponent(u.pathname).split("/app/")[1]).sort())
+);
 
 for (const url of socialPages) {
   const rel = decodeURIComponent(url.pathname).split("/app/")[1];

@@ -21,7 +21,22 @@ const LegalPageLayout = ({ title, subtitle, children, footer }) => (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12 relative">
       <ThemeToggle className="absolute top-8 right-4 sm:right-6 text-gray-500 dark:text-gray-400" />
       <div className="flex justify-center mb-6">
-        <Image src="/Dark.png" alt="OneXhib" width={160} height={48} priority className="h-10 sm:h-12 w-auto object-contain" />
+        <Image
+          src="/Dark.png"
+          alt="OneXhib"
+          width={160}
+          height={48}
+          priority
+          className="h-10 sm:h-12 w-auto object-contain dark:hidden"
+        />
+        <Image
+          src="/Untitled-2-01 1.png"
+          alt="OneXhib"
+          width={124}
+          height={42}
+          priority
+          className="hidden h-10 sm:h-12 w-auto object-contain dark:block"
+        />
       </div>
 
       <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-5 sm:p-10">

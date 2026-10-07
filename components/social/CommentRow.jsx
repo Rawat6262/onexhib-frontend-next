@@ -5,6 +5,8 @@ import Link from "next/link";
 import { Pencil, Trash2 } from "lucide-react";
 
 import InitialsAvatar from "@/components/social/InitialsAvatar";
+import RelationshipMenu from "@/components/social/RelationshipMenu";
+import { reportComment } from "@/models/social.model";
 import { displayName } from "@/lib/social/profile";
 import { postTimestamp } from "@/lib/social/post";
 import { CONTENT_MAX, AUTHOR_UNAVAILABLE, validateComment, commentLength } from "@/lib/social/comment";
@@ -37,6 +39,20 @@ export default function CommentRow({
   onEditCancel,
   onEditSubmit,
   onDeleteRequest,
+  /*
+   * PHASE 12 COMPLETION. Report and Block on the AUTHOR of this comment.
+   *
+   * viewerId comes from the parent rather than useAuth() here: a thread renders many of
+   * these, and a context read per row is a cost the list does not need.
+   *
+   * NO MUTE on a comment, for the same reason as on a post - a comment carries no mute
+   * flag, and a toggle whose label is a guess is worse than no toggle.
+   *
+   * onAuthorBlocked hands the decision to the list that owns the thread; this row keeps
+   * no local record of who is blocked.
+   */
+  viewerId = null,
+  onAuthorBlocked,
 }) {
   const author = comment.author || null;
   const name = author ? displayName(author) : AUTHOR_UNAVAILABLE;
@@ -130,6 +146,29 @@ export default function CommentRow({
                   icon={<Trash2 size={13} aria-hidden="true" />}
                   text="Delete"
                   destructive
+                />
+              </div>
+            ) : null}
+
+            {/*
+              NOT THE AUTHOR, and only when the account still exists - there is nobody to
+              act on when the author is gone. RelationshipMenu hides itself for self, so
+              this and the owner controls above are mutually exclusive.
+
+              REPORT TARGETS THE COMMENT. The route is bound here rather than chosen from
+              a type variable inside the menu, because a comment reported through the post
+              route would still answer 201.
+            */}
+            {!isOwn && author && author._id ? (
+              <div className="mt-2">
+                <RelationshipMenu
+                  viewerId={viewerId}
+                  targetId={String(author._id)}
+                  targetName={name}
+                  showMute={false}
+                  submitReport={(payload) => reportComment(comment._id, payload)}
+                  onBlocked={onAuthorBlocked}
+                  label={`Options for this comment`}
                 />
               </div>
             ) : null}

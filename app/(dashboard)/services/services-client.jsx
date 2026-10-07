@@ -7,10 +7,11 @@
 // blue-500/green-500/red-400 accents that appear nowhere on the public pages.
 import dynamic from "next/dynamic";
 import { useEffect, useState, useMemo } from "react";
-import { Pencil, Plus, Search, Trash2 } from "lucide-react";
+import ServiceExcelUploadModal from "@/components/popups/ServiceExcelUploadModal";
+import { Pencil, Plus, Search, Trash2, Upload } from "lucide-react";
 
 import {
-  getAdminExhibitionServices,
+  getMyExhibitionServices,
   deleteExhibitionService,
 } from "@/models/service.model";
 import {
@@ -19,6 +20,7 @@ import {
   StatCard,
   NoResults,
   btnPrimary,
+  btnSecondary,
   btnRow,
   btnRowDanger,
   inputBase,
@@ -34,6 +36,7 @@ const ServiceEditPopup = dynamic(() => import("@/components/popups/ExhibitionSer
 export default function ServicesClient() {
   const [services, setServices] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [showUpload, setShowUpload] = useState(false);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [editingId, setEditingId] = useState(null);
@@ -42,7 +45,20 @@ export default function ServicesClient() {
 
   const fetchServices = async () => {
     try {
-      const { data } = await getAdminExhibitionServices();
+      /*
+       * THE OWNER'S OWN LISTINGS ONLY.
+       *
+       * This used to call getAdminExhibitionServices, which is the PUBLIC endpoint
+       * backing /exhibition-services - so every provider saw every other provider's
+       * listings here, each with an Edit and a Delete button beside it. The buttons
+       * never actually worked on somebody else's row (the backend pins ownership on
+       * both mutations and answers 404 to a stranger), but the rows should not have
+       * been on this page to click in the first place.
+       *
+       * /api/myexhibitionservices scopes to req.user._id with no id in the path or
+       * query, so there is nothing to point at another account.
+       */
+      const { data } = await getMyExhibitionServices();
       if (data.success) {
         setServices(data.data);
       }
@@ -103,12 +119,31 @@ export default function ServicesClient() {
         title="Exhibition services"
         intro="The service providers listed on your account, across the seven categories the platform supports."
         actions={
-          <button type="button" className={btnPrimary} onClick={() => setShowModal(true)}>
-            <Plus size={16} aria-hidden="true" />
-            Add service
-          </button>
+          <div className="flex items-center gap-2">
+            <button type="button" className={btnSecondary} onClick={() => setShowUpload(true)}>
+              <Upload size={16} aria-hidden="true" />
+              Upload Excel
+            </button>
+            <button type="button" className={btnPrimary} onClick={() => setShowModal(true)}>
+              <Plus size={16} aria-hidden="true" />
+              Add service
+            </button>
+          </div>
         }
       />
+
+      {showUpload && (
+        <ServiceExcelUploadModal
+          isOpen={showUpload}
+          onClose={() => setShowUpload(false)}
+          /* Refetch rather than splice the response in: a partial import inserts some rows
+             and rejects others, so the server's list is the only accurate picture. */
+          onSuccess={() => {
+            setShowUpload(false);
+            fetchServices();
+          }}
+        />
+      )}
 
       {showModal && (
         <ExhibitionServicePopupForm

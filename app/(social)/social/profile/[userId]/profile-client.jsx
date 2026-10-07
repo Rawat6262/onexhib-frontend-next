@@ -1,14 +1,16 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { UserX } from "lucide-react";
 
 import { useAuth } from "@/components/auth/AuthProvider";
 import ProfileHeader from "@/components/social/ProfileHeader";
+import RelationshipMenu from "@/components/social/RelationshipMenu";
 import ProfileEditSheet from "@/components/social/ProfileEditSheet";
 import UserList from "@/components/social/UserList";
-import { getSocialProfile, getFollowers, getFollowing } from "@/models/social.model";
-import { isSelfProfile, applyFollowerDelta, describeRequestError } from "@/lib/social/profile";
+import { getSocialProfile, getFollowers, getFollowing, reportUser } from "@/models/social.model";
+import { isSelfProfile, applyFollowerDelta, describeRequestError, displayName } from "@/lib/social/profile";
 
 /**
  * A Community profile, fetched against the viewer's own session.
@@ -53,6 +55,7 @@ const TABS = Object.freeze([
 const DEFAULT_TAB = TABS[0].key;
 
 export default function ProfileClient({ userId }) {
+  const router = useRouter();
   const { user: cachedUser, status } = useAuth();
 
   const [profile, setProfile] = useState(null);
@@ -62,6 +65,7 @@ export default function ProfileClient({ userId }) {
   // is the tab a profile visit most often wants.
   const [tab, setTab] = useState(DEFAULT_TAB);
   const [editing, setEditing] = useState(false);
+  const [notice, setNotice] = useState(null);
 
   const abortRef = useRef(null);
 
@@ -114,6 +118,31 @@ export default function ProfileClient({ userId }) {
     );
   }, []);
 
+  /*
+   * MUTE STATE COMES FROM THE SERVER, on this very response, as `viewerMuted` - the
+   * viewer's OWN outgoing mute and nothing else. There is no mute-status endpoint to call
+   * and nothing is remembered locally, so the control is correct after a reload by
+   * construction rather than by cache invalidation.
+   *
+   * The server's confirmed boolean is written back here; a null means it did not say, so
+   * the profile is re-read instead of guessed at.
+   */
+  const handleMuteChange = useCallback((muted) => {
+    if (muted === null) { load(); return; }
+    setProfile((prev) => (prev ? { ...prev, viewerMuted: muted } : prev));
+  }, [load]);
+
+  /*
+   * AFTER A CONFIRMED BLOCK THIS PAGE CANNOT STAY. The server now answers 404 for this
+   * profile - the same 404 as a nonexistent account - so every subsequent read here would
+   * fail. Leaving the viewer on a page that is about to break, with a Follow button that
+   * no longer means anything, would be worse than moving them. No client-side block list
+   * is kept: the feed is the correct next surface and Privacy -> Blocked users is the undo.
+   */
+  const handleBlocked = useCallback(() => {
+    router.push("/social");
+  }, [router]);
+
   if (status === "loading" || phase === "loading") {
     return (
       <div className="mx-auto w-full max-w-2xl px-4 py-8 sm:px-6 sm:py-12" aria-busy="true">
@@ -163,7 +192,27 @@ export default function ProfileClient({ userId }) {
         isSelf={self}
         onFollowChange={handleFollowChange}
         onEdit={() => setEditing(true)}
+        actions={
+          <RelationshipMenu
+            viewerId={cachedUser?._id}
+            targetId={profile.user?._id}
+            targetName={displayName(profile.user)}
+            /* The server's own field. Never localStorage, never a remembered toggle. */
+            muted={Boolean(profile.viewerMuted)}
+            submitReport={(payload) => reportUser(profile.user._id, payload)}
+            onBlocked={handleBlocked}
+            onMuteChange={handleMuteChange}
+            onNotice={setNotice}
+            label="Options for this person"
+          />
+        }
       />
+
+      {notice ? (
+        <p role="status" className="mt-3 rounded-xl bg-gray-50 px-3 py-2 text-sm text-gray-700 dark:bg-gray-900 dark:text-gray-300">
+          {notice}
+        </p>
+      ) : null}
 
       {/* Real buttons in a tablist, so the tabs are keyboard reachable and their
           selected state is announced. */}

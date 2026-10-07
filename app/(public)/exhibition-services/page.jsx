@@ -45,10 +45,15 @@ import { SERVICE_CATEGORIES } from "@/lib/public-api";
 export const revalidate = 300;
 
 /**
- * Flip to true once /api/getexhibitionservice holds genuine provider records.
- * Until then the page is a category directory, not an empty marketplace.
+ * ON. The condition this flag was waiting for is met: /api/getexhibitionservice now holds
+ * real provider records, so the page is a directory with inventory rather than an empty
+ * marketplace pretending to have some.
+ *
+ * It stays a flag rather than being deleted because the honest behaviour when the
+ * endpoint is empty is still "category directory, no provider section" - ProviderListings
+ * returns null on an empty list, so the page degrades to exactly what it was.
  */
-const SHOW_PROVIDER_LISTINGS = false;
+const SHOW_PROVIDER_LISTINGS = true;
 
 const TITLE = "Exhibition services — printing, fabrication, staffing";
 const DESCRIPTION =
@@ -245,11 +250,17 @@ export default function ExhibitionServicesPage() {
 /**
  * Live provider listings, grouped by the enum category.
  *
- * Unreferenced while SHOW_PROVIDER_LISTINGS is false. Kept because the page was
- * specified to be structurally ready for real inventory — turning it on is a
- * one-line change rather than a rewrite. Note that the projection in
- * lib/public-api.js already drops full_name, mobile_number and address, so a
- * provider is shown as a service and a location, never as a person to phone.
+ * EVERY provider's listings, from the unscoped /api/getexhibitionservice — which is the
+ * difference between this page and the dashboard. The dashboard calls
+ * /api/myexhibitionservices and shows one provider their own rows; this shows everyone's,
+ * because that is what a public directory is for.
+ *
+ * WHAT IS AND IS NOT PUBLISHED. toPublicService in lib/public-api.js emits the business
+ * name, the service category, the location and the image. It still drops `mobile_number`
+ * and `address`: a phone number on a crawlable page is what address-harvesters collect,
+ * and the repo already treats direct contact details as something to put behind a session
+ * (see the organiser contact endpoint). An exhibitor finds the provider here and the
+ * contact route is a separate decision.
  */
 async function ProviderListings() {
   const { getServices } = await import("@/lib/public-api");
@@ -281,9 +292,16 @@ async function ProviderListings() {
               {providers.map((p) => (
                 <li
                   key={p.id}
-                  className="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300"
+                  className="rounded-xl border border-gray-200 bg-white px-4 py-3 dark:border-gray-800 dark:bg-gray-900"
                 >
-                  {[p.city, p.state, p.country].filter(Boolean).join(", ") || "Location not stated"}
+                  {/* Name first: it is what an exhibitor scans for. Plain React text -
+                      a provider-supplied string never goes near an HTML sink. */}
+                  <span className="block text-sm font-semibold text-gray-900 dark:text-gray-50">
+                    {p.name || "Service provider"}
+                  </span>
+                  <span className="mt-0.5 block text-xs text-gray-600 dark:text-gray-400">
+                    {[p.city, p.state, p.country].filter(Boolean).join(", ") || "Location not stated"}
+                  </span>
                 </li>
               ))}
             </ul>

@@ -1,6 +1,6 @@
 "use client";
 
-import { MessageSquare, UserCircle, Bell } from "lucide-react";
+import { MessageSquare, UserCircle, Bell, ShieldOff } from "lucide-react";
 import AppShell from "@/components/layout/AppShell";
 import RequireAuth from "@/components/auth/RequireAuth";
 import { useAuth } from "@/components/auth/AuthProvider";
@@ -45,6 +45,18 @@ export default function SocialLayout({ children }) {
       icon: <UserCircle size={16} />,
     });
   }
+  /*
+   * Privacy is in the SUB-NAV rather than tucked under /account, and that placement is the
+   * point. Blocking conceals the blocked person's profile, so once a block exists there is
+   * no route back to it from the person - the only way to undo one is to find this page.
+   * The /account/* pages are deliberately undiscoverable (nothing links to them, they are
+   * noindex/nofollow), so putting it there would satisfy the letter of "a management
+   * surface exists" while leaving blocks effectively permanent.
+   *
+   * Unconditional, unlike My profile: it needs no id, and a signed-in user can always have
+   * something to manage here.
+   */
+  items.push({ label: "Privacy", href: "/social/privacy", icon: <ShieldOff size={16} /> });
 
   return (
     <RequireAuth>

@@ -93,11 +93,31 @@ const CONTRACTS = [
   ["notifications", "getUnreadCount", "get", "/api/social/notifications/unread-count", () => social.getUnreadCount()],
   ["notifications", "markAllNotificationsRead", "put", "/api/social/notifications/read-all", () => social.markAllNotificationsRead()],
   ["notifications", "markNotificationRead", "put", `/api/social/notifications/${ID}/read`, () => social.markNotificationRead(ID)],
+
+  /*
+   * PHASE 12 COMPLETION. Block, mute and report.
+   *
+   * getBlockedUsers takes NO id, deliberately: the endpoint is self-scoped and there is
+   * no parameter through which one user could read another's blocked list. The three
+   * report entries are separate routes rather than one parameterised call, because the
+   * backend stores no target type - the ROUTE is what says what was reported, so a wrong
+   * `type` variable would file against the wrong collection and still answer 201.
+   */
+  ["block", "blockUser", "post", `/api/social/block/${ID}`, () => social.blockUser(ID)],
+  ["block", "unblockUser", "delete", `/api/social/block/${ID}`, () => social.unblockUser(ID)],
+  ["block", "getBlockedUsers", "get", "/api/social/blocked", () => social.getBlockedUsers()],
+
+  ["mute", "muteUser", "post", `/api/social/mute/${ID}`, () => social.muteUser(ID)],
+  ["mute", "unmuteUser", "delete", `/api/social/mute/${ID}`, () => social.unmuteUser(ID)],
+
+  ["report", "reportUser", "post", `/api/social/report/user/${ID}`, () => social.reportUser(ID, { reason: "SPAM" })],
+  ["report", "reportPost", "post", `/api/social/report/post/${ID}`, () => social.reportPost(ID, { reason: "SPAM" })],
+  ["report", "reportComment", "post", `/api/social/report/comment/${ID}`, () => social.reportComment(ID, { reason: "SPAM" })],
 ];
 
 console.log("social model: all 27 endpoint contracts");
 
-check("exactly 27 contracts are asserted", CONTRACTS.length === 27, String(CONTRACTS.length));
+check("exactly 35 contracts are asserted", CONTRACTS.length === 35, String(CONTRACTS.length));
 
 let group = "";
 for (const [g, label, method, url, invoke] of CONTRACTS) {
@@ -114,10 +134,10 @@ for (const [g, label, method, url, invoke] of CONTRACTS) {
 }
 
 console.log("");
-console.log("social model: the exported surface is exactly those 27");
+console.log("social model: the exported surface is exactly those 35");
 
 const exported = Object.keys(social).filter((k) => typeof social[k] === "function").sort();
-check("27 functions exported", exported.length === 27, `${exported.length}: ${exported.join(",")}`);
+check("35 functions exported", exported.length === 35, `${exported.length}: ${exported.join(",")}`);
 check(
   "every contract name is exported",
   CONTRACTS.every(([, label]) => exported.includes(label)),

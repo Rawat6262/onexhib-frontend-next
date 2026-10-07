@@ -37,7 +37,15 @@ export default function PublicFooter({ locations }) {
               width={200}
               height={45}
               loading="lazy"
-              className="h-8 w-auto object-contain"
+              className="h-8 w-auto object-contain dark:hidden"
+            />
+            <Image
+              src="/Untitled-2-01 1.png"
+              alt={SITE_NAME}
+              width={124}
+              height={42}
+              loading="lazy"
+              className="hidden h-8 w-auto object-contain dark:block"
             />
             <p className="mt-3 max-w-xs text-sm leading-relaxed text-gray-600 dark:text-gray-400">
               Discover exhibitions and trade shows worldwide, the companies exhibiting at them, and

@@ -21,7 +21,7 @@ import { displayName, roleLine, locationLine, displayCount } from "@/lib/social/
  * That is a UI choice about controls, never about data, and the backend pins
  * ownership into the write regardless.
  */
-export default function ProfileHeader({ profile, isSelf, onFollowChange, onEdit }) {
+export default function ProfileHeader({ profile, isSelf, onFollowChange, onEdit, actions }) {
   const user = profile.user || {};
   const name = displayName(user);
   const role = roleLine(user);
@@ -89,11 +89,21 @@ export default function ProfileHeader({ profile, isSelf, onFollowChange, onEdit 
               Edit profile
             </button>
           ) : (
-            <FollowButton
-              userId={String(user._id)}
-              following={Boolean(profile.following)}
-              onChange={onFollowChange}
-            />
+            /*
+             * Follow and the block/mute/report menu sit together, and `actions` is a slot
+             * rather than props because this component must not know how to block anyone.
+             * It renders identity; the page owns what happens after a confirmed mutation -
+             * which for a block is navigating away, since the server will conceal this
+             * profile on the next read.
+             */
+            <div className="flex items-center gap-2">
+              <FollowButton
+                userId={String(user._id)}
+                following={Boolean(profile.following)}
+                onChange={onFollowChange}
+              />
+              {actions}
+            </div>
           )}
         </div>
       </div>

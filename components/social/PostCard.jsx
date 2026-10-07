@@ -5,6 +5,9 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { ThumbsUp, ThumbsDown, MessageSquare, Globe, Users, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 
+import RelationshipMenu from "@/components/social/RelationshipMenu";
+import { reportPost } from "@/models/social.model";
+
 import InitialsAvatar from "@/components/social/InitialsAvatar";
 import PostMedia from "@/components/social/PostMedia";
 import { setPostReaction, clearPostReaction } from "@/models/social.model";
@@ -41,6 +44,20 @@ export default function PostCard({
   onPostChange,
   onEditRequest,
   onDeleteRequest,
+  /*
+   * PHASE 12 COMPLETION. Block / Mute / Report on the AUTHOR of this post.
+   *
+   * `viewerId` is passed in rather than read from useAuth() here, because this card
+   * is rendered dozens of times per feed and a context read per card is a cost the
+   * feed does not need - the parent already has the id.
+   *
+   * `onAuthorBlocked` lets the OWNER of the list decide what a confirmed block means
+   * for it. A feed refetches, because the server will now filter that author out; a
+   * post-detail page navigates away, because the post itself becomes unreadable. This
+   * card must not guess, and must not keep a local list of blocked authors.
+   */
+  viewerId = null,
+  onAuthorBlocked,
   // Defaults to true so the feed and the profile link to the detail page without
   // passing anything. The detail page itself passes false: a link to the page you
   // are already on is a control that does nothing.
@@ -167,6 +184,33 @@ export default function PostCard({
               setMenuOpen(false);
               onDeleteRequest(post);
             }}
+          />
+        ) : null}
+
+        {/*
+          NOT THE OWNER, and not a deleted author either - there is nobody to act on when
+          the account is gone, and no id to act with. RelationshipMenu hides itself for
+          self through canActOn, so the two menus can never both appear.
+
+          REPORT TARGETS THE POST, not its author, and the route is bound here rather
+          than selected inside the menu from a type variable. A post reported through the
+          user route would still answer 201, which is exactly why no variable decides it.
+        */}
+        {!isOwnPost && authorId ? (
+          <RelationshipMenu
+            viewerId={viewerId}
+            targetId={authorId}
+            targetName={name}
+            /*
+             * NO MUTE HERE. A post response carries no mute flag - the feed already
+             * suppresses muted authors server-side, and inventing `post.authorMuted`
+             * would be reading a field the backend does not send. Mute lives on the
+             * profile, where viewerMuted is authoritative.
+             */
+            showMute={false}
+            submitReport={(payload) => reportPost(post._id, payload)}
+            onBlocked={onAuthorBlocked}
+            label="Options for this post"
           />
         ) : null}
       </header>

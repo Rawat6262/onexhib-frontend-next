@@ -41,7 +41,19 @@ import {
  * through onCommentCount. Nothing here decrements, so there is no double decrement
  * to avoid, and the count is never `items.length` — that is one page of twenty.
  */
-export default function CommentList({ postId, viewerId, disabled = false, onCommentCount }) {
+export default function CommentList({
+  postId,
+  viewerId,
+  disabled = false,
+  onCommentCount,
+  /*
+   * A confirmed block on a comment author. The thread is reloaded rather than
+   * filtered locally: the server now hides that author's comments, and a reload is
+   * the only thing that gets the whole paged thread right. The owner of the page may
+   * override this - the post detail page navigates away instead.
+   */
+  onAuthorBlocked,
+}) {
   const [list, setList] = useState(emptyList);
   const [phase, setPhase] = useState("loading");
   const [initialError, setInitialError] = useState(null);
@@ -263,6 +275,8 @@ export default function CommentList({ postId, viewerId, disabled = false, onComm
                   key={id}
                   comment={comment}
                   isOwn={isOwnComment(viewerId, comment)}
+                  viewerId={viewerId}
+                  onAuthorBlocked={onAuthorBlocked || (() => load(null))}
                   disabled={disabled || (Boolean(pendingId) && pendingId !== id)}
                   editing={editingId === id}
                   pending={pendingId === id}

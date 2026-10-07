@@ -427,7 +427,30 @@ check("the row's profile links encode the user id",
 console.log("");
 console.log("no N+1: a row fetches nothing, ever");
 
-check("the row imports no model", !/models\/social\.model/.test(rowSrc));
+{
+  /*
+   * NARROWED IN PHASE 12. The row now has a Report action, so it does import one
+   * mutation. What this assertion exists to prevent is a row that FETCHES - a profile,
+   * a follow status, an author - which at fifty rows is the N+1 the backend's batching
+   * was built to avoid. A user-triggered mutation is not that, so the import is pinned
+   * to exactly one name instead of forbidden outright.
+   */
+  const rowModelImports = (rowSrc.match(/import \{([^}]*)\} from "@\/models\/social\.model"/g) || [])
+    .join(",")
+    .replace(/import \{|\} from "@\/models\/social\.model"/g, "")
+    .split(",")
+    .map((n) => n.trim())
+    .filter(Boolean)
+    .sort();
+  check("the row imports exactly one model function, reportComment",
+    JSON.stringify(rowModelImports) === JSON.stringify(["reportComment"]),
+    JSON.stringify(rowModelImports));
+  check("and it is a mutation, never a read",
+    !/getComments|getSocialProfile|getFollowStatus|getPost\(|getFollowers|getFollowing/.test(rowSrc));
+  check("the row still reports the COMMENT, never the post or the author",
+    /reportComment\(comment\._id, payload\)/.test(rowSrc)
+    && !/reportPost\(|reportUser\(/.test(rowSrc));
+}
 check("the row imports no axios", !/axios/.test(rowSrc));
 check("the composer imports no model", !/models\/social\.model/.test(composerSrc));
 check("the composer imports no axios", !/axios/.test(composerSrc));
@@ -787,7 +810,14 @@ for (const [label, re] of [
   ["discovery", /getDiscovery\(|suggested|trending/i],
   ["block", /blockUser\(/],
   ["mute", /muteUser\(/],
-  ["report", /reportPost\(|reportComment\(/],
+  /*
+   * `report` WAS on this list and has been removed: Phase 12 adds reporting on purpose.
+   * What replaces it is the assertion that matters now - a comment surface may reach the
+   * comment report route and no other. The backend stores no target type, so the route
+   * IS the record of what was reported, and a comment filed through the post route would
+   * still answer 201.
+   */
+  ["a report against the wrong target from a comment surface", /reportPost\(|reportUser\(/],
   ["a tag editor", /TagPicker|TagEditor|onTagsChange|setTaggedUsers/],
   ["an @mention parser", /@mention|mentionRegex|parseMentions/i],
   ["comment reactions", /setCommentReaction|commentReaction|likeComment/],

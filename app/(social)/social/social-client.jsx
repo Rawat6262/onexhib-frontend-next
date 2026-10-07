@@ -216,6 +216,15 @@ export default function SocialClient() {
             onPostChange={handlePostChange}
             onEditRequest={setEditing}
             onDeleteRequest={setDeleting}
+            viewerId={user?._id}
+            /*
+             * A CONFIRMED BLOCK REFETCHES THE FEED rather than splicing the author's posts
+             * out locally. The server now excludes that author from the feed query, so one
+             * reload gives the correct page - and it gives the correct PAGE, not just the
+             * rows currently on screen, which a local filter could not do. No client-side
+             * blocked list is kept anywhere.
+             */
+            onAuthorBlocked={() => load(null)}
           />
         ))}
       </div>

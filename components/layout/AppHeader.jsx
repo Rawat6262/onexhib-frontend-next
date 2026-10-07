@@ -51,7 +51,15 @@ export default function AppHeader({ nav = PUBLIC_NAV, right = null, mobileExtra 
             width={200}
             height={45}
             priority
-            className="h-8 w-auto object-contain sm:h-9"
+            className="h-8 w-auto object-contain dark:hidden sm:h-9"
+          />
+          <Image
+            src="/Untitled-2-01 1.png"
+            alt="OneXhib"
+            width={124}
+            height={42}
+            priority
+            className="hidden h-8 w-auto object-contain dark:block sm:h-9"
           />
         </Link>
 

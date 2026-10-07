@@ -1,7 +1,7 @@
 import axios from "axios";
 
 /**
- * The social API surface — all 27 deployed endpoints, one thin function each.
+ * The social API surface — all 35 deployed endpoints, one thin function each.
  *
  * TRANSPORT IS ALREADY SOLVED, AND IS NOT RE-SOLVED HERE
  * Every path is relative. next.config.mjs rewrites /api/:path* to the server-only
@@ -189,3 +189,89 @@ export const markAllNotificationsRead = () =>
 
 export const markNotificationRead = (notificationId) =>
   axios.put(`/api/social/notifications/${id(notificationId)}/read`);
+
+// --- BLOCK (3) ---------------------------------------------------------------
+
+/*
+ * NO BODY ON BLOCK OR UNBLOCK, and that is not an oversight to be tidied up later.
+ * The backend's two mutation endpoints REFUSE any body outright rather than ignoring
+ * one, because a request naming a `blocker` is either a client bug or an attempt to
+ * act as another user. axios sends no body when none is passed, so these must stay
+ * one-argument calls.
+ *
+ * Both answer `{ success, blocked }` - a boolean saying which way the switch now sits,
+ * never the row, the pair or the timestamps.
+ */
+export const blockUser = (userId) => axios.post(`/api/social/block/${id(userId)}`);
+
+/**
+ * DIRECTIONAL. This removes only the caller's own block row. If both parties blocked
+ * each other the other row survives and the pair stays mutually invisible, so a 200
+ * here must never be read as "we can see each other again".
+ */
+export const unblockUser = (userId) => axios.delete(`/api/social/block/${id(userId)}`);
+
+/**
+ * The accounts the SIGNED-IN VIEWER has blocked: `{ success, users, nextCursor, hasMore }`.
+ *
+ * NO userId ARGUMENT, deliberately - the endpoint takes none. The caller is the session,
+ * so there is no parameter through which one user could read another's list. Adding one
+ * here would be inventing a contract the server does not have.
+ *
+ * This list is the ONLY reliable way back to a blocked user's id: blocking conceals the
+ * profile with the same 404 as a nonexistent account, and every feed, list and comment
+ * path strips blocked users before hydration. An unblock UI therefore has to start here
+ * rather than from a profile page.
+ *
+ * Paged like the follower lists - same opaque cursor, same `hasMore`.
+ */
+export const getBlockedUsers = (page) =>
+  axios.get("/api/social/blocked", pageParams(page));
+
+// --- MUTE (2) ----------------------------------------------------------------
+
+/*
+ * Mute is DIRECTIONAL and invisible to the muted user, and it is NOT block: a muted
+ * user's profile, posts and comments all stay directly reachable. It suppresses only
+ * the muter's own feed and notifications.
+ *
+ * There is no mute-status GET, on purpose - "who muted me" is the fact mute exists to
+ * withhold, so the model carries no reverse index. The viewer's own outgoing state
+ * arrives as `viewerMuted` on GET /api/social/profile/:userId instead, which is why no
+ * client ever needs to remember it locally.
+ *
+ * Both take no body and answer `{ success, muted }`.
+ */
+export const muteUser = (userId) => axios.post(`/api/social/mute/${id(userId)}`);
+
+export const unmuteUser = (userId) => axios.delete(`/api/social/mute/${id(userId)}`);
+
+// --- REPORT (3) --------------------------------------------------------------
+
+/*
+ * THREE SEPARATE FUNCTIONS, NOT ONE GENERIC HELPER TAKING A TYPE.
+ *
+ * The backend has three distinct routes and deliberately stores no `targetType`; the
+ * route itself is what says what was reported. A helper like
+ * `report(type, id, body)` would put the target kind into a variable, and a wrong
+ * variable would file a report against the wrong collection while still answering 201.
+ * Three one-line functions make the route a compile-time fact instead.
+ *
+ * THE BODY IS A STRICT ALLOW-LIST: exactly `reason` and `details`, nothing else. The
+ * server REFUSES any other key rather than dropping it, so callers must not spread a
+ * form object in here - no reporter, actor, recipient, dedupeKey, targetType or
+ * reportedUser/Post/Comment. Those are all derived server-side from the session and
+ * the path.
+ *
+ * Success is `201 { success: true }` and nothing more. It means "stored", not
+ * "actioned": nothing is removed, nobody is banned, the target is not notified, and no
+ * block or mute is applied. A caller must not imply otherwise.
+ */
+export const reportUser = (userId, payload) =>
+  axios.post(`/api/social/report/user/${id(userId)}`, payload);
+
+export const reportPost = (postId, payload) =>
+  axios.post(`/api/social/report/post/${id(postId)}`, payload);
+
+export const reportComment = (commentId, payload) =>
+  axios.post(`/api/social/report/comment/${id(commentId)}`, payload);

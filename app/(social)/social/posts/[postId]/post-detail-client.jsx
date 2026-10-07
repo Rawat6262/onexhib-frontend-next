@@ -213,11 +213,21 @@ export default function PostDetailClient({ postId }) {
         // Already on the post: the count stays metadata here rather than becoming
         // a link to the page the reader is looking at.
         linkComments={false}
+        viewerId={user?._id}
+        /*
+         * BLOCKING THE AUTHOR MAKES THIS PAGE UNREADABLE. canViewPost is block-aware, so
+         * the next read of this post answers 404 - the same 404 as a post that never
+         * existed. Staying here would leave the reader on a page that is already gone, so
+         * the feed is the correct destination.
+         */
+        onAuthorBlocked={() => router.push("/social")}
       />
 
       <CommentList
         postId={postId}
         viewerId={user?._id}
+        // A confirmed block on a COMMENT author only invalidates the thread, not the post.
+        onAuthorBlocked={() => router.push("/social")}
         // Comment mutations stop while the post is being deleted — a comment
         // written into a post that is about to stop existing would only fail.
         disabled={deletePending}

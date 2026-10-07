@@ -51,9 +51,18 @@ export default function SignupForm({ stats }) {
 
   const router = useRouter();
 
+  // Mirrors allowedDesignations in the backend's webAuth.controller.js ::
+  // handleSignup. VISITOR and Exhibitor were both missing here, so neither could
+  // register on the web even though the app and the backend accepted them.
+  // ADMIN is deliberately absent — the backend refuses it from this public
+  // endpoint, since restrictToAdmin gates purely on designation.
+  // "Exhibitor" is mixed-case because the backend's enum is, and the value is
+  // compared exactly.
   const designationOptions = [
     { value: "ORGANISER", label: "ORGANISER" },
     { value: "EXHIBITION_SERVICE", label: "EXHIBITION_SERVICE" },
+    { value: "Exhibitor", label: "EXHIBITOR" },
+    { value: "VISITOR", label: "VISITOR" },
   ];
 
   const countries = useMemo(

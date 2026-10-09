@@ -12,9 +12,10 @@ import {
 import Breadcrumbs from "@/components/public/Breadcrumbs";
 import JsonLd from "@/components/seo/JsonLd";
 
-import { PUBLIC_ROUTES, pageMetadata, NOINDEX_FOLLOW } from "@/lib/seo";
+import { PUBLIC_ROUTES, publicPageMetadata } from "@/lib/seo";
 import { breadcrumbNode, graph } from "@/lib/jsonld";
-import { SERVICE_CATEGORIES } from "@/lib/public-api";
+import { serviceCategoryPath } from "@/lib/routes";
+import { getServiceDirectory } from "@/lib/services";
 
 /**
  * Exhibition services: /exhibition-services
@@ -23,37 +24,29 @@ import { SERVICE_CATEGORIES } from "@/lib/public-api";
  * area. "exhibition-services" is also the better URL for search: it matches the
  * query people actually type.
  *
- * WHY THIS PAGE SHOWS CATEGORIES AND NOT PROVIDERS
- * /api/getexhibitionservice currently returns exactly one record, and that
- * record is test data (full_name "asfa", country "Antigua And Barbuda").
- * Rendering it as a provider listing would present junk as real inventory and
- * make the marketplace look empty at the same time. So this page documents the
- * seven service categories the platform genuinely supports — taken verbatim
- * from the service_name enum in Model/Service.model.js, which is the one fixed,
- * trustworthy taxonomy in the whole backend — and invites providers to list.
+ * WHY THIS PAGE IS A HUB AND NOT A LISTING
+ * It used to render every provider on the platform inline — 498 names and towns
+ * under seven headings, in one unbroken run. That made the single most common
+ * task on the page (find a print shop near a show) a scroll past 370 providers
+ * of unrelated services, with nothing to narrow by. The providers now live on a
+ * page each, under /exhibition-services/[category], where there is a small
+ * enough set for filters to be worth having.
  *
- * Nothing here is fabricated: no provider names, no counts, no coverage claims.
- * When real providers exist, flip SHOW_PROVIDER_LISTINGS and the listing block
- * below renders them; that is the only change needed.
+ * So this page is the doorway: the seven categories the platform supports, taken
+ * verbatim from the service_name enum in Model/Service.model.js — the one fixed,
+ * trustworthy taxonomy in the backend — each with its real provider count and a
+ * link through.
+ *
+ * Nothing here is fabricated: every count is the length of the list the linked
+ * page renders, so a visitor can check it by following the link.
  *
  * SEO value: these seven categories are the highest-confidence long-tail on the
  * site precisely because the taxonomy is fixed — "exhibition stall fabrication",
- * "furniture rental for exhibitions", "LED screen rental for trade shows" and
- * so on all map to a real, permanent section of this page.
+ * "furniture rental for exhibitions", "LED screen rental for trade shows" and so
+ * on each map to a real, permanent page with real inventory behind it.
  */
 
 export const revalidate = 300;
-
-/**
- * ON. The condition this flag was waiting for is met: /api/getexhibitionservice now holds
- * real provider records, so the page is a directory with inventory rather than an empty
- * marketplace pretending to have some.
- *
- * It stays a flag rather than being deleted because the honest behaviour when the
- * endpoint is empty is still "category directory, no provider section" - ProviderListings
- * returns null on an empty list, so the page degrades to exactly what it was.
- */
-const SHOW_PROVIDER_LISTINGS = true;
 
 const TITLE = "Exhibition services — printing, fabrication, staffing";
 const DESCRIPTION =
@@ -96,33 +89,30 @@ const CATEGORY_DETAIL = {
 };
 
 /**
- * NOINDEX WHILE THERE ARE NO PROVIDERS.
+ * INDEXABLE. This reverses the noindex that used to sit here, following the
+ * instruction the previous note left behind: it was noindexed because
+ * /api/getexhibitionservice returned zero records, which made this "category
+ * explainers and nothing else — the thinnest indexable URL on the site".
  *
- * /api/getexhibitionservice returns zero records, so this page is category
- * explainers and nothing else — no inventory, no provider, nothing a visitor
- * from search could act on. That is a thin page, and it was the thinnest
- * indexable URL on the site.
+ * That condition no longer holds. The endpoint returns 498 providers across all
+ * seven categories, each category now has its own page with between 27 and 132
+ * of them, and this page is the hub that links them. The old note's own reversal
+ * instructions were: flip the listings on, swap NOINDEX_FOLLOW back to
+ * publicPageMetadata, and restore the sitemap entry. All three are done.
  *
- * It stays published and linked, because the categories are genuinely useful
- * context for an exhibitor and the page is a real destination from the header.
- * It is simply kept out of the index, and app/sitemap.js no longer lists it, so
- * the sitemap and the robots directive agree.
- *
- * TO REVERSE: when real providers exist, flip SHOW_PROVIDER_LISTINGS to true
- * and swap NOINDEX_FOLLOW back to publicPageMetadata here, then restore the
- * entry in app/sitemap.js. Nothing else needs to change.
- *
- * `follow` is deliberate: the links out of this page to the rest of the site
- * should still be crawled.
+ * TO REVERSE AGAIN, if the inventory ever disappears: swap this back to
+ * pageMetadata with NOINDEX_FOLLOW and drop the services block from
+ * app/sitemap.js, so the sitemap and the robots directive keep agreeing.
  */
-export const metadata = pageMetadata({
+export const metadata = publicPageMetadata({
   title: TITLE,
   description: DESCRIPTION,
   path: PUBLIC_ROUTES.services,
-  robots: NOINDEX_FOLLOW,
 });
 
-export default function ExhibitionServicesPage() {
+export default async function ExhibitionServicesPage() {
+  const { categories, total } = await getServiceDirectory();
+
   const trail = [
     { name: "Home", path: "/" },
     { name: "Exhibition services", path: PUBLIC_ROUTES.services },
@@ -139,9 +129,23 @@ export default function ExhibitionServicesPage() {
           Exhibition services
         </h1>
         <p className="mt-3 text-[15px] leading-relaxed text-gray-600 dark:text-gray-400">
-          Preparing for an exhibition takes more than a stand. OneXhib lists providers across seven
-          service categories, so exhibitors can find the support they need for a show — and
-          providers can be found by the exhibitors already planning one.
+          Preparing for an exhibition takes more than a stand.{" "}
+          {total ? (
+            <>
+              OneXhib lists{" "}
+              <strong className="font-semibold text-gray-900 dark:text-gray-100">
+                {total} service providers
+              </strong>{" "}
+              across seven categories, so exhibitors can find the support they need for a show — and
+              providers can be found by the exhibitors already planning one.
+            </>
+          ) : (
+            <>
+              OneXhib lists providers across seven service categories, so exhibitors can find the
+              support they need for a show — and providers can be found by the exhibitors already
+              planning one.
+            </>
+          )}
         </p>
       </header>
 
@@ -150,46 +154,68 @@ export default function ExhibitionServicesPage() {
           Service categories
         </h2>
         <ul className="grid list-none gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {SERVICE_CATEGORIES.map((name) => {
-            const detail = CATEGORY_DETAIL[name];
+          {categories.map((category) => {
+            const detail = CATEGORY_DETAIL[category.name];
             const Icon = detail?.icon;
-            return (
-              <li
-                key={name}
-                className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900"
-              >
+
+            /*
+             * A category with no providers is NOT a link. Its page 404s by
+             * design (see getServiceCategory), so linking it would put a
+             * guaranteed dead end on the busiest page in this tier. It still
+             * appears, because the seven categories describe what the platform
+             * supports whether or not anyone has listed under one yet.
+             */
+            const card = (
+              <>
                 {Icon ? (
                   <span className="inline-flex rounded-xl bg-[#131C55]/10 p-2.5 text-[#131C55] dark:bg-blue-400/10 dark:text-blue-300">
                     <Icon size={20} aria-hidden="true" />
                   </span>
                 ) : null}
-                <h3 className="mt-3.5 text-base font-semibold text-gray-900 dark:text-gray-50">
-                  {name}
+                <h3 className="mt-3.5 flex items-center gap-2 text-base font-semibold text-gray-900 dark:text-gray-50">
+                  {category.name}
+                  {category.count ? (
+                    <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+                      {category.count}
+                    </span>
+                  ) : null}
                 </h3>
                 {detail?.body ? (
                   <p className="mt-1.5 text-[15px] leading-relaxed text-gray-600 dark:text-gray-400">
                     {detail.body}
                   </p>
                 ) : null}
+                {category.count ? (
+                  <p className="mt-3 text-sm font-semibold text-[#131C55] dark:text-blue-300">
+                    View {category.count} {category.count === 1 ? "provider" : "providers"} →
+                  </p>
+                ) : null}
+              </>
+            );
+
+            return (
+              <li key={category.name}>
+                {category.count ? (
+                  <Link
+                    href={serviceCategoryPath(category.slug)}
+                    className="ox-card flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-5 transition hover:border-[#131C55]/40 hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:border-gray-800 dark:bg-gray-900 dark:hover:border-gray-600"
+                  >
+                    {card}
+                  </Link>
+                ) : (
+                  <div className="flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900">
+                    {card}
+                  </div>
+                )}
               </li>
             );
           })}
         </ul>
       </section>
 
-      {SHOW_PROVIDER_LISTINGS ? <ProviderListings /> : null}
-
-      {/* WHY THERE ARE NO PER-SERVICE PAGES (/exhibition-services/printing etc)
-          A page for one of these seven categories would contain exactly what is
-          already on the card above it: a heading, one sentence, and a signup
-          CTA. Seven pages of that is seven thin pages competing with this one,
-          which is the doorway pattern rather than an SEO gain. The unlock is
-          real provider records — /api/getexhibitionservice currently returns a
-          single test row — not more pages over the same sentence.
-
-          What this section CAN do honestly is connect the services tier to the
-          exhibitions tier, which is the relationship a visitor here actually
-          has: they are preparing for a specific show. */}
+      {/* Connects the services tier to the exhibitions tier, which is the
+          relationship a visitor here actually has: they are preparing for a
+          specific show. */}
       <section aria-labelledby="planning-heading" className="mt-14">
         <h2
           id="planning-heading"
@@ -244,71 +270,6 @@ export default function ExhibitionServicesPage() {
         </div>
       </section>
     </div>
-  );
-}
-
-/**
- * Live provider listings, grouped by the enum category.
- *
- * EVERY provider's listings, from the unscoped /api/getexhibitionservice — which is the
- * difference between this page and the dashboard. The dashboard calls
- * /api/myexhibitionservices and shows one provider their own rows; this shows everyone's,
- * because that is what a public directory is for.
- *
- * WHAT IS AND IS NOT PUBLISHED. toPublicService in lib/public-api.js emits the business
- * name, the service category, the location and the image. It still drops `mobile_number`
- * and `address`: a phone number on a crawlable page is what address-harvesters collect,
- * and the repo already treats direct contact details as something to put behind a session
- * (see the organiser contact endpoint). An exhibitor finds the provider here and the
- * contact route is a separate decision.
- */
-async function ProviderListings() {
-  const { getServices } = await import("@/lib/public-api");
-  const { items } = await getServices();
-  if (!items.length) return null;
-
-  const byCategory = SERVICE_CATEGORIES.map((name) => ({
-    name,
-    providers: items.filter((s) => s.service === name),
-  })).filter((group) => group.providers.length);
-
-  if (!byCategory.length) return null;
-
-  return (
-    <section aria-labelledby="providers-heading" className="mt-14">
-      <h2
-        id="providers-heading"
-        className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white"
-      >
-        Service providers
-      </h2>
-      <div className="mt-6 space-y-8">
-        {byCategory.map(({ name, providers }) => (
-          <div key={name}>
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-              {name}
-            </h3>
-            <ul className="mt-3 flex list-none flex-wrap gap-2">
-              {providers.map((p) => (
-                <li
-                  key={p.id}
-                  className="rounded-xl border border-gray-200 bg-white px-4 py-3 dark:border-gray-800 dark:bg-gray-900"
-                >
-                  {/* Name first: it is what an exhibitor scans for. Plain React text -
-                      a provider-supplied string never goes near an HTML sink. */}
-                  <span className="block text-sm font-semibold text-gray-900 dark:text-gray-50">
-                    {p.name || "Service provider"}
-                  </span>
-                  <span className="mt-0.5 block text-xs text-gray-600 dark:text-gray-400">
-                    {[p.city, p.state, p.country].filter(Boolean).join(", ") || "Location not stated"}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
-    </section>
   );
 }
 

@@ -15,7 +15,7 @@ import AuthCard, {
   authSecondaryBtn,
 } from "@/components/auth/AuthCard";
 
-export default function LoginForm({ stats }) {
+export default function LoginForm({ stats, nextPath = "" }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
@@ -34,7 +34,13 @@ export default function LoginForm({ stats }) {
         // the httpOnly uid cookie Express just set — never in localStorage.
         signIn(data.user);
         toast.success("Login successful!");
-        router.push(homeRouteForRole(data.user.designation));
+        /*
+         * Back to wherever they were sent from, when there was somewhere. Already
+         * sanitised on the server (see the page), so this cannot be an off-site
+         * URL — the fallback is the role's own home, which is what every sign-in
+         * did before.
+         */
+        router.push(nextPath || homeRouteForRole(data.user.designation));
       } else {
         toast.error("Login failed!");
       }

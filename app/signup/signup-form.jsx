@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { toast } from "sonner";
 import { signup } from "@/models/auth.model";
+import { otpSentMessage, smsQueryParam } from "@/lib/otp";
 import AuthCard, { authInput, authLabel, authLink, authPrimaryBtn } from "@/components/auth/AuthCard";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i;
@@ -171,10 +172,16 @@ export default function SignupForm({ stats }) {
       const { data } = await signup(payload, { withCredentials: true });
 
       if (data.success) {
-        toast.success("OTP sent to your email!");
+        // The code now goes to the phone as well as the inbox, but the SMS is
+        // best effort server-side — so the toast and the next screen report what
+        // the response says actually happened rather than promising both.
+        toast.success(otpSentMessage(data.channels));
         // React Router's location.state has no App Router equivalent; the email
-        // travels as a query param instead.
-        router.push(`/verify-otp?email=${encodeURIComponent(form.email)}`);
+        // travels as a query param instead, and the masked SMS destination
+        // alongside it (masked by the server — the full number never goes in a URL).
+        router.push(
+          `/verify-otp?email=${encodeURIComponent(form.email)}${smsQueryParam(data.channels)}`
+        );
       }
     } catch (err) {
       toast.error(err?.response?.data?.message || "Submission failed");

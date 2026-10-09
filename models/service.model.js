@@ -85,3 +85,22 @@ export const updateExhibitionService = (serviceId, formData) =>
 
 export const deleteExhibitionService = (serviceId) =>
   axios.delete(`/api/deleteexhibitionservice/${serviceId}`);
+
+/**
+ * Contact details for one provider — street address and mobile number.
+ *
+ * SIGNED IN ONLY. These are the two fields the public directory deliberately
+ * withholds: publishing ~500 providers' phone numbers on crawlable pages is what
+ * address-harvesters collect, and they are the providers' numbers rather than
+ * ours. The page stays public and indexable; this one call sits behind a session.
+ *
+ * Three projected fields, and the backend cannot return a fourth — see
+ * getServiceContact in Controller/exhibitionService.controller.js.
+ *
+ * Response shape: { success, contact: { name, address, mobile_number } }
+ *
+ * The id reaches a path segment, so it is encoded here rather than trusting a
+ * caller to have validated it.
+ */
+export const getExhibitionServiceContact = (serviceId) =>
+  axios.get(`/api/exhibition-services/${encodeURIComponent(String(serviceId))}/contact`);

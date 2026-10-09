@@ -9,12 +9,15 @@ import { NOINDEX_FOLLOW, pageMetadata } from "@/lib/seo";
 // simply should not be indexed.
 export const metadata = pageMetadata({
   title: "Verify OTP",
-  description: "Confirm the 6-digit code sent to your email address.",
+  description: "Confirm the 6-digit code sent to your email address and phone.",
   path: "/verify-otp",
   robots: NOINDEX_FOLLOW,
 });
 
 export default async function VerifyOtpPage({ searchParams }) {
-  const { email = "" } = await searchParams;
-  return <VerifyOtpForm initialEmail={email} />;
+  // `sms` is the already-masked destination signup carried over (see lib/otp.js).
+  // It is validated against the mask shape in the form rather than trusted here,
+  // because a query parameter is user-controlled and this one is rendered.
+  const { email = "", sms = "" } = await searchParams;
+  return <VerifyOtpForm initialEmail={email} initialSmsTo={sms} />;
 }

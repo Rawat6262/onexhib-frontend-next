@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
 import { requestPasswordReset } from "@/models/auth.model";
+import { otpSentMessage, smsQueryParam } from "@/lib/otp";
 import AuthCard from "@/components/auth/AuthCard";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i;
@@ -48,9 +49,13 @@ export default function ForgotPasswordForm({ initialEmail = "" }) {
     try {
       const { data } = await requestPasswordReset(email.trim(), newPass);
       if (data.success) {
-        toast.success(data.message || "OTP sent to your email!");
-        // Was navigate(..., { state: { email } }) under React Router.
-        router.push(`/reset-password?email=${encodeURIComponent(email.trim())}`);
+        toast.success(otpSentMessage(data.channels, data.message || "OTP sent to your email!"));
+        // Was navigate(..., { state: { email } }) under React Router. The masked
+        // SMS destination rides along the same way — this screen only ever knew
+        // the email, so the number can only come from the response.
+        router.push(
+          `/reset-password?email=${encodeURIComponent(email.trim())}${smsQueryParam(data.channels)}`
+        );
       }
     } catch (err) {
       toast.error(err?.response?.data?.message || "Failed to send OTP.");

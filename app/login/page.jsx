@@ -1,6 +1,7 @@
 import LoginForm from "./login-form";
 import { NOINDEX_FOLLOW, pageMetadata } from "@/lib/seo";
 import { getCounts, getUpcomingExhibitions } from "@/lib/public-api";
+import { safeNextPath } from "@/lib/auth";
 
 // Through pageMetadata() so the page gets a self-referencing canonical.
 // noindex without a canonical leaves Search Console reporting the URL as
@@ -15,8 +16,21 @@ export const metadata = pageMetadata({
   robots: NOINDEX_FOLLOW,
 });
 
-export default async function LoginPage() {
-  return <LoginForm stats={await platformStats()} />;
+export default async function LoginPage({ searchParams }) {
+  /*
+   * Where to go after signing in, when the visitor was sent here from somewhere
+   * specific — a provider's contact panel, for instance. Sanitised on arrival
+   * rather than at the point of use, so an unsafe value never reaches the client
+   * at all: `next` is attacker-controlled, and an unchecked one turns this page
+   * into an open redirect. See safeNextPath.
+   */
+  const { next = "" } = await searchParams;
+  return (
+    <LoginForm
+      stats={await platformStats()}
+      nextPath={safeNextPath(Array.isArray(next) ? next[0] : next)}
+    />
+  );
 }
 
 /**

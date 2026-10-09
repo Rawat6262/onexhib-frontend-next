@@ -13,6 +13,8 @@ export const metadata = pageMetadata({
 });
 
 export default async function ResetPasswordPage({ searchParams }) {
-  const { email = "" } = await searchParams;
-  return <ResetPasswordForm initialEmail={email} />;
+  // `sms` is the already-masked destination the forgot-password step carried
+  // over (see lib/otp.js); the form validates its shape before rendering it.
+  const { email = "", sms = "" } = await searchParams;
+  return <ResetPasswordForm initialEmail={email} initialSmsTo={sms} />;
 }

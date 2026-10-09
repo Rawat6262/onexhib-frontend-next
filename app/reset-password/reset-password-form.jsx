@@ -5,10 +5,11 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
 import { confirmPasswordReset } from "@/models/auth.model";
+import { parseSmsParam } from "@/lib/otp";
 import AuthCard from "@/components/auth/AuthCard";
 import OtpInput, { EMPTY_OTP } from "@/components/auth/OtpInput";
 
-export default function ResetPasswordForm({ initialEmail = "" }) {
+export default function ResetPasswordForm({ initialEmail = "", initialSmsTo = "" }) {
   const [otp, setOtp] = useState(EMPTY_OTP);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const otpRef = useRef(null);
@@ -17,6 +18,12 @@ export default function ResetPasswordForm({ initialEmail = "" }) {
   // Carried from the forgot-password step (was navigate state under React
   // Router); the page reads it from the query string on the server.
   const email = initialEmail;
+
+  // The masked number the code was also texted to, or "" if it went to the inbox
+  // only. Validated against the server's mask shape because it arrives from the
+  // query string and is rendered. No state: unlike the signup verify screen,
+  // this one has no resend button to re-report the channels.
+  const smsTo = parseSmsParam(initialSmsTo);
 
   useEffect(() => {
     if (!email) {
@@ -55,8 +62,18 @@ export default function ResetPasswordForm({ initialEmail = "" }) {
     <AuthCard formProps={{ onSubmit: handleSubmit }}>
       <div className="text-center space-y-2">
         <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Confirm Password Reset</h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400">We sent a 6-digit OTP to</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          We sent a 6-digit OTP to{smsTo ? " both of these" : ""}
+        </p>
         <p className="text-sm font-semibold text-[#131C55] dark:text-blue-300 break-all">{email}</p>
+        {/* Only when the server confirms the SMS left the gateway. The number is
+            the one already on the account — a reset code is never sent to a
+            number supplied with the request. */}
+        {smsTo && (
+          <p className="text-sm font-semibold text-[#131C55] dark:text-blue-300">
+            and by SMS to {smsTo}
+          </p>
+        )}
       </div>
 
       <OtpInput ref={otpRef} value={otp} onChange={setOtp} />

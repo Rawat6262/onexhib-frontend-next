@@ -7,9 +7,12 @@ import {
   exhibitionPath,
   productPath,
   blogPostPath,
+  serviceCategoryPath,
+  servicePath,
 } from "@/lib/routes";
 import { getLocationIndex } from "@/lib/locations";
 import { getCategoryIndex } from "@/lib/categories";
+import { getServiceDirectory } from "@/lib/services";
 import { getAllPosts } from "@/lib/blog";
 import { getIndexableMonths, getThisWeekExhibitions, monthSlug } from "@/lib/discovery";
 import { getNews } from "@/lib/newsroom";
@@ -182,7 +185,7 @@ async function buildAllUrls() {
       ]
     : [];
 
-  const [locations, categories, upcoming, ongoing, previous, companies, products] = await Promise.all([
+  const [locations, categories, services, upcoming, ongoing, previous, companies, products] = await Promise.all([
     // Only places that clear the quality threshold in lib/locations.js have a
     // page, so this adds ~96 URLs, not one per city in the data.
     getLocationIndex(),
@@ -190,6 +193,10 @@ async function buildAllUrls() {
     // index is empty until the API projects `category`, so nothing is listed
     // here that would 404.
     getCategoryIndex(),
+    // The seven service categories, plus their hub. Only categories that have
+    // providers get a page (the rest 404 by design), so this adds at most eight
+    // URLs and never one that would answer 404.
+    getServiceDirectory(),
     collect((page) => getUpcomingExhibitions({ page, limit: PAGE_SIZE }), BUDGET.upcoming),
     collect((page) => getOngoingExhibitions({ page, limit: PAGE_SIZE }), BUDGET.ongoing),
     collect((page) => getExhibitions("previous", { page, limit: PAGE_SIZE }), BUDGET.previous),
@@ -232,6 +239,50 @@ async function buildAllUrls() {
       priority: 0.8,
     })));
 
+  /*
+   * The services hub was noindex and absent from here while the provider
+   * endpoint was empty. It now carries 498 providers across seven category
+   * pages, so both it and they are listed - and the condition is still checked
+   * rather than assumed, because a sitemap must never contain a URL that then
+   * tells a crawler not to index it.
+   */
+  const serviceCategories = services.categories.filter((c) => c.count);
+  const serviceEntries = serviceCategories.length
+    ? [
+        {
+          url: `${SITE_URL}${PUBLIC_ROUTES.services}`,
+          lastModified: now,
+          changeFrequency: "weekly",
+          priority: 0.8,
+        },
+        ...serviceCategories.map((c) => ({
+          url: `${SITE_URL}${serviceCategoryPath(c.slug)}`,
+          lastModified: now,
+          changeFrequency: "weekly",
+          priority: 0.7,
+        })),
+        /*
+         * One URL per LISTING, not per business: a provider with three listings
+         * has three records with three ids and three pages, each about a
+         * different service. Roughly 500 URLs in total, which needs no budget
+         * cap - unlike exhibitions and products, the whole set arrives in the
+         * single unpaginated response the directory already fetched.
+         *
+         * Lower priority than the category pages they sit under: a category page
+         * links to every one of its providers, so crawling it first is the
+         * cheaper path into the set.
+         */
+        ...serviceCategories.flatMap((c) =>
+          c.providers.map((p) => ({
+            url: `${SITE_URL}${servicePath(p.name, p.id)}`,
+            lastModified: now,
+            changeFrequency: "monthly",
+            priority: 0.5,
+          }))
+        ),
+      ]
+    : [];
+
   const entries = [
     ...staticEntries,
     ...dateEntries,
@@ -239,6 +290,7 @@ async function buildAllUrls() {
     ...blogEntries,
     ...locationEntries,
     ...categoryEntries,
+    ...serviceEntries,
     ...exhibitionEntries(ongoing, "daily", 0.9),
     ...exhibitionEntries(upcoming, "weekly", 0.8),
     ...exhibitionEntries(previous, "yearly", 0.4),

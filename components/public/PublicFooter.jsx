@@ -3,6 +3,7 @@ import Link from "next/link";
 import { PUBLIC_ROUTES, SITE_NAME } from "@/lib/seo";
 import { cityLandingPath, countryLandingPath, exhibitionsScopePath } from "@/lib/routes";
 import { isBlogEmpty } from "@/lib/blog";
+import SocialLinks from "@/components/public/SocialLinks";
 
 /**
  * Public site footer.
@@ -106,9 +107,19 @@ export default function PublicFooter({ locations }) {
           </FooterColumn>
         </div>
 
-        <p className="mt-10 border-t border-gray-200 pt-6 text-xs text-gray-500 dark:border-gray-800 dark:text-gray-500">
-          © {year} {SITE_NAME}. All rights reserved.
-        </p>
+        {/* Bottom bar: copyright and the social row share one line on anything
+            wider than a phone, and stack on a phone rather than letting five
+            icons crowd the copyright. The icons come second in source order so
+            the reading order stays copyright-then-links in both layouts. */}
+        <div className="mt-10 flex flex-col gap-4 border-t border-gray-200 pt-6 sm:flex-row sm:items-center sm:justify-between dark:border-gray-800">
+          <p className="text-xs text-gray-500 dark:text-gray-500">
+            © {year} {SITE_NAME}. All rights reserved.
+          </p>
+          {/* The only outbound links in a footer whose whole job is internal
+              linking — see the note at the top of this file. They are the
+              brand's own profiles, so they are followed rather than nofollowed. */}
+          <SocialLinks />
+        </div>
       </div>
     </footer>
   );

@@ -77,8 +77,31 @@ check("5. the scoped path carries no user id for a caller to change",
 console.log("");
 console.log("services — the public page shows EVERY provider's listings");
 
-check("6. the directory reads the unscoped endpoint",
-  /getServices/.test(libSrc) && /getJson\("\/api\/getexhibitionservice"\)/.test(apiSrc));
+{
+  /*
+   * SCOPED TO THE FUNCTION, not to the file. There are now two callers of the unscoped
+   * endpoint - getServices and getServicesWithOwner - so a bare search of the module
+   * passed even when getServices itself had been repointed at the OWNER-SCOPED endpoint.
+   * That swap would silently cut the public directory down to one provider's listings
+   * while this assertion stayed green, because the other caller still matched. Each
+   * function is now read on its own body.
+   */
+  const fnBody = (name) => {
+    const at = apiSrc.indexOf(`export async function ${name}()`);
+    return at === -1 ? "" : apiSrc.slice(at, apiSrc.indexOf("\n}", at));
+  };
+  check("6. getServices reads the UNSCOPED endpoint",
+    /getJson\("\/api\/getexhibitionservice"\)/.test(fnBody("getServices")),
+    fnBody("getServices"));
+  check("6b. and never the owner-scoped one",
+    !/myexhibitionservices/.test(fnBody("getServices")), fnBody("getServices"));
+  check("6c. getServicesWithOwner reads the unscoped endpoint too",
+    /getJson\("\/api\/getexhibitionservice"\)/.test(fnBody("getServicesWithOwner"))
+    && !/myexhibitionservices/.test(fnBody("getServicesWithOwner")),
+    fnBody("getServicesWithOwner"));
+  check("6d. the directory layer uses one of them",
+    /getServices/.test(libSrc) || /getServicesWithOwner/.test(libSrc));
+}
 check("7. neither public page reads the scoped one",
   !/myexhibitionservices|getMyExhibitionServices/.test(publicSrc)
   && !/myexhibitionservices|getMyExhibitionServices/.test(catSrc)
@@ -194,6 +217,35 @@ check("46. the category page is indexable, and so is the hub",
   "these pages carry real inventory now");
 check("47. a category with no providers 404s instead of rendering an empty grid",
   /category && category\.count \? category : null/.test(libSrc) && /notFound\(\)/.test(catSrc));
+
+console.log("");
+console.log("services — provider-supplied text never becomes markup");
+
+/*
+ * EVERY SURFACE THAT RENDERS A PROVIDER, swept together rather than one at a time.
+ *
+ * `name`, `city`, `state` and `country` are all strings a provider typed into a form or a
+ * spreadsheet, and the directory pages are PUBLIC and crawlable. A single
+ * dangerouslySetInnerHTML anywhere in this set turns a listing field into stored XSS
+ * against every visitor - and a mutation that added one to the detail page survived this
+ * suite until this sweep existed, because the pages were read for their data sources and
+ * never for how they render.
+ *
+ * The list is the whole services surface on purpose: adding a page without adding it here
+ * is the way this guard would quietly stop covering anything.
+ */
+for (const [label, src] of [
+  ["the category index", publicSrc],
+  ["a category page", catSrc],
+  ["the provider detail page", detailSrc],
+  ["the directory component", dirSrc],
+  ["the provider card", cardSrc],
+  ["the contact panel", panelSrc],
+]) {
+  check(`${label} has no HTML sink`,
+    !/dangerouslySetInnerHTML|innerHTML|outerHTML|document\.write/.test(src),
+    `${label} renders provider text as markup`);
+}
 
 console.log("");
 console.log("services — the bulk import");

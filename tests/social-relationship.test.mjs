@@ -286,6 +286,20 @@ console.log("RelationshipMenu — confirmation, pending, and no local authority"
 
 check("67. it renders nothing for self", /if \(!canActOn\(viewerId, targetId\)\) return null;/.test(menuSrc));
 check("68. block goes through ConfirmDialog", /<ConfirmDialog/.test(menuSrc) && /onConfirm=\{doBlock\}/.test(menuSrc));
+/*
+ * AND THE MENU ITEM MUST ONLY OPEN IT. 68 on its own passed with the dialog present
+ * but unreachable: a Block item calling doBlock() directly leaves <ConfirmDialog>
+ * mounted and onConfirm wired, so both halves of 68 stay true while the confirmation
+ * never appears and a block happens on one click. The item's own handler is the fact
+ * that has to be pinned.
+ */
+check("68b. the Block item opens the dialog rather than blocking outright",
+  /setConfirmBlock\(true\)/.test(menuSrc),
+  "the Block menu item does not open the confirm dialog");
+check("68c. doBlock is reachable ONLY through the dialog's onConfirm",
+  (menuSrc.match(/(?<!function )doBlock\(\)/g) || []).length === 0
+  && (menuSrc.match(/onConfirm=\{doBlock\}/g) || []).length === 1,
+  JSON.stringify(menuSrc.match(/(?<!function )doBlock\(\)/g)));
 check("69. mute has no confirmation step", !/ConfirmDialog[\s\S]*onConfirm=\{doMute\}/.test(menuSrc));
 check("70. a second click while pending is refused, for both actions", (menuSrc.match(/if \(busy\) return;/g) || []).length === 2);
 check("71. the trigger is disabled while a mutation runs", /disabled=\{Boolean\(busy\)\}/.test(menuSrc));
@@ -316,6 +330,21 @@ check("91. details are required only for OTHER", /const detailsRequired = reason
 check("92. every open resets the form, so no reason carries over to another target", /setReason\(""\);/.test(dialogSrc));
 check("93. no HTML sink anywhere", !/dangerouslySetInnerHTML|innerHTML/.test(dialogSrc));
 check("94. the success message is the shared neutral one", /REPORT_SUCCESS_MESSAGE/.test(dialogSrc));
+/*
+ * A REPORT HAS NO SIDE EFFECTS, and that must be asserted about the CODE, not only
+ * about the copy. The backend stores the report and does nothing else: removes
+ * nothing, bans nobody, notifies no one, applies no block or mute. A dialog that
+ * helpfully blocked the target after submitting would honour none of that - and every
+ * assertion about the wording would still pass, because the wording would not change.
+ */
+check("94b. the report dialog imports no relationship mutation",
+  !/blockUser|unblockUser|muteUser|unmuteUser/.test(dialogSrc),
+  "the report dialog can block or mute");
+check("94c. and awaits nothing but the submit function it was handed",
+  (dialogSrc.match(/await \w+\(/g) || []).every((c) => c === "await submit("),
+  JSON.stringify(dialogSrc.match(/await \w+\(/g)));
+check("94d. reporting from the menu triggers no block or mute either",
+  !/submitReport[\s\S]{0,300}(blockUser|muteUser)\(/.test(menuSrc));
 check("95. the dialog announces itself as an alertdialog", /role="alertdialog"/.test(dialogSrc));
 check("96. errors are announced", /role="alert"/.test(dialogSrc));
 check("97. the details field is labelled and described", /htmlFor=\{detailsId\}/.test(dialogSrc) && /aria-describedby/.test(dialogSrc));

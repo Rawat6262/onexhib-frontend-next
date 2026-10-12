@@ -60,13 +60,25 @@ export async function generateMetadata({ params }) {
   const { provider, categoryName } = entry;
   const place = [provider.city, provider.state, provider.country].filter(Boolean).join(", ");
 
+  /*
+   * THE SPECIALITY IS THE MOST SPECIFIC TRUE THING ABOUT THIS LISTING, so it leads
+   * the description where there is one - "double-decker stall" says more to someone
+   * searching than "stall design & fabrication", which this provider shares with
+   * every other card on its category page. The title keeps the CATEGORY: a title is
+   * also the breadcrumb a person scans in a tab strip, and the category is what
+   * orients them.
+   */
+  const offer = provider.subcategory
+    ? `${provider.subcategory.toLowerCase()} (${categoryName.toLowerCase()})`
+    : categoryName.toLowerCase();
+
   return publicPageMetadata({
     title: place
       ? `${provider.name} — ${categoryName} in ${provider.city || provider.state}`
       : `${provider.name} — ${categoryName}`,
     description: place
-      ? `${provider.name} provides ${categoryName.toLowerCase()} for exhibitions and trade shows in ${place}.`
-      : `${provider.name} provides ${categoryName.toLowerCase()} for exhibitions and trade shows.`,
+      ? `${provider.name} provides ${offer} for exhibitions and trade shows in ${place}.`
+      : `${provider.name} provides ${offer} for exhibitions and trade shows.`,
     path: servicePath(provider.name, provider.id),
   });
 }
@@ -135,6 +147,21 @@ export default async function ServiceProviderPage({ params }) {
               {categoryName}
             </Link>
 
+            {/*
+              THE SPECIALITY, when the provider has named one. Plain text, NOT a link:
+              there is no per-subcategory page by design (the subcategory is a filter
+              on the category page, not a URL), and a chip that looks like the one
+              beside it but does nothing when clicked is worse than a label.
+
+              The value comes from the taxonomy - lib/public-api.js nulls any pair
+              that disagrees - so it cannot be used to write arbitrary text here.
+            */}
+            {provider.subcategory ? (
+              <span className="ml-2 inline-flex items-center rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-gray-600 dark:border-gray-700 dark:text-gray-400">
+                {provider.subcategory}
+              </span>
+            ) : null}
+
             {/* Plain React text. A provider-supplied string never goes near an HTML sink. */}
             <h1 className="mt-3 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl dark:text-white">
               {provider.name}
@@ -146,8 +173,15 @@ export default async function ServiceProviderPage({ params }) {
             </p>
 
             <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-gray-600 dark:text-gray-400">
-              {provider.name} offers {categoryName.toLowerCase()} for exhibition stands and trade
-              shows
+              {provider.name} offers{" "}
+              {provider.subcategory ? (
+                <>
+                  {provider.subcategory.toLowerCase()} within {categoryName.toLowerCase()}
+                </>
+              ) : (
+                categoryName.toLowerCase()
+              )}{" "}
+              for exhibition stands and trade shows
               {provider.city ? <> in and around {provider.city}</> : null}.
             </p>
           </header>

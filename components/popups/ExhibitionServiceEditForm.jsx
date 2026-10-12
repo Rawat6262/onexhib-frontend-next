@@ -4,6 +4,11 @@ import { City, Country, State } from "country-state-city";
 import React, { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { getExhibitionServiceById, updateExhibitionService } from "@/models/service.model";
+import {
+  SERVICE_CATEGORIES,
+  canonicalServiceCategory,
+  serviceSubcategories,
+} from "@/lib/service-taxonomy";
 
 const Label = ({ children, required, htmlFor }) => (
   <label htmlFor={htmlFor} className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-1.5 tracking-wide">
@@ -52,15 +57,8 @@ const Dropdown = ({ id, label, value, onChange, options, placeholder, required, 
   </div>
 );
 
-const SERVICE_OPTIONS = [
-  "Printing",
-  "Furniture Rental",
-  "LED / TV Rental",
-  "Fabrication",
-  "Protocol Staff",
-  "Catalog Printing",
-  "Corporate Gifting",
-];
+/* The category list comes from the taxonomy, never typed here - see the note in
+ * ExhibitionServicePopupForm. */
 
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
@@ -68,6 +66,7 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ServiceEditPopup = ({ serviceId, onClose }) => {
   const [full_name, setFullName] = useState("");
   const [service_name, setServiceName] = useState("");
+  const [service_subcategory, setServiceSubcategory] = useState("");
   const [mobile_number, setMobile] = useState("");
   const [address, setAddress] = useState("");
   const [country, setCountry] = useState("");
@@ -81,6 +80,13 @@ const ServiceEditPopup = ({ serviceId, onClose }) => {
   const [touched, setTouched] = useState({});
 
   const markTouched = (id) => setTouched((s) => ({ ...s, [id]: true }));
+
+  /* The specialities under the chosen category - cascading, exactly like
+   * state-after-country. See the note in ExhibitionServicePopupForm. */
+  const subcategories = useMemo(
+    () => (service_name ? serviceSubcategories(service_name) : []),
+    [service_name]
+  );
 
   const countries = useMemo(
     () => Country.getAllCountries().map((c) => ({ value: c.isoCode, label: c.name })),
@@ -104,7 +110,24 @@ const ServiceEditPopup = ({ serviceId, onClose }) => {
         if (data.success) {
           const s = data.data;
           setFullName(s.full_name || "");
-          setServiceName(s.service_name || "");
+
+          /*
+           * THE SAVED CATEGORY IS TRANSLATED BEFORE IT REACHES THE DROPDOWN.
+           *
+           * A listing written before the taxonomy migration still says
+           * "Fabrication", which is not one of the <option> values any more - so the
+           * select would render with NOTHING selected, and a provider who came to
+           * fix a phone number would have to re-pick their category or be blocked by
+           * "Service type is required". Resolving it forward means the form opens
+           * showing "Stall Design & Fabrication", already correct, and saving
+           * migrates that row as a side effect.
+           *
+           * An unresolvable value falls back to empty, which is the honest state: the
+           * form cannot claim a category the taxonomy does not contain.
+           */
+          const resolved = canonicalServiceCategory(s.service_name, s.service_subcategory);
+          setServiceName(resolved ? resolved.category : "");
+          setServiceSubcategory(resolved && resolved.subcategory ? resolved.subcategory : "");
           setMobile(s.mobile_number || "");
           setAddress(s.address || "");
 
@@ -154,6 +177,13 @@ const ServiceEditPopup = ({ serviceId, onClose }) => {
     const e = {};
     if (!full_name.trim()) e.full_name = "Full name is required.";
     if (!service_name) e.service_name = "Service type is required.";
+    /*
+     * Required ONLY once a category is chosen, because the dropdown does not
+     * exist before then - flagging a field the provider cannot see yet is how a
+     * form becomes unsubmittable for no visible reason. "General" is always an
+     * available answer, so this never forces a claim nobody can make.
+     */
+    if (service_name && !service_subcategory) e.service_subcategory = "Speciality is required.";
     if (!mobile_number.trim()) e.mobile_number = "Mobile number is required.";
     else if (!/^\+?[\d\s\-()]{7,15}$/.test(mobile_number.trim())) e.mobile_number = "Enter a valid mobile number.";
     if (!address.trim()) e.address = "Address is required.";
@@ -167,7 +197,7 @@ const ServiceEditPopup = ({ serviceId, onClose }) => {
     ev.preventDefault();
     const validationErrors = validateAll();
     setErrors(validationErrors);
-    setTouched({ full_name: true, service_name: true, mobile_number: true, address: true, country: true, state: true, city: true });
+    setTouched({ full_name: true, service_name: true, service_subcategory: true, mobile_number: true, address: true, country: true, state: true, city: true });
 
     if (Object.keys(validationErrors).length) {
       toast.error("Please fix the highlighted errors.");
@@ -179,6 +209,8 @@ const ServiceEditPopup = ({ serviceId, onClose }) => {
       const formData = new FormData();
       formData.append("full_name", full_name.trim());
       formData.append("service_name", service_name);
+      // Always sent, so clearing the dropdown actually clears the speciality.
+      formData.append("service_subcategory", service_subcategory);
       formData.append("mobile_number", mobile_number.trim());
       formData.append("address", address.trim());
       // country-state-city needs ISO codes to filter the cascading dropdowns,
@@ -244,13 +276,36 @@ const ServiceEditPopup = ({ serviceId, onClose }) => {
                     id="service_name"
                     label="Service Type"
                     value={service_name}
-                    onChange={(e) => setServiceName(e.target.value)}
-                    options={SERVICE_OPTIONS}
+                    /* Changing the category clears the speciality - one chosen under
+                       the old category is not valid under the new one. */
+                    onChange={(e) => {
+                      setServiceName(e.target.value);
+                      setServiceSubcategory("");
+                    }}
+                    options={SERVICE_CATEGORIES}
                     placeholder="Select Service"
                     required
                     onBlur={() => markTouched("service_name")}
                     error={touched.service_name ? errors.service_name : null}
                   />
+                  {/* REQUIRED - see the note in ExhibitionServicePopupForm. A listing
+                      written before this field existed loads with "General"
+                      preselected by canonicalServiceCategory above, so a provider who
+                      came here to fix a phone number is not blocked by a field they
+                      never filled in. */}
+                  {service_name && subcategories.length ? (
+                    <Dropdown
+                      id="service_subcategory"
+                      label="Speciality"
+                      value={service_subcategory}
+                      onChange={(e) => setServiceSubcategory(e.target.value)}
+                      options={subcategories}
+                      placeholder="Select speciality"
+                      required
+                      onBlur={() => markTouched("service_subcategory")}
+                      error={touched.service_subcategory ? errors.service_subcategory : null}
+                    />
+                  ) : null}
                   <InputField
                     id="mobile_number"
                     label="Mobile Number"

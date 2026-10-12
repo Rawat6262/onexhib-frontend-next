@@ -14,6 +14,7 @@ import {
   getMyExhibitionServices,
   deleteExhibitionService,
 } from "@/models/service.model";
+import { SERVICE_CATEGORIES, canonicalServiceCategory } from "@/lib/service-taxonomy";
 import {
   PageHeader,
   Panel,
@@ -83,7 +84,17 @@ export default function ServicesClient() {
 
   const filteredData = useMemo(() => {
     return services.filter((item) =>
-      [item.full_name, item.service_name, item.city, item.state, item.country, item.mobile_number].some(
+      [
+        item.full_name,
+        item.service_name,
+        // Searchable too: "banners" is how a provider thinks of the listing, and
+        // without this the only way to find it is by remembering the category.
+        item.service_subcategory,
+        item.city,
+        item.state,
+        item.country,
+        item.mobile_number,
+      ].some(
         (field) => field?.toLowerCase().includes(search.toLowerCase())
       )
     );
@@ -97,27 +108,33 @@ export default function ServicesClient() {
     if (newPage >= 1 && newPage <= totalPages) setCurrentPage(newPage);
   };
 
-  const SERVICE_NAMES = [
-    "Printing",
-    "Furniture Rental",
-    "LED / TV Rental",
-    "Fabrication",
-    "Protocol Staff",
-    "Catalog Printing",
-    "Corporate Gifting",
-  ];
-
-  // Count per service type
-  const serviceCounts = SERVICE_NAMES.reduce((acc, name) => {
-    acc[name] = services.filter((s) => s.service_name === name).length;
+  /*
+   * Per-category counts for the stat cards, over the CANONICAL category name.
+   *
+   * Resolved rather than matched literally, for the same reason the public
+   * directory resolves: a listing written before the taxonomy migration still says
+   * "Fabrication", and a literal match would count it under nothing and show the
+   * provider a row of zeroes beside a table full of their own listings.
+   *
+   * ONLY THE CATEGORIES THIS PROVIDER ACTUALLY USES get a card. All 35 would be two
+   * dozen zeroes - the hub's job is to describe what the platform supports; this
+   * screen's job is to describe what THIS account has listed. Ordered by the
+   * taxonomy so the cards do not reshuffle when a count changes.
+   */
+  const serviceCounts = services.reduce((acc, item) => {
+    const resolved = canonicalServiceCategory(item.service_name, item.service_subcategory);
+    const key = resolved ? resolved.category : null;
+    if (key) acc[key] = (acc[key] || 0) + 1;
     return acc;
   }, {});
+
+  const usedCategories = SERVICE_CATEGORIES.filter((name) => serviceCounts[name]);
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
       <PageHeader
         title="Exhibition services"
-        intro="The service providers listed on your account, across the seven categories the platform supports."
+        intro={`The service providers listed on your account, across the ${SERVICE_CATEGORIES.length} categories the platform supports.`}
         actions={
           <div className="flex items-center gap-2">
             <button type="button" className={btnSecondary} onClick={() => setShowUpload(true)}>
@@ -158,8 +175,8 @@ export default function ServicesClient() {
           organiser screen, so the two pages read as one product. */}
       <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
         <StatCard label="services listed" value={services.length} accent />
-        {SERVICE_NAMES.map((name) => (
-          <StatCard key={name} label={name} value={serviceCounts[name] || 0} />
+        {usedCategories.map((name) => (
+          <StatCard key={name} label={name} value={serviceCounts[name]} />
         ))}
       </div>
 
@@ -204,6 +221,11 @@ export default function ServicesClient() {
                         {item.full_name}
                       </p>
                       <span className={`${pill} mt-1`}>{item.service_name}</span>
+                      {item.service_subcategory ? (
+                        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                          {item.service_subcategory}
+                        </p>
+                      ) : null}
                     </div>
                   </div>
                   <dl className="mt-3 space-y-1 text-sm text-gray-600 dark:text-gray-400">
@@ -270,6 +292,11 @@ export default function ServicesClient() {
                       </td>
                       <td className="px-5 py-3.5">
                         <span className={pill}>{item.service_name}</span>
+                        {item.service_subcategory ? (
+                          <span className="mt-1 block text-xs text-gray-500 dark:text-gray-400">
+                            {item.service_subcategory}
+                          </span>
+                        ) : null}
                       </td>
                       <td className="px-5 py-3.5 text-gray-600 dark:text-gray-400">
                         {[item.city, item.state, item.country].filter(Boolean).join(", ") || "—"}

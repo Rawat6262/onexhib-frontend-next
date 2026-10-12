@@ -124,7 +124,7 @@ export default async function AboutPage() {
               {
                 icon: Wrench,
                 title: "Service providers",
-                body: `Offer the services exhibitors need to prepare for a show, across ${SERVICE_CATEGORIES.length} categories from stall fabrication to catalogue printing.`,
+                body: `Offer the services exhibitors need to prepare for a show, across ${SERVICE_CATEGORIES.length} categories from stall fabrication and printing to logistics, staffing and catering.`,
               },
             ].map(({ icon: Icon, title, body }) => (
               <li key={title} className="flex items-start gap-3">

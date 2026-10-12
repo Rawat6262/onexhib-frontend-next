@@ -134,6 +134,7 @@ export default async function ServiceCategoryPage({ params }) {
           letters={category.letters}
           states={category.states}
           cities={category.cities}
+          subcategories={category.subcategories}
         />
       </section>
 

@@ -4,6 +4,7 @@ import { City, Country, State } from "country-state-city";
 import React, { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { addExhibitionService } from "@/models/service.model";
+import { SERVICE_CATEGORIES, serviceSubcategories } from "@/lib/service-taxonomy";
 
 // --- Shared Label ---
 const Label = ({ children, required, htmlFor }) => (
@@ -79,15 +80,15 @@ const SimpleFileField = ({ id, label, onChange, accept = "image/*", error }) => 
   </div>
 );
 
-const SERVICE_OPTIONS = [
-  "Printing",
-  "Furniture Rental",
-  "LED / TV Rental",
-  "Fabrication",
-  "Protocol Staff",
-  "Catalog Printing",
-  "Corporate Gifting",
-];
+/*
+ * THE CATEGORY LIST IS IMPORTED, NEVER TYPED HERE.
+ *
+ * It used to be seven strings copied out of the backend enum, and the same seven
+ * were copied into the edit form, the dashboard and the Excel modal. A category
+ * misspelled in any one of those is a dropdown option the API rejects on submit,
+ * with no way for the form to know. lib/service-taxonomy.js is pure data - no
+ * server-only reach - so a Client Component can read the real taxonomy.
+ */
 
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
@@ -95,6 +96,7 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ExhibitionServicePopupForm = ({ onClose }) => {
   const [full_name, setFullName] = useState("");
   const [service_name, setServiceName] = useState("");
+  const [service_subcategory, setServiceSubcategory] = useState("");
   const [mobile_number, setMobile] = useState("");
   const [address, setAddress] = useState("");
   const [country, setCountry] = useState("");
@@ -106,6 +108,19 @@ const ExhibitionServicePopupForm = ({ onClose }) => {
   const [touched, setTouched] = useState({});
 
   const markTouched = (id) => setTouched((s) => ({ ...s, [id]: true }));
+
+  /*
+   * The specialities under the chosen category, empty until one is chosen.
+   *
+   * CASCADING, exactly like state-after-country below it: "Chairs" is a real
+   * subcategory but not of "Printing & Branding", and the backend rejects that pair
+   * rather than storing a contradiction. Deriving the options from the category
+   * means the form cannot offer the pair in the first place.
+   */
+  const subcategories = useMemo(
+    () => (service_name ? serviceSubcategories(service_name) : []),
+    [service_name]
+  );
 
   // Country / State / City
   const countries = useMemo(
@@ -144,6 +159,13 @@ const ExhibitionServicePopupForm = ({ onClose }) => {
     const e = {};
     if (!full_name.trim()) e.full_name = "Full name is required.";
     if (!service_name) e.service_name = "Service type is required.";
+    /*
+     * Required ONLY once a category is chosen, because the dropdown does not
+     * exist before then - flagging a field the provider cannot see yet is how a
+     * form becomes unsubmittable for no visible reason. "General" is always an
+     * available answer, so this never forces a claim nobody can make.
+     */
+    if (service_name && !service_subcategory) e.service_subcategory = "Speciality is required.";
     if (!mobile_number.trim()) e.mobile_number = "Mobile number is required.";
     else if (!/^\+?[\d\s\-()]{7,15}$/.test(mobile_number.trim())) e.mobile_number = "Enter a valid mobile number.";
     if (!address.trim()) e.address = "Address is required.";
@@ -157,7 +179,7 @@ const ExhibitionServicePopupForm = ({ onClose }) => {
     ev.preventDefault();
     const validationErrors = validateAll();
     setErrors(validationErrors);
-    setTouched({ full_name: true, service_name: true, mobile_number: true, address: true, country: true, state: true, city: true });
+    setTouched({ full_name: true, service_name: true, service_subcategory: true, mobile_number: true, address: true, country: true, state: true, city: true });
 
     if (Object.keys(validationErrors).length) {
       toast.error("Please fix the highlighted errors.");
@@ -169,6 +191,13 @@ const ExhibitionServicePopupForm = ({ onClose }) => {
       const formData = new FormData();
       formData.append("full_name", full_name.trim());
       formData.append("service_name", service_name);
+      /*
+       * Sent even when empty, so the field is always present in the payload. The
+       * backend treats an empty subcategory as "none", which is a valid state - and
+       * on the edit form the same append is what lets a provider CLEAR a speciality
+       * they no longer claim.
+       */
+      formData.append("service_subcategory", service_subcategory);
       formData.append("mobile_number", mobile_number.trim());
       formData.append("address", address.trim());
       // country-state-city needs ISO codes to filter the cascading dropdowns,
@@ -229,13 +258,44 @@ const ExhibitionServicePopupForm = ({ onClose }) => {
                   id="service_name"
                   label="Service Type"
                   value={service_name}
-                  onChange={(e) => setServiceName(e.target.value)}
-                  options={SERVICE_OPTIONS}
+                  /* Changing the category clears the speciality: one chosen under
+                     the previous category is not valid under this one, and leaving
+                     it set would submit a pair the API refuses. Same pattern as
+                     country -> state -> city below. */
+                  onChange={(e) => {
+                    setServiceName(e.target.value);
+                    setServiceSubcategory("");
+                  }}
+                  options={SERVICE_CATEGORIES}
                   placeholder="Select Service"
                   required
                   onBlur={() => markTouched("service_name")}
                   error={touched.service_name ? errors.service_name : null}
                 />
+                {/*
+                  REQUIRED, and only shown once a category is chosen - the options
+                  depend on it, and an empty speciality dropdown invites a click that
+                  does nothing.
+
+                  A provider who has not decided how to subdivide their work picks
+                  "General", which is the first option in every category and is a
+                  real answer rather than a blank. That is what makes requiring this
+                  fair: there is always a correct choice available, so nobody is
+                  forced to claim a speciality they do not have.
+                */}
+                {service_name && subcategories.length ? (
+                  <Dropdown
+                    id="service_subcategory"
+                    label="Speciality"
+                    value={service_subcategory}
+                    onChange={(e) => setServiceSubcategory(e.target.value)}
+                    options={subcategories}
+                    placeholder="Select speciality"
+                    required
+                    onBlur={() => markTouched("service_subcategory")}
+                    error={touched.service_subcategory ? errors.service_subcategory : null}
+                  />
+                ) : null}
                 <InputField
                   id="mobile_number"
                   label="Mobile Number"

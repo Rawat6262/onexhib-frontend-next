@@ -1,6 +1,7 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { duplicateExhibitionRedirects } from "./lib/duplicate-redirects.mjs";
+import { RETIRED_CATEGORY_SLUGS } from "./lib/service-taxonomy.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -90,14 +91,35 @@ const nextConfig = {
   },
 
   /**
-   * Permanent redirects for exhibition records removed as duplicates.
+   * Permanent redirects.
    *
-   * The list is generated from the deletion backups rather than written by
-   * hand - see lib/duplicate-redirects.mjs for the provenance and for why the
-   * source matches on the record id instead of a fixed slug.
+   * TWO SOURCES, both generated rather than written by hand here:
+   *
+   * 1. Exhibition records removed as duplicates. The list comes from the deletion
+   *    backups - see lib/duplicate-redirects.mjs for the provenance and for why the
+   *    source matches on the record id instead of a fixed slug.
+   *
+   * 2. Service category slugs retired by the taxonomy change. There is exactly ONE,
+   *    and that is the whole point: the taxonomy renamed six live categories and
+   *    froze their slugs, so /exhibition-services/catalog-printing is the only URL
+   *    in that tier this change removes. It 301s to the category that absorbed it
+   *    rather than 404ing, which keeps whatever ranking it had.
+   *
+   * statusCode: 301 rather than permanent: true, matching lib/duplicate-redirects.mjs
+   * and for the reason documented there: `permanent: true` emits 308, which also
+   * forbids changing the method, and 301 is what this site's redirects are
+   * specified to return. The two keys are mutually exclusive in Next, so
+   * `permanent` is deliberately absent here too.
    */
   async redirects() {
-    return duplicateExhibitionRedirects();
+    const retiredServiceCategories = Object.entries(RETIRED_CATEGORY_SLUGS).map(
+      ([from, to]) => ({
+        source: `/exhibition-services/${from}`,
+        destination: `/exhibition-services/${to}`,
+        statusCode: 301,
+      })
+    );
+    return [...duplicateExhibitionRedirects(), ...retiredServiceCategories];
   },
 
   async rewrites() {

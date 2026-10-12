@@ -193,9 +193,10 @@ async function buildAllUrls() {
     // index is empty until the API projects `category`, so nothing is listed
     // here that would 404.
     getCategoryIndex(),
-    // The seven service categories, plus their hub. Only categories that have
-    // providers get a page (the rest 404 by design), so this adds at most eight
-    // URLs and never one that would answer 404.
+    // The service categories, plus their hub. Only categories that have providers
+    // get a page (the rest 404 by design), so this adds one URL per category in
+    // use plus the hub, and never one that would answer 404. 29 of the 35 are
+    // empty today and are therefore absent from here, as they should be.
     getServiceDirectory(),
     collect((page) => getUpcomingExhibitions({ page, limit: PAGE_SIZE }), BUDGET.upcoming),
     collect((page) => getOngoingExhibitions({ page, limit: PAGE_SIZE }), BUDGET.ongoing),
@@ -241,8 +242,8 @@ async function buildAllUrls() {
 
   /*
    * The services hub was noindex and absent from here while the provider
-   * endpoint was empty. It now carries 498 providers across seven category
-   * pages, so both it and they are listed - and the condition is still checked
+   * endpoint was empty. It now carries ~1,000 providers across the category
+   * pages in use, so both it and they are listed - and the condition is still checked
    * rather than assumed, because a sitemap must never contain a URL that then
    * tells a crawler not to index it.
    */

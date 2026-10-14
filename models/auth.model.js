@@ -43,3 +43,10 @@ export const confirmPasswordReset = (email, otp) =>
   axios.post("/api/app/verify-forgot-password", { email, otp });
 
 export const logout = () => axios.post("/api/logout");
+
+/**
+ * Change the signed-in user's OWN account type. Self only (the server takes the
+ * id from the session), never ADMIN; writes role and designation together.
+ * Answers with the updated user, which the caller writes back through signIn().
+ */
+export const changeMyRole = (role) => axios.put("/api/account/role", { role });

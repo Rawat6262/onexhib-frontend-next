@@ -859,7 +859,9 @@ check("PostCard still has no local reaction transition decision",
   !/viewerReaction\s*===\s*clicked/.test(cardSrc));
 check("the owner menu is still gated on ownership and both handlers",
   /isOwnPost && onEditRequest && onDeleteRequest \?/.test(cardSrc));
-check("the feed still prepends a created post", /prependItem\(/.test(feedSrc));
+// The composer moved to /social/my-posts, and the prepend moved with it.
+const myPostsSrc = stripComments(read("app/(social)/social/my-posts/my-posts-client.jsx"));
+check("my posts prepends a created post", /prependItem\(prev, created\)/.test(myPostsSrc));
 check("the feed still deletes server-first",
   feedSrc.indexOf("await deletePost(") < feedSrc.indexOf("removeItem(prev, deleting._id)"));
 check("no post data is duplicated into PostCard's local state",

@@ -625,14 +625,15 @@ const socialPages = [];
   }
 })(routeDir);
 
-check("all six social routes were found", socialPages.length === 6, `found ${socialPages.length}`);
+check("all seven social routes were found", socialPages.length === 7, `found ${socialPages.length}`);
 check(
-  "and they are exactly the expected five",
+  "and they are exactly the expected seven",
   JSON.stringify(
     socialPages
       .map((u) => decodeURIComponent(u.pathname).split("/app/")[1])
       .sort()
   ) === JSON.stringify([
+    "(social)/social/my-posts/page.jsx",
     "(social)/social/notifications/page.jsx",
     "(social)/social/page.jsx",
     "(social)/social/people/page.jsx",

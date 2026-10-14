@@ -163,7 +163,7 @@ export default async function ServiceProviderPage({ params }) {
             ) : null}
 
             {/* Plain React text. A provider-supplied string never goes near an HTML sink. */}
-            <h1 className="mt-3 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl dark:text-white">
+            <h1 className="mt-3 text-3xl font-extrabold leading-[1.1] tracking-tight text-gray-900 sm:text-[2.6rem] dark:text-white">
               {provider.name}
             </h1>
 

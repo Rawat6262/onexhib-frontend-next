@@ -1,6 +1,6 @@
 "use client";
 
-import { MessageSquare, UserCircle, Bell, ShieldOff, Users } from "lucide-react";
+import { MessageSquare, PenSquare, UserCircle, Bell, ShieldOff, Users } from "lucide-react";
 import AppShell from "@/components/layout/AppShell";
 import RequireAuth from "@/components/auth/RequireAuth";
 import { useAuth } from "@/components/auth/AuthProvider";
@@ -16,7 +16,8 @@ import { useAuth } from "@/components/auth/AuthProvider";
  * would be a working API the UI refuses to open.
  *
  * Same structure as (dashboard)/layout.jsx: RequireAuth wrapping AppShell, with
- * `items` becoming the horizontal workspace sub-nav. Notifications joined it in
+ * `items` becoming the workspace sub-nav (a left rail on wide screens, see
+ * AppShell's `variant="sidebar"`). Notifications joined it in
  * Phase 11G, once the route it points at existed — a sub-nav link to a route that
  * does not exist is a 404 with a signpost.
  *
@@ -31,17 +32,24 @@ export default function SocialLayout({ children }) {
   const items = [
     { label: "Feed", href: "/social", icon: <MessageSquare size={16} /> },
     /*
+     * MY POSTS, right after Feed: reading and writing are the two halves of the
+     * same activity, and the feed's "Create post" prompt leads here. It holds the
+     * composer and the viewer's own posts with edit and delete. Unconditional,
+     * like Feed: /posts/me resolves the author from the session, not from an id.
+     */
+    { label: "My posts", href: "/social/my-posts", icon: <PenSquare size={16} /> },
+    /*
      * The route exists now, so the link is no longer a signposted 404. It carries NO
      * unread count of its own: the badge in the header reads the shared provider, and
      * a count here would either be a second request per navigation render or a second
      * number that drifts from the bell's.
      */
     /*
-     * PEOPLE, immediately after Feed, because it is the answer to an empty one.
+     * PEOPLE, straight after Feed and My posts, because it is the answer to an empty feed.
      *
      * Before this existed the social graph had no entrance: following somebody required
      * already holding their profile URL, so a new account saw an empty feed, a profile
-     * with no followers, and no route to anyone. Placing it second means the fix sits
+     * with no followers, and no route to anyone. Keeping it this high means the fix sits
      * next to the symptom.
      */
     { label: "People", href: "/social/people", icon: <Users size={16} /> },
@@ -69,7 +77,9 @@ export default function SocialLayout({ children }) {
 
   return (
     <RequireAuth>
-      <AppShell items={items}>{children}</AppShell>
+      <AppShell items={items} variant="sidebar" navTitle="Community">
+        {children}
+      </AppShell>
     </RequireAuth>
   );
 }

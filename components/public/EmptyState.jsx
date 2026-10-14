@@ -1,3 +1,5 @@
+import { SearchX } from "lucide-react";
+
 /**
  * Shown when a section's fetch failed or returned nothing.
  *
@@ -8,8 +10,14 @@
  */
 export default function EmptyState({ children }) {
   return (
-    <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50 px-6 py-10 text-center dark:border-gray-700 dark:bg-gray-900/50">
-      <p className="text-sm text-gray-500 dark:text-gray-400">{children}</p>
+    <div className="relative overflow-hidden rounded-2xl border border-dashed border-gray-300 bg-gradient-to-b from-gray-50 to-white px-6 py-12 text-center dark:border-gray-700 dark:from-gray-900/60 dark:to-gray-950">
+      <span
+        aria-hidden="true"
+        className="mx-auto mb-3 grid h-11 w-11 place-items-center rounded-2xl bg-[#2B3FB8]/[0.08] text-[#2B3FB8] dark:bg-blue-400/10 dark:text-blue-300"
+      >
+        <SearchX size={20} />
+      </span>
+      <p className="mx-auto max-w-md text-[15px] leading-relaxed text-gray-600 dark:text-gray-400">{children}</p>
     </div>
   );
 }

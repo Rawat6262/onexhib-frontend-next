@@ -97,7 +97,7 @@ export default function CompanyEditPopup({ open, onClose, companyId }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="ox-form fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
       <div className="relative bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 w-[92vw] sm:w-[80vw] h-[90vh] rounded-2xl shadow-2xl p-4 sm:p-6 overflow-auto">
         <div className="flex items-center justify-between mb-4">
@@ -112,68 +112,68 @@ export default function CompanyEditPopup({ open, onClose, companyId }) {
         ) : (
           <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm">Company Name</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Company Name</label>
               <input name="company_name" value={form.company_name} onChange={handleChange} className="mt-1 w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded px-2 py-1" />
             </div>
 
             <div>
-              <label className="block text-sm">Company Email</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Company Email</label>
               <input name="company_email" type="email" value={form.company_email} onChange={handleChange} className="mt-1 w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded px-2 py-1" />
             </div>
 
             <div>
-              <label className="block text-sm">Nature</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Nature</label>
               <input name="company_nature" value={form.company_nature} onChange={handleChange} className="mt-1 w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded px-2 py-1" />
             </div>
 
             <div>
-              <label className="block text-sm">Phone Number</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Phone Number</label>
               <input name="company_phone_number" type="tel" value={form.company_phone_number} onChange={handleChange} className="mt-1 w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded px-2 py-1" />
             </div>
 
             <div className="col-span-2">
-              <label className="block text-sm">Address</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Address</label>
               <textarea name="company_address" value={form.company_address} onChange={handleChange} rows={3} className="mt-1 w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded px-2 py-1" />
             </div>
 
             <div>
-              <label className="block text-sm">Pincode</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Pincode</label>
               <input name="pincode" type="number" value={form.pincode} onChange={handleChange} className="mt-1 w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded px-2 py-1" />
             </div>
 
             <div>
-              <label className="block text-sm">Company URL</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Company URL</label>
               <input name="company_url" value={form.company_url} onChange={handleChange} className="mt-1 w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded px-2 py-1" />
             </div>
 
             <div>
-              <label className="block text-sm">Company Website</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Company Website</label>
               <input name="company_website" value={form.company_website} onChange={handleChange} className="mt-1 w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded px-2 py-1" />
             </div>
 
             <div>
-              <label className="block text-sm">Company Image URL</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Company Image URL</label>
               <input name="company_image_url" value={form.company_image_url} onChange={handleChange} className="mt-1 w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded px-2 py-1" />
             </div>
 
             <div>
-              <label className="block text-sm">Hall No</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Hall No</label>
               <input name="hall_no" value={form.hall_no} onChange={handleChange} className="mt-1 w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded px-2 py-1" />
             </div>
 
             <div>
-              <label className="block text-sm">Stall No</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Stall No</label>
               <input name="stall_no" value={form.stall_no} onChange={handleChange} className="mt-1 w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded px-2 py-1" />
             </div>
 
             <div className="col-span-2">
-              <label className="block text-sm">About Company</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">About Company</label>
               <textarea name="about_company" value={form.about_company} onChange={handleChange} rows={4} className="mt-1 w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded px-2 py-1" />
             </div>
 
             <div className="col-span-2 flex justify-end gap-3 mt-4">
-              <button type="button" onClick={onClose} className="px-4 py-2 rounded border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800">Cancel</button>
-              <button type="submit" disabled={saving} className="px-4 py-2 rounded bg-blue-600 text-white">{saving ? 'Saving...' : 'Save Changes'}</button>
+              <button type="button" onClick={onClose} className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-6 py-2.5 text-sm font-semibold text-gray-700 transition hover:border-[#2B3FB8] hover:text-[#2B3FB8] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:border-blue-400 dark:hover:text-white">Cancel</button>
+              <button type="submit" disabled={saving} className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#131C55] to-[#2B3FB8] px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-900/25 transition hover:brightness-110 disabled:opacity-70 disabled:cursor-not-allowed motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500">{saving ? 'Saving...' : 'Save Changes'}</button>
             </div>
           </form>
         )}

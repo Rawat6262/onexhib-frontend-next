@@ -16,7 +16,7 @@ export default function CompanyCard({ company, className = "" }) {
 
   return (
     <article
-      className={`ox-card group relative flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white hover:border-[#131C55]/30 hover:shadow-lg dark:border-gray-800 dark:bg-gray-900 dark:hover:border-gray-600 ${className}`}
+      className={`ox-card ox-card-accent group relative flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white hover:border-[#2B3FB8]/30 hover:shadow-xl hover:shadow-indigo-900/10 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-blue-400/30 dark:hover:shadow-black/40 ${className}`}
     >
       <CardMedia
         image={image}
@@ -27,7 +27,7 @@ export default function CompanyCard({ company, className = "" }) {
 
       <div className="flex flex-1 flex-col gap-2 p-4">
         {nature ? (
-          <p className="line-clamp-1 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-[#131C55] dark:text-blue-300">
+          <p className="line-clamp-1 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.08em] text-[#2B3FB8] dark:text-blue-300">
             <Building2 size={12} aria-hidden="true" />
             {nature}
           </p>

@@ -87,7 +87,7 @@ export default function ProductEditPopup({ open, onClose, productId }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="ox-form fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
 
       <div className="relative bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 w-[92vw] sm:w-[80vw] h-[90vh] rounded-2xl shadow-2xl p-4 sm:p-6 overflow-auto">
@@ -108,7 +108,7 @@ export default function ProductEditPopup({ open, onClose, productId }) {
         ) : (
           <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm">Product Name</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Product Name</label>
               <input
                 name="product_name"
                 value={form.product_name}
@@ -118,7 +118,7 @@ export default function ProductEditPopup({ open, onClose, productId }) {
             </div>
 
             <div>
-              <label className="block text-sm">Category</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Category</label>
               <input
                 name="category"
                 value={form.category}
@@ -128,7 +128,7 @@ export default function ProductEditPopup({ open, onClose, productId }) {
             </div>
 
             <div>
-              <label className="block text-sm">Price</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Price</label>
               <input
                 name="price"
                 type="number"
@@ -139,7 +139,7 @@ export default function ProductEditPopup({ open, onClose, productId }) {
             </div>
 
             <div>
-              <label className="block text-sm">Unit</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Unit</label>
               <input
                 name="unit"
                 value={form.unit}
@@ -149,7 +149,7 @@ export default function ProductEditPopup({ open, onClose, productId }) {
             </div>
 
             <div>
-              <label className="block text-sm">Product URL</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Product URL</label>
               <input
                 name="product_url"
                 value={form.product_url}
@@ -159,7 +159,7 @@ export default function ProductEditPopup({ open, onClose, productId }) {
             </div>
 
             <div className="col-span-2">
-              <label className="block text-sm">Product Details</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Product Details</label>
               <textarea
                 name="details"
                 rows={4}
@@ -170,7 +170,7 @@ export default function ProductEditPopup({ open, onClose, productId }) {
             </div>
 
             <div className="col-span-2">
-              <label className="block text-sm">Product Video URL</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Product Video URL</label>
               <input
                 name="product_video_url"
                 value={form.product_video_url}
@@ -183,7 +183,7 @@ export default function ProductEditPopup({ open, onClose, productId }) {
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 rounded border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-6 py-2.5 text-sm font-semibold text-gray-700 transition hover:border-[#2B3FB8] hover:text-[#2B3FB8] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:border-blue-400 dark:hover:text-white"
               >
                 Cancel
               </button>
@@ -191,7 +191,7 @@ export default function ProductEditPopup({ open, onClose, productId }) {
               <button
                 type="submit"
                 disabled={saving}
-                className="px-4 py-2 rounded bg-blue-600 text-white"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#131C55] to-[#2B3FB8] px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-900/25 transition hover:brightness-110 disabled:opacity-70 disabled:cursor-not-allowed motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500"
               >
                 {saving ? "Saving..." : "Save Changes"}
               </button>

@@ -15,11 +15,11 @@ export default function Breadcrumbs({ trail }) {
 
   return (
     <nav aria-label="Breadcrumb" className="mb-5">
-      <ol className="flex list-none flex-wrap items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
+      <ol className="inline-flex max-w-full list-none flex-wrap items-center gap-1 rounded-full border border-gray-200 bg-white/70 px-3 py-1 text-[13px] text-gray-500 shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/[0.03] dark:text-gray-400">
         {trail.map(({ name, path }, i) => (
           <li key={path} className="flex items-center gap-1">
             {i === last ? (
-              <span aria-current="page" className="line-clamp-1 text-gray-700 dark:text-gray-300">
+              <span aria-current="page" className="line-clamp-1 font-medium text-gray-900 dark:text-gray-100">
                 {name}
               </span>
             ) : (

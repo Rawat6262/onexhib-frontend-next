@@ -128,10 +128,12 @@ export default function AppHeader({ nav = PUBLIC_NAV, right = null, mobileExtra 
 }
 
 const navLink =
-  "rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white";
+  "whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white";
 
+// whitespace-nowrap: at max-w-6xl the nav is tight, and "AI Search" was the
+// item that broke onto two lines first.
 const navLinkHighlight =
-  "inline-flex items-center gap-1.5 rounded-lg bg-[#131C55] px-3 py-2 text-sm font-semibold text-white transition hover:bg-[#0E1B6B] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:bg-blue-500 dark:hover:bg-blue-400 dark:text-gray-950";
+  "inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-gradient-to-r from-[#2B3FB8] to-[#6D4CF0] px-3 py-2 text-sm font-semibold text-white shadow-sm shadow-indigo-500/25 transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none";
 
 export const mobileLink =
   "block rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800";

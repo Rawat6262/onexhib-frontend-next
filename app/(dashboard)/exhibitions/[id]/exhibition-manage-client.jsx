@@ -13,6 +13,7 @@ import {
 import { getCompaniesForExhibition } from "@/models/company.model";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { ROLES } from "@/lib/auth";
+import TablePagination from "@/components/dashboard/TablePagination";
 
 // Modals are only needed once opened, so their code (and for the location
 // forms, country-state-city's ~2.3 MB dataset) is split out of this page's
@@ -52,7 +53,7 @@ export default function ExhibitionManageClient({ id }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [editingId, setEditingId] = useState(null);
 
-  const itemsPerPage = 5;
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const deleteExhibition = async () => {
     try {
@@ -110,6 +111,10 @@ export default function ExhibitionManageClient({ id }) {
   }, [fetchExhibitionData, fetchCompany]);
 
   const totalPages = Math.ceil(filteredCompanies.length / itemsPerPage) || 1;
+  // A delete or a bigger page size can leave the current page past the end.
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(totalPages);
+  }, [currentPage, totalPages]);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedCompanies = filteredCompanies.slice(startIndex, startIndex + itemsPerPage);
 
@@ -118,16 +123,16 @@ export default function ExhibitionManageClient({ id }) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FFFFFF] dark:bg-gray-950 text-gray-900 dark:text-gray-100">
-      <div className="flex-1 w-full mt-8 flex flex-col border border-gray-300 dark:border-gray-700 md:mx-4 lg:mx-6 bg-white dark:bg-gray-900 rounded-lg shadow-md overflow-y-auto">
+    <div className="mx-auto w-full max-w-6xl px-4 py-8 text-gray-900 sm:px-6 sm:py-12 dark:text-gray-100">
+      <div className="flex flex-col">
         {/* Header */}
-        <div className="w-full flex flex-col sm:flex-row gap-3 sm:gap-0 justify-between items-center px-4 sm:px-8 py-4 sm:h-20 border-b border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 rounded-t-lg">
-          <h1 className="flex-1 font-bold text-2xl sm:text-3xl tracking-wide">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <h1 className="flex-1 text-3xl font-extrabold leading-[1.1] tracking-tight text-gray-900 sm:text-[2.6rem] dark:text-white">
             {exhibition.exhibition_name || "Exhibition"}
           </h1>
           <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
             <button
-              className="h-10 w-full sm:w-48 border border-[#131C55] text-[#131C55] dark:text-blue-300 hover:bg-[#131C55]/5 dark:hover:bg-blue-400/10 rounded-lg font-semibold transition-colors"
+              className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-4 text-sm font-semibold text-gray-900 transition hover:border-[#2B3FB8] hover:text-[#2B3FB8] sm:w-48 motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:hover:border-blue-400"
               onClick={() => setDetails(true)}
             >
               Exhibition Details
@@ -143,26 +148,26 @@ export default function ExhibitionManageClient({ id }) {
         </div>
 
         {/* Summary Cards */}
-        <div className="w-full px-3 sm:px-4 mt-6 grid grid-cols-2 sm:flex sm:flex-wrap gap-3 sm:gap-6 justify-start">
+        <div className="mt-8 grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:gap-4">
           {[
             { title: "Total Companies", value: companies.length },
             { title: "Exhibition Stats", value: "Active" },
           ].map((card) => (
             <div
               key={card.title}
-              className="h-20 sm:h-24 sm:w-48 rounded-xl flex flex-col justify-center items-center bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 shadow-sm px-2"
+              className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 py-4 sm:w-48 dark:border-gray-800 dark:bg-gray-900"
             >
-              <p className="text-xs sm:text-lg font-medium text-gray-700 dark:text-gray-300 text-center">{card.title}</p>
+              <p className="text-[13px] font-medium text-gray-500 dark:text-gray-400">{card.title}</p>
               <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">{card.value}</p>
             </div>
           ))}
         </div>
 
         {/* Table Section */}
-        <div className="flex-1 w-full px-3 sm:px-4 mt-8 rounded-b-lg border border-t-0 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm pb-8 mb-8">
+        <div className="mt-8 overflow-hidden rounded-2xl border border-gray-200 bg-white pb-2 shadow-sm shadow-gray-900/[0.03] dark:border-gray-800 dark:bg-gray-900 dark:shadow-none">
           {/* Controls */}
-          <div className="py-4 w-full flex flex-col lg:flex-row justify-between gap-4 px-4 text-center">
-            <h2 className="font-bold text-2xl sm:text-3xl text-gray-800 dark:text-gray-100">Company List</h2>
+          <div className="flex w-full flex-col gap-4 border-b border-gray-200 bg-gradient-to-b from-gray-50/80 to-white px-5 py-4 text-center lg:flex-row lg:items-center lg:justify-between dark:border-gray-800 dark:from-white/[0.02] dark:to-transparent">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">Company List</h2>
             <div className="flex flex-col sm:flex-row gap-4 justify-end">
               <input
                 type="text"
@@ -177,19 +182,19 @@ export default function ExhibitionManageClient({ id }) {
 
               <button
                 onClick={() => setShowFormnew(true)}
-                className="h-10 w-full sm:w-48 border border-[#131C55] text-[#131C55] dark:text-blue-300 hover:bg-[#131C55]/5 dark:hover:bg-blue-400/10 rounded-lg font-semibold transition-colors"
+                className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-4 text-sm font-semibold text-gray-900 transition hover:border-[#2B3FB8] hover:text-[#2B3FB8] sm:w-48 motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:hover:border-blue-400"
               >
                 + Add News
               </button>
               <button
                 onClick={() => setShowForm(true)}
-                className="h-10 w-full sm:w-48 border border-[#131C55] text-[#131C55] dark:text-blue-300 hover:bg-[#131C55]/5 dark:hover:bg-blue-400/10 rounded-lg font-semibold transition-colors"
+                className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-4 text-sm font-semibold text-gray-900 transition hover:border-[#2B3FB8] hover:text-[#2B3FB8] sm:w-48 motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:hover:border-blue-400"
               >
                 + Add Company
               </button>
               <button
                 onClick={() => setShowUploadModal(true)}
-                className="h-10 w-full sm:w-48 border border-[#131C55] text-[#131C55] dark:text-blue-300 hover:bg-[#131C55]/5 dark:hover:bg-blue-400/10 rounded-lg font-semibold transition-colors"
+                className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-4 text-sm font-semibold text-gray-900 transition hover:border-[#2B3FB8] hover:text-[#2B3FB8] sm:w-48 motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:hover:border-blue-400"
               >
                 Upload Excel
               </button>
@@ -212,15 +217,15 @@ export default function ExhibitionManageClient({ id }) {
           </div>
 
           {/* List */}
-          <div className="flex-1 w-full mt-6">
+          <div className="w-full">
             {paginatedCompanies.length === 0 ? (
-              <p className="p-6 text-center text-gray-600 dark:text-gray-400 italic">No companies found</p>
+              <p className="px-5 py-12 text-center text-[15px] text-gray-500 dark:text-gray-400">No companies found</p>
             ) : (
               <>
                 {/* Card list — phones only */}
-                <div className="sm:hidden flex flex-col gap-3 px-4">
+                <div className="flex flex-col gap-3 px-4 py-4 sm:hidden">
                   {paginatedCompanies.map((c, index) => (
-                    <div key={c._id || index} className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-4">
+                    <div key={c._id || index} className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
                       <p className="font-semibold text-gray-900 dark:text-gray-100">
                         {startIndex + index + 1}. {c.company_name}
                       </p>
@@ -237,7 +242,7 @@ export default function ExhibitionManageClient({ id }) {
                       <div className="flex items-center gap-2 mt-3">
                         <button
                           onClick={() => router.push(`/companies/${c._id}`)}
-                          className="flex-1 border border-[#131C55] text-[#131C55] dark:text-blue-300 rounded-lg px-3 py-1.5 hover:bg-[#131C55]/5 dark:hover:bg-blue-400/10 transition-colors"
+                          className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-[13px] font-medium text-gray-700 transition hover:border-[#2B3FB8] hover:text-[#2B3FB8] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-blue-400 dark:hover:text-white flex-1"
                         >
                           View
                         </button>
@@ -253,14 +258,14 @@ export default function ExhibitionManageClient({ id }) {
                 </div>
 
                 {/* Table — sm and up */}
-                <div className="hidden sm:block overflow-auto max-h-[70vh] overscroll-contain rounded-lg text-left">
-                  <table className="w-full min-w-[700px] border-collapse border border-gray-300 dark:border-gray-700">
+                <div className="hidden max-h-[70vh] overflow-auto overscroll-contain text-left sm:block">
+                  <table className="w-full min-w-[700px] border-collapse text-sm">
                     <thead>
-                      <tr className="bg-gray-50 dark:bg-gray-800/80 text-gray-500 dark:text-gray-400 border-b border-gray-300 dark:border-gray-700 text-center">
+                      <tr className="text-center text-[11px] uppercase tracking-wider text-gray-500 dark:text-gray-400">
                         {["#", "Company Name", "Email", "Phone", "Action"].map((header) => (
                           <th
                             key={header}
-                            className="px-4 py-3 border-r border-gray-300 dark:border-gray-700 last:border-r-0 sticky top-0 z-10 bg-gray-50 dark:bg-gray-800/80 shadow-[inset_-1px_-1px_0_0_#d1d5db] dark:shadow-[inset_-1px_-1px_0_0_#374151] last:shadow-[inset_0_-1px_0_0_#d1d5db] dark:last:shadow-[inset_0_-1px_0_0_#374151] text-center"
+                            className="sticky top-0 z-10 border-b border-gray-200 bg-gray-50 px-4 py-3 font-semibold dark:border-gray-800 dark:bg-gray-900"
                           >
                             {header}
                           </th>
@@ -271,24 +276,24 @@ export default function ExhibitionManageClient({ id }) {
                       {paginatedCompanies.map((c, index) => (
                         <tr
                           key={c._id || index}
-                          className={index % 2 === 0 ? "bg-white dark:bg-gray-900" : "bg-gray-50 dark:bg-gray-800"}
+                          className={"bg-white transition-colors hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-white/[0.03]"}
                         >
-                          <td className="px-4 py-3 border border-gray-300 dark:border-gray-700 text-center">
+                          <td className="border-b border-gray-100 px-4 py-3.5 text-center text-gray-700 dark:border-gray-800 dark:text-gray-300">
                             {startIndex + index + 1}
                           </td>
-                          <td className="px-4 py-3 border border-gray-300 dark:border-gray-700 text-center">
+                          <td className="border-b border-gray-100 px-4 py-3.5 text-center text-gray-700 dark:border-gray-800 dark:text-gray-300">
                             {c.company_name}
                           </td>
-                          <td className="px-4 py-3 border border-gray-300 dark:border-gray-700 text-center">
+                          <td className="border-b border-gray-100 px-4 py-3.5 text-center text-gray-700 dark:border-gray-800 dark:text-gray-300">
                             {c.company_email}
                           </td>
-                          <td className="px-4 py-3 border border-gray-300 dark:border-gray-700 text-center">
+                          <td className="border-b border-gray-100 px-4 py-3.5 text-center text-gray-700 dark:border-gray-800 dark:text-gray-300">
                             {c.company_phone_number}
                           </td>
-                          <td className="px-4 py-3 border border-gray-300 dark:border-gray-700 flex justify-center gap-4">
+                          <td className="flex justify-center gap-2 border-b border-gray-100 px-4 py-3.5 dark:border-gray-800">
                             <button
                               onClick={() => router.push(`/companies/${c._id}`)}
-                              className="border border-[#131C55] text-[#131C55] dark:text-blue-300 rounded-lg px-3 py-1 hover:bg-[#131C55]/5 dark:hover:bg-blue-400/10 transition-colors"
+                              className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-[13px] font-medium text-gray-700 transition hover:border-[#2B3FB8] hover:text-[#2B3FB8] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-blue-400 dark:hover:text-white"
                             >
                               View
                             </button>
@@ -314,25 +319,18 @@ export default function ExhibitionManageClient({ id }) {
             onClose={() => setEditingId(null)}
           />
 
-          {/* Pagination */}
-          <div className="mt-6 flex justify-center gap-4 items-center">
-            <button
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="px-4 py-2 border border-[#131C55] text-[#131C55] dark:text-blue-300 rounded-lg hover:bg-[#131C55]/5 dark:hover:bg-blue-400/10 disabled:opacity-50"
-            >
-              Previous
-            </button>
-            <span className="text-gray-700 dark:text-gray-300 font-semibold">
-              Page {currentPage} of {totalPages}
-            </span>
-            <button
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="px-4 py-2 border border-[#131C55] text-[#131C55] dark:text-blue-300 rounded-lg hover:bg-[#131C55]/5 dark:hover:bg-blue-400/10 disabled:opacity-50"
-            >
-              Next
-            </button>
+          <div className="mt-6">
+          <TablePagination
+            page={currentPage}
+            pageSize={itemsPerPage}
+            total={filteredCompanies.length}
+            onPageChange={setCurrentPage}
+            onPageSizeChange={(size) => {
+              setItemsPerPage(size);
+              setCurrentPage(1);
+            }}
+            itemLabel="companies"
+          />
           </div>
         </div>
       </div>

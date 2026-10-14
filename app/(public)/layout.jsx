@@ -1,5 +1,6 @@
 import PublicHeader from "@/components/public/PublicHeader";
 import PublicFooter from "@/components/public/PublicFooter";
+import PageBackdrop from "@/components/public/PageBackdrop";
 import { getLocationIndex } from "@/lib/locations";
 
 /**
@@ -28,7 +29,12 @@ export default async function PublicLayout({ children }) {
     <div className="flex min-h-screen flex-col bg-white dark:bg-gray-950">
       <PublicHeader />
       {/* Exactly one <main> per page, starting below the header. */}
-      <main className="flex-1">{children}</main>
+      {/* `relative isolate` scopes the backdrop's -z-10 to <main>, so it sits
+          above the page background and below every page's content. */}
+      <main className="relative isolate flex-1">
+        <PageBackdrop />
+        {children}
+      </main>
       <PublicFooter locations={locations} />
     </div>
   );

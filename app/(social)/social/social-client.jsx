@@ -1,13 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { MessageSquare } from "lucide-react";
+import Link from "next/link";
+import { MessageSquare, PenSquare } from "lucide-react";
 
 import { toast } from "sonner";
 
 import { useAuth } from "@/components/auth/AuthProvider";
 import PostCard from "@/components/social/PostCard";
-import PostComposer from "@/components/social/PostComposer";
+import InitialsAvatar from "@/components/social/InitialsAvatar";
 import PostEditSheet from "@/components/social/PostEditSheet";
 import ConfirmDialog from "@/components/social/ConfirmDialog";
 import { getFeed, deletePost } from "@/models/social.model";
@@ -17,10 +18,10 @@ import {
   canLoadMore,
   replaceItem,
   removeItem,
-  prependItem,
 } from "@/lib/social/cursor-list";
 import { isOwnPost, describePostError } from "@/lib/social/post";
 import { describeMutationError } from "@/lib/social/post-form";
+import { displayName } from "@/lib/social/profile";
 
 /** Within the backend's MAX_LIMIT of 50; 20 is also the server's own default. */
 const PAGE_SIZE = 20;
@@ -118,18 +119,6 @@ export default function SocialClient() {
     setFeed((prev) => replaceItem(prev, next._id, next));
   }, []);
 
-  /**
-   * A post the viewer just created goes to the top.
-   *
-   * prependItem rather than a refetch: the created post is authoritative and
-   * complete, so re-requesting page one to show it would be a wasted round trip
-   * that also discards everything already loaded below. The cursor is left alone
-   * — it describes the server’s remaining rows, which this does not change.
-   */
-  const handleCreated = useCallback((created) => {
-    setFeed((prev) => prependItem(prev, created));
-  }, []);
-
   const handleConfirmDelete = useCallback(async () => {
     if (!deleting || deletePending) return;
 
@@ -188,7 +177,7 @@ export default function SocialClient() {
 
   if (!feed.items.length) {
     return (
-      <Shell composer={<PostComposer onCreated={handleCreated} />}>
+      <Shell composer={<ComposePrompt user={user} />}>
         <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50 px-6 py-12 text-center dark:border-gray-700 dark:bg-gray-900/50">
           <MessageSquare size={22} aria-hidden="true" className="mx-auto text-gray-400" />
           <h2 className="mt-3 text-base font-semibold text-gray-900 dark:text-gray-50">
@@ -199,14 +188,14 @@ export default function SocialClient() {
           </p>
           {/* No "Find people", no suggested accounts, no trending: there is no
               discovery endpoint, so any of those would be an instruction nobody
-              can follow. No "Create post" either — the composer is 11E. */}
+              can follow. Writing a post is the prompt above, not a second button. */}
         </div>
       </Shell>
     );
   }
 
   return (
-    <Shell composer={<PostComposer onCreated={handleCreated} />}>
+    <Shell composer={<ComposePrompt user={user} />}>
       <div className="space-y-4">
         {feed.items.map((post) => (
           <PostCard
@@ -297,10 +286,38 @@ function Shell({ children, composer = null }) {
       <p className="mt-2 text-[15px] leading-relaxed text-gray-600 dark:text-gray-400">
         Posts from you and the people you follow.
       </p>
-      {/* Absent while the feed is loading or errored: a composer above a skeleton
-          invites a post into a page whose state is unknown. */}
+      {/* Absent while the feed is loading or errored, so the page settles once
+          rather than shifting the prompt down when the skeleton resolves. */}
       {composer ? <div className="mt-6">{composer}</div> : null}
       <div className="mt-8">{children}</div>
     </div>
+  );
+}
+
+/**
+ * The feed's entry point for writing, in place of the full composer.
+ *
+ * The composer moved to /social/my-posts so the feed reads as a feed: a 400px
+ * form above it pushed the first post below the fold on a laptop. This keeps
+ * posting one click away without that cost. It is a link styled as an input,
+ * not a real input, because typing here and being moved mid-sentence to another
+ * page would lose what was typed.
+ */
+function ComposePrompt({ user }) {
+  return (
+    <Link
+      href="/social/my-posts#compose"
+      className="group flex items-center gap-3 rounded-2xl border border-gray-200 bg-white p-3 transition hover:border-[#131C55]/40 hover:shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none sm:p-4 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-blue-400/40"
+    >
+      <InitialsAvatar name={displayName(user)} size="sm" />
+      <span className="min-w-0 flex-1 truncate rounded-xl bg-gray-50 px-4 py-2.5 text-sm text-gray-500 transition group-hover:bg-gray-100 motion-reduce:transition-none dark:bg-gray-800/70 dark:text-gray-400 dark:group-hover:bg-gray-800">
+        Share an update with the community…
+      </span>
+      <span className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-[#131C55] px-3 py-2.5 text-sm font-semibold text-white transition group-hover:bg-[#0E1B6B] motion-reduce:transition-none sm:px-4 dark:bg-blue-500 dark:text-gray-950 dark:group-hover:bg-blue-400">
+        <PenSquare size={16} aria-hidden="true" />
+        <span className="hidden sm:inline">Create post</span>
+        <span className="sr-only sm:hidden">Create post</span>
+      </span>
+    </Link>
   );
 }

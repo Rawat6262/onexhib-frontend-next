@@ -27,7 +27,7 @@ export default function ExhibitionCard({ exhibition, priority = false, className
 
   return (
     <article
-      className={`ox-card group relative flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white hover:border-[#131C55]/30 hover:shadow-lg dark:border-gray-800 dark:bg-gray-900 dark:hover:border-gray-600 ${className}`}
+      className={`ox-card ox-card-accent group relative flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white hover:border-[#2B3FB8]/30 hover:shadow-xl hover:shadow-indigo-900/10 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-blue-400/30 dark:hover:shadow-black/40 ${className}`}
     >
       {/* Alt text names the event and where it is, because that is what the
           image is of and what someone who cannot see it needs. "exhibition
@@ -47,19 +47,19 @@ export default function ExhibitionCard({ exhibition, priority = false, className
       />
 
       {isFeatured ? (
-        <span className="absolute left-3 top-3 rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#131C55] shadow-sm dark:bg-gray-950/90 dark:text-gray-100">
+        <span className="absolute left-3 top-3 rounded-full bg-gradient-to-r from-amber-300 to-amber-400 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-amber-950 shadow-sm">
           Featured
         </span>
       ) : null}
 
       <div className="flex flex-1 flex-col gap-2.5 p-4">
         {category ? (
-          <p className="line-clamp-1 text-[11px] font-semibold uppercase tracking-wide text-[#131C55] dark:text-blue-300">
+          <p className="line-clamp-1 text-[11px] font-bold uppercase tracking-[0.08em] text-[#2B3FB8] dark:text-blue-300">
             {category}
           </p>
         ) : null}
 
-        <h3 className="line-clamp-2 text-base font-semibold leading-snug text-gray-900 dark:text-gray-50">
+        <h3 className="line-clamp-2 text-base font-semibold leading-snug text-gray-900 transition group-hover:text-[#2B3FB8] motion-reduce:transition-none dark:text-gray-50 dark:group-hover:text-blue-200">
           {/* Stretched link: the heading carries the href so the accessible name
               is the exhibition name, while ::after makes the whole card clickable. */}
           <Link href={href} className="after:absolute after:inset-0 after:content-['']">

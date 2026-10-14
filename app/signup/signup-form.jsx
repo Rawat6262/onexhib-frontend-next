@@ -60,10 +60,12 @@ export default function SignupForm({ stats }) {
   // "Exhibitor" is mixed-case because the backend's enum is, and the value is
   // compared exactly.
   const designationOptions = [
-    { value: "ORGANISER", label: "ORGANISER" },
-    { value: "EXHIBITION_SERVICE", label: "EXHIBITION_SERVICE" },
-    { value: "Exhibitor", label: "EXHIBITOR" },
-    { value: "VISITOR", label: "VISITOR" },
+    // Labels describe the person; values stay the backend enum. The raw enum
+    // ("EXHIBITION_SERVICE") gave people no way to tell which one they were.
+    { value: "VISITOR", label: "Visitor — I attend exhibitions" },
+    { value: "Exhibitor", label: "Exhibitor — I take a stand at exhibitions" },
+    { value: "ORGANISER", label: "Organiser — I run exhibitions" },
+    { value: "EXHIBITION_SERVICE", label: "Service provider — I offer services to exhibitions" },
   ];
 
   const countries = useMemo(
@@ -193,7 +195,7 @@ export default function SignupForm({ stats }) {
   return (
     <AuthCard wide formProps={{ onSubmit: handleSubmit }} stats={stats}>
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl dark:text-white">
+        <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 sm:text-[2rem] dark:text-white">
           Create your account
         </h1>
         <p className="mt-2 text-[15px] text-gray-600 dark:text-gray-400">
@@ -218,7 +220,7 @@ export default function SignupForm({ stats }) {
 
         <div>
           <SelectField
-            label="Designation"
+            label="I am a…"
             options={designationOptions}
             value={form.designation}
             onChange={(val) => {

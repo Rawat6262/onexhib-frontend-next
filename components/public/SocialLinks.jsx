@@ -68,9 +68,21 @@ const SOCIAL_LINKS = [
   },
 ];
 
-export default function SocialLinks({ className = "" }) {
+/**
+ * `tone`: "default" sits on the page background (light and dark themes);
+ * "onDark" is for a surface that is navy in both themes, like the footer, and
+ * renders the icons as round glass buttons.
+ */
+const TONES = {
+  default:
+    "inline-flex text-gray-500 transition hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:text-gray-400 dark:hover:text-white",
+  onDark:
+    "grid h-10 w-10 place-items-center rounded-full bg-white/[0.06] text-white/70 ring-1 ring-white/10 transition hover:-translate-y-0.5 hover:bg-white hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white motion-reduce:transform-none motion-reduce:transition-none",
+};
+
+export default function SocialLinks({ className = "", tone = "default" }) {
   return (
-    <ul className={`flex list-none items-center gap-4 ${className}`}>
+    <ul className={`flex list-none items-center ${tone === "onDark" ? "gap-2" : "gap-4"} ${className}`}>
       {SOCIAL_LINKS.map((social) => (
         <li key={social.name}>
           <a
@@ -81,7 +93,7 @@ export default function SocialLinks({ className = "" }) {
                the link it sits in is named, and a <title> as well would make a
                screen reader announce the same thing twice. */
             aria-label={`${SITE_NAME} on ${social.name}`}
-            className="inline-flex text-gray-500 transition hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:text-gray-400 dark:hover:text-white"
+            className={TONES[tone] || TONES.default}
           >
             <svg
               viewBox="0 0 24 24"

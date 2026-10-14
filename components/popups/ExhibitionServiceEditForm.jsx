@@ -26,7 +26,7 @@ const InputField = ({ id, label, value, onChange, placeholder, type = "text", re
       onChange={onChange}
       onBlur={onBlur}
       placeholder={placeholder}
-      className={`w-full rounded-md border px-3 py-2 text-gray-900 dark:text-gray-100 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 outline-none transition shadow-sm placeholder-gray-400 dark:placeholder-gray-500 ${
+      className={`w-full rounded-md border px-3 py-2 text-gray-900 dark:text-gray-100 focus:border-[#2B3FB8] focus:ring-4 focus:ring-[#2B3FB8]/15 outline-none transition shadow-sm placeholder-gray-400 dark:placeholder-gray-500 ${
         error ? "border-red-500" : "border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800"
       }`}
     />
@@ -42,7 +42,7 @@ const Dropdown = ({ id, label, value, onChange, options, placeholder, required, 
       value={value}
       onChange={onChange}
       onBlur={onBlur}
-      className={`w-full rounded-md border px-3 py-2 text-gray-900 dark:text-gray-100 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 outline-none transition shadow-sm ${
+      className={`w-full rounded-md border px-3 py-2 text-gray-900 dark:text-gray-100 focus:border-[#2B3FB8] focus:ring-4 focus:ring-[#2B3FB8]/15 outline-none transition shadow-sm ${
         error ? "border-red-500" : "border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800"
       }`}
     >
@@ -235,16 +235,16 @@ const ServiceEditPopup = ({ serviceId, onClose }) => {
   if (!serviceId) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/60 backdrop-blur-sm">
+    <div className="ox-form fixed inset-0 flex items-center justify-center z-50 bg-black/60 backdrop-blur-sm">
       <div className="bg-white dark:bg-gray-900 w-[90%] max-w-3xl max-h-[90vh] rounded-xl shadow-2xl flex flex-col overflow-hidden">
 
         {/* Header */}
-        <div className="flex justify-between items-center px-4 sm:px-8 py-4 sm:py-5 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800 shrink-0">
+        <div className="relative flex shrink-0 items-center justify-between border-b border-gray-200 bg-gradient-to-b from-gray-50 to-white px-4 py-4 sm:px-8 sm:py-5 dark:border-gray-800 dark:from-white/[0.03] dark:to-transparent">
           <div>
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 tracking-tight">Edit Service</h2>
+            <h2 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">Edit Service</h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">Update the service provider details</p>
           </div>
-          <button onClick={onClose} className="text-gray-400 dark:text-gray-500 hover:text-red-600 text-4xl leading-none transition-colors">
+          <button onClick={onClose} className="grid h-10 w-10 place-items-center rounded-full text-3xl leading-none text-gray-400 transition hover:bg-gray-100 hover:text-gray-700 dark:text-gray-500 dark:hover:bg-gray-800 dark:hover:text-white">
             &times;
           </button>
         </div>
@@ -260,8 +260,8 @@ const ServiceEditPopup = ({ serviceId, onClose }) => {
 
               {/* Left */}
               <div className="space-y-6">
-                <div className="bg-white dark:bg-gray-900 p-5 rounded-lg border border-gray-200 dark:border-gray-800 shadow-sm space-y-4">
-                  <h3 className="text-blue-700 dark:text-blue-400 font-bold uppercase text-xs tracking-wider mb-2">Basic Information</h3>
+                <div className="space-y-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+                  <h3 className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#2B3FB8] dark:text-blue-300">Basic Information</h3>
                   <InputField
                     id="full_name"
                     label="Full Name"
@@ -319,8 +319,8 @@ const ServiceEditPopup = ({ serviceId, onClose }) => {
                 </div>
 
                 {/* Image */}
-                <div className="bg-white dark:bg-gray-900 p-5 rounded-lg border border-gray-200 dark:border-gray-800 shadow-sm space-y-4">
-                  <h3 className="text-blue-700 dark:text-blue-400 font-bold uppercase text-xs tracking-wider mb-2">Profile Image</h3>
+                <div className="space-y-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+                  <h3 className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#2B3FB8] dark:text-blue-300">Profile Image</h3>
 
                   {/* Current image */}
                   {existingImage?.url && !newImage && (
@@ -365,8 +365,8 @@ const ServiceEditPopup = ({ serviceId, onClose }) => {
 
               {/* Right */}
               <div className="space-y-6">
-                <div className="bg-white dark:bg-gray-900 p-5 rounded-lg border border-gray-200 dark:border-gray-800 shadow-sm space-y-4">
-                  <h3 className="text-blue-700 dark:text-blue-400 font-bold uppercase text-xs tracking-wider mb-2">Location</h3>
+                <div className="space-y-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+                  <h3 className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#2B3FB8] dark:text-blue-300">Location</h3>
                   <Dropdown
                     id="country"
                     label="Country"
@@ -411,7 +411,7 @@ const ServiceEditPopup = ({ serviceId, onClose }) => {
                       onBlur={() => markTouched("address")}
                       placeholder="Street, Area, Zip Code"
                       rows={3}
-                      className={`w-full rounded-md border px-3 py-2 text-gray-900 dark:text-gray-100 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 outline-none transition shadow-sm resize-none placeholder-gray-400 dark:placeholder-gray-500 ${
+                      className={`w-full rounded-md border px-3 py-2 text-gray-900 dark:text-gray-100 focus:border-[#2B3FB8] focus:ring-4 focus:ring-[#2B3FB8]/15 outline-none transition shadow-sm resize-none placeholder-gray-400 dark:placeholder-gray-500 ${
                         touched.address && errors.address ? "border-red-500" : "border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800"
                       }`}
                     />
@@ -427,14 +427,14 @@ const ServiceEditPopup = ({ serviceId, onClose }) => {
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-6 py-2.5 rounded-lg bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 font-bold hover:bg-gray-100 dark:hover:bg-gray-700 transition shadow-sm"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-6 py-2.5 text-sm font-semibold text-gray-700 transition hover:border-[#2B3FB8] hover:text-[#2B3FB8] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:border-blue-400 dark:hover:text-white"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-8 py-2.5 rounded-lg bg-blue-600 text-white font-bold hover:bg-blue-700 transition shadow-md disabled:opacity-70"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#131C55] to-[#2B3FB8] px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-900/25 transition hover:brightness-110 disabled:opacity-70 disabled:cursor-not-allowed motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500"
                 >
                   {isSubmitting ? "Updating..." : "Update Service"}
                 </button>

@@ -72,7 +72,7 @@ export default function ForgotPasswordForm({ initialEmail = "" }) {
   return (
     <AuthCard formProps={{ onSubmit: handleSubmit }}>
       <div className="text-center space-y-2">
-        <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Reset Password</h1>
+        <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 sm:text-[2rem] dark:text-white">Reset Password</h1>
         <p className="text-sm text-gray-500 dark:text-gray-400">
           Enter your email and a new password — we&apos;ll send an OTP to confirm it&apos;s you.
         </p>

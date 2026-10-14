@@ -63,7 +63,7 @@ export default async function CategoriesHubPage() {
       <Breadcrumbs trail={trail} />
 
       <header className="max-w-3xl">
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl dark:text-white">
+        <h1 className="text-3xl font-extrabold leading-[1.1] tracking-tight text-gray-900 sm:text-[2.6rem] dark:text-white">
           Exhibitions by industry
         </h1>
         {categories.length ? (

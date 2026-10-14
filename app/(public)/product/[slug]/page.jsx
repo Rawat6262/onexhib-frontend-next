@@ -13,6 +13,7 @@ import { idFromSlug, isCanonicalSlug } from "@/lib/slug";
 import { formatPrice, truncate } from "@/lib/format";
 import { getCompanyById, getExhibitionById, getProductById, getProductsForCompany } from "@/lib/public-api";
 import ProductCard from "@/components/public/ProductCard";
+import EnquiryForm from "@/components/public/EnquiryForm";
 
 /**
  * Public product detail: /product/[slug]
@@ -125,7 +126,7 @@ export default async function ProductDetailPage({ params }) {
             </p>
           ) : null}
 
-          <h1 className="mt-3 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl dark:text-white">
+          <h1 className="mt-3 text-3xl font-extrabold leading-[1.1] tracking-tight text-gray-900 sm:text-[2.6rem] dark:text-white">
             {product.name}
           </h1>
 
@@ -177,6 +178,17 @@ export default async function ProductDetailPage({ params }) {
           ) : null}
         </div>
       </div>
+
+      {/* A product enquiry goes to the company that lists it. */}
+      {company?.contactable ? (
+        <EnquiryForm
+          className="mt-14"
+          targetType="product"
+          targetId={product.id}
+          recipientLabel={company.name}
+          listingName={product.name}
+        />
+      ) : null}
 
       {alsoFrom.length && company ? (
         <section aria-labelledby="also-heading" className="mt-14">

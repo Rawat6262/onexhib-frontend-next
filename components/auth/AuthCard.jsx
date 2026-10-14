@@ -39,11 +39,22 @@ export default function AuthCard({ children, wide = false, formProps, stats }) {
       <BrandPanel stats={stats} wide={wide} />
 
       {/* ── Form column ────────────────────────────────────────────────── */}
-      <div className="relative flex flex-col">
+      <div className="relative isolate flex flex-col overflow-hidden">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
+          <div className="absolute -top-32 -right-24 h-96 w-96 rounded-full bg-[radial-gradient(circle,rgba(43,63,184,0.12),transparent_65%)] dark:bg-[radial-gradient(circle,rgba(76,99,210,0.22),transparent_65%)]" />
+          <div
+            className="absolute inset-0 text-[#131C55] opacity-[0.04] [mask-image:radial-gradient(ellipse_at_top_right,black,transparent_70%)] dark:text-white dark:opacity-[0.05]"
+            style={{
+              backgroundImage:
+                "linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)",
+              backgroundSize: "40px 40px",
+            }}
+          />
+        </div>
         {/* Mobile brand bar. The panel is hidden below lg, and an auth screen
             with no logo at all reads as an untrusted page asking for a
             password. */}
-        <div className="flex items-center justify-between bg-[#131C55] px-4 py-3 lg:hidden">
+        <div className="flex items-center justify-between bg-gradient-to-r from-[#0B1240] to-[#1B2A7A] px-4 py-3 lg:hidden">
           <Link href="/" aria-label="OneXhib home">
             <Image
               src="/Untitled-2-01 1.png"
@@ -102,7 +113,7 @@ export default function AuthCard({ children, wide = false, formProps, stats }) {
  */
 function BrandPanel({ stats, wide }) {
   return (
-    <aside className="relative hidden overflow-hidden bg-gradient-to-br from-[#131C55] to-[#0E1B6B] lg:flex lg:flex-col">
+    <aside className="relative hidden overflow-hidden bg-gradient-to-br from-[#0B1240] via-[#131C55] to-[#2B1F7A] lg:flex lg:flex-col">
       <Image
         src="/bg2.jpg"
         alt=""
@@ -125,6 +136,10 @@ function BrandPanel({ stats, wide }) {
         aria-hidden="true"
         className="pointer-events-none absolute -bottom-24 -left-24 h-[26rem] w-[26rem] rounded-full bg-[radial-gradient(circle,rgba(76,99,210,0.35),transparent_65%)]"
       />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -top-32 -right-20 h-[22rem] w-[22rem] rounded-full bg-[radial-gradient(circle,rgba(139,92,246,0.30),transparent_65%)]"
+      />
 
       <div className={`relative flex flex-1 flex-col justify-between p-10 ${wide ? "xl:p-12" : "xl:p-14"}`}>
         <Link href="/" aria-label="OneXhib home" className="w-fit">
@@ -139,8 +154,11 @@ function BrandPanel({ stats, wide }) {
         </Link>
 
         <div className="max-w-md py-10">
-          <h2 className="text-3xl font-bold leading-tight tracking-tight text-white xl:text-4xl">
-            List your exhibition. Reach the people looking for it.
+          <h2 className="text-3xl leading-[1.1] font-extrabold tracking-tight text-white xl:text-[2.6rem]">
+            List your exhibition.{" "}
+            <span className="bg-gradient-to-r from-blue-300 via-indigo-300 to-violet-300 bg-clip-text text-transparent">
+              Reach the people looking for it.
+            </span>
           </h2>
           <p className="mt-4 text-[15px] leading-relaxed text-blue-100/80">
             OneXhib brings exhibitions and trade shows from around the world into one place, along
@@ -156,7 +174,7 @@ function BrandPanel({ stats, wide }) {
               { icon: Search, text: "Be found by visitors browsing by city, country and industry" },
             ].map(({ icon: Icon, text }) => (
               <li key={text} className="flex items-start gap-3">
-                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/10 text-blue-100 ring-1 ring-white/15">
+                <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-white/20 to-white/5 text-white ring-1 ring-white/20 backdrop-blur">
                   <Icon size={16} aria-hidden="true" />
                 </span>
                 <span className="text-[15px] leading-relaxed text-blue-50/90">{text}</span>
@@ -166,12 +184,12 @@ function BrandPanel({ stats, wide }) {
         </div>
 
         {stats?.length ? (
-          <dl className="flex flex-wrap gap-x-10 gap-y-4 border-t border-white/15 pt-6">
+          <dl className="grid grid-cols-3 divide-x divide-white/10 overflow-hidden rounded-2xl bg-white/[0.06] ring-1 ring-white/10 backdrop-blur">
             {stats.map(({ label, value }) => (
-              <div key={label}>
+              <div key={label} className="px-4 py-4">
                 <dt className="sr-only">{label}</dt>
                 <dd>
-                  <span className="block text-2xl font-bold tracking-tight text-white">{value}</span>
+                  <span className="block text-2xl font-extrabold tracking-tight text-white tabular-nums">{value}</span>
                   <span className="text-[13px] text-blue-200/70">{label}</span>
                 </dd>
               </div>
@@ -194,13 +212,13 @@ export const authLabel =
   "mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300";
 
 export const authInput =
-  "w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition focus:border-[#131C55] focus:outline-none focus:ring-2 focus:ring-[#131C55]/20 motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-blue-400 dark:focus:ring-blue-400/20";
+  "w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition focus:border-[#2B3FB8] focus:outline-none focus:ring-4 focus:ring-[#2B3FB8]/15 motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-blue-400 dark:focus:ring-blue-400/20";
 
 export const authPrimaryBtn =
-  "inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#131C55] px-5 py-3 text-[15px] font-semibold text-white shadow-sm transition hover:bg-[#0E1B6B] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] disabled:opacity-60 motion-reduce:transition-none";
+  "inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#131C55] to-[#2B3FB8] px-5 py-3 text-[15px] font-semibold text-white shadow-lg shadow-indigo-900/25 transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] disabled:opacity-60 disabled:hover:brightness-100 motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500";
 
 export const authSecondaryBtn =
   "inline-flex w-full items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-5 py-3 text-[15px] font-semibold text-gray-900 transition hover:border-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:hover:border-gray-500";
 
 export const authLink =
-  "font-semibold text-[#131C55] underline-offset-4 hover:underline dark:text-blue-300";
+  "font-semibold text-[#2B3FB8] underline-offset-4 hover:underline dark:text-blue-300";

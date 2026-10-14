@@ -18,6 +18,7 @@ import { idFromSlug, isCanonicalSlug } from "@/lib/slug";
 import { formatDateRange, formatLocation, toIsoDate } from "@/lib/format";
 import { getCompaniesForExhibition, getExhibitionById } from "@/lib/public-api";
 import ExhibitionCard from "@/components/public/ExhibitionCard";
+import EnquiryForm from "@/components/public/EnquiryForm";
 
 /**
  * Public exhibition detail: /exhibition/[slug]
@@ -341,6 +342,18 @@ export default async function ExhibitionDetailPage({ params }) {
             </section>
           ))}
         </div>
+      ) : null}
+
+      {/* Visitor -> organiser. Shown only when the backend can deliver to this
+          listing; the organiser's address never reaches the page. */}
+      {exhibition.contactable ? (
+        <EnquiryForm
+          className="mt-14"
+          targetType="exhibition"
+          targetId={exhibition.id}
+          recipientLabel="the organiser"
+          listingName={exhibition.name}
+        />
       ) : null}
 
       {nearby.length ? (

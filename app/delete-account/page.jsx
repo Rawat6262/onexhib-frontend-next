@@ -3,6 +3,7 @@ import LegalPageLayout, { Section } from "@/components/legal/LegalPageLayout";
 import JsonLd from "@/components/seo/JsonLd";
 import { breadcrumbNode, graph } from "@/lib/jsonld";
 import { pageMetadata } from "@/lib/seo";
+import { CONTACT_EMAIL } from "@/lib/business";
 
 export const metadata = pageMetadata({
   title: "Delete Your Account",
@@ -107,8 +108,8 @@ export default function DeleteAccountPage() {
         <p>If you are unable to delete your account or need assistance, please contact us:</p>
         <p>
           <span className="font-semibold text-gray-900 dark:text-gray-100">Email:</span>{" "}
-          <a href="mailto:onexhib@gmail.com" className="text-blue-600 dark:text-blue-400 hover:underline">
-            onexhib@gmail.com
+          <a href={`mailto:${CONTACT_EMAIL}`} className="text-blue-600 dark:text-blue-400 hover:underline">
+            {CONTACT_EMAIL}
           </a>
           <br />
           <span className="font-semibold text-gray-900 dark:text-gray-100">Company:</span> Sem Group

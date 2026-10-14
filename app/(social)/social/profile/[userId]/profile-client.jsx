@@ -9,6 +9,7 @@ import ProfileHeader from "@/components/social/ProfileHeader";
 import RelationshipMenu from "@/components/social/RelationshipMenu";
 import ProfileEditSheet from "@/components/social/ProfileEditSheet";
 import UserList from "@/components/social/UserList";
+import ProfilePosts from "@/components/social/ProfilePosts";
 import { getSocialProfile, getFollowers, getFollowing, reportUser } from "@/models/social.model";
 import { isSelfProfile, applyFollowerDelta, describeRequestError, displayName } from "@/lib/social/profile";
 
@@ -49,6 +50,9 @@ import { isSelfProfile, applyFollowerDelta, describeRequestError, displayName } 
  * one instance.
  */
 const TABS = Object.freeze([
+  // Posts first, like a professional network's "Activity": it is what a visitor
+  // came to see. The endpoint applies visibility, so this is safe for anyone.
+  { key: "posts", label: "Posts" },
   { key: "followers", label: "Followers" },
   { key: "following", label: "Following" },
 ]);
@@ -61,8 +65,7 @@ export default function ProfileClient({ userId }) {
   const [profile, setProfile] = useState(null);
   const [phase, setPhase] = useState("loading");
   const [errorMessage, setErrorMessage] = useState(null);
-  // Followers is the default now that Overview is gone — it is real content, and it
-  // is the tab a profile visit most often wants.
+  // The first tab (Posts) is the default - see TABS.
   const [tab, setTab] = useState(DEFAULT_TAB);
   const [editing, setEditing] = useState(false);
   const [notice, setNotice] = useState(null);
@@ -186,12 +189,13 @@ export default function ProfileClient({ userId }) {
   const self = isSelfProfile(cachedUser?._id, profile.user?._id);
 
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-8 sm:px-6 sm:py-12">
+    <div className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-12">
       <ProfileHeader
         profile={profile}
         isSelf={self}
         onFollowChange={handleFollowChange}
         onEdit={() => setEditing(true)}
+        onProfileChange={setProfile}
         actions={
           <RelationshipMenu
             viewerId={cachedUser?._id}
@@ -228,7 +232,7 @@ export default function ProfileClient({ userId }) {
             onClick={() => setTab(t.key)}
             className={`-mb-px border-b-2 px-3 py-2.5 text-sm font-medium transition motion-reduce:transition-none ${
               tab === t.key
-                ? "border-[#131C55] text-[#131C55] dark:border-blue-300 dark:text-blue-300"
+                ? "border-[#2B3FB8] font-semibold text-[#2B3FB8] dark:border-blue-300 dark:text-blue-300"
                 : "border-transparent text-gray-600 hover:border-gray-300 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
             }`}
           >
@@ -243,6 +247,15 @@ export default function ProfileClient({ userId }) {
         aria-labelledby={`social-tab-${tab}`}
         className="mt-5"
       >
+        {tab === "posts" ? (
+          <ProfilePosts
+            key={`posts-${userId}`}
+            userId={userId}
+            viewerId={cachedUser?._id}
+            isSelf={self}
+          />
+        ) : null}
+
         {tab === "followers" ? (
           <UserList
             key={`followers-${userId}`}

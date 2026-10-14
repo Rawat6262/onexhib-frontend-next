@@ -470,8 +470,9 @@ check("no Overview tab remains", !/"overview"|Overview/.test(clientSrc));
 check("the false posting copy is gone", !/posting is available/.test(clientSrc));
 check("nothing else claims a feature is unavailable",
   !/will appear here once|coming soon|not yet available/i.test(clientSrc));
-check("exactly two tabs remain",
-  /const TABS = Object\.freeze\(\[\s*\{ key: "followers", label: "Followers" \},\s*\{ key: "following", label: "Following" \},\s*\]\)/.test(clientSrc));
+// The Posts tab shipped once GET /posts/user/:id existed: Posts, Followers, Following.
+check("exactly three tabs, Posts first",
+  /const TABS = Object\.freeze\(\[\s*\{ key: "posts", label: "Posts" \},\s*\{ key: "followers", label: "Followers" \},\s*\{ key: "following", label: "Following" \},\s*\]\)/.test(clientSrc));
 // The default is DERIVED from the tab set, not written twice. A literal default is
 // how the removal left a setTab("overview") pointing at a tab that no longer existed.
 check("the default tab is derived from the tab set", /const DEFAULT_TAB = TABS\[0\]\.key;/.test(clientSrc));
@@ -481,8 +482,8 @@ check("no tab key is written as a literal anywhere else",
   (clientSrc.match(/setTab\("/g) || []).length === 0);
 check("the tab set is the single source — no second TABS array",
   (clientSrc.match(/const TABS =/g) || []).length === 1);
-check("no Posts tab was added in its place — that is still deferred scope",
-  !/key: "posts"|getUserPosts\(/.test(clientSrc));
+check("the Posts tab delegates to ProfilePosts rather than fetching inline",
+  /<ProfilePosts/.test(clientSrc) && !/getUserPosts\(/.test(clientSrc));
 check("the tablist is still keyboard reachable", /role="tablist"/.test(clientSrc) && /role="tab"/.test(clientSrc));
 check("each tab still controls a labelled panel",
   /aria-controls=/.test(clientSrc) && /aria-labelledby=/.test(clientSrc));
@@ -508,7 +509,15 @@ check("the profile edit form has aria-busy",
     stripComments(await read("../components/social/ProfileEditSheet.jsx"))));
 check("no markdown or HTML parser", !/marked|markdown|html-react-parser|DOMPurify/i.test(allNew));
 check("no tag notification types", !/POST_TAG|COMMENT_TAG/.test(allNew));
-check("no avatar or cover upload", !/upload/i.test(allNew));
+// Photo and cover upload shipped: the old "no upload" guard is replaced by checks on HOW.
+check("the header uploads through the four model calls only",
+  /uploadProfileAvatar/.test(headerLive) && /uploadProfileCover/.test(headerLive) &&
+  /removeProfileAvatar/.test(headerLive) && /removeProfileCover/.test(headerLive) && !/axios/.test(headerLive));
+check("the file goes up as FormData under \"image\"", /new FormData\(\)/.test(headerLive) && /append\("image", file\)/.test(headerLive));
+check("no Content-Type is set by hand (the browser adds the boundary)", !/Content-Type|multipart\/form-data/i.test(headerLive));
+check("type and size are checked before uploading", /MAX_BYTES/.test(headerLive) && /image\/jpeg,image\/png,image\/webp/.test(headerLive));
+check("upload controls exist only for the owner", /isSelf \? \(\s*<AvatarMenu/.test(headerLive));
+check("the server's profile replaces the local one", /onProfileChange\?\.\(response\.data\.profile\)/.test(headerLive));
 check("no user search", !/\/api\/search|userSearch|searchUsers/.test(allNew));
 check("no feed or post implementation", !/getFeed\(|PostCard|createPost\(/.test(allNew));
 check("no notification polling", !/getUnreadCount|setInterval/.test(allNew));

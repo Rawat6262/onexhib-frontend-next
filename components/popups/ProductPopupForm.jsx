@@ -97,7 +97,7 @@
 //   const labelClass = "block text-sm font-semibold text-gray-700 mb-1.5";
 
 //   return (
-//     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+//     <div className="ox-form fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
 //       {/* Main Container - 80% Width & Height */}
 //       <div className="bg-white w-[90%] h-[90%] md:w-[80%] md:h-[80%] rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-fadeIn">
         
@@ -190,7 +190,7 @@
 //                       onChange={handleImageChange}
 //                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
 //                     />
-//                     <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-4 flex flex-col items-center justify-center text-center bg-gray-50 dark:bg-gray-800 group-hover:border-green-400 group-hover:bg-green-50 dark:group-hover:bg-green-950 transition-all min-h-[160px]">
+//                     <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-4 flex flex-col items-center justify-center text-center bg-gray-50 dark:bg-gray-800 group-hover:border-[#2B3FB8] group-hover:bg-[#2B3FB8]/5 dark:group-hover:border-blue-400 dark:group-hover:bg-blue-400/10 transition-all min-h-[160px]">
 //                       {imagePreview ? (
 //                         <img
 //                           src={imagePreview}
@@ -217,7 +217,7 @@
 //                       onChange={handleVideoChange}
 //                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
 //                     />
-//                     <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-4 flex flex-col items-center justify-center text-center bg-gray-50 dark:bg-gray-800 group-hover:border-green-400 group-hover:bg-green-50 dark:group-hover:bg-green-950 transition-all min-h-[160px]">
+//                     <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-4 flex flex-col items-center justify-center text-center bg-gray-50 dark:bg-gray-800 group-hover:border-[#2B3FB8] group-hover:bg-[#2B3FB8]/5 dark:group-hover:border-blue-400 dark:group-hover:bg-blue-400/10 transition-all min-h-[160px]">
 //                       {videoPreview ? (
 //                         <video
 //                           src={videoPreview}
@@ -251,7 +251,7 @@
 //             <button
 //               type="submit"
 //               disabled={isSubmitting}
-//               className="px-8 py-2.5 rounded-lg font-medium text-white bg-green-600 hover:bg-green-700 shadow-md hover:shadow-lg transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2"
+//               className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#131C55] to-[#2B3FB8] px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-900/25 transition hover:brightness-110 disabled:opacity-70 disabled:cursor-not-allowed motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500"
 //             >
 //               {isSubmitting && (
 //                 <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -368,14 +368,14 @@ const ProductPopupForm = ({ Close, data, exid, refreshProducts }) => {
   const labelClass = "block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+    <div className="ox-form fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
       {/* Main Container - 80% Width & Height */}
       <div className="bg-white dark:bg-gray-900 w-[90%] h-[90%] md:w-[80%] md:h-[80%] rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-fadeIn">
 
         {/* Header */}
         <div className="flex items-center justify-between px-8 py-5 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shrink-0">
           <div>
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Add New Product</h2>
+            <h2 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">Add New Product</h2>
             <p className="text-sm text-gray-500 dark:text-gray-400">Enter product details and upload media</p>
           </div>
           <button
@@ -474,7 +474,7 @@ const ProductPopupForm = ({ Close, data, exid, refreshProducts }) => {
                       onChange={handleImageChange}
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                     />
-                    <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-4 flex flex-col items-center justify-center text-center bg-gray-50 dark:bg-gray-800 group-hover:border-green-400 group-hover:bg-green-50 dark:group-hover:bg-green-950 transition-all min-h-[160px]">
+                    <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-4 flex flex-col items-center justify-center text-center bg-gray-50 dark:bg-gray-800 group-hover:border-[#2B3FB8] group-hover:bg-[#2B3FB8]/5 dark:group-hover:border-blue-400 dark:group-hover:bg-blue-400/10 transition-all min-h-[160px]">
                       {imagePreview ? (
                         <img
                           src={imagePreview}
@@ -501,7 +501,7 @@ const ProductPopupForm = ({ Close, data, exid, refreshProducts }) => {
                       onChange={handleVideoChange}
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                     />
-                    <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-4 flex flex-col items-center justify-center text-center bg-gray-50 dark:bg-gray-800 group-hover:border-green-400 group-hover:bg-green-50 dark:group-hover:bg-green-950 transition-all min-h-[160px]">
+                    <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-4 flex flex-col items-center justify-center text-center bg-gray-50 dark:bg-gray-800 group-hover:border-[#2B3FB8] group-hover:bg-[#2B3FB8]/5 dark:group-hover:border-blue-400 dark:group-hover:bg-blue-400/10 transition-all min-h-[160px]">
                       {videoPreview ? (
                         <video
                           src={videoPreview}
@@ -535,7 +535,7 @@ const ProductPopupForm = ({ Close, data, exid, refreshProducts }) => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-8 py-2.5 rounded-lg font-medium text-white bg-green-600 hover:bg-green-700 shadow-md hover:shadow-lg transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#131C55] to-[#2B3FB8] px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-900/25 transition hover:brightness-110 disabled:opacity-70 disabled:cursor-not-allowed motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500"
             >
               {isSubmitting && (
                 <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

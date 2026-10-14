@@ -4,7 +4,9 @@ import {
   Building2,
   CalendarDays,
   Compass,
+  Globe2,
   Handshake,
+  Sparkles,
   MapPin,
   Package,
   Search as SearchIcon,
@@ -101,6 +103,9 @@ export default async function HomePage() {
     getNews(),
   ]);
 
+  const cityCards = topCities(locations, 8);
+  const cityMax = Math.max(1, ...cityCards.map((c) => c.count));
+
   return (
     <>
       <HomeJsonLd upcomingCount={upcoming.total} />
@@ -120,6 +125,7 @@ export default async function HomePage() {
       {featured.items.length ? (
         <Section
           id="featured"
+          eyebrow="Spotlight"
           title="Featured exhibitions"
           intro="A curated selection of the trade shows worth planning around."
           cta="All upcoming exhibitions"
@@ -136,6 +142,7 @@ export default async function HomePage() {
       {thisWeek.length ? (
         <Section
           id="this-week"
+          eyebrow="This week"
           title="Exhibitions this week"
           intro="Opening between now and Sunday, worldwide."
           cta="See the full week"
@@ -155,6 +162,7 @@ export default async function HomePage() {
       {/* ── Ongoing ─────────────────────────────────────────────────────── */}
       <Section
         id="ongoing"
+        eyebrow="Live now"
         title="Exhibitions happening now"
         intro="Trade shows and business exhibitions open to visitors today."
         cta="All ongoing exhibitions"
@@ -177,6 +185,7 @@ export default async function HomePage() {
       {/* ── Upcoming ────────────────────────────────────────────────────── */}
       <Section
         id="upcoming"
+        eyebrow="Coming up"
         title="Upcoming exhibitions"
         intro="Plan ahead with exhibition dates, venues and categories from across the world."
         cta="All upcoming exhibitions"
@@ -204,6 +213,7 @@ export default async function HomePage() {
       {locations.countries.length ? (
         <Section
           id="locations"
+          eyebrow="Explore by place"
           title="Find exhibitions by city and country"
           intro="Trade shows cluster around a handful of exhibition centres. Jump straight to the business events happening where you are, or where you are heading."
           cta="All exhibition locations"
@@ -213,24 +223,53 @@ export default async function HomePage() {
           <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
             Top cities
           </h3>
-          <ul className="mt-3 flex list-none flex-wrap gap-2.5">
-            {topCities(locations, 12).map((c) => (
+          {/* Cards rather than chips: the city is the decision here, so it gets
+              the type size, and the count sits on a bar scaled to the busiest
+              city so relative size reads without comparing numbers. */}
+          <ul className="mt-4 grid list-none grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            {cityCards.map((c, i) => (
               <li key={`${c.countrySlug}/${c.slug}`}>
                 <Link
                   href={cityLandingPath(c.countrySlug, c.slug)}
-                  className="ox-card group flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-800 hover:border-[#131C55]/40 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 dark:text-gray-200 dark:hover:border-gray-600"
+                  className="ox-card group relative flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white p-4 hover:border-[#131C55]/30 hover:shadow-lg sm:p-5 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-blue-400/30"
                 >
-                  <MapPin size={15} className="text-gray-400" aria-hidden="true" />
-                  <span>Exhibitions in {c.city}</span>
-                  <span className="rounded-md bg-gray-100 px-1.5 py-0.5 text-xs font-semibold text-gray-600 dark:bg-gray-800 dark:text-gray-400">
-                    {c.count}
+                  <span
+                    aria-hidden="true"
+                    className={`pointer-events-none absolute -top-10 -right-10 h-28 w-28 rounded-full opacity-60 blur-2xl transition group-hover:opacity-100 motion-reduce:transition-none ${CITY_GLOWS[i % CITY_GLOWS.length]}`}
+                  />
+                  <span aria-hidden="true" className="relative flex items-center justify-between gap-2">
+                    <span className="grid h-9 w-9 place-items-center rounded-xl bg-[#131C55]/[0.06] text-[#2B3FB8] dark:bg-blue-400/10 dark:text-blue-300">
+                      <MapPin size={17} />
+                    </span>
+                    <ArrowRight
+                      size={16}
+                      className="text-gray-300 transition group-hover:translate-x-0.5 group-hover:text-[#2B3FB8] motion-reduce:transition-none dark:text-gray-600 dark:group-hover:text-blue-300"
+                    />
+                  </span>
+                  {/* "Exhibitions in" stays in the anchor text (visually
+                      hidden) - it is the phrase the landing page ranks for. */}
+                  <span className="relative mt-4 line-clamp-1 text-lg font-bold tracking-tight text-gray-900 dark:text-white">
+                    <span className="sr-only">Exhibitions in </span>
+                    {c.city}
+                  </span>
+                  <span className="relative line-clamp-1 text-[13px] text-gray-500 dark:text-gray-400">{c.country}</span>
+                  <span className="relative mt-4 flex items-center gap-2.5">
+                    <span aria-hidden="true" className="h-1.5 flex-1 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
+                      <span
+                        className="block h-full rounded-full bg-gradient-to-r from-[#2B3FB8] to-[#8B5CF6]"
+                        style={{ width: `${Math.max(8, Math.round((c.count / cityMax) * 100))}%` }}
+                      />
+                    </span>
+                    <span className="shrink-0 text-xs font-semibold text-gray-700 tabular-nums dark:text-gray-300">
+                      {c.count} {c.count === 1 ? "show" : "shows"}
+                    </span>
                   </span>
                 </Link>
               </li>
             ))}
           </ul>
 
-          <h3 className="mt-8 text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+          <h3 className="mt-10 text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
             Top countries
           </h3>
           <ul className="mt-3 flex list-none flex-wrap gap-2">
@@ -238,10 +277,13 @@ export default async function HomePage() {
               <li key={c.slug}>
                 <Link
                   href={countryLandingPath(c.slug)}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3.5 py-1.5 text-[13px] font-medium text-gray-600 transition hover:border-[#131C55]/40 hover:text-[#131C55] motion-reduce:transition-none dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:border-gray-600 dark:hover:text-white"
+                  className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white py-1.5 pr-1.5 pl-3.5 text-[13px] font-medium text-gray-700 transition hover:border-[#131C55]/40 hover:text-[#131C55] hover:shadow-sm motion-reduce:transition-none dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-blue-400/40 dark:hover:text-white"
                 >
+                  <Globe2 size={14} aria-hidden="true" className="text-gray-400" />
                   Exhibitions in {c.country}
-                  <span className="text-gray-400 dark:text-gray-600">{c.count}</span>
+                  <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-semibold text-gray-600 tabular-nums dark:bg-gray-800 dark:text-gray-400">
+                    {c.count}
+                  </span>
                 </Link>
               </li>
             ))}
@@ -255,23 +297,43 @@ export default async function HomePage() {
       {industries.categories.length ? (
         <Section
           id="industries"
+          eyebrow="Explore by sector"
           title="Find exhibitions by industry"
           intro="Most trade shows are organised around a sector. Jump to the events in yours."
           cta="All industries"
           ctaHref={PUBLIC_ROUTES.categories}
           className="mt-16 sm:mt-20"
         >
-          <ul className="flex list-none flex-wrap gap-2.5">
-            {industries.categories.slice(0, 12).map((c) => (
+          {/* Tiles with a coloured monogram: twelve sectors read as a grid of
+              distinct destinations, where a wrapped row of grey chips read as
+              one long sentence. The anchor text is unchanged for crawlers. */}
+          <ul className="grid list-none grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {industries.categories.slice(0, 12).map((c, i) => (
               <li key={c.slug}>
                 <Link
                   href={categoryLandingPath(c.slug)}
-                  className="ox-card flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-800 hover:border-[#131C55]/40 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 dark:text-gray-200 dark:hover:border-gray-600"
+                  className="ox-card group flex h-full items-center gap-3.5 rounded-2xl border border-gray-200 bg-white p-3.5 hover:border-[#131C55]/30 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 dark:hover:border-blue-400/30"
                 >
-                  <span>{c.label} exhibitions</span>
-                  <span className="rounded-md bg-gray-100 px-1.5 py-0.5 text-xs font-semibold text-gray-600 dark:bg-gray-800 dark:text-gray-400">
-                    {c.count}
+                  <span
+                    aria-hidden="true"
+                    className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl text-base font-extrabold ${INDUSTRY_TONES[i % INDUSTRY_TONES.length]}`}
+                  >
+                    {c.label.charAt(0).toUpperCase()}
                   </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-[15px] font-semibold text-gray-900 dark:text-gray-100">
+                      {c.label}
+                      <span className="sr-only"> exhibitions</span>
+                    </span>
+                    <span className="text-[13px] text-gray-500 tabular-nums dark:text-gray-400">
+                      {c.count} upcoming
+                    </span>
+                  </span>
+                  <ArrowRight
+                    size={16}
+                    aria-hidden="true"
+                    className="shrink-0 text-gray-300 transition group-hover:translate-x-0.5 group-hover:text-[#2B3FB8] motion-reduce:transition-none dark:text-gray-600 dark:group-hover:text-blue-300"
+                  />
                 </Link>
               </li>
             ))}
@@ -282,6 +344,7 @@ export default async function HomePage() {
       {/* ── Companies ───────────────────────────────────────────────────── */}
       <Section
         id="companies"
+        eyebrow="Exhibitors"
         title="Discover businesses exhibiting"
         intro="Companies taking part in listed exhibitions, with what they do and where they are based."
         cta="Explore companies"
@@ -304,6 +367,7 @@ export default async function HomePage() {
       {/* ── Products ────────────────────────────────────────────────────── */}
       <Section
         id="products"
+        eyebrow="Showcase"
         title="Discover products"
         intro="What exhibiting companies are showcasing, from machinery to consumer goods."
         cta="Explore products"
@@ -335,6 +399,7 @@ export default async function HomePage() {
       {news.items.length ? (
         <Section
           id="news"
+          eyebrow="Newsroom"
           title="Industry news"
           intro="Announcements from across the exhibition world."
           cta="All news"
@@ -367,6 +432,7 @@ export default async function HomePage() {
       {/* ── FAQ ─────────────────────────────────────────────────────────── */}
       <Section
         id="faq"
+        eyebrow="FAQ"
         title="Questions about OneXhib"
         intro="What the platform covers and how to use it."
         className="mt-16 sm:mt-24"
@@ -388,6 +454,26 @@ export default async function HomePage() {
  * they can be ranked globally — otherwise "top cities" would silently mean
  * "cities of the largest country".
  */
+/** Corner glows for the city cards, cycled. Static class strings so Tailwind sees them. */
+const CITY_GLOWS = [
+  "bg-blue-400/25",
+  "bg-violet-400/25",
+  "bg-emerald-400/20",
+  "bg-amber-400/25",
+  "bg-rose-400/20",
+  "bg-cyan-400/25",
+];
+
+/** Monogram tones for the industry tiles, cycled. Each pairs a tint with a readable ink. */
+const INDUSTRY_TONES = [
+  "bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-300",
+  "bg-violet-100 text-violet-700 dark:bg-violet-500/15 dark:text-violet-300",
+  "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300",
+  "bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300",
+  "bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300",
+  "bg-cyan-100 text-cyan-800 dark:bg-cyan-500/15 dark:text-cyan-300",
+];
+
 function topCities(locations, max) {
   return locations.countries
     .flatMap((c) => c.cities)
@@ -402,7 +488,7 @@ function topCities(locations, max) {
  */
 function Hero({ counts, upcoming }) {
   return (
-    <section className="relative overflow-hidden border-b border-gray-200 dark:border-gray-800">
+    <section className="relative overflow-hidden border-b border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950">
       {/* Lightweight brand wash. A CSS gradient rather than an image: public/bg.png
           is 2 MB and would dominate LCP for no design benefit. */}
       <div
@@ -410,11 +496,26 @@ function Hero({ counts, upcoming }) {
         className="pointer-events-none absolute inset-0 bg-gradient-to-br from-[#131C55]/[0.07] via-transparent to-[#0E1B6B]/[0.05] dark:from-[#131C55]/25 dark:to-transparent"
       />
 
-      {/* Soft radial accent behind the showcase panel, so the right side of the
-          band is not flat colour even on the widest viewports. */}
+      {/* Soft radial accents behind the showcase panel and under the headline,
+          so neither side of the band is flat colour on the widest viewports. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -right-24 -top-24 h-[28rem] w-[28rem] rounded-full bg-[radial-gradient(circle,rgba(19,28,85,0.10),transparent_65%)] dark:bg-[radial-gradient(circle,rgba(76,99,210,0.18),transparent_65%)]"
+        className="pointer-events-none absolute -right-24 -top-24 h-[30rem] w-[30rem] rounded-full bg-[radial-gradient(circle,rgba(43,63,184,0.16),transparent_65%)] dark:bg-[radial-gradient(circle,rgba(76,99,210,0.30),transparent_65%)]"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -bottom-40 -left-32 h-[26rem] w-[26rem] rounded-full bg-[radial-gradient(circle,rgba(124,58,237,0.10),transparent_65%)] dark:bg-[radial-gradient(circle,rgba(139,92,246,0.18),transparent_65%)]"
+      />
+      {/* Fine grid, faded out towards the edges with a radial mask so it reads
+          as texture behind the copy rather than as graph paper. Inline SVG. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 text-[#131C55] opacity-[0.06] [mask-image:radial-gradient(ellipse_at_30%_40%,black,transparent_70%)] dark:text-white dark:opacity-[0.07]"
+        style={{
+          backgroundImage:
+            "linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)",
+          backgroundSize: "44px 44px",
+        }}
       />
 
       {/* Two columns from lg up: the copy no longer runs out halfway across the
@@ -422,13 +523,27 @@ function Hero({ counts, upcoming }) {
           showcase removes itself — see HeroShowcase. */}
       <div className="relative mx-auto grid w-full max-w-6xl items-center gap-12 px-4 pb-14 pt-14 sm:px-6 sm:pb-20 sm:pt-20 lg:grid-cols-[1.05fr_0.95fr] lg:gap-10">
         <div className="min-w-0">
-          <p className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white/70 px-3 py-1 text-xs font-medium text-gray-600 backdrop-blur dark:border-gray-700 dark:bg-gray-900/70 dark:text-gray-300">
-            <Compass size={13} aria-hidden="true" />
-            Exhibition discovery worldwide
+          <p className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white/70 py-1 pr-3 pl-1.5 text-xs font-medium text-gray-600 shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/5 dark:text-gray-300">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2 py-0.5 font-semibold text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-300">
+              <span aria-hidden="true" className="relative flex h-1.5 w-1.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-70 motion-reduce:animate-none" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              </span>
+              Live
+            </span>
+            {upcoming.total
+              ? `${upcoming.total.toLocaleString("en-US")} upcoming exhibitions worldwide`
+              : "Exhibition discovery worldwide"}
           </p>
 
-          <h1 className="mt-5 text-4xl font-bold leading-[1.1] tracking-tight text-gray-900 sm:text-5xl lg:text-[3.05rem] dark:text-white">
-            Discover exhibitions,
+          <h1 className="mt-5 text-4xl font-extrabold leading-[1.06] tracking-tight text-gray-900 sm:text-5xl lg:text-[3.4rem] dark:text-white">
+            Discover{" "}
+            {/* The one word the page is about, in the brand gradient. Text stays
+                real text: a crawler and a screen reader read the same h1. */}
+            <span className="bg-gradient-to-r from-[#2B3FB8] via-[#5B5BF0] to-[#8B5CF6] bg-clip-text text-transparent dark:from-blue-300 dark:via-indigo-300 dark:to-violet-300">
+              exhibitions
+            </span>
+            ,
             <br className="hidden sm:block" /> exhibitors and products
           </h1>
 
@@ -500,28 +615,39 @@ function WhyOneXhib({ archiveTotal }) {
     },
   ];
 
+  // A full-bleed tinted band: after a long run of card rails this is where the
+  // page changes from "browse" to "about", and a change of ground says so before
+  // a single word is read.
   return (
-    <Section
-      id="why"
-      title="Why use OneXhib"
-      intro="Exhibition information is scattered across organiser sites, PDFs and directories. This is the alternative."
-      className="mt-16 sm:mt-24"
-    >
-      <ul className="grid list-none gap-4 sm:grid-cols-2">
-        {points.map(({ icon: Icon, title, body }) => (
-          <li
-            key={title}
-            className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900"
-          >
-            <span className="inline-flex rounded-xl bg-[#131C55]/10 p-2.5 text-[#131C55] dark:bg-blue-400/10 dark:text-blue-300">
-              <Icon size={20} aria-hidden="true" />
-            </span>
-            <h3 className="mt-3.5 text-base font-semibold text-gray-900 dark:text-gray-50">{title}</h3>
-            <p className="mt-1.5 text-[15px] leading-relaxed text-gray-600 dark:text-gray-400">{body}</p>
-          </li>
-        ))}
-      </ul>
-    </Section>
+    <div className="mt-20 border-y border-gray-200 bg-gradient-to-b from-gray-50 to-white py-16 sm:mt-28 sm:py-20 dark:border-white/5 dark:from-white/[0.03] dark:to-transparent">
+      <Section
+        id="why"
+        eyebrow="The platform"
+        title="Why use OneXhib"
+        intro="Exhibition information is scattered across organiser sites, PDFs and directories. This is the alternative."
+      >
+        <ul className="grid list-none gap-4 sm:grid-cols-2">
+          {points.map(({ icon: Icon, title, body }, i) => (
+            <li
+              key={title}
+              className="ox-card group relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 hover:shadow-lg dark:border-gray-800 dark:bg-gray-900"
+            >
+              <span
+                aria-hidden="true"
+                className="absolute top-4 right-5 text-5xl font-extrabold tracking-tighter text-gray-100 select-none dark:text-white/[0.04]"
+              >
+                0{i + 1}
+              </span>
+              <span className="relative inline-flex rounded-xl bg-gradient-to-br from-[#2B3FB8] to-[#8B5CF6] p-3 text-white shadow-md shadow-indigo-500/20">
+                <Icon size={20} aria-hidden="true" />
+              </span>
+              <h3 className="relative mt-4 text-lg font-semibold text-gray-900 dark:text-gray-50">{title}</h3>
+              <p className="relative mt-1.5 text-[15px] leading-relaxed text-gray-600 dark:text-gray-400">{body}</p>
+            </li>
+          ))}
+        </ul>
+      </Section>
+    </div>
   );
 }
 
@@ -531,16 +657,22 @@ function ForBusinesses() {
     {
       icon: CalendarDays,
       role: "Organisers",
+      action: "List your exhibition",
+      accent: "from-blue-500 to-indigo-500",
       body: "List your exhibition with its dates, venue, category and description, add the layout and brochure, and keep the details current as the event approaches.",
     },
     {
       icon: Building2,
       role: "Exhibiting companies",
+      action: "Showcase your company",
+      accent: "from-violet-500 to-fuchsia-500",
       body: "Appear on the exhibition you are taking part in, describe what your business does, and add the products you are showcasing with images and details.",
     },
     {
       icon: Handshake,
       role: "Service providers",
+      action: "Offer your services",
+      accent: "from-emerald-500 to-teal-500",
       body: "List the services you offer to exhibitors — printing, fabrication, furniture and LED rental, staffing and gifting — and the locations you cover.",
     },
   ];
@@ -548,21 +680,34 @@ function ForBusinesses() {
   return (
     <Section
       id="for-business"
+      eyebrow="For business"
       title="For organisers, exhibitors and service providers"
       intro="Everything on OneXhib is listed by the businesses behind it. Creating an account is how you get on the platform."
       className="mt-16 sm:mt-24"
     >
       <ul className="grid list-none gap-4 md:grid-cols-3">
-        {audiences.map(({ icon: Icon, role, body }) => (
+        {audiences.map(({ icon: Icon, role, body, action, accent }) => (
           <li
             key={role}
-            className="flex flex-col rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900"
+            className="ox-card relative flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 hover:shadow-lg dark:border-gray-800 dark:bg-gray-900"
           >
-            <span className="inline-flex w-fit rounded-xl bg-[#131C55]/10 p-2.5 text-[#131C55] dark:bg-blue-400/10 dark:text-blue-300">
+            <span aria-hidden="true" className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${accent}`} />
+            <span className={`inline-flex w-fit rounded-xl bg-gradient-to-br p-3 text-white shadow-md ${accent}`}>
               <Icon size={20} aria-hidden="true" />
             </span>
-            <h3 className="mt-3.5 text-base font-semibold text-gray-900 dark:text-gray-50">{role}</h3>
+            <h3 className="mt-4 text-lg font-semibold text-gray-900 dark:text-gray-50">{role}</h3>
             <p className="mt-1.5 flex-1 text-[15px] leading-relaxed text-gray-600 dark:text-gray-400">{body}</p>
+            <Link
+              href="/signup"
+              className="group mt-5 inline-flex w-fit items-center gap-1.5 text-sm font-semibold text-[#2B3FB8] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#131C55] dark:text-blue-300"
+            >
+              {action}
+              <ArrowRight
+                size={15}
+                aria-hidden="true"
+                className="transition group-hover:translate-x-0.5 motion-reduce:transition-none"
+              />
+            </Link>
           </li>
         ))}
       </ul>
@@ -600,21 +745,24 @@ function HowItWorks() {
   ];
 
   return (
-    <Section id="how-it-works" title="How OneXhib works" className="mt-16 sm:mt-24">
-      <ol className="grid list-none gap-4 md:grid-cols-3">
+    <Section id="how-it-works" eyebrow="Three steps" title="How OneXhib works" className="mt-16 sm:mt-24">
+      {/* A dashed rail joins the three numbers on md+, so the steps read as a
+          sequence rather than as three unrelated cards. */}
+      <ol className="relative grid list-none gap-8 md:grid-cols-3 md:gap-6">
+        <span
+          aria-hidden="true"
+          className="absolute top-7 right-[16%] left-[16%] hidden border-t-2 border-dashed border-gray-200 md:block dark:border-gray-700"
+        />
         {steps.map(({ icon: Icon, title, body }, i) => (
-          <li
-            key={title}
-            className="relative rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900"
-          >
-            <div className="flex items-center gap-3">
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#131C55] text-sm font-bold text-white">
+          <li key={title} className="relative flex flex-col items-center text-center">
+            <span className="relative grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-[#131C55] to-[#2B3FB8] text-white shadow-lg ring-8 shadow-indigo-900/20 ring-white dark:ring-gray-950">
+              <Icon size={22} aria-hidden="true" />
+              <span className="absolute -top-2 -right-2 grid h-6 w-6 place-items-center rounded-full bg-amber-400 text-[11px] font-extrabold text-amber-950 shadow">
                 {i + 1}
               </span>
-              <Icon size={19} className="text-[#131C55] dark:text-blue-300" aria-hidden="true" />
-            </div>
-            <h3 className="mt-3.5 text-base font-semibold text-gray-900 dark:text-gray-50">{title}</h3>
-            <p className="mt-1.5 text-[15px] leading-relaxed text-gray-600 dark:text-gray-400">{body}</p>
+            </span>
+            <h3 className="mt-5 text-lg font-semibold text-gray-900 dark:text-gray-50">{title}</h3>
+            <p className="mt-1.5 max-w-xs text-[15px] leading-relaxed text-gray-600 dark:text-gray-400">{body}</p>
           </li>
         ))}
       </ol>
@@ -628,8 +776,29 @@ function FinalCta() {
       aria-labelledby="cta-heading"
       className="mx-auto mt-20 w-full max-w-6xl px-4 sm:mt-24 sm:px-6"
     >
-      <div className="ox-reveal overflow-hidden rounded-3xl bg-gradient-to-br from-[#131C55] to-[#0E1B6B] px-6 py-14 text-center sm:px-12">
-        <h2 id="cta-heading" className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+      <div className="ox-reveal relative isolate overflow-hidden rounded-[28px] bg-gradient-to-br from-[#0B1240] via-[#131C55] to-[#2B1F7A] px-6 py-16 text-center shadow-[0_30px_80px_-30px_rgba(19,28,85,0.6)] ring-1 ring-white/10 sm:px-12 sm:py-20">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -top-24 left-1/2 -z-10 h-72 w-[36rem] -translate-x-1/2 rounded-full bg-blue-500/30 blur-3xl"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-20 -bottom-24 -z-10 h-64 w-64 rounded-full bg-violet-500/25 blur-3xl"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 -z-10 text-white opacity-[0.07] [mask-image:radial-gradient(ellipse_at_center,black,transparent_75%)]"
+          style={{
+            backgroundImage:
+              "linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)",
+            backgroundSize: "40px 40px",
+          }}
+        />
+        <p className="mx-auto mb-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold tracking-wide text-blue-100 ring-1 ring-white/15">
+          <Sparkles size={13} aria-hidden="true" />
+          Free to browse — no account needed
+        </p>
+        <h2 id="cta-heading" className="text-3xl font-extrabold tracking-tight text-white sm:text-5xl">
           Discover what&apos;s happening with OneXhib
         </h2>
         <p className="mx-auto mt-3 max-w-xl text-[15px] leading-relaxed text-blue-100/90 sm:text-base">
@@ -639,7 +808,7 @@ function FinalCta() {
         <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
           <Link
             href={PUBLIC_ROUTES.exhibitions}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3.5 text-[15px] font-semibold text-[#131C55] transition hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white motion-reduce:transition-none"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3.5 text-[15px] font-semibold text-[#131C55] shadow-lg shadow-black/20 transition hover:-translate-y-0.5 hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white motion-reduce:transform-none motion-reduce:transition-none"
           >
             Explore exhibitions
             <ArrowRight size={17} aria-hidden="true" />

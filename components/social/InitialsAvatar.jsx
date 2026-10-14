@@ -21,6 +21,8 @@ export default function InitialsAvatar({ name, src = null, size = "md", classNam
     sm: "h-9 w-9 text-xs",
     md: "h-12 w-12 text-sm",
     lg: "h-20 w-20 text-xl sm:h-24 sm:w-24 sm:text-2xl",
+    // The profile header's photo, overlapping the cover banner.
+    xl: "h-28 w-28 text-3xl sm:h-36 sm:w-36 sm:text-4xl",
   }[size] || "h-12 w-12 text-sm";
 
   // alt="" and aria-hidden: the name is always rendered as text next to the

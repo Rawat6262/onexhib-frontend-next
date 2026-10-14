@@ -1,11 +1,11 @@
 import Link from "next/link";
-import { Mail, Phone, MapPin, Smartphone } from "lucide-react";
+import { Mail, MapPin, Smartphone } from "lucide-react";
 
 import ProsePage, { ProseSection } from "@/components/public/ProsePage";
+import ContactForm from "@/components/public/ContactForm";
 import { PUBLIC_ROUTES, publicPageMetadata } from "@/lib/seo";
 import {
   CONTACT_EMAIL,
-  CONTACT_PHONE,
   LOCATION_LINE,
   PLAY_STORE_URL,
 } from "@/lib/business";
@@ -13,21 +13,22 @@ import {
 /**
  * /contact - the real ways to reach OneXhib.
  *
- * Only the three channels the business actually supplied are listed. There are
+ * Only the channels the business actually supplied are listed - email, the
+ * contact form (which delivers to that same inbox), where we are based, and the
+ * app. The phone number was withdrawn on 2026-10-14. There are
  * deliberately NO office hours, no response-time commitment, no department
  * addresses (sales@, support@, press@) and no street address, because none of
  * those were provided and a contact page that promises a reply time nobody
  * agreed to is worse than one that stays quiet about it.
  *
- * Both the email and the phone are real actionable links (mailto:, tel:) rather
- * than plain text - a contact page that cannot be actioned from a phone is
- * failing at its one job.
+ * The email is a real mailto: link and the form posts to POST /api/contact, so the
+ * page can be actioned from any device without copying an address.
  */
 
 export const metadata = publicPageMetadata({
   title: "Contact us",
   description:
-    "Get in touch with the OneXhib team by email or phone. We are based in Ludhiana, Punjab, India, and reply to organiser and exhibitor enquiries.",
+    "Get in touch with the OneXhib team by email or through the contact form. We are based in Ludhiana, Punjab, India, and reply to organiser and exhibitor enquiries.",
   path: "/contact",
 });
 
@@ -43,14 +44,7 @@ export default function ContactPage() {
       label: "Email",
       value: CONTACT_EMAIL,
       href: `mailto:${CONTACT_EMAIL}`,
-      note: "The best way to reach us about listings, corrections or your account.",
-    },
-    {
-      icon: Phone,
-      label: "Phone",
-      value: CONTACT_PHONE,
-      href: `tel:${CONTACT_PHONE}`,
-      note: null,
+      note: "Write to us directly, or use the form below.",
     },
     {
       icon: MapPin,
@@ -67,13 +61,14 @@ export default function ContactPage() {
       intro="Questions about a listing, a correction to an exhibition, or your account — here is how to reach us."
       trail={trail}
       aside={
-        <ul className="mt-8 grid list-none gap-4 sm:grid-cols-2">
+        <>
+        <ul className="mt-8 grid list-none gap-4 sm:grid-cols-3">
           {channels.map(({ icon: Icon, label, value, href, note }) => (
             <li
               key={label}
-              className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900"
+              className="ox-card rounded-2xl border border-gray-200 bg-white p-5 hover:shadow-lg dark:border-gray-800 dark:bg-gray-900"
             >
-              <span className="inline-flex rounded-xl bg-[#131C55]/10 p-2.5 text-[#131C55] dark:bg-blue-400/10 dark:text-blue-300">
+              <span className="inline-flex rounded-xl bg-gradient-to-br from-[#2B3FB8] to-[#8B5CF6] p-2.5 text-white shadow-md shadow-indigo-500/20">
                 <Icon size={18} aria-hidden="true" />
               </span>
               <p className="mt-3 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
@@ -99,8 +94,8 @@ export default function ContactPage() {
             </li>
           ))}
 
-          <li className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900">
-            <span className="inline-flex rounded-xl bg-[#131C55]/10 p-2.5 text-[#131C55] dark:bg-blue-400/10 dark:text-blue-300">
+          <li className="ox-card rounded-2xl border border-gray-200 bg-white p-5 hover:shadow-lg dark:border-gray-800 dark:bg-gray-900">
+            <span className="inline-flex rounded-xl bg-gradient-to-br from-[#2B3FB8] to-[#8B5CF6] p-2.5 text-white shadow-md shadow-indigo-500/20">
               <Smartphone size={18} aria-hidden="true" />
             </span>
             <p className="mt-3 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
@@ -116,6 +111,21 @@ export default function ContactPage() {
             </a>
           </li>
         </ul>
+
+        <section id="message" aria-labelledby="message-heading" className="mt-12 scroll-mt-24">
+          <p className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#2B3FB8] dark:text-blue-300">
+            <span aria-hidden="true" className="h-px w-6 bg-current opacity-60" />
+            Write to us
+          </p>
+          <h2 id="message-heading" className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl dark:text-white">
+            Send us a message
+          </h2>
+          <p className="mt-2 mb-6 text-[15px] leading-relaxed text-gray-600 dark:text-gray-400">
+            Ask a question, request a correction, or tell us what you need. It reaches the team inbox directly.
+          </p>
+          <ContactForm contactEmail={CONTACT_EMAIL} />
+        </section>
+        </>
       }
     >
       <ProseSection id="listings" title="Corrections to an exhibition listing">

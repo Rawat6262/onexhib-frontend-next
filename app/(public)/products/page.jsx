@@ -74,7 +74,7 @@ export default async function ProductsPage({ searchParams }) {
       <Breadcrumbs trail={trail} />
 
       <header>
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl dark:text-white">
+        <h1 className="text-3xl font-extrabold leading-[1.1] tracking-tight text-gray-900 sm:text-[2.6rem] dark:text-white">
           Products on OneXhib
         </h1>
         <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-gray-600 dark:text-gray-400">

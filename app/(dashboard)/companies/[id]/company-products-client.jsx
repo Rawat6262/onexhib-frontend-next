@@ -7,12 +7,12 @@
 import dynamic from "next/dynamic";
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { getPageNumbers } from "@/lib/paginate";
 
 import { toast } from "sonner";
 
 import { getProductsForCompany, deleteProduct } from "@/models/product.model";
 import { getCompanyById, deleteCompany } from "@/models/company.model";
+import TablePagination from "@/components/dashboard/TablePagination";
 
 // Modals are only needed once opened, so their code (and for the location
 // forms, country-state-city's ~2.3 MB dataset) is split out of this page's
@@ -30,7 +30,7 @@ export default function CompanyProductsClient({ id }) {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
-  const itemsPerPage = 5;
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   /** ✅ Fetch products with memoized function */
   const fetchProducts = useCallback(async () => {
@@ -83,6 +83,10 @@ export default function CompanyProductsClient({ id }) {
 
   /** ✅ Pagination logic */
   const totalPages = Math.max(1, Math.ceil(filteredData.length / itemsPerPage));
+  // A delete or a bigger page size can leave the current page past the end.
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(totalPages);
+  }, [currentPage, totalPages]);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedData = filteredData.slice(
     startIndex,
@@ -108,12 +112,12 @@ export default function CompanyProductsClient({ id }) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
+    <div className="mx-auto w-full max-w-6xl px-4 py-8 text-gray-900 sm:px-6 sm:py-12 dark:text-gray-100">
 
       <main className="flex-1 mt-2 md:mx-4 lg:mx-6 p-4 sm:p-6">
-        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-md border border-gray-300 dark:border-gray-700 p-4 sm:p-6">
+        <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm shadow-gray-900/[0.03] sm:p-6 dark:border-gray-800 dark:bg-gray-900 dark:shadow-none">
           {/* HEADER */}
-         <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-gray-300 dark:border-gray-700 pb-4">
+         <header className="flex flex-col items-start justify-between gap-4 border-b border-gray-200 pb-4 sm:flex-row sm:items-center dark:border-gray-800">
 
   {/* Title */}
   <h1 className="font-bold text-2xl sm:text-3xl">
@@ -152,7 +156,7 @@ export default function CompanyProductsClient({ id }) {
 
           {/* COMPANY INFO */}
           <section className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="p-5 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm bg-gray-50 dark:bg-gray-800 space-y-1">
+            <div className="space-y-1 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
               <p>
                 <b>Phone:</b> {company.company_phone_number}
               </p>
@@ -163,7 +167,7 @@ export default function CompanyProductsClient({ id }) {
                 <b>Address:</b> {company.company_address}
               </p>
             </div>
-            <div className="p-5 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm bg-gray-50 dark:bg-gray-800">
+            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
               <p className="font-bold text-gray-800 dark:text-gray-100">About</p>
               <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 leading-relaxed">
                 {company.about_company || "This is a demo about section."}
@@ -172,11 +176,11 @@ export default function CompanyProductsClient({ id }) {
           </section>
 
           {/* PRODUCT LIST */}
-          <section className="mt-8 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm bg-white dark:bg-gray-900 p-4">
+          <section className="mt-8 overflow-hidden rounded-2xl border border-gray-200 bg-white p-0 shadow-sm shadow-gray-900/[0.03] dark:border-gray-800 dark:bg-gray-900 dark:shadow-none">
             {/* Controls */}
             <div className="flex flex-col lg:flex-row justify-between gap-4 items-center">
               <div className="text-center lg:text-left">
-                <h2 className="font-bold text-2xl sm:text-3xl text-gray-800 dark:text-gray-100">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">
                   Product List
                 </h2>
               </div>
@@ -192,13 +196,13 @@ export default function CompanyProductsClient({ id }) {
                   className="h-10 w-full sm:w-64 border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800 rounded-lg px-3 text-gray-700 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500"
                 />
                 <button
-                  className="h-10 w-full sm:w-48 border border-[#131C55] text-[#131C55] dark:text-blue-300 bg-white dark:bg-gray-900 hover:bg-[#131C55] hover:text-white rounded-lg font-semibold transition-colors"
+                  className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#131C55] to-[#2B3FB8] px-4 text-sm font-semibold text-white shadow-md shadow-indigo-900/20 transition hover:brightness-110 sm:w-48 motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500"
                   onClick={() => setShowForm(true)}
                 >
                   + Add Product
                 </button>
                 <button
-                  className="h-10 w-full sm:w-48 border border-[#131C55] text-[#131C55] dark:text-blue-300 bg-white dark:bg-gray-900 hover:bg-[#131C55] hover:text-white rounded-lg font-semibold transition-colors"
+                  className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#131C55] to-[#2B3FB8] px-4 text-sm font-semibold text-white shadow-md shadow-indigo-900/20 transition hover:brightness-110 sm:w-48 motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500"
                   onClick={() => setShowUploadModal(true)}
                 >
                   Upload Excel
@@ -214,11 +218,17 @@ export default function CompanyProductsClient({ id }) {
             />
 
             {/* Pagination */}
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              setCurrentPage={setCurrentPage}
-            />
+            <TablePagination
+            page={currentPage}
+            pageSize={itemsPerPage}
+            total={filteredData.length}
+            onPageChange={setCurrentPage}
+            onPageSizeChange={(size) => {
+              setItemsPerPage(size);
+              setCurrentPage(1);
+            }}
+            itemLabel="products"
+          />
           </section>
         </div>
       </main>
@@ -247,9 +257,9 @@ export default function CompanyProductsClient({ id }) {
 
 function SummaryCard({ label, value }) {
   return (
-    <div className="h-24 w-48 rounded-xl flex flex-col justify-center items-center bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 shadow-sm">
-      <p className="text-lg font-medium text-gray-700 dark:text-gray-300">{label}</p>
-      <p className="text-4xl font-bold text-gray-900 dark:text-gray-100">{value}</p>
+    <div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 py-4 dark:border-gray-800 dark:bg-gray-900 w-48">
+      <p className="text-[13px] font-medium text-gray-500 dark:text-gray-400">{label}</p>
+      <p className="bg-gradient-to-r from-[#131C55] to-[#2B3FB8] bg-clip-text text-4xl font-extrabold text-transparent dark:from-blue-300 dark:to-violet-300">{value}</p>
     </div>
   );
 }
@@ -259,15 +269,15 @@ function ProductTable({ paginatedData, startIndex, onDelete }) {
 const [selectedProductId, setSelectedProductId] = useState(null);
 const router = useRouter();
   if (paginatedData.length === 0) {
-    return <p className="mt-6 p-6 text-center text-gray-600 dark:text-gray-400 italic">No products found</p>;
+    return <p className="mt-6 px-5 py-12 text-center text-[15px] text-gray-500 dark:text-gray-400">No products found</p>;
   }
 
   return (
     <div className="mt-6">
       {/* Card list — phones only */}
-      <div className="sm:hidden flex flex-col gap-3">
+      <div className="flex flex-col gap-3 p-4 sm:hidden">
         {paginatedData.map((item, index) => (
-          <div key={item._id || index} className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-4">
+          <div key={item._id || index} className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
             <p className="font-semibold text-gray-900 dark:text-gray-100">
               {startIndex + index + 1}. {item.product_name}
             </p>
@@ -284,7 +294,7 @@ const router = useRouter();
             <div className="flex items-center gap-2 mt-3">
               <button
                 onClick={() => router.push(`/products/${item._id}`)}
-                className="flex-1 border border-[#131C55] text-[#131C55] dark:text-blue-300 rounded-lg px-3 py-1.5 hover:bg-[#131C55]/5 dark:hover:bg-blue-400/10 transition-colors"
+                className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-[13px] font-medium text-gray-700 transition hover:border-[#2B3FB8] hover:text-[#2B3FB8] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-blue-400 dark:hover:text-white flex-1"
               >
                 View
               </button>
@@ -309,15 +319,15 @@ const router = useRouter();
       </div>
 
       {/* Table — sm and up */}
-      <div className="hidden sm:block overflow-auto max-h-[70vh] overscroll-contain rounded-lg">
-        <table className="w-full min-w-[700px] border-collapse border border-gray-300 dark:border-gray-700">
+      <div className="hidden max-h-[70vh] overflow-auto overscroll-contain sm:block">
+        <table className="w-full min-w-[700px] border-collapse text-sm">
           <thead>
             <tr className="bg-gray-50 dark:bg-gray-800/80 text-gray-500 dark:text-gray-400">
               {["#", "Product Name", "Category", "Price", "Action"].map(
                 (header) => (
                   <th
                     key={header}
-                    className="px-4 py-3 border border-gray-300 dark:border-gray-700"
+                    className="border-b border-gray-100 px-4 py-3.5 text-gray-700 dark:border-gray-800 dark:text-gray-300"
                   >
                     {header}
                   </th>
@@ -329,28 +339,28 @@ const router = useRouter();
             {paginatedData.map((item, index) => (
               <tr
                 key={item._id || index}
-                className={index % 2 === 0 ? "bg-white dark:bg-gray-900" : "bg-gray-50 dark:bg-gray-800"}
+                className={"bg-white transition-colors hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-white/[0.03]"}
               >
-                <td className="px-4 py-3 border border-gray-300 dark:border-gray-700 text-center">
+                <td className="border-b border-gray-100 px-4 py-3.5 text-center text-gray-700 dark:border-gray-800 dark:text-gray-300">
                   {startIndex + index + 1}
                 </td>
 
-                <td className="px-4 py-3 border border-gray-300 dark:border-gray-700 text-center">
+                <td className="border-b border-gray-100 px-4 py-3.5 text-center text-gray-700 dark:border-gray-800 dark:text-gray-300">
                   {item.product_name}
                 </td>
 
-                <td className="px-4 py-3 border border-gray-300 dark:border-gray-700 text-center">
+                <td className="border-b border-gray-100 px-4 py-3.5 text-center text-gray-700 dark:border-gray-800 dark:text-gray-300">
                   {item.category}
                 </td>
 
-                <td className="px-4 py-3 border border-gray-300 dark:border-gray-700 text-center">
+                <td className="border-b border-gray-100 px-4 py-3.5 text-center text-gray-700 dark:border-gray-800 dark:text-gray-300">
                   ₹{item.price}
                 </td>
 
-                <td className="px-4 py-3 border border-gray-300 dark:border-gray-700 flex justify-center gap-4">
+                <td className="flex justify-center gap-2 border-b border-gray-100 px-4 py-3.5 dark:border-gray-800">
                   <button
                     onClick={() => router.push(`/products/${item._id}`)}
-                    className="border border-[#131C55] text-[#131C55] dark:text-blue-300 rounded-lg px-3 py-1 hover:bg-[#131C55]/5 dark:hover:bg-blue-400/10 transition-colors"
+                    className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-[13px] font-medium text-gray-700 transition hover:border-[#2B3FB8] hover:text-[#2B3FB8] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-blue-400 dark:hover:text-white"
                   >
                     View
                   </button>
@@ -385,48 +395,6 @@ const router = useRouter();
           setSelectedProductId(null);
         }}
       />
-    </div>
-  );
-}
-
-function Pagination({ currentPage, totalPages, setCurrentPage }) {
-  if (totalPages <= 1) return null;
-
-  return (
-    <div className="mt-6 flex gap-1 items-center flex-wrap justify-center">
-      <button
-        onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-        disabled={currentPage === 1}
-        className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed text-sm"
-        aria-label="Previous page"
-      >
-        ‹
-      </button>
-      {getPageNumbers(currentPage, totalPages).map((page, i) =>
-        page === "..." ? (
-          <span key={`dots-${i}`} className="w-8 h-8 flex items-center justify-center text-gray-400 dark:text-gray-500 text-sm">…</span>
-        ) : (
-          <button
-            key={page}
-            onClick={() => setCurrentPage(page)}
-            className={`w-8 h-8 flex items-center justify-center rounded-lg border text-sm font-medium transition-colors ${
-              page === currentPage
-                ? "bg-[#131C55] border-[#131C55] text-white"
-                : "border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-            }`}
-          >
-            {page}
-          </button>
-        )
-      )}
-      <button
-        onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-        disabled={currentPage === totalPages}
-        className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed text-sm"
-        aria-label="Next page"
-      >
-        ›
-      </button>
     </div>
   );
 }

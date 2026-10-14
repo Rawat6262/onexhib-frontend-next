@@ -145,12 +145,12 @@ export default async function ExhibitionsPage({ searchParams }) {
   if (!meta) notFound();
 
   // A keyword search goes to the *search endpoints, which accept `search` alone
-  // and return an uncapped result set — lib/public-api.js caps it. Everything
+  // and return an uncapped result set — lib/public-api.js pages it. Everything
   // else uses the paginated listing endpoints with the real location filters.
   const isSearch = Boolean(search);
   const [result, cities] = await Promise.all([
     isSearch
-      ? searchExhibitions(scope, search, { limit: PER_PAGE })
+      ? searchExhibitions(scope, search, { limit: PER_PAGE, page })
       : getExhibitions(scope, { page, limit: PER_PAGE, city, state, country }),
     getUpcomingCities({ max: 14 }),
   ]);
@@ -174,8 +174,9 @@ export default async function ExhibitionsPage({ searchParams }) {
 
   // A page number past the end used to return 200 with an empty grid, which
   // Search Console reports as a soft 404 and which wastes crawl budget on URLs
-  // that hold nothing. An out-of-range page is a 404.
-  if (page > 1 && !isSearch && !result.items.length) notFound();
+  // that hold nothing. An out-of-range page is a 404 — for a search too, since
+  // its "no exhibitions matched" empty state would be false on page 9 of 13.
+  if (page > 1 && !result.items.length) notFound();
 
   const filterLabel = [city, state, country].filter(Boolean).join(", ");
   const heading = isSearch
@@ -207,12 +208,19 @@ export default async function ExhibitionsPage({ searchParams }) {
   // browse, so an All tab on an unsearched page would lead nowhere useful.
   const tabScopes = isSearch ? [...SCOPES, ALL_SCOPE] : SCOPES;
 
+  // Same rules as scopeHref: a search URL carries its term and an explicit scope,
+  // and the location filters belong to the listing only (the search endpoints
+  // ignore them). Without `search` here, page 2 of a search was page 2 of the
+  // unsearched listing.
   const buildHref = (nextPage) => {
     const qs = new URLSearchParams();
-    if (scope !== "upcoming") qs.set("scope", scope);
-    if (city) qs.set("city", city);
-    if (state) qs.set("state", state);
-    if (country) qs.set("country", country);
+    if (scope !== "upcoming" || search) qs.set("scope", scope);
+    if (search) qs.set("search", search);
+    else {
+      if (city) qs.set("city", city);
+      if (state) qs.set("state", state);
+      if (country) qs.set("country", country);
+    }
     if (nextPage > 1) qs.set("page", String(nextPage));
     const q = qs.toString();
     return q ? `${PUBLIC_ROUTES.exhibitions}?${q}` : PUBLIC_ROUTES.exhibitions;
@@ -238,7 +246,7 @@ export default async function ExhibitionsPage({ searchParams }) {
       <Breadcrumbs trail={trail} />
 
       <header>
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl dark:text-white">
+        <h1 className="text-3xl font-extrabold leading-[1.1] tracking-tight text-gray-900 sm:text-[2.6rem] dark:text-white">
           {heading}
         </h1>
         <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-gray-600 dark:text-gray-400">
@@ -378,11 +386,9 @@ export default async function ExhibitionsPage({ searchParams }) {
         ) : null}
       </div>
 
-      {/* The *search endpoints return no pagination, so paging is offered only
-          for the listing views, which genuinely support it. */}
-      {isSearch ? null : (
-        <Pagination page={result.page} totalPages={result.totalPages} buildHref={buildHref} />
-      )}
+      {/* Searches page too: the search endpoints return every match and
+          lib/public-api.js slices the requested page out of them. */}
+      <Pagination page={result.page} totalPages={result.totalPages} buildHref={buildHref} />
     </div>
   );
 }
@@ -390,6 +396,6 @@ export default async function ExhibitionsPage({ searchParams }) {
 const chip = (active) =>
   `inline-flex rounded-full border px-3.5 py-1.5 text-[13px] font-medium transition motion-reduce:transition-none ${
     active
-      ? "border-[#131C55] bg-[#131C55]/10 text-[#131C55] dark:border-blue-400 dark:bg-blue-400/10 dark:text-blue-300"
+      ? "border-transparent bg-gradient-to-r from-[#131C55] to-[#2B3FB8] text-white shadow-sm shadow-indigo-900/20 dark:from-blue-500 dark:to-indigo-500"
       : "border-gray-200 bg-white text-gray-600 hover:border-[#131C55]/40 hover:text-[#131C55] dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:border-gray-600 dark:hover:text-white"
   }`;

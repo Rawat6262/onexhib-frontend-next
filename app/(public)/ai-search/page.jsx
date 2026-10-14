@@ -55,7 +55,7 @@ export default function AiSearchPage() {
           <Sparkles size={13} aria-hidden="true" />
           Beta
         </span>
-        <h1 className="mt-3 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl dark:text-white">
+        <h1 className="mt-3 text-3xl font-extrabold leading-[1.1] tracking-tight text-gray-900 sm:text-[2.6rem] dark:text-white">
           Search exhibitions naturally
         </h1>
         <p className="mt-3 text-[15px] leading-relaxed text-gray-600 dark:text-gray-400">

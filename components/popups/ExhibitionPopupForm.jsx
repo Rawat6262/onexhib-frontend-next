@@ -27,7 +27,7 @@ const InputField = ({ id, label, value, onChange, placeholder, type = "text", re
       placeholder={placeholder}
       aria-invalid={!!error}
       aria-describedby={error ? `${id}-error` : undefined}
-      className={`w-full rounded-md border px-3 py-2 text-gray-900 dark:text-gray-100 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 outline-none transition shadow-sm placeholder-gray-400 dark:placeholder-gray-500 ${
+      className={`w-full rounded-md border px-3 py-2 text-gray-900 dark:text-gray-100 focus:border-[#2B3FB8] focus:ring-4 focus:ring-[#2B3FB8]/15 outline-none transition shadow-sm placeholder-gray-400 dark:placeholder-gray-500 ${
         error ? "border-red-500" : "border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800"
       }`}
     />
@@ -48,7 +48,7 @@ const TextAreaField = ({ id, label, value, onChange, placeholder, rows = 3, requ
       rows={rows}
       aria-invalid={!!error}
       aria-describedby={error ? `${id}-error` : undefined}
-      className={`w-full rounded-md border px-3 py-2 text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 outline-none transition shadow-sm resize-none placeholder-gray-400 ${
+      className={`w-full rounded-md border px-3 py-2 text-gray-900 focus:border-[#2B3FB8] focus:ring-4 focus:ring-[#2B3FB8]/15 outline-none transition shadow-sm resize-none placeholder-gray-400 ${
         error ? "border-red-500" : "border-gray-300 bg-white"
       }`}
     />
@@ -263,7 +263,7 @@ const Dropdown = ({
         onBlur={onBlur}
         aria-invalid={!!error}
         aria-describedby={error ? `${id}-error` : undefined}
-        className={`w-full rounded-md border px-3 py-2 text-gray-900 dark:text-gray-100 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 outline-none transition shadow-sm ${
+        className={`w-full rounded-md border px-3 py-2 text-gray-900 dark:text-gray-100 focus:border-[#2B3FB8] focus:ring-4 focus:ring-[#2B3FB8]/15 outline-none transition shadow-sm ${
           error ? "border-red-500" : "border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800"
         }`}
       >
@@ -286,7 +286,7 @@ const Dropdown = ({
         placeholder={placeholder}
         aria-invalid={!!error}
         aria-describedby={error ? `${id}-error` : undefined}
-        className={`w-full rounded-md border px-3 py-2 text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 outline-none transition shadow-sm placeholder-gray-400 ${
+        className={`w-full rounded-md border px-3 py-2 text-gray-900 focus:border-[#2B3FB8] focus:ring-4 focus:ring-[#2B3FB8]/15 outline-none transition shadow-sm placeholder-gray-400 ${
           error ? "border-red-500" : "border-gray-300 bg-white"
         }`}
       />
@@ -425,19 +425,19 @@ const Dropdown = ({
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/60 backdrop-blur-sm">
+    <div className="ox-form fixed inset-0 flex items-center justify-center z-50 bg-black/60 backdrop-blur-sm">
       {/* 90% Width and Height Container */}
       <div className="bg-white dark:bg-gray-900 w-[90%] h-[90%] rounded-xl shadow-2xl flex flex-col overflow-hidden animate-fadeIn">
 
         {/* Header */}
-        <div className="flex justify-between items-center px-4 sm:px-8 py-4 sm:py-5 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800 shrink-0">
+        <div className="relative flex shrink-0 items-center justify-between border-b border-gray-200 bg-gradient-to-b from-gray-50 to-white px-4 py-4 sm:px-8 sm:py-5 dark:border-gray-800 dark:from-white/[0.03] dark:to-transparent">
           <div>
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 tracking-tight">Add New Exhibition</h2>
+            <h2 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">Add New Exhibition</h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">Please fill in the details below</p>
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 dark:text-gray-500 hover:text-red-600 text-4xl leading-none transition-colors"
+            className="grid h-10 w-10 place-items-center rounded-full text-3xl leading-none text-gray-400 transition hover:bg-gray-100 hover:text-gray-700 dark:text-gray-500 dark:hover:bg-gray-800 dark:hover:text-white"
             aria-label="Close"
           >
             &times;
@@ -450,8 +450,8 @@ const Dropdown = ({
 
             {/* === Left Column === */}
             <div className="space-y-6">
-              <div className="bg-white dark:bg-gray-900 p-5 rounded-lg border border-gray-200 dark:border-gray-800 shadow-sm space-y-4">
-                <h3 className="text-blue-700 dark:text-blue-400 font-bold uppercase text-xs tracking-wider mb-2">Basic Information</h3>
+              <div className="space-y-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+                <h3 className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#2B3FB8] dark:text-blue-300">Basic Information</h3>
                 <InputField
                   id="exhibition_name"
                   label="Exhibition Name"
@@ -488,8 +488,8 @@ const Dropdown = ({
                 </div>
               </div>
 
-              <div className="bg-white dark:bg-gray-900 p-5 rounded-lg border border-gray-200 dark:border-gray-800 shadow-sm space-y-4">
-                <h3 className="text-blue-700 dark:text-blue-400 font-bold uppercase text-xs tracking-wider mb-2">Location</h3>
+              <div className="space-y-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+                <h3 className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#2B3FB8] dark:text-blue-300">Location</h3>
                <div className="grid md:grid-cols-3 gap-6">
          {console.log(countries)}
  <Dropdown
@@ -571,8 +571,8 @@ const Dropdown = ({
               </div>
 
 
-              <div className="bg-white dark:bg-gray-900 p-5 rounded-lg border border-gray-200 dark:border-gray-800 shadow-sm space-y-4">
-                <h3 className="text-blue-700 dark:text-blue-400 font-bold uppercase text-xs tracking-wider mb-2">Schedule Details</h3>
+              <div className="space-y-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+                <h3 className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#2B3FB8] dark:text-blue-300">Schedule Details</h3>
                 <TextAreaField
                   id="speakers"
                   label="Speakers"
@@ -604,8 +604,8 @@ const Dropdown = ({
             {/* === Right Column === */}
             <div className="space-y-6">
 
-              <div className="bg-white dark:bg-gray-900 p-5 rounded-lg border border-gray-200 dark:border-gray-800 shadow-sm space-y-4">
-                <h3 className="text-blue-700 dark:text-blue-400 font-bold uppercase text-xs tracking-wider mb-2">Dates & Media</h3>
+              <div className="space-y-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+                <h3 className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#2B3FB8] dark:text-blue-300">Dates & Media</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <InputField
                     id="startDate"
@@ -652,8 +652,8 @@ const Dropdown = ({
                 </div>
               </div>
 
-              <div className="bg-white dark:bg-gray-900 p-5 rounded-lg border border-gray-200 dark:border-gray-800 shadow-sm space-y-4">
-                <h3 className="text-blue-700 dark:text-blue-400 font-bold uppercase text-xs tracking-wider mb-2">Additional Info</h3>
+              <div className="space-y-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+                <h3 className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#2B3FB8] dark:text-blue-300">Additional Info</h3>
                 <TextAreaField
                   id="about_exhibition"
                   label="About Exhibition"
@@ -684,8 +684,8 @@ const Dropdown = ({
                 </div>
               </div>
 
-              <div className="bg-white dark:bg-gray-900 p-5 rounded-lg border border-gray-200 dark:border-gray-800 shadow-sm space-y-4">
-                <h3 className="text-blue-700 dark:text-blue-400 font-bold uppercase text-xs tracking-wider mb-2">Contact & Legal</h3>
+              <div className="space-y-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+                <h3 className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#2B3FB8] dark:text-blue-300">Contact & Legal</h3>
                 <InputField
                   id="Support"
                   label="Support Contact"
@@ -715,8 +715,8 @@ const Dropdown = ({
                   />
                 </div>
               </div>
-              <div className="bg-white dark:bg-gray-900 p-5 rounded-lg border border-gray-200 dark:border-gray-800 shadow-sm space-y-4">
-                <h3 className="text-blue-700 dark:text-blue-400 font-bold uppercase text-xs tracking-wider mb-2">Exhibitor & vistor</h3>
+              <div className="space-y-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+                <h3 className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#2B3FB8] dark:text-blue-300">Exhibitor & vistor</h3>
                 <TextAreaField
                   id="Exhibitor_Profile"
                   label="Exhibitor_Profile"
@@ -758,14 +758,14 @@ const Dropdown = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-6 py-2.5 rounded-lg bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 font-bold hover:bg-gray-100 dark:hover:bg-gray-700 transition shadow-sm"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-6 py-2.5 text-sm font-semibold text-gray-700 transition hover:border-[#2B3FB8] hover:text-[#2B3FB8] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:border-blue-400 dark:hover:text-white"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-8 py-2.5 rounded-lg bg-blue-600 text-white font-bold hover:bg-blue-700 transition shadow-md disabled:opacity-70"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#131C55] to-[#2B3FB8] px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-900/25 transition hover:brightness-110 disabled:opacity-70 disabled:cursor-not-allowed motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500"
               >
                 {isSubmitting ? "Saving..." : "Save Exhibition"}
               </button>

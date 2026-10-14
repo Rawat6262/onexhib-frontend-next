@@ -77,7 +77,7 @@ function Placeholder({ label }) {
   return (
     <div
       aria-hidden="true"
-      className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#131C55] via-[#182270] to-[#0E1B6B]"
+      className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#131C55] via-[#22308F] to-[#4B2E9E]"
     >
       {/* Faint grid, drawn once as an inline SVG data URI - no network request. */}
       <div

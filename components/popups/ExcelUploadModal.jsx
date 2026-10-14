@@ -108,7 +108,7 @@ const ExcelUploadModal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay">
+    <div className="ox-form modal-overlay">
       <div className="modal-container">
         {/* Header */}
         <div className="modal-header">

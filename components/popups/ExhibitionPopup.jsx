@@ -30,7 +30,7 @@ export default function ExhibitionPopup({ onClose, exhibitionId }) {
   }, [exhibitionId]);
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 px-4">
+    <div className="ox-form fixed inset-0 flex items-center justify-center bg-black/50 z-50 px-4">
       <div className="bg-white dark:bg-gray-900 w-full max-w-md p-6 rounded-2xl shadow-lg relative animate-fadeIn">
 
         {/* Close Button */}
@@ -44,7 +44,7 @@ export default function ExhibitionPopup({ onClose, exhibitionId }) {
         {/* Header with Logo */}
         <div className="flex flex-col items-center mb-6">
 
-          <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+          <h2 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">
             {exhibition?.exhibition_name || "Exhibition"}
           </h2>
         </div>
@@ -89,7 +89,7 @@ export default function ExhibitionPopup({ onClose, exhibitionId }) {
             <div className="mt-6 flex justify-end">
               <button
                 onClick={onClose}
-                className="px-5 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#131C55] to-[#2B3FB8] px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-900/25 transition hover:brightness-110 disabled:opacity-70 disabled:cursor-not-allowed motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500"
               >
                 Close
               </button>

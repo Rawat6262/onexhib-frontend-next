@@ -474,7 +474,7 @@ const CompanyPopupForm = ({ Close, data, onCompanyAdded }) => {
   return (
     <>
       <style>{styles}</style>
-      <div className="pf pf-overlay">
+      <div className="ox-form pf pf-overlay">
         <div className="pf-dialog">
 
           {/* Header */}

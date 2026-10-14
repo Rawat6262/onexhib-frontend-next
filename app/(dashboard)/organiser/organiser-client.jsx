@@ -4,9 +4,9 @@ import dynamic from "next/dynamic";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Pencil, Plus, Search } from "lucide-react";
+import TablePagination from "@/components/dashboard/TablePagination";
 
 import { getExhibitions } from "@/models/exhibition.model";
-import { getPageNumbers } from "@/lib/paginate";
 import {
   PageHeader,
   Panel,
@@ -44,7 +44,7 @@ export default function OrganiserClient() {
   const [showModal, setShowModal] = useState(false);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [id, setId] = useState(null);
   const router = useRouter();
   const [editingId, setEditingId] = useState(null);
@@ -79,6 +79,11 @@ export default function OrganiserClient() {
   }, [exhibitions, search]);
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage) || 1;
+  // A delete or a bigger page size can leave the current page past the end;
+  // pull it back rather than showing an empty table under a valid-looking pager.
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(totalPages);
+  }, [currentPage, totalPages]);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedData = filteredData.slice(startIndex, startIndex + itemsPerPage);
 
@@ -250,66 +255,18 @@ export default function OrganiserClient() {
           onClose={() => setEditingId(null)}
         />
 
-        <div className="flex flex-col items-center justify-between gap-3 border-t border-gray-200 px-5 py-4 sm:flex-row dark:border-gray-800">
-          <p className="text-[13px] text-gray-500 dark:text-gray-400">
-            Showing{" "}
-            <span className="font-medium text-gray-700 dark:text-gray-300">
-              {filteredData.length === 0 ? 0 : startIndex + 1}–
-              {Math.min(startIndex + itemsPerPage, filteredData.length)}
-            </span>{" "}
-            of{" "}
-            <span className="font-medium text-gray-700 dark:text-gray-300">
-              {filteredData.length}
-            </span>
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-1">
-            <button
-              type="button"
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-              className={pageBtn}
-              aria-label="Previous page"
-            >
-              ‹
-            </button>
-            {getPageNumbers(currentPage, totalPages).map((page, i) =>
-              page === "..." ? (
-                <span
-                  key={`dots-${i}`}
-                  className="flex h-8 w-8 items-center justify-center text-sm text-gray-400"
-                >
-                  …
-                </span>
-              ) : (
-                <button
-                  key={page}
-                  type="button"
-                  onClick={() => handlePageChange(page)}
-                  aria-current={page === currentPage ? "page" : undefined}
-                  className={page === currentPage ? pageBtnActive : pageBtn}
-                >
-                  {page}
-                </button>
-              )
-            )}
-            <button
-              type="button"
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className={pageBtn}
-              aria-label="Next page"
-            >
-              ›
-            </button>
-          </div>
-        </div>
+        <TablePagination
+          page={currentPage}
+          pageSize={itemsPerPage}
+          total={filteredData.length}
+          onPageChange={handlePageChange}
+          onPageSizeChange={(size) => {
+            setItemsPerPage(size);
+            setCurrentPage(1);
+          }}
+          itemLabel="exhibitions"
+        />
       </Panel>
     </div>
   );
 }
-
-const pageBtn =
-  "flex h-8 w-8 items-center justify-center rounded-lg border border-gray-300 text-sm text-gray-600 transition hover:border-[#131C55] hover:text-[#131C55] disabled:cursor-not-allowed disabled:opacity-40 motion-reduce:transition-none dark:border-gray-700 dark:text-gray-300 dark:hover:border-gray-500 dark:hover:text-white";
-
-const pageBtnActive =
-  "flex h-8 w-8 items-center justify-center rounded-lg border border-[#131C55] bg-[#131C55] text-sm font-medium text-white";

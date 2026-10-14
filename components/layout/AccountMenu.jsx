@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { LogOut, ChevronDown, UserCircle } from "lucide-react";
+import { LogOut, ChevronDown, UserCircle, MessagesSquare, PenSquare, BadgeCheck } from "lucide-react";
 
 import { logout } from "@/models/auth.model";
 import { useAuth } from "@/components/auth/AuthProvider";
@@ -95,6 +95,29 @@ export default function AccountMenu() {
               <p className="truncate text-xs text-gray-500 dark:text-gray-400">{email}</p>
             ) : null}
           </div>
+          {/* Community entry points, labelled. The header shows Community as an
+              icon only (it is out of room), so this is where the words live. Every
+              signed-in account can use social, so neither needs a role check. */}
+          <div className="border-b border-gray-100 py-1 dark:border-gray-800">
+            <Link
+              href="/social"
+              role="menuitem"
+              onClick={() => setOpen(false)}
+              className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-sm font-medium text-gray-700 transition hover:bg-gray-50 motion-reduce:transition-none dark:text-gray-200 dark:hover:bg-gray-800"
+            >
+              <MessagesSquare size={16} aria-hidden="true" className="text-gray-400" />
+              Community feed
+            </Link>
+            <Link
+              href="/social/my-posts"
+              role="menuitem"
+              onClick={() => setOpen(false)}
+              className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-sm font-medium text-gray-700 transition hover:bg-gray-50 motion-reduce:transition-none dark:text-gray-200 dark:hover:bg-gray-800"
+            >
+              <PenSquare size={16} aria-hidden="true" className="text-gray-400" />
+              My posts
+            </Link>
+          </div>
           {/* Rendered only when an id exists, because the destination is built
               from it — a link to /social/profile/undefined would 404. The id is
               never shown as text; it only forms the href. */}
@@ -109,6 +132,16 @@ export default function AccountMenu() {
               My social profile
             </Link>
           ) : null}
+          {/* Every account can reach its type switcher; /welcome has no role gate. */}
+          <Link
+            href="/welcome#account-type"
+            role="menuitem"
+            onClick={() => setOpen(false)}
+            className="flex w-full items-center gap-2.5 border-b border-gray-100 px-4 py-2.5 text-left text-sm font-medium text-gray-700 transition hover:bg-gray-50 motion-reduce:transition-none dark:border-gray-800 dark:text-gray-200 dark:hover:bg-gray-800"
+          >
+            <BadgeCheck size={16} aria-hidden="true" className="text-gray-400" />
+            Account type
+          </Link>
           <button
             type="button"
             role="menuitem"

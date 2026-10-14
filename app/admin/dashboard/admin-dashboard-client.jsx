@@ -8,7 +8,7 @@ import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { getOrganisers } from "@/models/organiser.model";
-import { getPageNumbers } from "@/lib/paginate";
+import TablePagination from "@/components/dashboard/TablePagination";
 
 // Modals are only needed once opened, so their code (and for the location
 // forms, country-state-city's ~2.3 MB dataset) is split out of this page's
@@ -23,7 +23,7 @@ export default function AdminDashboardClient() {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [showPopup, setShowPopup] = useState(false);
-  const itemsPerPage = 6;
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // /api/admin/signup now returns organiser counts for exhibitions/companies/products
   // alongside the organiser list, so one call covers everything this page needs —
@@ -66,6 +66,10 @@ export default function AdminDashboardClient() {
 
   // Pagination logic
   const totalPages = Math.ceil(filteredData.length / itemsPerPage) || 1;
+  // A delete or a bigger page size can leave the current page past the end.
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(totalPages);
+  }, [currentPage, totalPages]);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedData = filteredData.slice(
     startIndex,
@@ -77,22 +81,26 @@ export default function AdminDashboardClient() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FFFFFF] dark:bg-gray-950 text-gray-900 dark:text-gray-100 font-serif">
+    <div className="mx-auto w-full max-w-6xl px-4 py-8 text-gray-900 sm:px-6 sm:py-12 dark:text-gray-100">
 
-      <div className="flex-1 w-full mt-8 flex flex-col border border-gray-300 dark:border-gray-700 md:mx-4 lg:mx-6 bg-white dark:bg-gray-900 rounded-lg shadow-md overflow-y-auto">
+      <div className="flex flex-col">
         {/* Header */}
-        <div className="w-full flex flex-col sm:flex-row gap-3 sm:gap-0 items-center justify-between px-4 sm:px-8 py-4 sm:h-20 border-b border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 rounded-t-lg">
-          <h1 className="font-bold text-2xl sm:text-3xl tracking-wide">Admin Dashboard</h1>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div className="min-w-0">
+            <p className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#2B3FB8] dark:text-blue-300"><span aria-hidden="true" className="h-px w-6 bg-current opacity-60" />Admin</p>
+            <p className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#2B3FB8] dark:text-blue-300"><span aria-hidden="true" className="h-px w-6 bg-current opacity-60" />Admin</p>
+            <h1 className="text-3xl font-extrabold leading-[1.1] tracking-tight text-gray-900 sm:text-[2.6rem] dark:text-white">Admin Dashboard</h1>
+          </div>
           <button
             onClick={() => setShowPopup(true)}
-            className="h-10 w-full sm:w-48 border-2 border-blue-500 text-blue-500 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-950 rounded-md font-semibold transition-colors"
+            className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#131C55] to-[#2B3FB8] px-4 text-sm font-semibold text-white shadow-md shadow-indigo-900/20 transition hover:brightness-110 sm:w-48 motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500"
           >
             + New Organiser
           </button>
         </div>
 
         {/* Summary Cards */}
-        <div className="w-full px-3 sm:px-4 mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-6">
+        <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
           <SummaryCard title="Organiser" value={bigdata.length} />
           <SummaryCard title="Exhibition" value={exhibition} />
           <SummaryCard title="Company" value={company} />
@@ -100,8 +108,8 @@ export default function AdminDashboardClient() {
         </div>
 
         {/* Search Bar */}
-        <div className="py-4 w-full px-3 sm:px-4 flex flex-col lg:flex-row justify-between gap-4 px-4 mt-6">
-          <h2 className="font-bold text-2xl sm:text-3xl text-gray-800 dark:text-gray-100">
+        <div className="mt-2 flex w-full flex-col gap-4 px-5 py-4 lg:flex-row lg:justify-between">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">
             Organisers
           </h2>
           <input
@@ -112,20 +120,20 @@ export default function AdminDashboardClient() {
               setCurrentPage(1);
             }}
             placeholder="Search organisers"
-            className="h-10 w-full sm:w-64 border border-gray-400 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-md text-gray-700 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-500 px-3 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="h-10 rounded-xl border border-gray-300 bg-white px-3.5 text-sm text-gray-900 placeholder-gray-500 transition focus:border-[#2B3FB8] focus:outline-none focus:ring-4 focus:ring-[#2B3FB8]/15 motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 w-full sm:w-64"
           />
         </div>
 
         {/* List */}
-        <div className="flex-1 w-full px-3 sm:px-4 mt-4 rounded-b-lg border border-t-0 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm pb-8 mb-8">
+        <div className="mt-8 overflow-hidden rounded-2xl border border-gray-200 bg-white pb-2 shadow-sm shadow-gray-900/[0.03] dark:border-gray-800 dark:bg-gray-900 dark:shadow-none">
           {paginatedData.length === 0 ? (
-            <p className="p-6 text-center text-gray-600 dark:text-gray-400 italic">No data found</p>
+            <p className="px-5 py-12 text-center text-[15px] text-gray-500 dark:text-gray-400">No data found</p>
           ) : (
             <>
               {/* Card list — phones only */}
               <div className="sm:hidden flex flex-col gap-3 p-4">
                 {paginatedData.map((item, index) => (
-                  <div key={item._id || index} className="rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm p-4">
+                  <div key={item._id || index} className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
                     <p className="font-semibold text-gray-900 dark:text-gray-100">
                       {startIndex + index + 1}. {`${item.first_name || ""} ${item.last_name || ""}`.trim()}
                     </p>
@@ -152,12 +160,12 @@ export default function AdminDashboardClient() {
               </div>
 
               {/* Table — sm and up */}
-              <div className="hidden sm:block overflow-auto max-h-[70vh] overscroll-contain rounded-md">
-                <table className="w-full min-w-[700px] border-collapse border border-gray-300 dark:border-gray-700">
+              <div className="hidden max-h-[70vh] overflow-auto overscroll-contain sm:block">
+                <table className="w-full min-w-[700px] border-collapse text-sm">
                   <thead>
-                    <tr className="bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-b border-gray-300 dark:border-gray-700">
+                    <tr className="text-left text-[11px] uppercase tracking-wider text-gray-500 dark:text-gray-400">
                       {["#", "Full Name", "E-mail", "Phone", "Company", "Designation"].map((header) => (
-                        <th key={header} className="px-4 py-3 border-r border-gray-300 dark:border-gray-700 last:border-r-0 sticky top-0 z-10 bg-gray-200 dark:bg-gray-800 shadow-[inset_-1px_-1px_0_0_#d1d5db] dark:shadow-[inset_-1px_-1px_0_0_#374151] last:shadow-[inset_0_-1px_0_0_#d1d5db] dark:last:shadow-[inset_0_-1px_0_0_#374151]">
+                        <th key={header} className="sticky top-0 z-10 border-b border-gray-200 bg-gray-50 px-4 py-3 font-semibold dark:border-gray-800 dark:bg-gray-900">
                           {header}
                         </th>
                       ))}
@@ -165,15 +173,15 @@ export default function AdminDashboardClient() {
                   </thead>
                   <tbody>
                     {paginatedData.map((item, index) => (
-                      <tr key={item._id || index} className={index % 2 === 0 ? "bg-white dark:bg-gray-900" : "bg-gray-50 dark:bg-gray-800"}>
-                        <td className="px-4 py-3 border border-gray-300 dark:border-gray-700 text-center">{startIndex + index + 1}</td>
-                        <td className="px-4 py-3 border border-gray-300 dark:border-gray-700 text-center">
+                      <tr key={item._id || index} className={"bg-white transition-colors hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-white/[0.03]"}>
+                        <td className="border-b border-gray-100 px-4 py-3.5 text-center text-gray-700 dark:border-gray-800 dark:text-gray-300">{startIndex + index + 1}</td>
+                        <td className="border-b border-gray-100 px-4 py-3.5 text-center text-gray-700 dark:border-gray-800 dark:text-gray-300">
                           {`${item.first_name || ""} ${item.last_name || ""}`.trim()}
                         </td>
-                        <td className="px-4 py-3 border border-gray-300 dark:border-gray-700 text-center">{item.email}</td>
-                        <td className="px-4 py-3 border border-gray-300 dark:border-gray-700 text-center">{item.mobile_number}</td>
-                        <td className="px-4 py-3 border border-gray-300 dark:border-gray-700 text-center">{item.company_name}</td>
-                        <td className="px-4 py-3 border border-gray-300 dark:border-gray-700 text-center">{item.designation}</td>
+                        <td className="border-b border-gray-100 px-4 py-3.5 text-center text-gray-700 dark:border-gray-800 dark:text-gray-300">{item.email}</td>
+                        <td className="border-b border-gray-100 px-4 py-3.5 text-center text-gray-700 dark:border-gray-800 dark:text-gray-300">{item.mobile_number}</td>
+                        <td className="border-b border-gray-100 px-4 py-3.5 text-center text-gray-700 dark:border-gray-800 dark:text-gray-300">{item.company_name}</td>
+                        <td className="border-b border-gray-100 px-4 py-3.5 text-center text-gray-700 dark:border-gray-800 dark:text-gray-300">{item.designation}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -182,52 +190,18 @@ export default function AdminDashboardClient() {
             </>
           )}
 
-          {/* Pagination */}
-          <div className="mt-6 px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Showing{" "}
-              <span className="font-medium text-gray-700 dark:text-gray-300">
-                {filteredData.length === 0 ? 0 : startIndex + 1}–{Math.min(startIndex + itemsPerPage, filteredData.length)}
-              </span>{" "}
-              of <span className="font-medium text-gray-700 dark:text-gray-300">{filteredData.length}</span> organisers
-            </p>
-            <div className="flex gap-1 items-center flex-wrap justify-center">
-              <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="w-8 h-8 flex items-center justify-center rounded-md border border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed text-sm"
-                aria-label="Previous page"
-              >
-                ‹
-              </button>
-              {getPageNumbers(currentPage, totalPages).map((page, i) =>
-                page === "..." ? (
-                  <span key={`dots-${i}`} className="w-8 h-8 flex items-center justify-center text-gray-400 dark:text-gray-500 text-sm">
-                    …
-                  </span>
-                ) : (
-                  <button
-                    key={page}
-                    onClick={() => handlePageChange(page)}
-                    className={`w-8 h-8 flex items-center justify-center rounded-md border text-sm font-medium transition-colors ${
-                      page === currentPage
-                        ? "bg-blue-600 border-blue-600 text-white"
-                        : "border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-                    }`}
-                  >
-                    {page}
-                  </button>
-                )
-              )}
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="w-8 h-8 flex items-center justify-center rounded-md border border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed text-sm"
-                aria-label="Next page"
-              >
-                ›
-              </button>
-            </div>
+          <div className="mt-6">
+          <TablePagination
+            page={currentPage}
+            pageSize={itemsPerPage}
+            total={filteredData.length}
+            onPageChange={setCurrentPage}
+            onPageSizeChange={(size) => {
+              setItemsPerPage(size);
+              setCurrentPage(1);
+            }}
+            itemLabel="organisers"
+          />
           </div>
         </div>
       </div>
@@ -244,9 +218,9 @@ export default function AdminDashboardClient() {
 }
 
 const SummaryCard = ({ title, value }) => (
-  <div className="h-20 sm:h-24 rounded-xl flex flex-col justify-center items-center bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 shadow-sm px-2">
-    <p className="text-xs sm:text-lg font-medium text-gray-700 dark:text-gray-300 text-center">{title}</p>
-    <p className="text-2xl sm:text-4xl font-bold text-gray-900 dark:text-gray-100">{value}</p>
+  <div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 py-4 dark:border-gray-800 dark:bg-gray-900">
+    <p className="text-[13px] font-medium text-gray-500 dark:text-gray-400">{title}</p>
+    <p className="mt-1 text-2xl font-extrabold tracking-tight text-gray-900 tabular-nums sm:text-3xl dark:text-white">{value}</p>
   </div>
 );
 

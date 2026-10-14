@@ -111,7 +111,7 @@ export default function VerifyOtpForm({ initialEmail = "", initialSmsTo = "" }) 
       <div className="text-center space-y-2">
         {/* "Verify Your Account", not "Verify Your Email": with the code also
             going out by SMS, the email is one of two places to look for it. */}
-        <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Verify Your Account</h1>
+        <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 sm:text-[2rem] dark:text-white">Verify Your Account</h1>
         <p className="text-sm text-gray-500 dark:text-gray-400">
           We sent a 6-digit OTP to{smsTo ? " both of these" : ""}
         </p>

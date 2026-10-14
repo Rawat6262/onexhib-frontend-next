@@ -51,7 +51,7 @@ export default function ProductDetailClient({ id }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <div>
         <div className="flex-1 p-6 md:p-10">
           <div className="max-w-5xl mx-auto animate-pulse">
             <div className="h-4 w-40 bg-gray-50 dark:bg-gray-800/80 rounded mb-6" />
@@ -79,10 +79,10 @@ export default function ProductDetailClient({ id }) {
 
   if (error || !product) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <div>
         <div className="flex-1 flex items-center justify-center p-6">
           <div className="text-center">
-            <p className="text-lg font-medium text-gray-700 dark:text-gray-300">
+            <p className="text-[13px] font-medium text-gray-500 dark:text-gray-400">
               {error || "Product not found."}
             </p>
             <button
@@ -98,7 +98,7 @@ export default function ProductDetailClient({ id }) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100">
+    <div className="text-gray-900 dark:text-gray-100">
 
       <div className="flex-1 p-6 md:p-10">
         <div className="max-w-5xl mx-auto">
@@ -121,7 +121,7 @@ export default function ProductDetailClient({ id }) {
             <div className="grid grid-cols-1 md:grid-cols-2">
               {/* Image */}
               <div className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-6 sm:p-10 flex items-center justify-center">
-                <div className="w-full max-w-md aspect-square rounded-xl overflow-hidden bg-white dark:bg-gray-900 shadow-md ring-1 ring-black/5 dark:ring-white/10">
+                <div className="aspect-square w-full max-w-md overflow-hidden rounded-3xl bg-white shadow-xl shadow-indigo-900/10 ring-1 ring-black/5 dark:bg-gray-900 dark:ring-white/10">
                   {product.product_url ? (
                     <img
                       src={product.product_url}
@@ -139,12 +139,12 @@ export default function ProductDetailClient({ id }) {
               {/* Details */}
               <div className="p-6 sm:p-10 flex flex-col">
                 {product.category && (
-                  <span className="self-start mb-4 inline-block px-3 py-1 text-xs font-semibold tracking-wide uppercase text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950 rounded-full ring-1 ring-indigo-100 dark:ring-indigo-900">
+                  <span className="mb-4 inline-block self-start rounded-full bg-[#2B3FB8]/10 px-3 py-1 text-xs font-bold tracking-wide text-[#2B3FB8] uppercase ring-1 ring-[#2B3FB8]/15 dark:bg-blue-400/10 dark:text-blue-300 dark:ring-blue-400/20">
                     {product.category}
                   </span>
                 )}
 
-                <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100 mb-2">
+                <h1 className="mb-2 text-3xl font-extrabold leading-[1.1] tracking-tight text-gray-900 sm:text-[2.4rem] dark:text-white">
                   {product.product_name}
                 </h1>
 

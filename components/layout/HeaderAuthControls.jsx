@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { LayoutGrid } from "lucide-react";
+import { LayoutGrid, MessagesSquare } from "lucide-react";
 
 import { useAuth } from "@/components/auth/AuthProvider";
 import { homeRouteForRole } from "@/lib/auth";
@@ -39,6 +39,31 @@ export default function HeaderAuthControls() {
 
   return (
     <>
+      {/*
+        COMMUNITY, for signed-in visitors only, and from here rather than the
+        primary nav. PUBLIC_NAV is server-rendered and shared by every visitor, so
+        it cannot know who is signed in — and a guest clicking Community could
+        only be bounced to /login. This island already makes exactly that decision
+        for Dashboard, so the link rides along with it at no extra cost.
+
+        ICON-ONLY in the bar, with the name in a hover/focus tooltip and in
+        aria-label. The header is at capacity inside max-w-6xl: a sixth text item
+        here squeezes the primary nav until "AI Search" breaks across two lines.
+        The account menu and the mobile list carry the labelled version.
+      */}
+      <Link
+        href="/social"
+        aria-label="Community"
+        className="group relative hidden h-9 w-9 items-center justify-center rounded-lg text-gray-600 transition hover:bg-[#131C55]/[0.06] hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none sm:inline-flex dark:text-gray-300 dark:hover:bg-blue-400/10 dark:hover:text-blue-200"
+      >
+        <MessagesSquare size={18} aria-hidden="true" />
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute top-full left-1/2 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg transition group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none dark:bg-gray-700"
+        >
+          Community
+        </span>
+      </Link>
       {/* The way back into the workspace. Without it, a signed-in user who
           browses into the public site has no route home except the URL bar. */}
       <Link
@@ -95,6 +120,11 @@ export function HeaderAuthMobileLinks() {
       <li>
         <Link href={homeRouteForRole(role)} className={mobileLink}>
           Dashboard
+        </Link>
+      </li>
+      <li>
+        <Link href="/social" className={mobileLink}>
+          Community
         </Link>
       </li>
     </>

@@ -15,6 +15,7 @@ import { formatDateRange, formatLocation, toIsoDate, truncate } from "@/lib/form
 import { cityLandingPath } from "@/lib/routes";
 import { resolvePlaceLinks } from "@/lib/locations";
 import { getCompanyById, getExhibitionById, getProductsForCompany } from "@/lib/public-api";
+import EnquiryForm from "@/components/public/EnquiryForm";
 
 /**
  * Public company detail: /company/[slug]
@@ -143,7 +144,7 @@ export default async function CompanyDetailPage({ params }) {
             </p>
           ) : null}
 
-          <h1 className="mt-3 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl dark:text-white">
+          <h1 className="mt-3 text-3xl font-extrabold leading-[1.1] tracking-tight text-gray-900 sm:text-[2.6rem] dark:text-white">
             {company.name}
           </h1>
 
@@ -232,6 +233,16 @@ export default async function CompanyDetailPage({ params }) {
             {company.about}
           </p>
         </section>
+      ) : null}
+
+      {company.contactable ? (
+        <EnquiryForm
+          className="mt-12"
+          targetType="company"
+          targetId={company.id}
+          recipientLabel={company.name}
+          listingName={company.name}
+        />
       ) : null}
 
       {products.items.length ? (

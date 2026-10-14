@@ -85,6 +85,19 @@ export const getSocialProfile = (userId, config) =>
 /** Only `bio` and `headline` are editable — the backend ignores anything else. */
 export const updateSocialProfile = (payload) => axios.put("/api/social/profile", payload);
 
+/*
+ * Profile photo and cover. Own profile only - no id. `formData` carries one file
+ * under "image"; as with createPost, NO Content-Type is set, so the browser adds
+ * the multipart boundary itself. Each answers { profile } in the GET shape.
+ */
+export const uploadProfileAvatar = (formData) => axios.put("/api/social/profile/avatar", formData);
+
+export const removeProfileAvatar = () => axios.delete("/api/social/profile/avatar");
+
+export const uploadProfileCover = (formData) => axios.put("/api/social/profile/cover", formData);
+
+export const removeProfileCover = () => axios.delete("/api/social/profile/cover");
+
 // --- POSTS (7) ---------------------------------------------------------------
 
 /**

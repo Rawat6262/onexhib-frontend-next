@@ -15,7 +15,7 @@ import {
   featureExhibition,
   unfeatureExhibition,
 } from "@/models/exhibition.model";
-import { getPageNumbers } from "@/lib/paginate";
+import TablePagination from "@/components/dashboard/TablePagination";
 
 // Modals are only needed once opened, so their code (and for the location
 // forms, country-state-city's ~2.3 MB dataset) is split out of this page's
@@ -42,7 +42,8 @@ export default function AdminOrganisersClient() {
   const [showModal, setShowModal] = useState(false);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 50; // server page size — matches the params sent to /api/admin/exhibition
+  // Server page size, sent as `limit`; the backend caps it at 500.
+  const [itemsPerPage, setItemsPerPage] = useState(50);
   const [organiserId, setOrganiserId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [update, setupdate] = useState(false);
@@ -154,16 +155,20 @@ export default function AdminOrganisersClient() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FFFFFF] dark:bg-gray-950 text-gray-900 dark:text-gray-100 font-serif">
+    <div className="mx-auto w-full max-w-6xl px-4 py-8 text-gray-900 sm:px-6 sm:py-12 dark:text-gray-100">
 
-      <div className="flex-1 w-full mt-8 flex flex-col border border-gray-300 dark:border-gray-700 md:mx-4 lg:mx-6 bg-white dark:bg-gray-900 rounded-lg shadow-md overflow-y-auto">
+      <div className="flex flex-col">
         {/* Header */}
-        <div className="w-full flex flex-col sm:flex-row gap-3 sm:gap-0 justify-between items-center px-4 sm:px-8 py-4 sm:h-20 border-b border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 rounded-t-lg">
-          <h1 className="flex-1 font-bold text-2xl sm:text-3xl tracking-wide">SEM GROUP</h1>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div className="min-w-0">
+            <p className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#2B3FB8] dark:text-blue-300"><span aria-hidden="true" className="h-px w-6 bg-current opacity-60" />Admin</p>
+            <p className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#2B3FB8] dark:text-blue-300"><span aria-hidden="true" className="h-px w-6 bg-current opacity-60" />Admin</p>
+            <h1 className="text-3xl font-extrabold leading-[1.1] tracking-tight text-gray-900 sm:text-[2.6rem] dark:text-white">SEM GROUP</h1>
+          </div>
         </div>
 
         {/* Summary Cards */}
-        <div className="w-full px-3 sm:px-4 mt-6 grid grid-cols-3 gap-3 sm:gap-6">
+        <div className="mt-8 grid grid-cols-3 gap-3 sm:gap-4">
           {[
             { title: "Exhibitions", value: total },
             { title: "Companies", value: companies },
@@ -172,20 +177,20 @@ export default function AdminOrganisersClient() {
             (card) => (
               <div
                 key={card.title}
-                className="h-20 sm:h-24 rounded-xl flex flex-col justify-center items-center bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 shadow-sm px-2"
+                className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 py-4 dark:border-gray-800 dark:bg-gray-900"
               >
-                <p className="text-xs sm:text-lg font-medium text-gray-700 dark:text-gray-300 text-center">{card.title}</p>
-                <p className="text-2xl sm:text-4xl font-bold text-gray-900 dark:text-gray-100">{card.value}</p>
+                <p className="text-[13px] font-medium text-gray-500 dark:text-gray-400">{card.title}</p>
+                <p className="mt-1 text-2xl font-extrabold tracking-tight text-gray-900 tabular-nums sm:text-3xl dark:text-white">{card.value}</p>
               </div>
             )
           )}
         </div>
 
         {/* Table Section */}
-        <div className="flex-1 w-full px-3 sm:px-4 mt-8 rounded-b-lg border border-t-0 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm pb-8 mb-8">
+        <div className="mt-8 overflow-hidden rounded-2xl border border-gray-200 bg-white pb-2 shadow-sm shadow-gray-900/[0.03] dark:border-gray-800 dark:bg-gray-900 dark:shadow-none">
           {/* Controls */}
-          <div className="py-4 w-full flex flex-col lg:flex-row justify-between gap-4 px-4 text-center">
-            <h2 className="font-bold text-2xl sm:text-3xl text-gray-800 dark:text-gray-100">Exhibition List</h2>
+          <div className="flex w-full flex-col gap-4 border-b border-gray-200 bg-gradient-to-b from-gray-50/80 to-white px-5 py-4 text-center lg:flex-row lg:items-center lg:justify-between dark:border-gray-800 dark:from-white/[0.02] dark:to-transparent">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">Exhibition List</h2>
             <div className="flex flex-col sm:flex-row gap-4 justify-end flex-wrap">
               {/* Month/year selects share a row even on the smallest phones. */}
               <div className="flex gap-3">
@@ -195,7 +200,7 @@ export default function AdminOrganisersClient() {
                     setMonthFilter(e.target.value);
                     setCurrentPage(1);
                   }}
-                  className="h-10 flex-1 min-w-0 border border-gray-400 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-md text-gray-700 dark:text-gray-100 px-2 sm:px-3 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="h-10 rounded-xl border border-gray-300 bg-white px-3.5 text-sm text-gray-900 placeholder-gray-500 transition focus:border-[#2B3FB8] focus:outline-none focus:ring-4 focus:ring-[#2B3FB8]/15 motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 min-w-0 flex-1"
                 >
                   <option value="">Month</option>
                   {MONTH_NAMES.map((name, i) => (
@@ -208,7 +213,7 @@ export default function AdminOrganisersClient() {
                     setYearFilter(e.target.value);
                     setCurrentPage(1);
                   }}
-                  className="h-10 flex-1 min-w-0 border border-gray-400 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-md text-gray-700 dark:text-gray-100 px-2 sm:px-3 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="h-10 rounded-xl border border-gray-300 bg-white px-3.5 text-sm text-gray-900 placeholder-gray-500 transition focus:border-[#2B3FB8] focus:outline-none focus:ring-4 focus:ring-[#2B3FB8]/15 motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 min-w-0 flex-1"
                 >
                   <option value="">Year</option>
                   {YEAR_OPTIONS.map((y) => (
@@ -222,7 +227,7 @@ export default function AdminOrganisersClient() {
                       setYearFilter("");
                       setCurrentPage(1);
                     }}
-                    className="h-10 shrink-0 border border-gray-400 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md px-3 sm:px-4 font-semibold transition-colors"
+                    className="inline-flex h-10 shrink-0 items-center justify-center rounded-xl border border-gray-300 bg-white px-4 text-sm font-semibold text-gray-700 transition hover:border-[#2B3FB8] hover:text-[#2B3FB8] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-blue-400 dark:hover:text-white"
                   >
                     Clear
                   </button>
@@ -237,10 +242,10 @@ export default function AdminOrganisersClient() {
                 }}
                 placeholder="Search this page"
                 title="Only filters the exhibitions currently loaded on this page"
-                className="h-10 w-full sm:w-64 border border-gray-400 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-md text-gray-700 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-500 px-3 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="h-10 rounded-xl border border-gray-300 bg-white px-3.5 text-sm text-gray-900 placeholder-gray-500 transition focus:border-[#2B3FB8] focus:outline-none focus:ring-4 focus:ring-[#2B3FB8]/15 motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 w-full sm:w-64"
               />
               <button
-                className="h-10 w-full sm:w-48 border-2 border-blue-500 text-blue-500 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-950 rounded-md font-semibold transition-colors"
+                className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#131C55] to-[#2B3FB8] px-4 text-sm font-semibold text-white shadow-md shadow-indigo-900/20 transition hover:brightness-110 sm:w-48 motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500"
                 onClick={() => setShowModal(true)}
               >
                 + Add Exhibition
@@ -258,19 +263,19 @@ export default function AdminOrganisersClient() {
           )}
 
           {/* List */}
-          <div className="flex-1 w-full mt-6">
+          <div className="w-full">
             {loading ? (
-              <p className="text-center py-6 text-gray-600 dark:text-gray-400">Loading...</p>
+              <p className="px-5 py-12 text-center text-[15px] text-gray-500 dark:text-gray-400">Loading...</p>
             ) : paginatedData.length === 0 ? (
-              <p className="p-6 text-center text-gray-600 dark:text-gray-400 italic">No data found</p>
+              <p className="px-5 py-12 text-center text-[15px] text-gray-500 dark:text-gray-400">No data found</p>
             ) : (
               <>
                 {/* Card list — phones only */}
-                <div className="sm:hidden flex flex-col gap-3 px-4">
+                <div className="flex flex-col gap-3 px-4 py-4 sm:hidden">
                   {paginatedData.map((item, index) => (
                     <div
                       key={item._id || index}
-                      className="rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm p-4"
+                      className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900"
                     >
                       <div className="flex items-start justify-between gap-2">
                         <p className="font-semibold text-gray-900 dark:text-gray-100">
@@ -301,13 +306,13 @@ export default function AdminOrganisersClient() {
                       </dl>
                       <div className="flex items-center gap-2 mt-3">
                         <button
-                          className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 border border-blue-500 text-blue-500 dark:text-blue-400 rounded-md hover:bg-blue-100 dark:hover:bg-blue-950 transition"
+                          className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-[13px] font-medium text-gray-700 transition hover:border-[#2B3FB8] hover:text-[#2B3FB8] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-blue-400 dark:hover:text-white flex-1"
                           onClick={() => router.push(`/exhibitions/${item._id}`)}
                         >
                           View
                         </button>
                         <button
-                          className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 border border-green-500 text-green-500 dark:text-green-400 rounded-md hover:bg-green-100 dark:hover:bg-green-950 transition"
+                          className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-[13px] font-medium text-gray-700 transition hover:border-emerald-500 hover:text-emerald-600 motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-emerald-400 dark:hover:text-emerald-300 flex-1"
                           onClick={() => setEditingId(item._id)}
                         >
                           Edit
@@ -330,13 +335,13 @@ export default function AdminOrganisersClient() {
                 </div>
 
                 {/* Table — sm and up */}
-                <div className="hidden sm:block overflow-auto max-h-[70vh] overscroll-contain rounded-md text-left">
-                  <table className="w-full min-w-[700px] border-collapse border border-gray-300 dark:border-gray-700">
+                <div className="hidden max-h-[70vh] overflow-auto overscroll-contain text-left sm:block">
+                  <table className="w-full min-w-[700px] border-collapse text-sm">
                     <thead>
-                      <tr className="bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-b border-gray-300 dark:border-gray-700">
+                      <tr className="text-left text-[11px] uppercase tracking-wider text-gray-500 dark:text-gray-400">
                         {["#", "Exhibition BY", "Exhibition Name", "Address", "Category", "Start Date", "End Date", "Featured", "Action"].map(
                           (header) => (
-                            <th key={header} className="px-4 py-3 border-r border-gray-300 dark:border-gray-700 last:border-r-0 sticky top-0 z-10 bg-gray-200 dark:bg-gray-800 shadow-[inset_-1px_-1px_0_0_#d1d5db] dark:shadow-[inset_-1px_-1px_0_0_#374151] last:shadow-[inset_0_-1px_0_0_#d1d5db] dark:last:shadow-[inset_0_-1px_0_0_#374151]">
+                            <th key={header} className="sticky top-0 z-10 border-b border-gray-200 bg-gray-50 px-4 py-3 font-semibold dark:border-gray-800 dark:bg-gray-900">
                               {header}
                             </th>
                           )
@@ -346,19 +351,19 @@ export default function AdminOrganisersClient() {
 
                     <tbody>
                       {paginatedData.map((item, index) => (
-                        <tr key={item._id || index} className={index % 2 === 0 ? "bg-white dark:bg-gray-900" : "bg-gray-50 dark:bg-gray-800"}>
-                          <td className="px-4 py-3 border border-gray-300 dark:border-gray-700">{startIndex + index + 1}</td>
-                          <td className="px-4 py-3 border border-gray-300 dark:border-gray-700">{item.addedBy}</td>
-                          <td className="px-4 py-3 border border-gray-300 dark:border-gray-700">{item.exhibition_name}</td>
-                          <td className="px-4 py-3 border border-gray-300 dark:border-gray-700">{item.exhibition_address}</td>
-                          <td className="px-4 py-3 border border-gray-300 dark:border-gray-700">{item.category}</td>
-                          <td className="px-4 py-3 border border-gray-300 dark:border-gray-700">
+                        <tr key={item._id || index} className={"bg-white transition-colors hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-white/[0.03]"}>
+                          <td className="border-b border-gray-100 px-4 py-3.5 text-gray-700 dark:border-gray-800 dark:text-gray-300">{startIndex + index + 1}</td>
+                          <td className="border-b border-gray-100 px-4 py-3.5 text-gray-700 dark:border-gray-800 dark:text-gray-300">{item.addedBy}</td>
+                          <td className="border-b border-gray-100 px-4 py-3.5 text-gray-700 dark:border-gray-800 dark:text-gray-300">{item.exhibition_name}</td>
+                          <td className="border-b border-gray-100 px-4 py-3.5 text-gray-700 dark:border-gray-800 dark:text-gray-300">{item.exhibition_address}</td>
+                          <td className="border-b border-gray-100 px-4 py-3.5 text-gray-700 dark:border-gray-800 dark:text-gray-300">{item.category}</td>
+                          <td className="border-b border-gray-100 px-4 py-3.5 text-gray-700 dark:border-gray-800 dark:text-gray-300">
                             {item.starting_date ? new Date(item.starting_date).toLocaleDateString() : "—"}
                           </td>
-                          <td className="px-4 py-3 border border-gray-300 dark:border-gray-700">
+                          <td className="border-b border-gray-100 px-4 py-3.5 text-gray-700 dark:border-gray-800 dark:text-gray-300">
                             {item.ending_date ? new Date(item.ending_date).toLocaleDateString() : "—"}
                           </td>
-                          <td className="px-4 py-3 border border-gray-300 dark:border-gray-700 text-center">
+                          <td className="border-b border-gray-100 px-4 py-3.5 text-center text-gray-700 dark:border-gray-800 dark:text-gray-300">
                             <button
                               className={`px-3 py-1 border rounded-md transition disabled:opacity-50 disabled:cursor-not-allowed ${
                                 item.is_featured
@@ -372,16 +377,16 @@ export default function AdminOrganisersClient() {
                               {featuringIds.has(item._id) ? "..." : item.is_featured ? "★ Featured" : "Feature"}
                             </button>
                           </td>
-                          <td className="px-4 py-3 border border-gray-300 dark:border-gray-700">
+                          <td className="border-b border-gray-100 px-4 py-3.5 text-gray-700 dark:border-gray-800 dark:text-gray-300">
                             <div className="flex items-center gap-2">
                               <button
-                                className="flex items-center gap-1 px-3 py-1 border border-blue-500 text-blue-500 dark:text-blue-400 rounded-md hover:bg-blue-100 dark:hover:bg-blue-950 transition"
+                                className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-[13px] font-medium text-gray-700 transition hover:border-[#2B3FB8] hover:text-[#2B3FB8] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-blue-400 dark:hover:text-white"
                                 onClick={() => router.push(`/exhibitions/${item._id}`)}
                               >
                                 View
                               </button>
                               <button
-                                className="flex items-center gap-1 px-3 py-1 border border-green-500 text-green-500 dark:text-green-400 rounded-md hover:bg-green-100 dark:hover:bg-green-950 transition"
+                                className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-[13px] font-medium text-gray-700 transition hover:border-emerald-500 hover:text-emerald-600 motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-emerald-400 dark:hover:text-emerald-300"
                                 onClick={() => setEditingId(item._id)}
                               >
                                 Edit
@@ -405,53 +410,21 @@ export default function AdminOrganisersClient() {
     />
   </div>
 
-          {/* Pagination Controls */}
-          <div className="mt-6 px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Showing{" "}
-              <span className="font-medium text-gray-700 dark:text-gray-300">
-                {filteredData.length === 0 ? 0 : startIndex + 1}–{startIndex + filteredData.length}
-              </span>{" "}
-              of <span className="font-medium text-gray-700 dark:text-gray-300">{total}</span> exhibitions
-              {" "}(page {currentPage} of {totalPages})
-            </p>
-            <div className="flex gap-1 items-center flex-wrap justify-center">
-              <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="w-8 h-8 flex items-center justify-center rounded-md border border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed text-sm"
-                aria-label="Previous page"
-              >
-                ‹
-              </button>
-              {getPageNumbers(currentPage, totalPages).map((page, i) =>
-                page === "..." ? (
-                  <span key={`dots-${i}`} className="w-8 h-8 flex items-center justify-center text-gray-400 dark:text-gray-500 text-sm">
-                    …
-                  </span>
-                ) : (
-                  <button
-                    key={page}
-                    onClick={() => handlePageChange(page)}
-                    className={`w-8 h-8 flex items-center justify-center rounded-md border text-sm font-medium transition-colors ${
-                      page === currentPage
-                        ? "bg-blue-600 border-blue-600 text-white"
-                        : "border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-                    }`}
-                  >
-                    {page}
-                  </button>
-                )
-              )}
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="w-8 h-8 flex items-center justify-center rounded-md border border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed text-sm"
-                aria-label="Next page"
-              >
-                ›
-              </button>
-            </div>
+          <div className="mt-6">
+            <TablePagination
+              page={currentPage}
+              pageSize={itemsPerPage}
+              total={total}
+              totalPages={totalPages}
+              shownCount={filteredData.length}
+              onPageChange={handlePageChange}
+              onPageSizeChange={(size) => {
+                setItemsPerPage(size);
+                setCurrentPage(1);
+              }}
+              pageSizeOptions={[25, 50, 100]}
+              itemLabel="exhibitions"
+            />
           </div>
         </div>
       </div>

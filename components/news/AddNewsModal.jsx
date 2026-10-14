@@ -91,7 +91,7 @@ export default function NewsView({ onClose }) {
 };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 bg-slate-900/60 backdrop-blur-sm p-4">
+    <div className="ox-form fixed inset-0 flex items-center justify-center z-50 bg-slate-900/60 backdrop-blur-sm p-4">
       <div className="bg-white dark:bg-slate-900 w-full max-w-4xl max-h-[90%] rounded-2xl shadow-2xl flex flex-col overflow-hidden">
 
         {/* Header */}
@@ -207,7 +207,7 @@ export default function NewsView({ onClose }) {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-8 py-2.5 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 hover:shadow-lg transition-all shadow-md disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#131C55] to-[#2B3FB8] px-8 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-900/25 transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500"
               >
                 {isSubmitting ? "Publishing..." : "Publish News"}
               </button>

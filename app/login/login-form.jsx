@@ -54,7 +54,7 @@ export default function LoginForm({ stats, nextPath = "" }) {
   return (
     <AuthCard formProps={{ onSubmit: handleSubmit }} stats={stats}>
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl dark:text-white">
+        <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 sm:text-[2rem] dark:text-white">
           Welcome back
         </h1>
         <p className="mt-2 text-[15px] text-gray-600 dark:text-gray-400">

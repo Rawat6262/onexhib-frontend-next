@@ -68,6 +68,11 @@ const CONTRACTS = [
 
   ["profile", "getSocialProfile", "get", `/api/social/profile/${ID}`, () => social.getSocialProfile(ID)],
   ["profile", "updateSocialProfile", "put", "/api/social/profile", () => social.updateSocialProfile({ bio: "b" })],
+  // Profile photo and cover: own profile only, so no id in any of the four.
+  ["profile", "uploadProfileAvatar", "put", "/api/social/profile/avatar", () => social.uploadProfileAvatar(new FormData())],
+  ["profile", "removeProfileAvatar", "delete", "/api/social/profile/avatar", () => social.removeProfileAvatar()],
+  ["profile", "uploadProfileCover", "put", "/api/social/profile/cover", () => social.uploadProfileCover(new FormData())],
+  ["profile", "removeProfileCover", "delete", "/api/social/profile/cover", () => social.removeProfileCover()],
 
   ["posts", "createPost", "post", "/api/social/posts", () => social.createPost({ title: "t" })],
   ["posts", "getFeed", "get", "/api/social/feed", () => social.getFeed()],
@@ -125,7 +130,7 @@ const CONTRACTS = [
 
 console.log("social model: all 27 endpoint contracts");
 
-check("exactly 36 contracts are asserted", CONTRACTS.length === 36, String(CONTRACTS.length));
+check("exactly 40 contracts are asserted", CONTRACTS.length === 40, String(CONTRACTS.length));
 
 let group = "";
 for (const [g, label, method, url, invoke] of CONTRACTS) {
@@ -145,7 +150,7 @@ console.log("");
 console.log("social model: the exported surface is exactly those 36");
 
 const exported = Object.keys(social).filter((k) => typeof social[k] === "function").sort();
-check("36 functions exported", exported.length === 36, `${exported.length}: ${exported.join(",")}`);
+check("40 functions exported", exported.length === 40, `${exported.length}: ${exported.join(",")}`);
 check(
   "every contract name is exported",
   CONTRACTS.every(([, label]) => exported.includes(label)),

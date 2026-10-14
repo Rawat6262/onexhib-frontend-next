@@ -1,6 +1,6 @@
 "use client";
 
-import { MessageSquare, UserCircle, Bell, ShieldOff } from "lucide-react";
+import { MessageSquare, UserCircle, Bell, ShieldOff, Users } from "lucide-react";
 import AppShell from "@/components/layout/AppShell";
 import RequireAuth from "@/components/auth/RequireAuth";
 import { useAuth } from "@/components/auth/AuthProvider";
@@ -36,6 +36,15 @@ export default function SocialLayout({ children }) {
      * a count here would either be a second request per navigation render or a second
      * number that drifts from the bell's.
      */
+    /*
+     * PEOPLE, immediately after Feed, because it is the answer to an empty one.
+     *
+     * Before this existed the social graph had no entrance: following somebody required
+     * already holding their profile URL, so a new account saw an empty feed, a profile
+     * with no followers, and no route to anyone. Placing it second means the fix sits
+     * next to the symptom.
+     */
+    { label: "People", href: "/social/people", icon: <Users size={16} /> },
     { label: "Notifications", href: "/social/notifications", icon: <Bell size={16} /> },
   ];
   if (user?._id) {

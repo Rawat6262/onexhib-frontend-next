@@ -625,7 +625,7 @@ const socialPages = [];
   }
 })(routeDir);
 
-check("all five social routes were found", socialPages.length === 5, `found ${socialPages.length}`);
+check("all six social routes were found", socialPages.length === 6, `found ${socialPages.length}`);
 check(
   "and they are exactly the expected five",
   JSON.stringify(
@@ -635,6 +635,7 @@ check(
   ) === JSON.stringify([
     "(social)/social/notifications/page.jsx",
     "(social)/social/page.jsx",
+    "(social)/social/people/page.jsx",
     "(social)/social/posts/[postId]/page.jsx",
     "(social)/social/privacy/page.jsx",
     "(social)/social/profile/[userId]/page.jsx",

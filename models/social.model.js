@@ -1,7 +1,7 @@
 import axios from "axios";
 
 /**
- * The social API surface — all 35 deployed endpoints, one thin function each.
+ * The social API surface — all 36 deployed endpoints, one thin function each.
  *
  * TRANSPORT IS ALREADY SOLVED, AND IS NOT RE-SOLVED HERE
  * Every path is relative. next.config.mjs rewrites /api/:path* to the server-only
@@ -189,6 +189,25 @@ export const markAllNotificationsRead = () =>
 
 export const markNotificationRead = (notificationId) =>
   axios.put(`/api/social/notifications/${id(notificationId)}/read`);
+
+// --- PEOPLE (1) --------------------------------------------------------------
+
+/**
+ * People the viewer could follow: `{ success, users, nextCursor, hasMore }`.
+ *
+ * NO userId ARGUMENT - the directory is built relative to the SESSION. The server
+ * excludes the viewer, excludes anyone blocked in either direction, and attaches a
+ * `following` flag per row from one batched lookup, so a row needs no request of its own.
+ *
+ * This is the social graph's entrance. Before it existed you could follow somebody only
+ * if you already held their profile URL, which is why UserList's empty state refused to
+ * print a "find people" prompt: there was nowhere to send them.
+ *
+ * `q` searches the public name fields literally - a term is escaped server-side, so a
+ * full stop matches a full stop rather than everyone.
+ */
+export const getPeople = (page) =>
+  axios.get("/api/social/people", pageParams(page));
 
 // --- BLOCK (3) ---------------------------------------------------------------
 

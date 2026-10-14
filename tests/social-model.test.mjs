@@ -103,6 +103,14 @@ const CONTRACTS = [
    * backend stores no target type - the ROUTE is what says what was reported, so a wrong
    * `type` variable would file against the wrong collection and still answer 201.
    */
+  /*
+   * PHASE 13. The people directory - the social graph's entrance.
+   *
+   * No id argument, like getBlockedUsers: the list is built relative to the SESSION, so
+   * there is no parameter through which one user could request another's view of it.
+   */
+  ["people", "getPeople", "get", "/api/social/people", () => social.getPeople()],
+
   ["block", "blockUser", "post", `/api/social/block/${ID}`, () => social.blockUser(ID)],
   ["block", "unblockUser", "delete", `/api/social/block/${ID}`, () => social.unblockUser(ID)],
   ["block", "getBlockedUsers", "get", "/api/social/blocked", () => social.getBlockedUsers()],
@@ -117,7 +125,7 @@ const CONTRACTS = [
 
 console.log("social model: all 27 endpoint contracts");
 
-check("exactly 35 contracts are asserted", CONTRACTS.length === 35, String(CONTRACTS.length));
+check("exactly 36 contracts are asserted", CONTRACTS.length === 36, String(CONTRACTS.length));
 
 let group = "";
 for (const [g, label, method, url, invoke] of CONTRACTS) {
@@ -134,10 +142,10 @@ for (const [g, label, method, url, invoke] of CONTRACTS) {
 }
 
 console.log("");
-console.log("social model: the exported surface is exactly those 35");
+console.log("social model: the exported surface is exactly those 36");
 
 const exported = Object.keys(social).filter((k) => typeof social[k] === "function").sort();
-check("35 functions exported", exported.length === 35, `${exported.length}: ${exported.join(",")}`);
+check("36 functions exported", exported.length === 36, `${exported.length}: ${exported.join(",")}`);
 check(
   "every contract name is exported",
   CONTRACTS.every(([, label]) => exported.includes(label)),

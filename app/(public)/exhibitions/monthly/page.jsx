@@ -2,11 +2,12 @@ import Link from "next/link";
 
 import Breadcrumbs from "@/components/public/Breadcrumbs";
 import EmptyState from "@/components/public/EmptyState";
+import CalendarExplorer from "@/components/public/CalendarExplorer";
 import JsonLd from "@/components/seo/JsonLd";
 
 import { PUBLIC_ROUTES, publicPageMetadata } from "@/lib/seo";
 import { breadcrumbNode, graph, itemListNode } from "@/lib/jsonld";
-import { getMonthlyIndex, MIN_MONTH_EXHIBITIONS, monthSlug } from "@/lib/discovery";
+import { getCalendarEvents, getMonthlyIndex, MIN_MONTH_EXHIBITIONS, monthSlug } from "@/lib/discovery";
 
 /**
  * /exhibitions/monthly — the calendar hub.
@@ -34,7 +35,9 @@ export const metadata = publicPageMetadata({
 });
 
 export default async function MonthlyHubPage() {
-  const months = await getMonthlyIndex();
+  // The calendar's events come from the same cached walk as the month index.
+  const [months, calendar] = await Promise.all([getMonthlyIndex(), getCalendarEvents()]);
+  const today = new Date().toISOString().slice(0, 10);
   const linkable = months.filter((m) => m.count >= MIN_MONTH_EXHIBITIONS);
 
   const trail = [
@@ -83,59 +86,14 @@ export default async function MonthlyHubPage() {
       </header>
 
       {months.length ? (
-        <ul className="mt-10 grid list-none grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {months.map((m) => {
-            const { year, month } = monthSlug(m.year, m.month);
-            const href = `${PUBLIC_ROUTES.exhibitions}/monthly/${year}/${month}`;
-            const hasPage = m.count >= MIN_MONTH_EXHIBITIONS;
-            const share = busiest?.count ? Math.round((m.count / busiest.count) * 100) : 0;
-
-            const body = (
-              <>
-                <div className="flex items-baseline justify-between gap-3">
-                  <span className="text-base font-semibold text-gray-900 dark:text-gray-50">
-                    {m.label}
-                  </span>
-                  <span className="text-sm tabular-nums text-gray-500 dark:text-gray-400">
-                    {m.count.toLocaleString("en-US")}
-                  </span>
-                </div>
-                {/* Proportional bar, purely decorative - the number above is the
-                    accessible value, so this is hidden from assistive tech. */}
-                <div
-                  aria-hidden="true"
-                  className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800"
-                >
-                  <div
-                    className="h-full rounded-full bg-[#131C55] dark:bg-blue-400"
-                    style={{ width: `${Math.max(share, 3)}%` }}
-                  />
-                </div>
-                <p className="mt-2 text-xs text-gray-500 dark:text-gray-500">
-                  {m.count === 1 ? "1 exhibition" : `${m.count} exhibitions`}
-                  {hasPage ? "" : " — too few for its own page yet"}
-                </p>
-              </>
-            );
-
-            return (
-              <li key={`${m.year}-${m.month}`}>
-                {hasPage ? (
-                  <Link
-                    href={href}
-                    className="ox-card block rounded-2xl border border-gray-200 bg-white p-4 hover:border-[#131C55]/30 hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:border-gray-800 dark:bg-gray-900 dark:hover:border-gray-600"
-                  >
-                    {body}
-                  </Link>
-                ) : (
-                  <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50/60 p-4 dark:border-gray-700 dark:bg-gray-900/40">
-                    {body}
-                  </div>
-                )}
-              </li>
-            );
-          })}
-        </ul>
+        // Unfiltered, this renders the same month list and links as before; the
+        // filters, timeline and charts are layered on top in the browser.
+        <CalendarExplorer
+          data={calendar}
+          months={months.map((m) => ({ year: m.year, month: m.month, count: m.count }))}
+          today={today}
+          minForPage={MIN_MONTH_EXHIBITIONS}
+        />
       ) : (
         <div className="mt-10">
           <EmptyState>

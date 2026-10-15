@@ -121,7 +121,7 @@ export default function WelcomeClient() {
           <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-blue-100/90">
             {hasWorkspace
               ? "Your dashboard is ready. You can also change your account type below if it no longer fits."
-              : "Visitor and exhibitor accounts don't have a dashboard. Everything on OneXhib is open to you, and the links below are a good place to start. If you run exhibitions or offer services, switch your account type further down this page."}
+              : "Visitor accounts don't have a dashboard. Everything on OneXhib is open to you, and the links below are a good place to start. If you exhibit, run exhibitions or offer services, switch your account type further down this page."}
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             {hasWorkspace ? (
@@ -129,7 +129,7 @@ export default function WelcomeClient() {
                 href={homeRouteForRole(role)}
                 className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-[#131C55] transition hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white motion-reduce:transition-none"
               >
-                Go to my dashboard
+                {role === ROLES.EXHIBITOR ? "Open my exhibitor workspace" : "Go to my dashboard"}
                 <ArrowRight size={16} aria-hidden="true" />
               </Link>
             ) : (

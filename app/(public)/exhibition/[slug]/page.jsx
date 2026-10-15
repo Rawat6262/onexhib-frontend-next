@@ -198,8 +198,9 @@ export default async function ExhibitionDetailPage({ params }) {
     { title: "About the organiser", body: exhibition.aboutOrganiser },
     { title: "Speakers", body: exhibition.speakers },
     { title: "Sessions", body: exhibition.session },
-    { title: "Sponsors", body: exhibition.sponsor },
-    { title: "Partners", body: exhibition.partners },
+    // Text is the older form; once logos exist they are shown instead (below).
+    { title: "Sponsors", body: exhibition.sponsorLogos.length ? "" : exhibition.sponsor },
+    { title: "Partners", body: exhibition.partnerLogos.length ? "" : exhibition.partners },
   ].filter((s) => s.body);
 
   return (
@@ -342,6 +343,37 @@ export default async function ExhibitionDetailPage({ params }) {
             </section>
           ))}
         </div>
+      ) : null}
+
+      {exhibition.sponsorLogos.length || exhibition.partnerLogos.length ? (
+        <section aria-label="Sponsors and partners" className="mt-14 space-y-10">
+          {[
+            { title: "Sponsors", logos: exhibition.sponsorLogos },
+            { title: "Partners", logos: exhibition.partnerLogos },
+          ]
+            .filter((g) => g.logos.length)
+            .map((g) => (
+              <div key={g.title}>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">{g.title}</h2>
+                <ul className="mt-4 grid list-none grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+                  {g.logos.map((logo) => (
+                    <li
+                      key={logo.id}
+                      className="grid aspect-[3/2] place-items-center rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-100"
+                    >
+                      {/* Plain <img>: hotlinked logos of any shape, shown whole. */}
+                      <img
+                        src={logo.url}
+                        alt={`${exhibition.name} ${g.title === "Sponsors" ? "sponsor" : "partner"} logo`}
+                        loading="lazy"
+                        className="max-h-full max-w-full object-contain"
+                      />
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+        </section>
       ) : null}
 
       {/* Visitor -> organiser. Shown only when the backend can deliver to this

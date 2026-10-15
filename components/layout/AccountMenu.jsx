@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { LogOut, ChevronDown, UserCircle, MessagesSquare, PenSquare, BadgeCheck } from "lucide-react";
+import { LogOut, ChevronDown, UserCircle, MessagesSquare, PenSquare, BadgeCheck, Bookmark, CalendarClock, Store } from "lucide-react";
 
 import { logout } from "@/models/auth.model";
 import { useAuth } from "@/components/auth/AuthProvider";
@@ -132,6 +132,22 @@ export default function AccountMenu() {
               My social profile
             </Link>
           ) : null}
+          {/* Personal pages. Both existed with nothing linking to them, so the only
+              way in was typing the URL. The workspace link shows for exhibitors,
+              whose home it is. */}
+          <div className="border-b border-gray-100 py-1 dark:border-gray-800">
+            {user?.designation === "Exhibitor" ? (
+              <MenuLink href="/exhibitor" icon={Store} onClick={() => setOpen(false)}>
+                Exhibitor workspace
+              </MenuLink>
+            ) : null}
+            <MenuLink href="/account/saved" icon={Bookmark} onClick={() => setOpen(false)}>
+              Saved exhibitions
+            </MenuLink>
+            <MenuLink href="/account/meetings" icon={CalendarClock} onClick={() => setOpen(false)}>
+              My meetings
+            </MenuLink>
+          </div>
           {/* Every account can reach its type switcher; /welcome has no role gate. */}
           <Link
             href="/welcome#account-type"
@@ -155,5 +171,19 @@ export default function AccountMenu() {
         </div>
       ) : null}
     </div>
+  );
+}
+
+function MenuLink({ href, icon: Icon, onClick, children }) {
+  return (
+    <Link
+      href={href}
+      role="menuitem"
+      onClick={onClick}
+      className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-sm font-medium text-gray-700 transition hover:bg-gray-50 motion-reduce:transition-none dark:text-gray-200 dark:hover:bg-gray-800"
+    >
+      <Icon size={16} aria-hidden="true" className="text-gray-400" />
+      {children}
+    </Link>
   );
 }

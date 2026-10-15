@@ -83,9 +83,18 @@ export default async function CompanyDetailPage({ params }) {
 
   // company.createdBy references the exhibition the company was listed under.
   // Fetched only to link back, and it fails soft to null.
-  const [products, exhibition] = await Promise.all([
+  const [products, exhibition, attending] = await Promise.all([
     getProductsForCompany(company.id),
     company.exhibitionId ? getExhibitionById(company.exhibitionId) : Promise.resolve(null),
+    // Self-listed companies name the shows they attend; each fails soft to null.
+    Promise.all(
+      company.participations.map(async (p) => {
+        const ex = await getExhibitionById(p.exhibitionId);
+        return ex ? { ...p, exhibition: ex } : null;
+      })
+    ).then((rows) =>
+      rows.filter(Boolean).sort((a, b) => new Date(a.exhibition.startDate) - new Date(b.exhibition.startDate))
+    ),
   ]);
 
   // Several companies have no `about` text, which left the page with little
@@ -223,6 +232,34 @@ export default async function CompanyDetailPage({ params }) {
           ) : null}
         </div>
       </header>
+
+      {attending.length ? (
+        <section aria-labelledby="attending-heading" className="mt-10">
+          <h2 id="attending-heading" className="text-lg font-semibold text-gray-900 dark:text-gray-50">
+            Where to meet {company.name}
+          </h2>
+          <ul className="mt-3 grid list-none gap-3 sm:grid-cols-2">
+            {attending.map(({ exhibition: ex, hall, stall }) => (
+              <li key={ex.id}>
+                <Link
+                  href={exhibitionPath(ex.name, ex.id)}
+                  className="ox-card flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-4 hover:border-[#2B3FB8]/30 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 dark:hover:border-blue-400/30"
+                >
+                  <span className="font-semibold text-gray-900 dark:text-gray-50">{ex.name}</span>
+                  <span className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                    {[formatDateRange(ex.startDate, ex.endDate), formatLocation(ex, { includeVenue: false })].filter(Boolean).join(" · ")}
+                  </span>
+                  {hall || stall ? (
+                    <span className="mt-2 w-fit rounded-full bg-[#2B3FB8]/10 px-2.5 py-0.5 text-xs font-semibold text-[#2B3FB8] dark:bg-blue-400/10 dark:text-blue-300">
+                      {[hall ? `Hall ${hall}` : null, stall ? `Stall ${stall}` : null].filter(Boolean).join(" · ")}
+                    </span>
+                  ) : null}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       {company.about ? (
         <section className="mt-10 max-w-3xl">

@@ -90,3 +90,32 @@ export const uploadExhibitionsExcel = (file, onProgress) =>
     xhr.open("POST", "/api/exhibition/upload-excel");
     xhr.send(formData);
   });
+
+/*
+ * Sponsor / partner logos on an existing exhibition (owner or admin).
+ * kind: "sponsor" | "partner". Each answers { sponsor_logos, partner_logos }.
+ * No Content-Type is set for the upload - the browser adds the multipart boundary.
+ */
+export const addExhibitionLogos = (exhibitionId, kind, files) => {
+  const data = new FormData();
+  for (const f of files) data.append("logos", f);
+  return axios.post(`/api/exhibition/${encodeURIComponent(exhibitionId)}/logos/${kind}`, data);
+};
+
+export const removeExhibitionLogo = (exhibitionId, kind, logoId) =>
+  axios.delete(`/api/exhibition/${encodeURIComponent(exhibitionId)}/logos/${kind}/${encodeURIComponent(logoId)}`);
+
+/**
+ * Ask the site to rebuild one exhibition's public page now rather than after its
+ * 5-minute cache. Fire-and-forget: a failure only means the change appears a
+ * few minutes later, so it never blocks or fails the edit that triggered it.
+ */
+export const refreshExhibitionPage = (exhibitionId) => {
+  if (!exhibitionId) return;
+  fetch("/api/revalidate/exhibition", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ id: String(exhibitionId) }),
+  }).catch(() => {});
+};

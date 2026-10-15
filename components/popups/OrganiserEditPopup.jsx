@@ -9,12 +9,22 @@
 // - isAdmin (bool)  <-- true when opened from the admin screens, uses the admin-only update endpoint
 
 import React, { useEffect, useState } from "react";
-import { fetchExhibitionById, updateExhibition, adminUpdateExhibition } from "@/models/exhibition.model";
+import { fetchExhibitionById, updateExhibition, adminUpdateExhibition, addExhibitionLogos, removeExhibitionLogo, refreshExhibitionPage } from "@/models/exhibition.model";
+import { toast } from "sonner";
+import LogoPicker from "@/components/popups/LogoPicker";
 
 export default function ExhibitionEditPopup({ open, onClose, exhibitionId, isAdmin = false }) {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+  /*
+   * Sponsor / partner logos are managed live, not through Save: each add uploads
+   * at once and each remove deletes at once (POST/DELETE /api/exhibition/:id/logos),
+   * for owner and admin alike. They are deliberately NOT part of `form`, so the
+   * JSON Save never sends a logo list (the API ignores one anyway).
+   */
+  const [logos, setLogos] = useState({ sponsor_logos: [], partner_logos: [] });
+  const [logoBusy, setLogoBusy] = useState(null); // "sponsor" | "partner" | null
   const [form, setForm] = useState({
     exhibition_name: "",
     addedBy: "",
@@ -62,6 +72,10 @@ export default function ExhibitionEditPopup({ open, onClose, exhibitionId, isAdm
       })
       .then((data) => {
         // map server fields to form fields
+        setLogos({
+          sponsor_logos: Array.isArray(data.sponsor_logos) ? data.sponsor_logos : [],
+          partner_logos: Array.isArray(data.partner_logos) ? data.partner_logos : [],
+        });
         setForm({
           exhibition_name: data.exhibition_name || "",
           addedBy: data.addedBy || "",
@@ -101,6 +115,35 @@ export default function ExhibitionEditPopup({ open, onClose, exhibitionId, isAdm
 
   if (!open) return null;
 
+  async function addLogos(kind, files) {
+    setLogoBusy(kind);
+    try {
+      const { data } = await addExhibitionLogos(exhibitionId, kind, files);
+      setLogos({ sponsor_logos: data.sponsor_logos || [], partner_logos: data.partner_logos || [] });
+      refreshExhibitionPage(exhibitionId); // show the new logos on the public page now
+      toast.success(`${files.length} ${files.length === 1 ? "logo" : "logos"} added.`);
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "The logos could not be uploaded.");
+    } finally {
+      setLogoBusy(null);
+    }
+  }
+
+  async function removeLogo(kind, logoId) {
+    setLogoBusy(kind);
+    try {
+      const { data } = await removeExhibitionLogo(exhibitionId, kind, logoId);
+      setLogos({ sponsor_logos: data.sponsor_logos || [], partner_logos: data.partner_logos || [] });
+      refreshExhibitionPage(exhibitionId);
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "The logo could not be removed.");
+    } finally {
+      setLogoBusy(null);
+    }
+  }
+
+  const logoItems = (list) => list.map((l) => ({ key: String(l._id), url: l.url }));
+
   function handleChange(e) {
     const { name, value } = e.target;
     setForm((s) => ({ ...s, [name]: value }));
@@ -122,6 +165,7 @@ export default function ExhibitionEditPopup({ open, onClose, exhibitionId, isAdm
       }
 
       const updated = await res.json();
+      refreshExhibitionPage(exhibitionId);
       console.log("Saved:", updated);
       onClose && onClose();
     } catch (err) {
@@ -233,23 +277,42 @@ export default function ExhibitionEditPopup({ open, onClose, exhibitionId, isAdm
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Sponsor</label>
-              <input name="sponsor" value={form.sponsor} onChange={handleChange} className="mt-1 w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded px-2 py-1" />
-            </div>
-
-            <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Privacy Policy</label>
               <input name="privacy_policy" value={form.privacy_policy} onChange={handleChange} className="mt-1 w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded px-2 py-1" />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Partners</label>
-              <input name="partners" value={form.partners} onChange={handleChange} className="mt-1 w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded px-2 py-1" />
-            </div>
-
-            <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Terms of Service</label>
               <input name="terms_of_service" value={form.terms_of_service} onChange={handleChange} className="mt-1 w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded px-2 py-1" />
+            </div>
+
+            {/* Logos save immediately - see the note on `logos` above. */}
+            <div className="grid gap-5 rounded-2xl border border-gray-200 p-4 sm:col-span-2 md:grid-cols-2 dark:border-gray-800">
+              <LogoPicker
+                id="edit-sponsor-logos"
+                label="Sponsor logos"
+                hint="Added and removed straight away - no need to press Save."
+                items={logoItems(logos.sponsor_logos)}
+                busy={logoBusy === "sponsor"}
+                onAdd={(files) => addLogos("sponsor", files)}
+                onRemove={(id) => removeLogo("sponsor", id)}
+                onError={(m) => toast.error(m)}
+              />
+              <LogoPicker
+                id="edit-partner-logos"
+                label="Partner logos"
+                hint="Added and removed straight away - no need to press Save."
+                items={logoItems(logos.partner_logos)}
+                busy={logoBusy === "partner"}
+                onAdd={(files) => addLogos("partner", files)}
+                onRemove={(id) => removeLogo("partner", id)}
+                onError={(m) => toast.error(m)}
+              />
+              {form.sponsor || form.partners ? (
+                <p className="text-xs text-gray-500 md:col-span-2 dark:text-gray-400">
+                  Listed earlier as text: {[form.sponsor && `Sponsors - ${form.sponsor}`, form.partners && `Partners - ${form.partners}`].filter(Boolean).join(" · ")}
+                </p>
+              ) : null}
             </div>
 
             <div>

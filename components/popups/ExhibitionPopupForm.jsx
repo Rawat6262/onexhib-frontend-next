@@ -1,10 +1,11 @@
 "use client";
 
 import { City, Country, State } from "country-state-city";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import Select from 'react-select';
 import { createExhibition } from "@/models/exhibition.model";
+import LogoPicker from "@/components/popups/LogoPicker";
 
 // --- 1. Refined Label Component (Bold & Visible) ---
 const Label = ({ children, required, htmlFor }) => (
@@ -103,8 +104,18 @@ const ExhibitionPopupForm = ({ onClose }) => {
   const [session, setSession] = useState("");
 
 
-  const [sponsor, setSponsor] = useState("");
-  const [partners, setPartners] = useState("");
+  // Sponsors and partners are LOGOS now: picked here, previewed locally, and sent
+  // with the create request as sponsor_logos / partner_logos. The old free-text
+  // fields are still sent empty so the payload shape the API expects is unchanged.
+  const [sponsor] = useState("");
+  const [partners] = useState("");
+  const [sponsorFiles, setSponsorFiles] = useState([]);
+  const [partnerFiles, setPartnerFiles] = useState([]);
+  const sponsorItems = useMemo(() => sponsorFiles.map((f, i) => ({ key: `${i}-${f.name}-${f.size}`, url: URL.createObjectURL(f), file: f })), [sponsorFiles]);
+  const partnerItems = useMemo(() => partnerFiles.map((f, i) => ({ key: `${i}-${f.name}-${f.size}`, url: URL.createObjectURL(f), file: f })), [partnerFiles]);
+  // Object URLs hold the file in memory until revoked.
+  useEffect(() => () => sponsorItems.forEach((x) => URL.revokeObjectURL(x.url)), [sponsorItems]);
+  useEffect(() => () => partnerItems.forEach((x) => URL.revokeObjectURL(x.url)), [partnerItems]);
   const [Support, setSupport] = useState(""); // Support state
 
   const [privacy_policy, setPrivacy] = useState("");
@@ -392,6 +403,8 @@ const Dropdown = ({
       formData.append("session", session.trim());
       formData.append("sponsor", sponsor.trim());
       formData.append("partners", partners.trim());
+      for (const f of sponsorFiles) formData.append("sponsor_logos", f);
+      for (const f of partnerFiles) formData.append("partner_logos", f);
       formData.append("exhibitor_profile", Exhibitor_Profile.trim());
       formData.append("vistor", vistor_Profile.trim());
       formData.append("Support", Support.trim());
@@ -666,22 +679,22 @@ const Dropdown = ({
                   error={touched.about_exhibition ? errors.about_exhibition : null}
                 />
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <TextAreaField
-                    id="sponsor"
-                    label="Sponsors"
-                    value={sponsor}
-                    onChange={(e) => setSponsor(e.target.value)}
-                    rows={2}
-                  />
-                  <TextAreaField
-                    id="partners"
-                    label="Partners"
-                    value={partners}
-                    onChange={(e) => setPartners(e.target.value)}
-                    rows={2}
-                  />
-                </div>
+                <LogoPicker
+                  id="sponsor-logos"
+                  label="Sponsor logos"
+                  items={sponsorItems}
+                  onAdd={(files) => setSponsorFiles((x) => [...x, ...files])}
+                  onRemove={(key) => setSponsorFiles((x) => x.filter((_, i) => sponsorItems[i]?.key !== key))}
+                  onError={(m) => toast.error(m)}
+                />
+                <LogoPicker
+                  id="partner-logos"
+                  label="Partner logos"
+                  items={partnerItems}
+                  onAdd={(files) => setPartnerFiles((x) => [...x, ...files])}
+                  onRemove={(key) => setPartnerFiles((x) => x.filter((_, i) => partnerItems[i]?.key !== key))}
+                  onError={(m) => toast.error(m)}
+                />
               </div>
 
               <div className="space-y-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">

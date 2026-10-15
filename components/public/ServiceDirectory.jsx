@@ -435,7 +435,7 @@ export default function ServiceDirectory({
                           the only cards above the fold. */}
                       <ServiceProviderCard
                         provider={provider}
-                        priority={!isFiltered && groupIndex === 0 && i < 4}
+                        priority={!isFiltered && groupIndex === 0 && i === 0}
                         showSpeciality={showSpeciality}
                       />
                     </li>
@@ -452,7 +452,7 @@ export default function ServiceDirectory({
                     filter the user has already scrolled past the fold. */}
                 <ServiceProviderCard
                   provider={provider}
-                  priority={!isFiltered && i < 4}
+                  priority={!isFiltered && i === 0}
                   showSpeciality={showSpeciality}
                 />
               </li>

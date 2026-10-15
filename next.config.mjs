@@ -49,7 +49,13 @@ const CSP_REPORT_ONLY = [
   // only when NEXT_PUBLIC_GA_ID is set, because a header that changes shape
   // between environments is a header nobody can reason about. With no GA ID
   // configured the script is never requested, so the allowance costs nothing.
-  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com",
+  //
+  // 'unsafe-eval' is added in DEVELOPMENT ONLY. `next dev` evaluates code from
+  // strings for Fast Refresh and its eval-based source maps, which logged
+  // hundreds of report-only violations per page load and buried any real one.
+  // A production build performs no eval, so production keeps the strict policy -
+  // this is the one deliberate difference between the two environments.
+  `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : ""} https://www.googletagmanager.com`,
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' data: https://fonts.gstatic.com",
   "img-src 'self' data: blob: https:",

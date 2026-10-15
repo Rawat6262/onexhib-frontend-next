@@ -56,8 +56,11 @@ export default function HeroShowcase({ items = [], total }) {
         </div>
 
         <ul className="mt-3 space-y-1">
-          {rows.map((exhibition, i) => (
-            <ShowcaseRow key={exhibition.id} exhibition={exhibition} priority={i === 0} />
+          {rows.map((exhibition) => (
+            // No priority: this panel is display:none below lg, and a preload for
+            // a hidden image is exactly what Chrome's "preloaded but not used"
+            // warning reports. Its 56px thumbnails are not the LCP element.
+            <ShowcaseRow key={exhibition.id} exhibition={exhibition} />
           ))}
         </ul>
 

@@ -1,14 +1,14 @@
 import Link from "next/link";
-import { MapPin } from "lucide-react";
 
 import Breadcrumbs from "@/components/public/Breadcrumbs";
 import EmptyState from "@/components/public/EmptyState";
+import LocationExplorer from "@/components/public/LocationExplorer";
 import JsonLd from "@/components/seo/JsonLd";
 
 import { PUBLIC_ROUTES, publicPageMetadata } from "@/lib/seo";
 import { breadcrumbNode, graph, itemListNode } from "@/lib/jsonld";
-import { cityLandingPath, countryLandingPath } from "@/lib/routes";
-import { getLocationIndex, MIN_CITY, MIN_COUNTRY } from "@/lib/locations";
+import { countryLandingPath } from "@/lib/routes";
+import { getLocationEvents, getLocationIndex, MIN_CITY, MIN_COUNTRY } from "@/lib/locations";
 import { getGeoCountryMap } from "@/lib/public-api";
 
 /**
@@ -36,7 +36,19 @@ export default async function LocationsHubPage() {
   // The geo map is a lookup for flags only — it never decides which countries
   // appear. getLocationIndex() owns that, gated on real exhibition inventory,
   // so the ~250-entry reference list cannot turn into ~250 pages.
-  const [{ countries }, geo] = await Promise.all([getLocationIndex(), getGeoCountryMap()]);
+  // The events share the index's cached walk of upcoming exhibitions - no extra request.
+  const [{ countries }, geo, events] = await Promise.all([getLocationIndex(), getGeoCountryMap(), getLocationEvents()]);
+
+  // What the explorer needs from the index: the places with landing pages, plus
+  // flags. Plain data only - Maps and functions cannot cross to a client component.
+  const directory = countries.map((c) => ({
+    country: c.country,
+    slug: c.slug,
+    count: c.count,
+    flag: geo.get(c.country?.toLowerCase())?.flag || null,
+    cities: c.cities.map((city) => ({ city: city.city, slug: city.slug, countrySlug: city.countrySlug, count: city.count })),
+  }));
+  const today = new Date().toISOString().slice(0, 10);
 
   const trail = [
     { name: "Home", path: "/" },
@@ -83,60 +95,10 @@ export default async function LocationsHubPage() {
         </p>
       </header>
 
+      {/* The explorer renders the country/city directory itself (every landing
+          link stays in the server HTML) and swaps in live results while filtering. */}
       {countries.length ? (
-        <div className="mt-10 space-y-10">
-          {countries.map((country) => (
-            <section key={country.slug} aria-labelledby={`country-${country.slug}`}>
-              <h2 id={`country-${country.slug}`} className="flex items-center gap-2.5 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
-                {/* Flag from the backend country reference. Decorative: the
-                    country name sits right beside it, so a screen reader
-                    announcing the emoji would just repeat it. */}
-                {geo.get(country.name?.toLowerCase())?.flag ? (
-                  <span aria-hidden="true" className="text-2xl leading-none">
-                    {geo.get(country.name.toLowerCase()).flag}
-                  </span>
-                ) : null}
-                <Link
-                  href={countryLandingPath(country.slug)}
-                  className="underline-offset-4 hover:text-[#131C55] hover:underline dark:hover:text-blue-300"
-                >
-                  Exhibitions in {country.country}
-                </Link>
-                <span className="ml-2 align-middle text-sm font-medium text-gray-500 dark:text-gray-500">
-                  {country.count} upcoming
-                </span>
-              </h2>
-
-              {country.cities.length ? (
-                <ul className="mt-3 flex list-none flex-wrap gap-2">
-                  {country.cities.map((c) => (
-                    <li key={c.slug}>
-                      <Link
-                        href={cityLandingPath(c.countrySlug, c.slug)}
-                        className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3.5 py-1.5 text-[13px] font-medium text-gray-600 transition hover:border-[#131C55]/40 hover:text-[#131C55] motion-reduce:transition-none dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:border-gray-600 dark:hover:text-white"
-                      >
-                        <MapPin size={13} className="text-gray-400" aria-hidden="true" />
-                        {c.city}
-                        <span className="text-gray-400 dark:text-gray-600">{c.count}</span>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="mt-2 text-sm text-gray-500 dark:text-gray-500">
-                  Listings are spread across smaller cities;{" "}
-                  <Link
-                    href={countryLandingPath(country.slug)}
-                    className="underline underline-offset-4 hover:text-[#131C55] dark:hover:text-white"
-                  >
-                    see all exhibitions in {country.country}
-                  </Link>
-                  .
-                </p>
-              )}
-            </section>
-          ))}
-        </div>
+        <LocationExplorer data={events} directory={directory} today={today} />
       ) : (
         <div className="mt-10">
           <EmptyState>

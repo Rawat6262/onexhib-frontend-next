@@ -343,7 +343,7 @@ export default async function ExhibitionsPage({ searchParams }) {
           <ul className="grid list-none gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {result.items.map((exhibition, i) => (
               <li key={exhibition.id}>
-                <ExhibitionCard exhibition={exhibition} priority={i < 4} className="h-full" />
+                <ExhibitionCard exhibition={exhibition} priority={i === 0} className="h-full" />
               </li>
             ))}
           </ul>

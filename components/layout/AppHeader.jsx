@@ -50,7 +50,14 @@ export default function AppHeader({ nav = PUBLIC_NAV, right = null, mobileExtra 
             alt="OneXhib"
             width={200}
             height={45}
-            priority
+            // Lazy (next/image's default) on purpose - neither priority NOR eager.
+            // Only one of these two logos is ever visible (the theme is a class
+            // the server cannot see). Priority adds a <link rel=preload>, and
+            // React 19 also auto-preloads any non-lazy <img> during SSR, so
+            // either way the hidden logo was preloaded and Chrome warned
+            // "preloaded but not used" on every page. Lazy loads the visible one
+            // straight away (it is at the top of the viewport) and never fetches
+            // the display:none one at all.
             className="h-8 w-auto object-contain dark:hidden sm:h-9"
           />
           <Image
@@ -58,7 +65,6 @@ export default function AppHeader({ nav = PUBLIC_NAV, right = null, mobileExtra 
             alt="OneXhib"
             width={124}
             height={42}
-            priority
             className="hidden h-8 w-auto object-contain dark:block sm:h-9"
           />
         </Link>

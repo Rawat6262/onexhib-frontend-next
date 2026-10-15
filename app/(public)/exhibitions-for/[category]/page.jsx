@@ -185,7 +185,7 @@ export default async function CategoryLandingPage({ params, searchParams }) {
             <li key={exhibition.id}>
               <ExhibitionCard
                 exhibition={exhibition}
-                priority={page === 1 && i < 4}
+                priority={page === 1 && i === 0}
                 className="h-full"
               />
             </li>

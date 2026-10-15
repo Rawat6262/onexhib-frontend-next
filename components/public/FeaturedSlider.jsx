@@ -131,7 +131,10 @@ export default function FeaturedSlider({ items = [], className = "" }) {
             key={exhibition.id}
             exhibition={exhibition}
             active={i === index}
-            priority={i === 0}
+            // No preload: the slider sits below the hero, so on load nothing in it
+            // is visible and a preload here only triggers Chrome's unused-preload
+            // warning. The first slide still loads normally as it scrolls in.
+            priority={false}
             position={i + 1}
             total={count}
             id={`${baseId}-slide-${i}`}

@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { Tag } from "lucide-react";
 
 import Breadcrumbs from "@/components/public/Breadcrumbs";
 import EmptyState from "@/components/public/EmptyState";
+import IndustryExplorer from "@/components/public/IndustryExplorer";
 import JsonLd from "@/components/seo/JsonLd";
 
 import { PUBLIC_ROUTES, publicPageMetadata, pageMetadata, NOINDEX_FOLLOW } from "@/lib/seo";
@@ -48,6 +48,34 @@ export default async function CategoriesHubPage() {
 
   const covered = categories.reduce((n, c) => n + c.count, 0);
 
+  /*
+   * Compact data for the interactive explorer: each industry's exhibitions as
+   * [startDate, countryIndex] pairs into one shared country list. Built from the
+   * records the index already holds - no extra request - and small enough to
+   * ship (two short values per event). `today` travels with it so the client's
+   * first render matches this HTML exactly.
+   */
+  const countryIndex = new Map();
+  const countryNames = [];
+  const indexOf = (name) => {
+    const label = String(name || "").trim();
+    if (!label) return -1;
+    const key = label.toLowerCase();
+    if (!countryIndex.has(key)) {
+      countryIndex.set(key, countryNames.length);
+      countryNames.push(label);
+    }
+    return countryIndex.get(key);
+  };
+  const today = new Date().toISOString().slice(0, 10);
+  const explorerData = categories.map((c) => ({
+    label: c.label,
+    slug: c.slug,
+    events: c.items
+      .map((e) => [String(e.startDate || "").slice(0, 10), indexOf(e.country)])
+      .filter(([d, ci]) => d.length === 10 && ci >= 0),
+  }));
+
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
       <JsonLd
@@ -90,27 +118,7 @@ export default async function CategoriesHubPage() {
       </header>
 
       {categories.length ? (
-        <ul className="mt-10 grid list-none gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {categories.map((c) => (
-            <li key={c.slug}>
-              <Link
-                href={categoryLandingPath(c.slug)}
-                className="ox-card flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-5 hover:border-[#131C55]/40 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 dark:hover:border-gray-600"
-              >
-                <span className="inline-flex w-fit rounded-xl bg-[#131C55]/10 p-2.5 text-[#131C55] dark:bg-blue-400/10 dark:text-blue-300">
-                  <Tag size={20} aria-hidden="true" />
-                </span>
-                <h2 className="mt-3.5 text-base font-semibold text-gray-900 dark:text-gray-50">
-                  {c.label} exhibitions
-                </h2>
-                <p className="mt-1.5 text-[15px] text-gray-600 dark:text-gray-400">
-                  {c.count} upcoming {c.count === 1 ? "event" : "events"}
-                  {c.countries.length ? <> · {c.countries.slice(0, 2).map((x) => x.name).join(", ")}</> : null}
-                </p>
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <IndustryExplorer industries={explorerData} countries={countryNames} today={today} />
       ) : (
         <div className="mt-10">
           {/* Not an error state: the live API does not yet return `category`, so

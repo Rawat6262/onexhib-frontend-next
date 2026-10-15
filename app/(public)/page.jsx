@@ -18,6 +18,7 @@ import Section from "@/components/public/Section";
 import Rail, { RailItem } from "@/components/public/Rail";
 import ExhibitionCard from "@/components/public/ExhibitionCard";
 import FeaturedSlider from "@/components/public/FeaturedSlider";
+import NearbyExhibitions from "@/components/public/NearbyExhibitions";
 import HeroShowcase from "@/components/public/HeroShowcase";
 import CompanyCard from "@/components/public/CompanyCard";
 import ProductCard from "@/components/public/ProductCard";
@@ -136,6 +137,12 @@ export default async function HomePage() {
         </Section>
       ) : null}
 
+      {/* ── Near you ────────────────────────────────────────────────────── */}
+      {/* A client island on an otherwise static page: it reads the signed-in
+          user's own city/state/country and fills in after hydration. Guests see
+          a one-line sign-in prompt; nothing renders when there is nothing near. */}
+      <NearbyExhibitions className="mt-16 sm:mt-20" />
+
       {/* ── This week ───────────────────────────────────────────────────── */}
       {/* Rendered only when the week holds something - an empty rail under a
           "this week" heading reads as broken rather than quiet. */}
@@ -171,9 +178,9 @@ export default async function HomePage() {
       >
         {ongoing.items.length ? (
           <Rail>
-            {ongoing.items.map((exhibition, i) => (
+            {ongoing.items.map((exhibition) => (
               <RailItem key={exhibition.id}>
-                <ExhibitionCard exhibition={exhibition} priority={i === 0} className="h-full" />
+                <ExhibitionCard exhibition={exhibition} className="h-full" />
               </RailItem>
             ))}
           </Rail>

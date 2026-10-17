@@ -38,7 +38,7 @@ import { getCategoryIndex } from "@/lib/categories";
 import {
   getCompanies,
   getCounts,
-  getFeaturedExhibitions,
+  getFeaturedForSlider,
   getOngoingExhibitions,
   getPreviousExhibitions,
   getProducts,
@@ -80,7 +80,7 @@ export default async function HomePage() {
   // One parallel round of requests. Every fetcher fails soft, so a slow or
   // unreachable backend degrades individual sections instead of the page.
   const [featured, ongoing, upcoming, previous, locations, industries, companies, products, counts, banners, thisWeek, news] = await Promise.all([
-    getFeaturedExhibitions({ limit: 8 }),
+    getFeaturedForSlider({ limit: 20 }),
     getOngoingExhibitions({ limit: 8 }),
     getUpcomingExhibitions({ limit: 8 }),
     getPreviousExhibitions({ limit: 1 }), // archive count only, per the plan

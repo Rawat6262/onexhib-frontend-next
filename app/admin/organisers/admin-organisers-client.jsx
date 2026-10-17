@@ -1,459 +1,490 @@
 "use client";
 
-// Migrated from views/admin/AdminOrganiserView.jsx.
-// Behaviour, markup and classes are unchanged. The sidebar now comes from
-// app/admin/layout.jsx, getPageNumbers moved to lib/paginate.js, and
-// navigation uses next/navigation with the new clean routes.
 import dynamic from "next/dynamic";
-import { useCallback, useEffect, useState, useMemo, useRef } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { KeyRound } from "lucide-react";
+import {
+  Building2,
+  CalendarDays,
+  CalendarRange,
+  Eye,
+  KeyRound,
+  Loader2,
+  MapPin,
+  Package,
+  Pencil,
+  Plus,
+  Star,
+  X,
+} from "lucide-react";
 
 import {
+  featureExhibition,
   getAdminExhibitionsPage,
   getExhibitionsByMonthYear,
-  featureExhibition,
+  refreshExhibitionPage,
   unfeatureExhibition,
 } from "@/models/exhibition.model";
 import TablePagination from "@/components/dashboard/TablePagination";
+import {
+  AdminHeader,
+  AdminPage,
+  Badge,
+  EmptyState,
+  LoadingRows,
+  Panel,
+  SearchField,
+  StatCard,
+  StatGrid,
+  adminSelect,
+  btnPrimary,
+  btnRow,
+  fmtDate,
+  tbody,
+  td,
+  th,
+  thead,
+  tr,
+} from "@/components/admin/AdminUI";
 
 // Modals are only needed once opened, so their code (and for the location
 // forms, country-state-city's ~2.3 MB dataset) is split out of this page's
 // first-load bundle.
 const ExhibitionPopupForm = dynamic(() => import("@/components/popups/ExhibitionPopupForm"), { ssr: false });
-const OrganiserPopup = dynamic(() => import("@/components/organiser/OrganiserDetailsPopup"), { ssr: false });
 const ExhibitionEditPopup = dynamic(() => import("@/components/popups/OrganiserEditPopup"), { ssr: false });
 const ExhibitionAccessDialog = dynamic(() => import("@/components/admin/ExhibitionAccessDialog"), { ssr: false });
+
+/**
+ * Admin: every exhibition. (The URL is /admin/organisers for old bookmarks; the
+ * page has always listed exhibitions, under a leftover "SEM GROUP" title.)
+ *
+ * THREE WAYS TO NARROW THE LIST
+ *  - nothing: the admin listing, newest first, paged on the server;
+ *  - month + year: the monthly endpoint, paged on the server;
+ *  - search: the catalogue-wide search (/api/exhibitions/search, the same one
+ *    the public site uses), top 24 matches across upcoming, live and past.
+ *    It replaced "Search this page", which only filtered the 50 rows already
+ *    loaded and so missed almost everything. Search results carry no "added
+ *    by" - that route never exposes contact data.
+ */
 
 const MONTH_NAMES = [
   "January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December",
 ];
-
-// Exhibitions can be scheduled well ahead of time, so bias the range forward.
 const CURRENT_YEAR = new Date().getFullYear();
 const YEAR_OPTIONS = Array.from({ length: 8 }, (_, i) => CURRENT_YEAR - 2 + i);
+const SEARCH_LIMIT = 24;
+
+const day = (v) => (v ? String(v).slice(0, 10) : "");
+function statusOf(start, end) {
+  const now = new Date().toISOString().slice(0, 10);
+  const s = day(start);
+  const e = day(end) || s;
+  if (!s) return null;
+  if (e < now) return { label: "Ended", tone: "gray" };
+  if (s > now) return { label: "Upcoming", tone: "sky" };
+  return { label: "Live", tone: "emerald" };
+}
+
+function dateRange(a, b) {
+  if (!a) return "Dates not set";
+  const from = fmtDate(a);
+  const to = b ? fmtDate(b) : "";
+  return to && to !== from ? `${from} – ${to}` : from;
+}
+
+/** Search results arrive in the public shape; map them onto the admin row. */
+const fromSearch = (e) => ({
+  _id: e.id,
+  exhibition_name: e.name,
+  exhibition_address: [e.venue, e.city, e.country].filter(Boolean).join(", "),
+  category: e.category,
+  starting_date: e.startDate,
+  ending_date: e.endDate,
+  is_featured: e.isFeatured,
+  addedBy: null,
+});
 
 export default function AdminOrganisersClient() {
-  const [exhibitions, setExhibitions] = useState([]);
-  const [companies, setCompanies] = useState(0);
-  const [products, setProducts] = useState(0);
+  const [rows, setRows] = useState(null);
+  const [counts, setCounts] = useState({});
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
-  const [showModal, setShowModal] = useState(false);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(50);
+
+  const [month, setMonth] = useState("");
+  const [year, setYear] = useState("");
+  const monthActive = Boolean(month && year);
+  const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  // Server page size, sent as `limit`; the backend caps it at 500.
-  const [itemsPerPage, setItemsPerPage] = useState(50);
-  const [organiserId, setOrganiserId] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [update, setupdate] = useState(false);
-  const router = useRouter();
+  const searching = search.length >= 2;
+
+  const [showAdd, setShowAdd] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  // { id, name } of the exhibition whose edit access is open, or null.
   const [accessFor, setAccessFor] = useState(null);
-
-  // Month/year filter — when both are set, the list comes from the monthly
-  // endpoint instead of the plain admin listing.
-  const [monthFilter, setMonthFilter] = useState("");
-  const [yearFilter, setYearFilter] = useState("");
-  const isMonthFilterActive = Boolean(monthFilter && yearFilter);
-
-  // Guards against out-of-order responses: if the filter changes while an older
-  // request is still in flight, the older response is discarded instead of
-  // overwriting the list with stale (or mismatched) data.
-  const requestIdRef = useRef(0);
-
-  // Server-side pagination: fetches only the current page (thousands of exhibitions
-  // exist, so loading everything up front doesn't scale).
-  const fetchExhibitions = useCallback(async (page) => {
-    const requestId = ++requestIdRef.current;
-    try {
-      setLoading(true);
-
-      if (isMonthFilterActive) {
-        const { data: response } = await getExhibitionsByMonthYear({
-          month: monthFilter,
-          year: yearFilter,
-          page,
-          limit: itemsPerPage,
-        });
-        if (requestId !== requestIdRef.current) return; // superseded by a newer request
-        setExhibitions(response?.data ?? []);
-        setTotal(response?.total || 0);
-        setTotalPages(response?.totalPages || 1);
-        return;
-      }
-
-      const { data: response } = await getAdminExhibitionsPage({ page, limit: itemsPerPage });
-      if (requestId !== requestIdRef.current) return; // superseded by a newer request
-      const data = response?.data ?? [];
-
-      setOrganiserId(data[0]?.createdby || null);
-      setExhibitions(data);
-      setCompanies(response?.companies || 0);
-      setProducts(response?.products || 0);
-      setTotal(response?.total || 0);
-      setTotalPages(response?.totalPages || 1);
-    } catch (error) {
-      console.error("Error fetching exhibitions:", error.message);
-    } finally {
-      if (requestId === requestIdRef.current) setLoading(false);
-    }
-  }, [itemsPerPage, isMonthFilterActive, monthFilter, yearFilter]);
+  const [featuringIds, setFeaturingIds] = useState(() => new Set());
+  const reqRef = useRef(0);
 
   useEffect(() => {
-    fetchExhibitions(currentPage);
-  }, [currentPage, fetchExhibitions]);
+    const t = setTimeout(() => setSearch(searchInput.trim()), 300);
+    return () => clearTimeout(t);
+  }, [searchInput]);
 
-  // Applying/clearing the filter resets to page 1 via the change handlers below
-  // (not a separate effect) — otherwise the page-reset and the filter change
-  // each trigger their own fetch, racing each other.
-
-  // Tracks which exhibition IDs currently have a feature/unfeature request in
-  // flight, so each row's button can disable itself independently.
-  const [featuringIds, setFeaturingIds] = useState(() => new Set());
-
-  const handleToggleFeature = async (id, nextFeatured) => {
-    setFeaturingIds((prev) => new Set(prev).add(id));
+  const load = useCallback(async () => {
+    const id = ++reqRef.current;
+    setRows(null);
     try {
-      if (nextFeatured) {
-        await featureExhibition(id);
-        toast.success("Exhibition marked as featured");
-      } else {
-        await unfeatureExhibition(id);
-        toast.success("Exhibition removed from featured");
+      if (searching) {
+        const res = await fetch(`/api/exhibitions/search?scope=all&limit=${SEARCH_LIMIT}&search=${encodeURIComponent(search)}`);
+        const data = await res.json();
+        if (id !== reqRef.current) return;
+        const items = (data.items || []).map(fromSearch);
+        setRows(items);
+        setTotal(data.total || items.length);
+        setTotalPages(1);
+        return;
       }
-      setExhibitions((prev) =>
-        prev.map((item) => (item._id === id ? { ...item, is_featured: nextFeatured } : item))
-      );
-    } catch (error) {
-      console.error("Error updating featured status:", error.message);
-      toast.error(nextFeatured ? "Failed to feature exhibition" : "Failed to unfeature exhibition");
+      if (monthActive) {
+        const { data } = await getExhibitionsByMonthYear({ month, year, page, limit: pageSize });
+        if (id !== reqRef.current) return;
+        setRows(data?.data ?? []);
+        setTotal(data?.total || 0);
+        setTotalPages(data?.totalPages || 1);
+        return;
+      }
+      const { data } = await getAdminExhibitionsPage({ page, limit: pageSize });
+      if (id !== reqRef.current) return;
+      setRows(data?.data ?? []);
+      setTotal(data?.total || 0);
+      setTotalPages(data?.totalPages || 1);
+      setCounts({ exhibitions: data?.exhibitions ?? data?.total ?? 0, companies: data?.companies ?? 0, products: data?.products ?? 0 });
+    } catch {
+      if (id !== reqRef.current) return;
+      setRows([]);
+      toast.error("Could not load exhibitions.");
+    }
+  }, [searching, search, monthActive, month, year, page, pageSize]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  // The overall counts come from the plain listing; fetch them once even if the
+  // page opens straight into a filter.
+  useEffect(() => {
+    getAdminExhibitionsPage({ page: 1, limit: 1 })
+      .then(({ data }) => setCounts({ exhibitions: data?.total ?? 0, companies: data?.companies ?? 0, products: data?.products ?? 0 }))
+      .catch(() => setCounts({ exhibitions: null, companies: null, products: null }));
+  }, []);
+
+  async function toggleFeature(item) {
+    const next = !item.is_featured;
+    setFeaturingIds((prev) => new Set(prev).add(item._id));
+    try {
+      if (next) await featureExhibition(item._id);
+      else await unfeatureExhibition(item._id);
+      toast.success(next ? "Exhibition featured. It now shows in the home page slider." : "Removed from featured.");
+      setRows((prev) => prev.map((r) => (r._id === item._id ? { ...r, is_featured: next } : r)));
+      refreshExhibitionPage(item._id, { featured: true }); // home slider + the show's page
+    } catch {
+      toast.error(next ? "Could not feature it." : "Could not unfeature it.");
     } finally {
       setFeaturingIds((prev) => {
-        const next = new Set(prev);
-        next.delete(id);
-        return next;
+        const s = new Set(prev);
+        s.delete(item._id);
+        return s;
       });
     }
+  }
+
+  const clearFilters = () => {
+    setMonth("");
+    setYear("");
+    setSearchInput("");
+    setSearch("");
+    setPage(1);
   };
 
-  // The backend has no search endpoint, so this only filters the exhibitions
-  // already loaded for the current page — not the full collection.
-  const filteredData = useMemo(() => {
-    if (!search.trim()) return exhibitions;
-    return exhibitions.filter((item) =>
-      [item.exhibition_name, item.category, item.addedBy, item.exhibition_address].some((field) =>
-        field?.toLowerCase().includes(search.toLowerCase())
-      )
-    );
-  }, [exhibitions, search]);
-
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedData = filteredData;
-
-  const handlePageChange = (newPage) => {
-    if (newPage >= 1 && newPage <= totalPages) setCurrentPage(newPage);
-  };
+  const mode = searching ? "search" : monthActive ? "month" : "all";
+  const panelTitle =
+    mode === "search"
+      ? `Matches for “${search}”`
+      : mode === "month"
+        ? `Starting in ${MONTH_NAMES[Number(month) - 1]} ${year}`
+        : "All exhibitions";
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-8 text-gray-900 sm:px-6 sm:py-12 dark:text-gray-100">
-
-      <div className="flex flex-col">
-        {/* Header */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div className="min-w-0">
-            <p className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#2B3FB8] dark:text-blue-300"><span aria-hidden="true" className="h-px w-6 bg-current opacity-60" />Admin</p>
-            <h1 className="text-3xl font-extrabold leading-[1.1] tracking-tight text-gray-900 sm:text-[2.6rem] dark:text-white">SEM GROUP</h1>
-          </div>
-        </div>
-
-        {/* Summary Cards */}
-        <div className="mt-8 grid grid-cols-3 gap-3 sm:gap-4">
-          {[
-            { title: "Exhibitions", value: total },
-            { title: "Companies", value: companies },
-            { title: "Products", value: products },
-          ].map(
-            (card) => (
-              <div
-                key={card.title}
-                className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 py-4 dark:border-gray-800 dark:bg-gray-900"
-              >
-                <p className="text-[13px] font-medium text-gray-500 dark:text-gray-400">{card.title}</p>
-                <p className="mt-1 text-2xl font-extrabold tracking-tight text-gray-900 tabular-nums sm:text-3xl dark:text-white">{card.value}</p>
-              </div>
-            )
-          )}
-        </div>
-
-        {/* Table Section */}
-        <div className="mt-8 overflow-hidden rounded-2xl border border-gray-200 bg-white pb-2 shadow-sm shadow-gray-900/[0.03] dark:border-gray-800 dark:bg-gray-900 dark:shadow-none">
-          {/* Controls */}
-          <div className="flex w-full flex-col gap-4 border-b border-gray-200 bg-gradient-to-b from-gray-50/80 to-white px-5 py-4 text-center lg:flex-row lg:items-center lg:justify-between dark:border-gray-800 dark:from-white/[0.02] dark:to-transparent">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">Exhibition List</h2>
-            <div className="flex flex-col sm:flex-row gap-4 justify-end flex-wrap">
-              {/* Month/year selects share a row even on the smallest phones. */}
-              <div className="flex gap-3">
-                <select
-                  value={monthFilter}
-                  onChange={(e) => {
-                    setMonthFilter(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                  className="h-10 rounded-xl border border-gray-300 bg-white px-3.5 text-sm text-gray-900 placeholder-gray-500 transition focus:border-[#2B3FB8] focus:outline-none focus:ring-4 focus:ring-[#2B3FB8]/15 motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 min-w-0 flex-1"
-                >
-                  <option value="">Month</option>
-                  {MONTH_NAMES.map((name, i) => (
-                    <option key={name} value={i + 1}>{name}</option>
-                  ))}
-                </select>
-                <select
-                  value={yearFilter}
-                  onChange={(e) => {
-                    setYearFilter(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                  className="h-10 rounded-xl border border-gray-300 bg-white px-3.5 text-sm text-gray-900 placeholder-gray-500 transition focus:border-[#2B3FB8] focus:outline-none focus:ring-4 focus:ring-[#2B3FB8]/15 motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 min-w-0 flex-1"
-                >
-                  <option value="">Year</option>
-                  {YEAR_OPTIONS.map((y) => (
-                    <option key={y} value={y}>{y}</option>
-                  ))}
-                </select>
-                {isMonthFilterActive && (
-                  <button
-                    onClick={() => {
-                      setMonthFilter("");
-                      setYearFilter("");
-                      setCurrentPage(1);
-                    }}
-                    className="inline-flex h-10 shrink-0 items-center justify-center rounded-xl border border-gray-300 bg-white px-4 text-sm font-semibold text-gray-700 transition hover:border-[#2B3FB8] hover:text-[#2B3FB8] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-blue-400 dark:hover:text-white"
-                  >
-                    Clear
-                  </button>
-                )}
-              </div>
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                  setCurrentPage(1);
-                }}
-                placeholder="Search this page"
-                title="Only filters the exhibitions currently loaded on this page"
-                className="h-10 rounded-xl border border-gray-300 bg-white px-3.5 text-sm text-gray-900 placeholder-gray-500 transition focus:border-[#2B3FB8] focus:outline-none focus:ring-4 focus:ring-[#2B3FB8]/15 motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 w-full sm:w-64"
-              />
-              <button
-                className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#131C55] to-[#2B3FB8] px-4 text-sm font-semibold text-white shadow-md shadow-indigo-900/20 transition hover:brightness-110 sm:w-48 motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500"
-                onClick={() => setShowModal(true)}
-              >
-                + Add Exhibition
-              </button>
-            </div>
-          </div>
-
-          {showModal && (
-            <ExhibitionPopupForm
-              onClose={() => {
-                setShowModal(false);
-                fetchExhibitions(currentPage);
-              }}
-            />
-          )}
-
-          {/* List */}
-          <div className="w-full">
-            {loading ? (
-              <p className="px-5 py-12 text-center text-[15px] text-gray-500 dark:text-gray-400">Loading...</p>
-            ) : paginatedData.length === 0 ? (
-              <p className="px-5 py-12 text-center text-[15px] text-gray-500 dark:text-gray-400">No data found</p>
-            ) : (
-              <>
-                {/* Card list — phones only */}
-                <div className="flex flex-col gap-3 px-4 py-4 sm:hidden">
-                  {paginatedData.map((item, index) => (
-                    <div
-                      key={item._id || index}
-                      className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900"
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <p className="font-semibold text-gray-900 dark:text-gray-100">
-                          {startIndex + index + 1}. {item.exhibition_name}
-                        </p>
-                      </div>
-                      <dl className="mt-2 space-y-1 text-sm text-gray-600 dark:text-gray-400">
-                        <div className="flex gap-1">
-                          <dt className="font-medium text-gray-500 dark:text-gray-400">By:</dt>
-                          <dd className="truncate">{item.addedBy || "—"}</dd>
-                        </div>
-                        <div className="flex gap-1">
-                          <dt className="font-medium text-gray-500 dark:text-gray-400">Category:</dt>
-                          <dd>{item.category || "—"}</dd>
-                        </div>
-                        <div className="flex gap-1">
-                          <dt className="font-medium text-gray-500 dark:text-gray-400">Address:</dt>
-                          <dd className="truncate">{item.exhibition_address || "—"}</dd>
-                        </div>
-                        <div className="flex gap-1">
-                          <dt className="font-medium text-gray-500 dark:text-gray-400">Dates:</dt>
-                          <dd>
-                            {item.starting_date ? new Date(item.starting_date).toLocaleDateString() : "—"}
-                            {" – "}
-                            {item.ending_date ? new Date(item.ending_date).toLocaleDateString() : "—"}
-                          </dd>
-                        </div>
-                      </dl>
-                      <div className="flex items-center gap-2 mt-3">
-                        <button
-                          className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-[13px] font-medium text-gray-700 transition hover:border-[#2B3FB8] hover:text-[#2B3FB8] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-blue-400 dark:hover:text-white flex-1"
-                          onClick={() => router.push(`/exhibitions/${item._id}`)}
-                        >
-                          View
-                        </button>
-                        <button
-                          className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-[13px] font-medium text-gray-700 transition hover:border-emerald-500 hover:text-emerald-600 motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-emerald-400 dark:hover:text-emerald-300 flex-1"
-                          onClick={() => setEditingId(item._id)}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-[13px] font-medium text-gray-700 transition hover:border-[#2B3FB8] hover:text-[#2B3FB8] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-blue-400 dark:hover:text-white flex-1"
-                          onClick={() => setAccessFor({ id: item._id, name: item.exhibition_name })}
-                          title="Let someone else edit this exhibition"
-                        >
-                          <KeyRound size={13} aria-hidden="true" />
-                          Access
-                        </button>
-                        <button
-                          className={`flex-1 flex items-center justify-center gap-1 px-3 py-1.5 border rounded-md transition disabled:opacity-50 disabled:cursor-not-allowed ${
-                            item.is_featured
-                              ? "border-amber-400 text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950 hover:bg-amber-100 dark:hover:bg-amber-900"
-                              : "border-amber-500 text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-950"
-                          }`}
-                          disabled={featuringIds.has(item._id)}
-                          onClick={() => handleToggleFeature(item._id, !item.is_featured)}
-                          title={item.is_featured ? "Click to unfeature" : "Click to feature"}
-                        >
-                          {featuringIds.has(item._id) ? "..." : item.is_featured ? "★ Featured" : "Feature"}
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Table — sm and up */}
-                <div className="hidden max-h-[70vh] overflow-auto overscroll-contain text-left sm:block">
-                  <table className="w-full min-w-[700px] border-collapse text-sm">
-                    <thead>
-                      <tr className="text-left text-[11px] uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                        {["#", "Exhibition BY", "Exhibition Name", "Address", "Category", "Start Date", "End Date", "Featured", "Action"].map(
-                          (header) => (
-                            <th key={header} className="sticky top-0 z-10 border-b border-gray-200 bg-gray-50 px-4 py-3 font-semibold dark:border-gray-800 dark:bg-gray-900">
-                              {header}
-                            </th>
-                          )
-                        )}
-                      </tr>
-                    </thead>
-
-                    <tbody>
-                      {paginatedData.map((item, index) => (
-                        <tr key={item._id || index} className={"bg-white transition-colors hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-white/[0.03]"}>
-                          <td className="border-b border-gray-100 px-4 py-3.5 text-gray-700 dark:border-gray-800 dark:text-gray-300">{startIndex + index + 1}</td>
-                          <td className="border-b border-gray-100 px-4 py-3.5 text-gray-700 dark:border-gray-800 dark:text-gray-300">{item.addedBy}</td>
-                          <td className="border-b border-gray-100 px-4 py-3.5 text-gray-700 dark:border-gray-800 dark:text-gray-300">{item.exhibition_name}</td>
-                          <td className="border-b border-gray-100 px-4 py-3.5 text-gray-700 dark:border-gray-800 dark:text-gray-300">{item.exhibition_address}</td>
-                          <td className="border-b border-gray-100 px-4 py-3.5 text-gray-700 dark:border-gray-800 dark:text-gray-300">{item.category}</td>
-                          <td className="border-b border-gray-100 px-4 py-3.5 text-gray-700 dark:border-gray-800 dark:text-gray-300">
-                            {item.starting_date ? new Date(item.starting_date).toLocaleDateString() : "—"}
-                          </td>
-                          <td className="border-b border-gray-100 px-4 py-3.5 text-gray-700 dark:border-gray-800 dark:text-gray-300">
-                            {item.ending_date ? new Date(item.ending_date).toLocaleDateString() : "—"}
-                          </td>
-                          <td className="border-b border-gray-100 px-4 py-3.5 text-center text-gray-700 dark:border-gray-800 dark:text-gray-300">
-                            <button
-                              className={`px-3 py-1 border rounded-md transition disabled:opacity-50 disabled:cursor-not-allowed ${
-                                item.is_featured
-                                  ? "border-amber-400 text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950 hover:bg-amber-100 dark:hover:bg-amber-900"
-                                  : "border-amber-500 text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-950"
-                              }`}
-                              disabled={featuringIds.has(item._id)}
-                              onClick={() => handleToggleFeature(item._id, !item.is_featured)}
-                              title={item.is_featured ? "Click to unfeature" : "Click to feature"}
-                            >
-                              {featuringIds.has(item._id) ? "..." : item.is_featured ? "★ Featured" : "Feature"}
-                            </button>
-                          </td>
-                          <td className="border-b border-gray-100 px-4 py-3.5 text-gray-700 dark:border-gray-800 dark:text-gray-300">
-                            <div className="flex items-center gap-2">
-                              <button
-                                className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-[13px] font-medium text-gray-700 transition hover:border-[#2B3FB8] hover:text-[#2B3FB8] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-blue-400 dark:hover:text-white"
-                                onClick={() => router.push(`/exhibitions/${item._id}`)}
-                              >
-                                View
-                              </button>
-                              <button
-                                className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-[13px] font-medium text-gray-700 transition hover:border-emerald-500 hover:text-emerald-600 motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-emerald-400 dark:hover:text-emerald-300"
-                                onClick={() => setEditingId(item._id)}
-                              >
-                                Edit
-                              </button>
-                              <button
-                                className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-[13px] font-medium text-gray-700 transition hover:border-[#2B3FB8] hover:text-[#2B3FB8] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-blue-400 dark:hover:text-white"
-                                onClick={() => setAccessFor({ id: item._id, name: item.exhibition_name })}
-                                title="Let someone else edit this exhibition"
-                              >
-                                <KeyRound size={13} aria-hidden="true" />
-                                Access
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </>
-            )}
-
-            {/* Render popup ONCE, at the end (or top) of component */}
-    <ExhibitionEditPopup
-      open={Boolean(editingId)}
-      exhibitionId={editingId}
-      isAdmin
-      onClose={() => setEditingId(null)}
-    />
-    {accessFor && (
-      <ExhibitionAccessDialog
-        exhibitionId={accessFor.id}
-        exhibitionName={accessFor.name}
-        onClose={() => setAccessFor(null)}
+    <AdminPage>
+      <AdminHeader
+        title="Exhibitions"
+        description="Every exhibition on OneXhib. Edit details, feature shows on the home page, or give an organiser access to keep their own listing up to date."
+        actions={
+          <button type="button" onClick={() => setShowAdd(true)} className={btnPrimary}>
+            <Plus size={16} aria-hidden="true" />
+            Add exhibition
+          </button>
+        }
       />
-    )}
-  </div>
 
-          <div className="mt-6">
+      <StatGrid cols={3}>
+        <StatCard icon={<CalendarDays size={16} />} label="Exhibitions" value={counts.exhibitions} />
+        <StatCard href="/admin/companies" icon={<Building2 size={16} />} tone="violet" label="Companies" value={counts.companies} />
+        <StatCard href="/admin/products" icon={<Package size={16} />} tone="sky" label="Products" value={counts.products} />
+      </StatGrid>
+
+      <Panel
+        title={panelTitle}
+        count={rows ? total : undefined}
+        description={
+          mode === "search"
+            ? `Top ${SEARCH_LIMIT} matches across upcoming, live and past exhibitions.`
+            : mode === "month"
+              ? "Exhibitions whose start date falls in this month."
+              : "Newest first."
+        }
+        toolbar={
+          <>
+            <div className="flex gap-2">
+              <select
+                value={month}
+                onChange={(e) => {
+                  setMonth(e.target.value);
+                  setPage(1);
+                }}
+                aria-label="Month"
+                className={`${adminSelect} w-32`}
+              >
+                <option value="">Month</option>
+                {MONTH_NAMES.map((name, i) => (
+                  <option key={name} value={i + 1}>
+                    {name}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={year}
+                onChange={(e) => {
+                  setYear(e.target.value);
+                  setPage(1);
+                }}
+                aria-label="Year"
+                className={`${adminSelect} w-24`}
+              >
+                <option value="">Year</option>
+                {YEAR_OPTIONS.map((y) => (
+                  <option key={y} value={y}>
+                    {y}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <SearchField value={searchInput} onChange={setSearchInput} placeholder="Search all exhibitions" className="sm:w-72" />
+            {mode !== "all" || month || year ? (
+              <button type="button" onClick={clearFilters} className={`${btnRow} h-10`}>
+                <X size={14} aria-hidden="true" />
+                Clear
+              </button>
+            ) : null}
+          </>
+        }
+        footer={
+          rows && rows.length && mode !== "search" ? (
             <TablePagination
-              page={currentPage}
-              pageSize={itemsPerPage}
+              page={page}
+              pageSize={pageSize}
               total={total}
               totalPages={totalPages}
-              shownCount={filteredData.length}
-              onPageChange={handlePageChange}
+              shownCount={rows.length}
+              onPageChange={setPage}
               onPageSizeChange={(size) => {
-                setItemsPerPage(size);
-                setCurrentPage(1);
+                setPageSize(size);
+                setPage(1);
               }}
               pageSizeOptions={[25, 50, 100]}
               itemLabel="exhibitions"
             />
-          </div>
-        </div>
+          ) : null
+        }
+      >
+        {month && !year ? (
+          <p className="border-b border-gray-100 bg-sky-50/60 px-5 py-2 text-xs text-sky-800 dark:border-gray-800 dark:bg-sky-400/5 dark:text-sky-200">
+            Pick a year too to filter by month.
+          </p>
+        ) : null}
+
+        {rows === null ? (
+          <LoadingRows rows={5} />
+        ) : rows.length === 0 ? (
+          <EmptyState icon={<CalendarRange size={22} aria-hidden="true" />} title="No exhibitions found">
+            {mode === "all" ? "Add the first one with “Add exhibition”." : "Try another search or month."}
+          </EmptyState>
+        ) : (
+          <>
+            <div className="hidden max-h-[70vh] overflow-auto overscroll-contain xl:block">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className={thead}>
+                    <th scope="col" className={th}>Exhibition</th>
+                    <th scope="col" className={th}>Dates</th>
+                    <th scope="col" className={th}>Category</th>
+                    <th scope="col" className={th}>Added by</th>
+                    <th scope="col" className={th}><span className="sr-only">Actions</span></th>
+                  </tr>
+                </thead>
+                <tbody className={tbody}>
+                  {rows.map((item) => (
+                    <tr key={item._id} className={tr}>
+                      <td className={`${td} min-w-[16rem] max-w-[24rem]`}>
+                        <NameCell item={item} />
+                      </td>
+                      <td className={`${td} whitespace-nowrap text-[13px] text-gray-700 dark:text-gray-300`}>
+                        {dateRange(item.starting_date, item.ending_date)}
+                        {statusOf(item.starting_date, item.ending_date) ? (
+                          <div className="mt-1">
+                            <Badge tone={statusOf(item.starting_date, item.ending_date).tone}>
+                              {statusOf(item.starting_date, item.ending_date).label}
+                            </Badge>
+                          </div>
+                        ) : null}
+                      </td>
+                      <td className={`${td} max-w-[12rem] text-[13px] text-gray-700 dark:text-gray-300`}>
+                        <span className="line-clamp-2">{item.category || "—"}</span>
+                      </td>
+                      <td className={`${td} max-w-[12rem] text-[13px] text-gray-600 dark:text-gray-400`}>
+                        <span className="block truncate">{item.addedBy || (mode === "search" ? "—" : "Unknown")}</span>
+                      </td>
+                      <td className={td}>
+                        <RowActions
+                          item={item}
+                          busy={featuringIds.has(item._id)}
+                          onFeature={() => toggleFeature(item)}
+                          onEdit={() => setEditingId(item._id)}
+                          onAccess={() => setAccessFor({ id: item._id, name: item.exhibition_name })}
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <ul className={`xl:hidden ${tbody}`}>
+              {rows.map((item) => {
+                const s = statusOf(item.starting_date, item.ending_date);
+                return (
+                  <li key={item._id} className="space-y-3 px-4 py-4 sm:px-5">
+                    <NameCell item={item} />
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-gray-600 dark:text-gray-400">
+                      <span className="inline-flex items-center gap-1">
+                        <CalendarDays size={13} aria-hidden="true" className="text-gray-400" />
+                        {dateRange(item.starting_date, item.ending_date)}
+                      </span>
+                      {s ? <Badge tone={s.tone}>{s.label}</Badge> : null}
+                      {item.category ? <span className="truncate">{item.category}</span> : null}
+                    </div>
+                    {item.addedBy ? <p className="truncate text-xs text-gray-400">Added by {item.addedBy}</p> : null}
+                    <RowActions
+                      item={item}
+                      busy={featuringIds.has(item._id)}
+                      onFeature={() => toggleFeature(item)}
+                      onEdit={() => setEditingId(item._id)}
+                      onAccess={() => setAccessFor({ id: item._id, name: item.exhibition_name })}
+                      wrap
+                    />
+                  </li>
+                );
+              })}
+            </ul>
+          </>
+        )}
+      </Panel>
+
+      {showAdd && (
+        <ExhibitionPopupForm
+          onClose={() => {
+            setShowAdd(false);
+            load();
+          }}
+        />
+      )}
+      <ExhibitionEditPopup
+        open={Boolean(editingId)}
+        exhibitionId={editingId}
+        isAdmin
+        onClose={() => {
+          setEditingId(null);
+          load();
+        }}
+      />
+      {accessFor && (
+        <ExhibitionAccessDialog exhibitionId={accessFor.id} exhibitionName={accessFor.name} onClose={() => setAccessFor(null)} />
+      )}
+    </AdminPage>
+  );
+}
+
+function NameCell({ item }) {
+  return (
+    <div className="min-w-0">
+      <div className="flex items-start gap-1.5">
+        {item.is_featured ? <Star size={14} aria-label="Featured" className="mt-0.5 shrink-0 fill-amber-400 text-amber-400" /> : null}
+        <p className="font-semibold leading-snug text-gray-900 dark:text-gray-100">{item.exhibition_name || "Untitled exhibition"}</p>
       </div>
+      {item.exhibition_address ? (
+        <p className="mt-0.5 flex items-start gap-1 text-xs text-gray-500 dark:text-gray-400">
+          <MapPin size={12} aria-hidden="true" className="mt-0.5 shrink-0" />
+          <span className="line-clamp-2">{item.exhibition_address}</span>
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+const iconBtn =
+  "grid h-8 w-8 place-items-center rounded-lg border border-gray-300 bg-white text-gray-600 transition hover:border-[#2B3FB8] hover:text-[#2B3FB8] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2B3FB8] dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-blue-400 dark:hover:text-white";
+
+/**
+ * In the table (`wrap` false) View/Edit/Access are icon buttons with tooltips
+ * so the row keeps its width for the name; on cards there is room for labels.
+ */
+function RowActions({ item, busy, onFeature, onEdit, onAccess, wrap = false }) {
+  const label = (text) => (wrap ? text : null);
+  const cls = wrap ? btnRow : iconBtn;
+  return (
+    <div className={`flex items-center gap-1.5 ${wrap ? "flex-wrap" : "justify-end"}`}>
+      <Link href={`/exhibitions/${item._id}`} target="_blank" rel="noopener" className={cls} title="View public page" aria-label="View public page">
+        <Eye size={14} aria-hidden="true" />
+        {label("View")}
+      </Link>
+      <button type="button" onClick={onEdit} className={cls} title="Edit details" aria-label="Edit details">
+        <Pencil size={14} aria-hidden="true" />
+        {label("Edit")}
+      </button>
+      <button type="button" onClick={onAccess} className={cls} title="Edit access: let an organiser edit this exhibition" aria-label="Edit access">
+        <KeyRound size={14} aria-hidden="true" />
+        {label("Access")}
+      </button>
+      <button
+        type="button"
+        onClick={onFeature}
+        disabled={busy}
+        aria-pressed={Boolean(item.is_featured)}
+        aria-label={item.is_featured ? "Featured - click to remove from the home page slider" : "Feature on the home page slider"}
+        title={item.is_featured ? "Featured - click to remove from the home page slider" : "Feature on the home page slider"}
+        className={`inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-lg text-[13px] font-semibold transition disabled:opacity-60 ${
+          wrap ? "px-3 py-1.5" : "h-8 w-8"
+        } ${
+          item.is_featured
+            ? "bg-amber-50 text-amber-600 ring-1 ring-amber-500/40 hover:bg-amber-100 dark:bg-amber-400/10 dark:text-amber-300 dark:ring-amber-400/30"
+            : "border border-gray-300 bg-white text-gray-600 hover:border-amber-400 hover:text-amber-600 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-amber-400 dark:hover:text-amber-300"
+        }`}
+      >
+        {busy ? <Loader2 size={14} className="animate-spin" aria-hidden="true" /> : <Star size={14} aria-hidden="true" className={item.is_featured ? "fill-current" : ""} />}
+        {wrap ? (item.is_featured ? "Featured" : "Feature") : null}
+      </button>
     </div>
   );
 }

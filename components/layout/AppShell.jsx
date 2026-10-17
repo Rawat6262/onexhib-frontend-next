@@ -54,10 +54,12 @@ const COMMUNITY_NAV = [{ href: "/social", label: "Community" }];
  * same horizontal tab strip as everyone else rather than a drawer that hides
  * the labels again. `navTitle` labels the rail.
  */
-export default function AppShell({ items = [], variant = "tabs", navTitle, children }) {
+export default function AppShell({ items = [], variant = "tabs", navTitle, wide = false, children }) {
   const pathname = usePathname();
   const activeHref = findActiveHref(items, pathname);
   const sidebar = variant === "sidebar" && items.length > 0;
+  // `wide`: the admin console's tables need the extra room beside its rail.
+  const container = wide ? "max-w-7xl" : "max-w-6xl";
 
   return (
     /*
@@ -111,7 +113,7 @@ export default function AppShell({ items = [], variant = "tabs", navTitle, child
             sidebar ? "lg:hidden" : ""
           }`}
         >
-          <nav aria-label="Workspace" className="mx-auto w-full max-w-6xl px-4 sm:px-6">
+          <nav aria-label="Workspace" className={`mx-auto w-full ${container} px-4 sm:px-6`}>
             <ul className="-mb-px flex list-none items-center gap-1 overflow-x-auto">
               {items.map((item) => {
                 const active = item.href === activeHref;
@@ -143,7 +145,7 @@ export default function AppShell({ items = [], variant = "tabs", navTitle, child
       ) : null}
 
       {sidebar ? (
-        <div className="mx-auto flex w-full max-w-6xl flex-1 lg:gap-8 lg:px-6">
+        <div className={`mx-auto flex w-full ${container} flex-1 lg:gap-6 lg:px-6`}>
           <SideNav items={items} activeHref={activeHref} title={navTitle} />
           <main className="min-w-0 flex-1">{children}</main>
         </div>
@@ -198,10 +200,18 @@ function SideNav({ items, activeHref, title }) {
             </p>
           ) : null}
           <ul className="flex list-none flex-col gap-0.5">
-            {items.map((item) => {
+            {items.map((item, i) => {
               const active = item.href === activeHref;
+              // Optional `group` on an item starts a labelled section in the rail
+              // (the tab strip and phone menu ignore it).
+              const heading = item.group && item.group !== items[i - 1]?.group ? item.group : null;
               return (
                 <li key={item.href}>
+                  {heading ? (
+                    <p className={`px-3 pb-1.5 text-[10.5px] font-semibold uppercase tracking-[0.1em] text-gray-400 dark:text-gray-500 ${i === 0 ? "pt-1" : "pt-4"}`}>
+                      {heading}
+                    </p>
+                  ) : null}
                   <Link
                     href={item.href}
                     aria-current={active ? "page" : undefined}

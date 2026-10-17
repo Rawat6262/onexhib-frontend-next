@@ -130,12 +130,17 @@ export const removeExhibitionLogo = (exhibitionId, kind, logoId) =>
  * 5-minute cache. Fire-and-forget: a failure only means the change appears a
  * few minutes later, so it never blocks or fails the edit that triggered it.
  */
-export const refreshExhibitionPage = (exhibitionId) => {
+export const refreshExhibitionPage = (exhibitionId, { featured = false } = {}) => {
   if (!exhibitionId) return;
   fetch("/api/revalidate/exhibition", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
-    body: JSON.stringify({ id: String(exhibitionId) }),
+    body: JSON.stringify({ id: String(exhibitionId), featured }),
   }).catch(() => {});
 };
+
+// Every featured exhibition, past ones included (the endpoint does not filter
+// by date). Paged at the API's 100 cap; the set is small and curated.
+export const getFeaturedExhibitionsPage = ({ page = 1, limit = 100 } = {}) =>
+  axios.get("/api/exhibitions/featured", { params: { page, limit } });

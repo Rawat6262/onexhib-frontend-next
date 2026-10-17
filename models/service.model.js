@@ -104,3 +104,14 @@ export const deleteExhibitionService = (serviceId) =>
  */
 export const getExhibitionServiceContact = (serviceId) =>
   axios.get(`/api/exhibition-services/${encodeURIComponent(String(serviceId))}/contact`);
+
+/*
+ * ADMIN - every listing with its owner, lead count and catalogue stats.
+ * params: { page, limit (<=100), search, category, country, owner ("none" or a
+ * user id), leads ("yes"), sort ("newest" | "oldest" | "leads" | "name"), stats ("0" to skip) }
+ * Answers { data, total, totalPages, categories, stats }.
+ */
+export const getAdminServicesPage = (params) => axios.get("/api/admin/services", { params });
+
+// Admin-only: remove any listing (spam, duplicates). Its image is deleted too.
+export const adminDeleteService = (id) => axios.delete(`/api/admin/services/${id}`);

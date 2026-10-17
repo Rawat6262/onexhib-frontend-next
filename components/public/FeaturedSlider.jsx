@@ -160,7 +160,8 @@ export default function FeaturedSlider({ items = [], className = "" }) {
                 <span className="text-sm text-white/45"> / {pad(count)}</span>
               </p>
 
-              <div className="pointer-events-auto flex items-center gap-1.5">
+              {/* Many slides do not fit as dots on a phone; the counter says enough there. */}
+              <div className={`pointer-events-auto items-center gap-1.5 ${count > 8 ? "hidden sm:flex" : "flex"}`}>
                 {slides.map((exhibition, i) => {
                   const active = i === index;
                   return (

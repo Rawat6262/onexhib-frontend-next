@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
 
-import { exhibitionTag } from "@/lib/public-api";
+import { FEATURED_TAG, exhibitionTag } from "@/lib/public-api";
 
 /**
- * POST /api/revalidate/exhibition  { id }
+ * POST /api/revalidate/exhibition  { id, featured? }
+ *
+ * `featured: true` also drops the cached featured list (the home page slider),
+ * sent by the admin Featured page when a show is featured or unfeatured.
  *
  * Drops the cached detail data for one exhibition - and with it the cached
  * /exhibition/[slug] page built from that data - so a change shows on the next
@@ -25,8 +28,9 @@ export async function POST(request) {
     return NextResponse.json({ ok: false }, { status: 401 });
   }
   let id = "";
+  let featured = false;
   try {
-    ({ id = "" } = await request.json());
+    ({ id = "", featured = false } = await request.json());
   } catch {
     /* fall through to the validation below */
   }
@@ -34,5 +38,6 @@ export async function POST(request) {
     return NextResponse.json({ ok: false }, { status: 400 });
   }
   revalidateTag(exhibitionTag(id));
+  if (featured === true) revalidateTag(FEATURED_TAG);
   return NextResponse.json({ ok: true }, { headers: { "Cache-Control": "no-store" } });
 }

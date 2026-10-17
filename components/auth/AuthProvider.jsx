@@ -51,8 +51,9 @@ export default function AuthProvider({ children }) {
     setStatus("guest");
   }, []);
 
-  const signIn = useCallback((nextUser) => {
-    writeCachedUser(nextUser);
+  // `lifetime` (a SESSION_LIFETIME value) only when a new session starts; see writeCachedUser.
+  const signIn = useCallback((nextUser, lifetime) => {
+    writeCachedUser(nextUser, lifetime);
     setUser(nextUser);
     setStatus("authed");
   }, []);

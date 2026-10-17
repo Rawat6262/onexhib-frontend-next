@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
 import { login as loginRequest } from "@/models/auth.model";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { homeRouteForRole } from "@/lib/auth";
+import { SESSION_LIFETIME, homeRouteForRole } from "@/lib/auth";
+import PasswordInput from "@/components/auth/PasswordInput";
 import AuthCard, {
   authInput,
   authLabel,
@@ -15,6 +16,8 @@ import AuthCard, {
   authSecondaryBtn,
 } from "@/components/auth/AuthCard";
 
+const REMEMBERED_EMAIL_KEY = "ox_login_email";
+
 export default function LoginForm({ stats, nextPath = "" }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,6 +25,19 @@ export default function LoginForm({ stats, nextPath = "" }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const { signIn } = useAuth();
+
+  // The email only - never the password, which the browser's own manager handles.
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem(REMEMBERED_EMAIL_KEY);
+      if (saved) {
+        setEmail(saved);
+        setRememberMe(true);
+      }
+    } catch {
+      /* storage blocked: the form simply starts empty */
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -32,7 +48,15 @@ export default function LoginForm({ stats, nextPath = "" }) {
       if (data.success) {
         // Only the non-sensitive profile is cached. The session itself lives in
         // the httpOnly uid cookie Express just set — never in localStorage.
-        signIn(data.user);
+        // Ticked: 30 days, matching the uid cookie Express just set. Unticked:
+        // until the browser closes - the header no longer outlives the session.
+        signIn(data.user, rememberMe ? SESSION_LIFETIME.REMEMBER : SESSION_LIFETIME.BROWSER);
+        try {
+          if (rememberMe) window.localStorage.setItem(REMEMBERED_EMAIL_KEY, email.trim());
+          else window.localStorage.removeItem(REMEMBERED_EMAIL_KEY);
+        } catch {
+          /* non-fatal */
+        }
         toast.success("Login successful!");
         /*
          * Back to wherever they were sent from, when there was somewhere. Already
@@ -84,8 +108,7 @@ export default function LoginForm({ stats, nextPath = "" }) {
           <label className={authLabel} htmlFor="password">
             Password
           </label>
-          <input
-            type="password"
+          <PasswordInput
             id="password"
             name="password"
             value={password}

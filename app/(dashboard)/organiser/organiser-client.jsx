@@ -3,10 +3,10 @@
 import dynamic from "next/dynamic";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Pencil, Plus, Search } from "lucide-react";
+import { KeyRound, Pencil, Plus, Search } from "lucide-react";
 import TablePagination from "@/components/dashboard/TablePagination";
 
-import { getExhibitions } from "@/models/exhibition.model";
+import { getExhibitions, getSharedExhibitions } from "@/models/exhibition.model";
 import {
   PageHeader,
   Panel,
@@ -48,6 +48,22 @@ export default function OrganiserClient() {
   const [id, setId] = useState(null);
   const router = useRouter();
   const [editingId, setEditingId] = useState(null);
+  // Exhibitions an admin gave this user edit access to. Kept apart from their
+  // own list: they can edit these but not delete them.
+  const [shared, setShared] = useState([]);
+
+  const fetchShared = useCallback(async () => {
+    try {
+      const { data } = await getSharedExhibitions();
+      setShared(Array.isArray(data?.data) ? data.data : []);
+    } catch {
+      setShared([]); // the section simply stays hidden
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchShared();
+  }, [fetchShared]);
 
   const fetchExhibitions = useCallback(async () => {
     try {
@@ -252,7 +268,10 @@ export default function OrganiserClient() {
         <ExhibitionEditPopup
           open={Boolean(editingId)}
           exhibitionId={editingId}
-          onClose={() => setEditingId(null)}
+          onClose={() => {
+            setEditingId(null);
+            fetchShared(); // a renamed shared show should show its new name
+          }}
         />
 
         <TablePagination
@@ -267,6 +286,71 @@ export default function OrganiserClient() {
           itemLabel="exhibitions"
         />
       </Panel>
+
+      {shared.length > 0 && <SharedWithYou items={shared} onEdit={setEditingId} />}
     </div>
+  );
+}
+
+const dateRange = (a, b) => {
+  const fmt = (d) =>
+    d ? new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }) : "";
+  const from = fmt(a);
+  const to = fmt(b);
+  return from && to && from !== to ? `${from} – ${to}` : from || to || "Dates not set";
+};
+
+/** Listings the OneXhib team created and an admin let this organiser edit. */
+function SharedWithYou({ items, onEdit }) {
+  const router = useRouter();
+  return (
+    <section aria-labelledby="shared-title" className="mt-10">
+      <div className="flex items-start gap-3">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#2B3FB8]/10 text-[#2B3FB8] dark:bg-blue-400/15 dark:text-blue-300">
+          <KeyRound size={17} aria-hidden="true" />
+        </span>
+        <div>
+          <h2 id="shared-title" className="text-lg font-bold text-gray-900 dark:text-gray-50">
+            Shared with you
+            <span className="ml-2 align-middle text-sm font-medium text-gray-500 dark:text-gray-400">{items.length}</span>
+          </h2>
+          <p className="mt-0.5 text-sm text-gray-600 dark:text-gray-400">
+            The OneXhib team gave you access to keep these listings up to date. You can edit them, but not
+            delete them.
+          </p>
+        </div>
+      </div>
+
+      <ul className="mt-4 grid list-none grid-cols-1 gap-3 sm:grid-cols-2">
+        {items.map((item) => (
+          <li
+            key={item._id}
+            className="flex flex-col rounded-2xl border border-gray-200 bg-white p-4 shadow-sm shadow-gray-900/[0.03] transition hover:border-[#2B3FB8]/40 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-blue-400/40"
+          >
+            <p className="font-semibold text-gray-900 dark:text-gray-100">{item.exhibition_name}</p>
+            <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+              {dateRange(item.starting_date, item.ending_date)}
+            </p>
+            {item.exhibition_address ? (
+              <p className="mt-0.5 truncate text-sm text-gray-500 dark:text-gray-500" title={item.exhibition_address}>
+                {item.exhibition_address}
+              </p>
+            ) : null}
+            <div className="mt-auto flex items-center justify-between gap-2 pt-4">
+              {item.category ? <span className={`${pill} truncate`}>{item.category}</span> : <span />}
+              <div className="flex shrink-0 gap-2">
+                <button type="button" className={btnRow} onClick={() => router.push(`/exhibitions/${item._id}`)}>
+                  View
+                </button>
+                <button type="button" className={btnRow} onClick={() => onEdit(item._id)}>
+                  <Pencil size={14} aria-hidden="true" />
+                  Edit
+                </button>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }

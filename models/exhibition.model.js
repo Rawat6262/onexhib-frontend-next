@@ -52,6 +52,26 @@ export const adminUpdateExhibition = (exhibitionId, payload) =>
 
 export const deleteExhibition = (id) => axios.delete(`/api/delete/exhibition/${id}`);
 
+/*
+ * EDIT ACCESS - an admin lets a show's real organiser edit a listing the OneXhib
+ * team created. The editor saves through the normal owner routes above
+ * (updateExhibition, the logo calls); the server decides who may. They can edit,
+ * never delete. Refusals come back as 409 with a message to show as-is.
+ */
+
+// Exhibitions an admin gave the signed-in user edit access to ("Shared with you").
+export const getSharedExhibitions = () => axios.get("/api/exhibition/shared");
+
+// Admin-only. Each answers with the panel's full state:
+// { exhibition, editors: [{ _id, name, email, company_name }], recentChanges, maxEditors }
+export const getExhibitionEditors = (id) => axios.get(`/api/admin/exhibition/${id}/editors`);
+
+export const grantExhibitionEditor = (id, email) =>
+  axios.post(`/api/admin/exhibition/${id}/editors`, { email });
+
+export const revokeExhibitionEditor = (id, userId) =>
+  axios.delete(`/api/admin/exhibition/${id}/editors/${userId}`);
+
 // Admin-only equivalent — deletes any exhibition regardless of owner.
 export const adminDeleteExhibition = (id) => axios.delete(`/api/admin/exhibition/${id}`);
 

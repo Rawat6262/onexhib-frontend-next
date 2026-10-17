@@ -1,4 +1,4 @@
-import Image from "next/image";
+import CardImage from "@/components/public/CardImage";
 
 /**
  * Image slot for every public card, with the branded placeholder fallback.
@@ -35,7 +35,10 @@ export default function CardMedia({
       className={`relative ${aspect} w-full overflow-hidden ${image ? bg : "bg-[#131C55]"} ${className}`}
     >
       {image ? (
-        <Image
+        // CardImage swaps to the placeholder if the image fails to load (a dead or
+        // now-private hotlink), so a card never shows a broken-image icon.
+        <CardImage
+          fallback={<Placeholder label={label} />}
           src={image.url}
           alt={alt}
           fill

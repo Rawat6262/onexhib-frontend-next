@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { useTheme } from 'next-themes';
 import Image from "next/image";
 import { signup } from '@/models/auth.model';
+import PasswordInput from "@/components/auth/PasswordInput";
 
 function NewOrganiserPopup({ onClose }) {
   const [form, setForm] = useState({
@@ -474,20 +475,25 @@ const InputField = ({ id, label, name, value, onChange, type = 'text', required,
       {label}
       {required && <span className="text-red-600 ml-1">*</span>}
     </label>
-    <input
-      id={id}
-      type={type}
-      name={name}
-      value={value}
-      onChange={onChange}
-      onBlur={onBlur}
-      placeholder={placeholder || label}
-      required={required}
-      aria-invalid={!!error}
-      aria-describedby={error ? `${id}-error` : undefined}
-      maxLength={name === 'mobile_number' ? 10 : undefined}
-      className={`w-full px-4 py-2 rounded-lg border ${error ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'} bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900 transition`}
-    />
+    {(() => {
+      const inputProps = {
+        id,
+        name,
+        value,
+        onChange,
+        onBlur,
+        placeholder: placeholder || label,
+        required,
+        'aria-invalid': !!error,
+        'aria-describedby': error ? `${id}-error` : undefined,
+        maxLength: name === 'mobile_number' ? 10 : undefined,
+        className: `w-full px-4 py-2 rounded-lg border ${error ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'} bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900 transition`,
+      };
+      // Password fields get the show/hide toggle; everything else is unchanged.
+      return type === 'password'
+        ? <PasswordInput {...inputProps} autoComplete="new-password" />
+        : <input {...inputProps} type={type} />;
+    })()}
     {error && (
       <p id={`${id}-error`} className="text-xs text-red-600 mt-1">
         {error}

@@ -97,10 +97,13 @@ export default function PrivacyPolicyPage() {
       <ProseSection id="cookies" title="4. Cookies &amp; Authentication">
         <p>
           <span className="font-semibold text-gray-900 dark:text-gray-100">Essential cookie:</span>{" "}
-          we use a single essential cookie to keep you signed in securely. It is httpOnly (not
+          we use an essential cookie to keep you signed in securely. It is httpOnly (not
           readable by page scripts) and is only used for authentication — we don&apos;t use it for
           advertising or cross-site tracking. If you check &quot;Remember me&quot; at login, this
-          cookie persists for 30 days; otherwise it clears when you close your browser.
+          cookie persists for 30 days; otherwise it clears when you close your browser. A second
+          small cookie with the same lifetime holds no personal data; it only tells the page whether
+          that sign-in is still active. &quot;Remember me&quot; also saves your email address on
+          your own device, so the login form is filled in next time; unticking it removes it.
         </p>
         <p>
           <span className="font-semibold text-gray-900 dark:text-gray-100">Analytics cookies:</span>{" "}

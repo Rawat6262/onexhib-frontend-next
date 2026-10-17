@@ -6,7 +6,7 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { verifyOtp, resendOtp } from "@/models/auth.model";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { homeRouteForRole } from "@/lib/auth";
+import { SESSION_LIFETIME, homeRouteForRole } from "@/lib/auth";
 import { otpSentMessage, parseSmsParam, smsDestination } from "@/lib/otp";
 import AuthCard from "@/components/auth/AuthCard";
 import OtpInput, { EMPTY_OTP } from "@/components/auth/OtpInput";
@@ -75,7 +75,7 @@ export default function VerifyOtpForm({ initialEmail = "", initialSmsTo = "" }) 
         // The Vite version also did localStorage.setItem('token', data.token),
         // putting a raw JWT in storage readable by any script. Dropped: the
         // session already travels in the httpOnly uid cookie Express sets here.
-        signIn(data.user);
+        signIn(data.user, SESSION_LIFETIME.SIGNUP);
         toast.success("Account verified successfully!");
         router.push(homeRouteForRole(data.user.designation));
       }

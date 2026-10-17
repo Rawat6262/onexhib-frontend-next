@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { requestPasswordReset } from "@/models/auth.model";
 import { otpSentMessage, smsQueryParam } from "@/lib/otp";
 import AuthCard from "@/components/auth/AuthCard";
+import PasswordInput from "@/components/auth/PasswordInput";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i;
 const PASSWORD_RE = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&^_-]{8,}$/;
@@ -99,8 +100,7 @@ export default function ForgotPasswordForm({ initialEmail = "" }) {
           <label className="block mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300" htmlFor="newPass">
             New Password
           </label>
-          <input
-            type="password"
+          <PasswordInput
             id="newPass"
             value={newPass}
             onChange={(e) => setNewPass(e.target.value)}
@@ -115,8 +115,7 @@ export default function ForgotPasswordForm({ initialEmail = "" }) {
           <label className="block mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300" htmlFor="confirmPass">
             Confirm New Password
           </label>
-          <input
-            type="password"
+          <PasswordInput
             id="confirmPass"
             value={confirmPass}
             onChange={(e) => setConfirmPass(e.target.value)}

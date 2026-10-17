@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { CalendarDays, MapPin } from "lucide-react";
 
 import Breadcrumbs from "@/components/public/Breadcrumbs";
@@ -10,7 +10,7 @@ import JsonLd from "@/components/seo/JsonLd";
 import { PUBLIC_ROUTES, publicPageMetadata, pageMetadata, NOINDEX_FOLLOW } from "@/lib/seo";
 import { breadcrumbNode, graph, itemListNode } from "@/lib/jsonld";
 import { cityLandingPath, countryLandingPath, exhibitionPath } from "@/lib/routes";
-import { dateSummary, getCountryFacet, getExhibitionsInPlace } from "@/lib/locations";
+import { dateSummary, getExhibitionsInPlace, resolveLocationPage } from "@/lib/locations";
 
 /**
  * Country landing page: /exhibitions-in/[country]
@@ -48,8 +48,10 @@ const readPage = (sp) => {
 
 export async function generateMetadata({ params, searchParams }) {
   const { country } = await params;
-  const facet = await getCountryFacet(country);
-  if (!facet) return { title: "Location not found", robots: { index: false, follow: true } };
+  const resolved = await resolveLocationPage(country);
+  // The page itself redirects in this case; this is only ever a fallback.
+  if (!resolved) return { title: "Exhibitions by location", robots: NOINDEX_FOLLOW };
+  const { facet, indexable } = resolved;
 
   const page = readPage(await searchParams);
   const summary = dateSummary(facet.dates);
@@ -60,9 +62,11 @@ export async function generateMetadata({ params, searchParams }) {
     ? `${facet.count} upcoming exhibitions and trade shows across ${facet.country}, from ${summary.firstLabel} to ${summary.lastLabel}. Browse by city, with dates and full details for every event.`
     : `Upcoming exhibitions and trade shows across ${facet.country}, with dates and full details for every event.`;
 
-  if (page > 1) {
+  // Page 2+, or a country below MIN_COUNTRY (see resolveLocationPage): still a
+  // working page, kept out of search.
+  if (page > 1 || !indexable) {
     return pageMetadata({
-      title: `Exhibitions in ${facet.country} — page ${page}`,
+      title: page > 1 ? `Exhibitions in ${facet.country} — page ${page}` : title,
       description,
       path: canonical,
       robots: NOINDEX_FOLLOW,
@@ -74,12 +78,14 @@ export async function generateMetadata({ params, searchParams }) {
 
 export default async function CountryLandingPage({ params, searchParams }) {
   const { country } = await params;
-  const facet = await getCountryFacet(country);
-  if (!facet) notFound();
+  const resolved = await resolveLocationPage(country);
+  // No upcoming shows in this country any more: the hub, rather than a 404.
+  if (!resolved) redirect(PUBLIC_ROUTES.locations);
+  const { facet } = resolved;
 
   const page = readPage(await searchParams);
   const items = await getExhibitionsInPlace({ country: facet.country });
-  if (!items.length) notFound();
+  if (!items.length) redirect(PUBLIC_ROUTES.locations);
 
   const summary = dateSummary(items.map((e) => e.startDate).filter(Boolean));
   const totalPages = Math.max(1, Math.ceil(items.length / PER_PAGE));

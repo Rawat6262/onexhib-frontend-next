@@ -6,7 +6,7 @@ import Breadcrumbs from "@/components/public/Breadcrumbs";
 import ExhibitionCard from "@/components/public/ExhibitionCard";
 import JsonLd from "@/components/seo/JsonLd";
 
-import { PUBLIC_ROUTES, publicPageMetadata } from "@/lib/seo";
+import { NOINDEX_FOLLOW, PUBLIC_ROUTES, pageMetadata, publicPageMetadata } from "@/lib/seo";
 import { breadcrumbNode, graph, itemListNode } from "@/lib/jsonld";
 import { exhibitionPath } from "@/lib/routes";
 import {
@@ -20,20 +20,33 @@ import {
 /**
  * /exhibitions/monthly/2027/03 — one month of the calendar.
  *
- * ONLY MONTHS WITH REAL INVENTORY EXIST
- * generateStaticParams emits the months that clear MIN_MONTH_EXHIBITIONS, and
- * dynamicParams is false, so any other month/year pair 404s rather than
- * rendering an empty page. That is deliberate: the backend will happily compute
- * any month you ask for, and honouring that would create an unbounded set of
- * near-empty URLs — /monthly/2031/07 and the rest — which is textbook doorway
- * generation. A 404 is the honest answer for a month with nothing in it.
+ * WHICH MONTHS ARE PAGES
+ * - Outside the window parseParams allows (one year back, two ahead), or a
+ *   month with no shows at all: 404. That keeps crawlers from walking an
+ *   unbounded set of empty URLs (/monthly/2031/07 and the rest).
+ * - At least MIN_MONTH_EXHIBITIONS shows: a normal, indexable page. The same
+ *   threshold governs the sitemap.
+ * - Fewer than that: still rendered for anyone who follows a link, but
+ *   noindex - too thin to be a search result.
  *
- * The same threshold governs the sitemap, so what is listed and what is
- * reachable never disagree.
+ * PAST MONTHS STAY UP
+ * These used to count only upcoming and ongoing shows, so a month emptied
+ * itself as its shows ended and turned into a 404 - after Google had already
+ * indexed it (Search Console: /exhibitions/monthly/2026/09). A month that has
+ * started now includes the shows that already closed, and reads in the past
+ * tense once it is over.
  */
 
 export const revalidate = 3600;
-export const dynamicParams = false;
+/*
+ * TRUE, not false. With false the set of months was frozen at build time: as the
+ * calendar rolled forward, a month that gained its listings after a deploy 404'd
+ * (logged in production as "Internal: NoFallbackError") even though the calendar
+ * page linked to it, until the next rebuild. The guards in MonthPage below -
+ * parseParams, the empty-month 404 and noindex below MIN_MONTH_EXHIBITIONS -
+ * still keep nonsense and thin months out of the index.
+ */
+export const dynamicParams = true;
 
 export async function generateStaticParams() {
   const months = await getIndexableMonths();
@@ -44,8 +57,20 @@ function parseParams(year, month) {
   const y = Number(year);
   const m = Number(month);
   if (!Number.isInteger(y) || !Number.isInteger(m) || m < 1 || m > 12) return null;
-  if (y < 2000 || y > 2100) return null;
+  // A realistic window, not 2000-2100: with dynamicParams on, every accepted pair
+  // can reach the backend, so a crawler walking /monthly/2093/07 and the rest
+  // must 404 here without a fetch. One year back to two ahead covers everything
+  // the calendar links to (MONTHS_AHEAD in lib/discovery.js is 14).
+  const now = new Date();
+  const index = y * 12 + (m - 1);
+  const current = now.getUTCFullYear() * 12 + now.getUTCMonth();
+  if (index < current - 12 || index > current + 24) return null;
   return { year: y, month: m };
+}
+
+/** True once the whole month is behind us (UTC). */
+function isPastMonth({ year, month }, now = new Date()) {
+  return Date.UTC(year, month, 1) <= now.getTime();
 }
 
 export async function generateMetadata({ params }) {
@@ -56,16 +81,20 @@ export async function generateMetadata({ params }) {
   const label = monthLabel(parsed.year, parsed.month);
   const items = await getMonthExhibitions(parsed.year, parsed.month);
   const slug = monthSlug(parsed.year, parsed.month);
+  const verb = isPastMonth(parsed) ? "took place" : "open";
 
-  return publicPageMetadata({
+  const meta = {
     title: `Exhibitions in ${label}`,
     description:
-      `${items.length} exhibitions and trade shows open in ${label}, worldwide. See dates, venues, cities and categories for every event.`.slice(
+      `${items.length} exhibitions and trade shows ${verb} in ${label}, worldwide. See dates, venues, cities and categories for every event.`.slice(
         0,
         158
       ),
     path: `${PUBLIC_ROUTES.exhibitions}/monthly/${slug.year}/${slug.month}`,
-  });
+  };
+  return items.length >= MIN_MONTH_EXHIBITIONS
+    ? publicPageMetadata(meta)
+    : pageMetadata({ ...meta, robots: NOINDEX_FOLLOW });
 }
 
 export default async function MonthPage({ params }) {
@@ -75,10 +104,9 @@ export default async function MonthPage({ params }) {
 
   const items = await getMonthExhibitions(parsed.year, parsed.month);
 
-  // Belt and braces alongside dynamicParams:false — if a month's inventory
-  // drops below the floor between builds, it stops being a page rather than
-  // degrading into a thin one.
-  if (items.length < MIN_MONTH_EXHIBITIONS) notFound();
+  // Nothing at all: a 404. A thin month still renders (noindex - see metadata).
+  if (items.length === 0) notFound();
+  const past = isPastMonth(parsed);
 
   const label = monthLabel(parsed.year, parsed.month);
   const slug = monthSlug(parsed.year, parsed.month);
@@ -130,11 +158,25 @@ export default async function MonthPage({ params }) {
           Exhibitions in {label}
         </h1>
         <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-gray-600 dark:text-gray-400">
-          {items.length.toLocaleString("en-US")} exhibitions and trade shows open in {label}
+          {items.length.toLocaleString("en-US")}{" "}
+          {items.length === 1 ? "exhibition or trade show" : "exhibitions and trade shows"}{" "}
+          {past ? "took place" : "open"} in {label}
           {countries.length > 1 ? ` across ${countries.length} countries` : ""}. Listings are ordered
           by opening date.
         </p>
       </header>
+
+      {past ? (
+        <p className="mt-5 inline-flex flex-wrap items-center gap-x-2 gap-y-1 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm text-amber-900 dark:border-amber-400/25 dark:bg-amber-400/10 dark:text-amber-200">
+          This month has passed.
+          <Link
+            href={`${PUBLIC_ROUTES.exhibitions}/monthly`}
+            className="font-semibold underline underline-offset-4 hover:no-underline"
+          >
+            See upcoming months
+          </Link>
+        </p>
+      ) : null}
 
       <div className="mt-10 space-y-10">
         {[...groups.entries()].map(([day, dayItems]) => {

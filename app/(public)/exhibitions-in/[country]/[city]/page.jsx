@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { CalendarDays, MapPin } from "lucide-react";
 
 import Breadcrumbs from "@/components/public/Breadcrumbs";
@@ -10,7 +10,7 @@ import JsonLd from "@/components/seo/JsonLd";
 import { PUBLIC_ROUTES, publicPageMetadata, pageMetadata, NOINDEX_FOLLOW } from "@/lib/seo";
 import { breadcrumbNode, graph, itemListNode } from "@/lib/jsonld";
 import { cityLandingPath, countryLandingPath, exhibitionPath } from "@/lib/routes";
-import { dateSummary, getCityFacet, getCountryFacet, getExhibitionsInPlace } from "@/lib/locations";
+import { dateSummary, getCountryFacet, getExhibitionsInPlace, resolveLocationPage } from "@/lib/locations";
 
 /**
  * City landing page: /exhibitions-in/[country]/[city]
@@ -28,11 +28,13 @@ import { dateSummary, getCityFacet, getCountryFacet, getExhibitionsInPlace } fro
  * which one a slug meant. Nesting removes the ambiguity entirely, and gives the
  * crawler the hierarchy it should see anyway: hub -> country -> city -> event.
  *
- * WHY IT CANNOT 404-PROOF ITSELF WITH generateStaticParams
+ * WHEN A CITY THINS OUT
  * The qualifying set changes as exhibitions are added and pass, so params are
- * resolved on demand and ISR-cached. A city that drops below the threshold
- * stops resolving and starts returning 404 - which is correct: the page no
- * longer has the content it promises.
+ * resolved on demand and ISR-cached (see resolveLocationPage):
+ *   - below MIN_CITY but still has upcoming shows: rendered, but noindex;
+ *   - no upcoming shows at all: redirected to its country page (or the hub).
+ * It used to 404, which Search Console reported as errors for cities Google had
+ * indexed while they qualified, and left visitors on old links at a dead end.
  */
 
 /**
@@ -70,8 +72,10 @@ function describe(facet, count, summary) {
 
 export async function generateMetadata({ params, searchParams }) {
   const { country, city } = await params;
-  const facet = await getCityFacet(country, city);
-  if (!facet) return { title: "Location not found", robots: { index: false, follow: true } };
+  const resolved = await resolveLocationPage(country, city);
+  // The page itself redirects in this case; this is only ever a fallback.
+  if (!resolved) return { title: "Exhibitions by location", robots: NOINDEX_FOLLOW };
+  const { facet, indexable } = resolved;
 
   const page = readPage(await searchParams);
   const items = await getExhibitionsInPlace(facet);
@@ -85,9 +89,9 @@ export async function generateMetadata({ params, searchParams }) {
   // Page 2+ canonicalises to page 1 of the SAME city - never to an unrelated
   // page - and stays out of the index while its links remain followable. This
   // mirrors how the companies and products listings already behave.
-  if (page > 1) {
+  if (page > 1 || !indexable) {
     return pageMetadata({
-      title: `Exhibitions in ${facet.city} — page ${page}`,
+      title: page > 1 ? `Exhibitions in ${facet.city} — page ${page}` : title,
       description,
       path: canonical,
       robots: NOINDEX_FOLLOW,
@@ -99,17 +103,21 @@ export async function generateMetadata({ params, searchParams }) {
 
 export default async function CityLandingPage({ params, searchParams }) {
   const { country, city } = await params;
-  const facet = await getCityFacet(country, city);
-  // Below the quality threshold, or not a place in the data at all. A 404 is
-  // the honest answer; a thin page would be worse for both users and crawlers.
-  if (!facet) notFound();
+  const resolved = await resolveLocationPage(country, city);
+  // No upcoming shows here any more: send the visitor somewhere that has some.
+  if (!resolved) {
+    redirect((await resolveLocationPage(country)) ? countryLandingPath(country) : PUBLIC_ROUTES.locations);
+  }
+  const { facet } = resolved;
 
   const page = readPage(await searchParams);
   const [items, ongoing] = await Promise.all([
     getExhibitionsInPlace(facet),
     getExhibitionsInPlace(facet, { scope: "ongoing" }),
   ]);
-  if (!items.length && !ongoing.length) notFound();
+  if (!items.length && !ongoing.length) {
+    redirect((await resolveLocationPage(facet.countrySlug)) ? countryLandingPath(facet.countrySlug) : PUBLIC_ROUTES.locations);
+  }
 
   const summary = dateSummary(items.map((e) => e.startDate).filter(Boolean));
   const totalPages = Math.max(1, Math.ceil(items.length / PER_PAGE));

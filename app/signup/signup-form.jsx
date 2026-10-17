@@ -8,6 +8,7 @@ import { useTheme } from "next-themes";
 import { toast } from "sonner";
 import { signup } from "@/models/auth.model";
 import { otpSentMessage, smsQueryParam } from "@/lib/otp";
+import PasswordInput from "@/components/auth/PasswordInput";
 import AuthCard, { authInput, authLabel, authLink, authPrimaryBtn } from "@/components/auth/AuthCard";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i;
@@ -277,8 +278,12 @@ export default function SignupForm({ stats }) {
 
 const InputField = ({ label, error, ...props }) => (
   <div>
-    <label className={authLabel}>{label}</label>
-    <input {...props} className={authInput} />
+    <label className={authLabel} htmlFor={props.name}>{label}</label>
+    {props.type === "password" ? (
+      <PasswordInput {...props} id={props.name} autoComplete="new-password" className={authInput} />
+    ) : (
+      <input {...props} id={props.name} className={authInput} />
+    )}
     {error && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{error}</p>}
   </div>
 );

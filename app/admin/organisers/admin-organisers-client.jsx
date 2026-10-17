@@ -8,6 +8,7 @@ import dynamic from "next/dynamic";
 import { useCallback, useEffect, useState, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { KeyRound } from "lucide-react";
 
 import {
   getAdminExhibitionsPage,
@@ -23,6 +24,7 @@ import TablePagination from "@/components/dashboard/TablePagination";
 const ExhibitionPopupForm = dynamic(() => import("@/components/popups/ExhibitionPopupForm"), { ssr: false });
 const OrganiserPopup = dynamic(() => import("@/components/organiser/OrganiserDetailsPopup"), { ssr: false });
 const ExhibitionEditPopup = dynamic(() => import("@/components/popups/OrganiserEditPopup"), { ssr: false });
+const ExhibitionAccessDialog = dynamic(() => import("@/components/admin/ExhibitionAccessDialog"), { ssr: false });
 
 const MONTH_NAMES = [
   "January", "February", "March", "April", "May", "June",
@@ -49,6 +51,8 @@ export default function AdminOrganisersClient() {
   const [update, setupdate] = useState(false);
   const router = useRouter();
   const [editingId, setEditingId] = useState(null);
+  // { id, name } of the exhibition whose edit access is open, or null.
+  const [accessFor, setAccessFor] = useState(null);
 
   // Month/year filter — when both are set, the list comes from the monthly
   // endpoint instead of the plain admin listing.
@@ -161,7 +165,6 @@ export default function AdminOrganisersClient() {
         {/* Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div className="min-w-0">
-            <p className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#2B3FB8] dark:text-blue-300"><span aria-hidden="true" className="h-px w-6 bg-current opacity-60" />Admin</p>
             <p className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#2B3FB8] dark:text-blue-300"><span aria-hidden="true" className="h-px w-6 bg-current opacity-60" />Admin</p>
             <h1 className="text-3xl font-extrabold leading-[1.1] tracking-tight text-gray-900 sm:text-[2.6rem] dark:text-white">SEM GROUP</h1>
           </div>
@@ -318,6 +321,14 @@ export default function AdminOrganisersClient() {
                           Edit
                         </button>
                         <button
+                          className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-[13px] font-medium text-gray-700 transition hover:border-[#2B3FB8] hover:text-[#2B3FB8] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-blue-400 dark:hover:text-white flex-1"
+                          onClick={() => setAccessFor({ id: item._id, name: item.exhibition_name })}
+                          title="Let someone else edit this exhibition"
+                        >
+                          <KeyRound size={13} aria-hidden="true" />
+                          Access
+                        </button>
+                        <button
                           className={`flex-1 flex items-center justify-center gap-1 px-3 py-1.5 border rounded-md transition disabled:opacity-50 disabled:cursor-not-allowed ${
                             item.is_featured
                               ? "border-amber-400 text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950 hover:bg-amber-100 dark:hover:bg-amber-900"
@@ -391,6 +402,14 @@ export default function AdminOrganisersClient() {
                               >
                                 Edit
                               </button>
+                              <button
+                                className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-[13px] font-medium text-gray-700 transition hover:border-[#2B3FB8] hover:text-[#2B3FB8] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-blue-400 dark:hover:text-white"
+                                onClick={() => setAccessFor({ id: item._id, name: item.exhibition_name })}
+                                title="Let someone else edit this exhibition"
+                              >
+                                <KeyRound size={13} aria-hidden="true" />
+                                Access
+                              </button>
                             </div>
                           </td>
                         </tr>
@@ -408,6 +427,13 @@ export default function AdminOrganisersClient() {
       isAdmin
       onClose={() => setEditingId(null)}
     />
+    {accessFor && (
+      <ExhibitionAccessDialog
+        exhibitionId={accessFor.id}
+        exhibitionName={accessFor.name}
+        onClose={() => setAccessFor(null)}
+      />
+    )}
   </div>
 
           <div className="mt-6">

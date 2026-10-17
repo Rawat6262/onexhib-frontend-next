@@ -7,6 +7,7 @@ import { Building2, CalendarDays, Mail, MapPin, Package, Phone } from "lucide-re
 import { getAdminCompaniesPage } from "@/models/company.model";
 import { getAdminExhibitionsPage } from "@/models/exhibition.model";
 import TablePagination from "@/components/dashboard/TablePagination";
+import { companyPath } from "@/lib/routes";
 import {
   AdminHeader,
   AdminPage,
@@ -167,9 +168,14 @@ export default function AdminCompaniesClient() {
                         <p className="text-xs text-gray-400">{timeAgo(c.createdAt)}</p>
                       </td>
                       <td className={`${td} text-right`}>
-                        <Link href={`/companies/${c._id}`} target="_blank" rel="noopener" className={btnRow}>
-                          View
-                        </Link>
+                        <div className="flex justify-end gap-1.5">
+                          <Link href={companyPath(c.company_name, c._id)} target="_blank" rel="noopener" className={btnRow}>
+                            View
+                          </Link>
+                          <Link href={`/companies/${c._id}`} className={btnRow}>
+                            Manage
+                          </Link>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -182,7 +188,7 @@ export default function AdminCompaniesClient() {
                 <li key={c._id} className="space-y-2.5 px-4 py-4 sm:px-5">
                   <div className="flex items-start justify-between gap-3">
                     <CompanyCell c={c} />
-                    <Link href={`/companies/${c._id}`} target="_blank" rel="noopener" className={btnRow}>
+                    <Link href={companyPath(c.company_name, c._id)} target="_blank" rel="noopener" className={btnRow}>
                       View
                     </Link>
                   </div>

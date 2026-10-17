@@ -6,6 +6,7 @@ import { Package, Tag } from "lucide-react";
 
 import { getAdminProductsPage } from "@/models/product.model";
 import TablePagination from "@/components/dashboard/TablePagination";
+import { productPath } from "@/lib/routes";
 import {
   AdminHeader,
   AdminPage,
@@ -171,9 +172,14 @@ export default function AdminProductsClient() {
                         <p className="text-xs text-gray-400">{timeAgo(p.createdAt)}</p>
                       </td>
                       <td className={`${td} text-right`}>
-                        <Link href={`/products/${p._id}`} target="_blank" rel="noopener" className={btnRow}>
-                          View
-                        </Link>
+                        <div className="flex justify-end gap-1.5">
+                          <Link href={productPath(p.product_name, p._id)} target="_blank" rel="noopener" className={btnRow}>
+                            View
+                          </Link>
+                          <Link href={`/products/${p._id}`} className={btnRow}>
+                            Manage
+                          </Link>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -186,7 +192,7 @@ export default function AdminProductsClient() {
                 <li key={p._id} className="space-y-2 px-4 py-4">
                   <div className="flex items-start justify-between gap-3">
                     <ProductCell p={p} />
-                    <Link href={`/products/${p._id}`} target="_blank" rel="noopener" className={btnRow}>
+                    <Link href={productPath(p.product_name, p._id)} target="_blank" rel="noopener" className={btnRow}>
                       View
                     </Link>
                   </div>

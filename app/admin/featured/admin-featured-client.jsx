@@ -23,6 +23,7 @@ import {
   unfeatureExhibition,
 } from "@/models/exhibition.model";
 import TablePagination from "@/components/dashboard/TablePagination";
+import { exhibitionPath } from "@/lib/routes";
 import { AdminHeader, AdminPage, StatCard, StatGrid } from "@/components/admin/AdminUI";
 import { btnPrimary, btnRow, btnRowDanger, btnSecondary, inputBase, pill } from "@/components/dashboard/ui";
 
@@ -353,7 +354,7 @@ export default function AdminFeaturedClient() {
                   </div>
 
                   <div className="flex shrink-0 items-center gap-2 sm:justify-end">
-                    <Link href={`/exhibitions/${it.id}`} className={btnRow} target="_blank" rel="noopener">
+                    <Link href={exhibitionPath(it.name, it.id)} className={btnRow} target="_blank" rel="noopener">
                       View
                     </Link>
                     {confirmId === it.id ? (

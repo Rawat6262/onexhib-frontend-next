@@ -135,6 +135,11 @@ export default function AppShell({ items = [], variant = "tabs", navTitle, wide 
                         {item.icon}
                       </span>
                       {item.label}
+                      {item.badge ? (
+                        <span className="rounded-full bg-amber-500 px-1.5 py-px text-[11px] font-bold tabular-nums text-white" aria-label={`${item.badge} waiting`}>
+                          {item.badge}
+                        </span>
+                      ) : null}
                     </Link>
                   </li>
                 );
@@ -232,6 +237,11 @@ function SideNav({ items, activeHref, title }) {
                       {item.icon}
                     </span>
                     <span className="truncate">{item.label}</span>
+                    {item.badge ? (
+                      <span className="ml-auto rounded-full bg-amber-500 px-1.5 py-px text-[11px] font-bold tabular-nums text-white" aria-label={`${item.badge} waiting`}>
+                        {item.badge}
+                      </span>
+                    ) : null}
                   </Link>
                 </li>
               );

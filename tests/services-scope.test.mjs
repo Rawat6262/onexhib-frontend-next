@@ -72,8 +72,9 @@ const svcModelSrc = strip(read("models/service.model.js"));
 console.log("services — the dashboard shows the viewer their OWN listings");
 
 check("1. the scoped endpoint exists in the model",
-  /getMyExhibitionServices = \(\) => axios\.get\("\/api\/myexhibitionservices"\)/.test(modelSrc));
-check("2. the dashboard calls it", /await getMyExhibitionServices\(\)/.test(dashSrc));
+  // Optional paging params only - still no user id anywhere in the request.
+  /getMyExhibitionServices = \(params\) => axios\.get\("\/api\/myexhibitionservices", \{ params \}\)/.test(modelSrc));
+check("2. the dashboard calls it", /await getMyExhibitionServices\(/.test(dashSrc));
 check("3. and no longer calls the public one",
   !/getAdminExhibitionServices\(\)/.test(dashSrc),
   "the dashboard still reads the unscoped endpoint");

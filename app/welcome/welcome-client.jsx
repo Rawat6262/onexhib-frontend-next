@@ -5,7 +5,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   ArrowRight,
+  Bookmark,
   Briefcase,
+  CalendarClock,
+  Users,
   CalendarDays,
   Check,
   Building2,
@@ -148,6 +151,32 @@ export default function WelcomeClient() {
               Change account type
             </a>
           </div>
+
+          {/* Every account's own things - a visitor's real "dashboard". They
+              were reachable only from the account menu. */}
+          <ul className="mt-8 grid list-none grid-cols-1 gap-2.5 border-t border-white/10 pt-6 sm:grid-cols-3">
+            {[
+              { href: "/account/saved", label: "Saved exhibitions", sub: "Shows you bookmarked", Icon: Bookmark },
+              { href: "/account/meetings", label: "My meetings", sub: "Requests and bookings", Icon: CalendarClock },
+              { href: "/social", label: "Community", sub: "Posts from people you follow", Icon: Users },
+            ].map(({ href, label, sub, Icon }) => (
+              <li key={href}>
+                <Link
+                  href={href}
+                  className="group flex items-center gap-3 rounded-2xl bg-white/[0.07] px-4 py-3 ring-1 ring-white/10 transition hover:bg-white/[0.12] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white motion-reduce:transition-none"
+                >
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-white/10 text-white">
+                    <Icon size={17} aria-hidden="true" />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-semibold text-white">{label}</span>
+                    <span className="block truncate text-xs text-blue-100/70">{sub}</span>
+                  </span>
+                  <ArrowRight size={15} aria-hidden="true" className="shrink-0 text-blue-100/60 transition group-hover:translate-x-0.5 motion-reduce:transform-none" />
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 

@@ -70,7 +70,7 @@ export default function AppHeader({ nav = PUBLIC_NAV, right = null, mobileExtra 
         </Link>
 
         {nav.length ? (
-          <nav aria-label="Primary" className="hidden md:block">
+          <nav aria-label="Primary" className="hidden xl:block">
             <ul className="flex list-none items-center gap-1">
               {nav.map((item) => (
                 <li key={item.href}>
@@ -94,7 +94,7 @@ export default function AppHeader({ nav = PUBLIC_NAV, right = null, mobileExtra 
           {right}
 
           {/* Native disclosure: no JavaScript, no hydration, closes on Esc. */}
-          <details className="group relative md:hidden">
+          <details className="group relative xl:hidden">
             <summary
               className="flex cursor-pointer items-center rounded-lg p-2 text-gray-600 marker:content-none [&::-webkit-details-marker]:hidden dark:text-gray-300"
               aria-label="Open menu"

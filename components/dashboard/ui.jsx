@@ -10,10 +10,12 @@
  * public site is Poppins) - four independent reasons it read as a different
  * website.
  *
- * These are plain presentational components with no client hooks, so they can
- * be used from a Server Component too if any signed-in page later stops being
- * a client one.
+ * StatCard, Panel and NoResults now render the admin console's versions, so a
+ * role dashboard and the admin area look like one product.
  */
+import { Inbox } from "lucide-react";
+import { EmptyState, Panel as AdminPanel, StatCard as AdminStatCard } from "@/components/admin/AdminUI";
+
 
 /** Page title block. Mirrors the <header> on every public listing page. */
 export function PageHeader({ title, intro, actions, eyebrow = "Dashboard" }) {
@@ -41,69 +43,52 @@ export function PageHeader({ title, intro, actions, eyebrow = "Dashboard" }) {
 }
 
 /**
- * One statistic. Deliberately the same shape as the public CountsStrip: number
- * first at a large weight, label under it, no decorative chrome.
+ * One statistic. Same card as the admin console (components/admin/AdminUI.jsx):
+ * pass `icon`/`tone`/`hint`/`href` for the full card; the old two-prop form
+ * ({ label, value }) still works. `accent` keeps the filled brand card for the
+ * one number a page wants to lead with.
  */
-export function StatCard({ label, value, accent = false }) {
+export function StatCard({ label, value, accent = false, icon, tone, hint, href, warn }) {
+  if (!accent) {
+    return <AdminStatCard label={label} value={value} icon={icon} tone={tone} hint={hint} href={href} warn={warn} />;
+  }
   return (
-    <div
-      className={`relative overflow-hidden rounded-2xl px-5 py-4 ${
-        accent
-          ? "bg-gradient-to-br from-[#131C55] via-[#1B2A7A] to-[#3A2A9A] text-white shadow-lg shadow-indigo-900/20 ring-1 ring-white/10"
-          : "border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900"
-      }`}
-    >
-      {accent ? (
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute -top-10 -right-10 h-28 w-28 rounded-full bg-blue-400/30 blur-2xl"
-        />
-      ) : (
-        <span
-          aria-hidden="true"
-          className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-[#2B3FB8] to-[#8B5CF6] opacity-70"
-        />
-      )}
-      <p
-        className={`relative text-2xl font-extrabold tracking-tight tabular-nums sm:text-3xl ${
-          accent ? "text-white" : "text-gray-900 dark:text-white"
-        }`}
-      >
-        {value}
+    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#131C55] via-[#1B2A7A] to-[#3A2A9A] px-5 py-4 text-white shadow-lg shadow-indigo-900/20 ring-1 ring-white/10">
+      <span aria-hidden="true" className="pointer-events-none absolute -top-10 -right-10 h-28 w-28 rounded-full bg-blue-400/30 blur-2xl" />
+      <div className="relative flex items-center justify-between gap-2">
+        <p className="truncate text-[13px] font-medium text-blue-100/80">{label}</p>
+        {icon ? (
+          <span aria-hidden="true" className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-white/15 text-white">
+            {icon}
+          </span>
+        ) : null}
+      </div>
+      <p className="relative mt-2 text-2xl font-extrabold tracking-tight tabular-nums sm:text-[1.9rem]">
+        {value === undefined ? <span className="inline-block h-7 w-14 animate-pulse rounded-md bg-white/15 align-middle" /> : value}
       </p>
-      <p className={`relative mt-0.5 text-[13px] leading-snug ${accent ? "text-blue-100/80" : "text-gray-600 dark:text-gray-400"}`}>
-        {label}
-      </p>
+      {hint ? <p className="relative mt-1 truncate text-xs text-blue-100/70">{hint}</p> : null}
     </div>
   );
 }
 
-/** A titled content surface — the dashboard equivalent of a public Section. */
-export function Panel({ title, count, toolbar, children }) {
-  return (
-    <section className="mt-8 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm shadow-gray-900/[0.03] dark:border-gray-800 dark:bg-gray-900 dark:shadow-none">
-      {(title || toolbar) && (
-        <div className="flex flex-col gap-4 border-b border-gray-200 bg-gradient-to-b from-gray-50/80 to-white px-5 py-4 lg:flex-row lg:items-center lg:justify-between dark:border-gray-800 dark:from-white/[0.02] dark:to-transparent">
-          {title ? (
-            <div className="min-w-0">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">{title}</h2>
-              {count != null ? (
-                <p className="mt-0.5 text-[13px] text-gray-500 dark:text-gray-400">{count}</p>
-              ) : null}
-            </div>
-          ) : null}
-          {toolbar ? <div className="flex flex-col gap-2.5 sm:flex-row">{toolbar}</div> : null}
-        </div>
-      )}
-      {children}
-    </section>
-  );
+/**
+ * A titled content surface. The admin console's Panel; `count` may be a number
+ * or a phrase ("12 exhibitions"), and `description`/`footer` are optional.
+ */
+export function Panel(props) {
+  return <AdminPanel {...props} />;
 }
 
-/** Consistent empty state, matching the public EmptyState tone. */
-export function NoResults({ children }) {
+/** Consistent empty state - an icon, a line, and optional detail. */
+export function NoResults({ children, title, icon }) {
+  if (title) return <EmptyState title={title} icon={icon}>{children}</EmptyState>;
   return (
-    <p className="px-5 py-12 text-center text-[15px] text-gray-500 dark:text-gray-400">{children}</p>
+    <div className="px-5 py-12 text-center">
+      <span className="mx-auto grid h-11 w-11 place-items-center rounded-2xl bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500">
+        {icon || <Inbox size={20} aria-hidden="true" />}
+      </span>
+      <p className="mt-3 text-[15px] text-gray-600 dark:text-gray-400">{children}</p>
+    </div>
   );
 }
 

@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-import { PageHeader, Panel, btnPrimary, btnSecondary, btnRow, btnRowDanger, inputBase } from "@/components/dashboard/ui";
+import { PageHeader, Panel, StatCard, btnPrimary, btnSecondary, btnRow, btnRowDanger, inputBase } from "@/components/dashboard/ui";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import ConfirmDialog from "@/components/social/ConfirmDialog";
 import {
@@ -79,6 +79,21 @@ export default function ExhibitorClient() {
   const company = ws?.company || null;
   const products = ws?.products || [];
   const shows = ws?.participations || [];
+
+  const today = new Date().toISOString().slice(0, 10);
+  const nextShow = shows
+    .filter((sh) => String(sh.endDate || sh.startDate || "").slice(0, 10) >= today)
+    .sort((a, b) => String(a.startDate).localeCompare(String(b.startDate)))[0];
+  // Share of the profile fields filled in - logo counts as one.
+  const completeness = company
+    ? Math.round(
+        (["company_name", "company_nature", "company_email", "company_phone_number", "company_website", "company_address", "about_company", "company_image_url"].filter(
+          (k) => String(company[k] || "").trim()
+        ).length /
+          8) *
+          100
+      )
+    : 0;
 
   const steps = [
     { label: "Company profile", done: Boolean(company), tab: "company" },
@@ -150,6 +165,29 @@ export default function ExhibitorClient() {
           </li>
         ))}
       </ol>
+
+      {/* At a glance - once there is a company to describe. */}
+      {company ? (
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+          <StatCard accent icon={<Package size={16} />} label="Products" value={products.length} />
+          <StatCard icon={<CalendarDays size={16} />} tone="sky" label="Exhibitions you attend" value={shows.length} />
+          <StatCard
+            icon={<MapPin size={16} />}
+            tone="emerald"
+            label="Next show"
+            value={nextShow ? <span className="block truncate text-base font-bold sm:text-lg">{nextShow.name}</span> : null}
+            hint={nextShow ? [formatDateRange(nextShow.startDate, nextShow.endDate), nextShow.stall_no ? `Stall ${nextShow.stall_no}` : ""].filter(Boolean).join(" · ") : "add the shows you attend"}
+          />
+          <StatCard
+            icon={<Check size={16} />}
+            tone="violet"
+            label="Profile complete"
+            value={`${completeness}%`}
+            hint={completeness < 100 ? "fill in the missing fields" : "looking good"}
+            warn={completeness < 100}
+          />
+        </div>
+      ) : null}
 
       {/* Tabs */}
       <div role="tablist" aria-label="Workspace sections" className="ox-rail mt-8 flex gap-1 overflow-x-auto overflow-y-hidden border-b border-gray-200 dark:border-gray-800">

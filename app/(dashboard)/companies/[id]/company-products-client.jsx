@@ -1,400 +1,398 @@
 "use client";
 
-// Migrated from views/product/ProductsView.jsx.
-// Behaviour, markup and classes are unchanged. The sidebar comes from
-// app/(dashboard)/layout.jsx and navigation uses next/navigation with the
-// new clean routes.
 import dynamic from "next/dynamic";
-import { useState, useMemo, useEffect, useCallback } from "react";
+import Link from "next/link";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-
 import { toast } from "sonner";
+import {
+  ArrowLeft,
+  Download,
+  Eye,
+  FileSpreadsheet,
+  Globe,
+  Loader2,
+  Mail,
+  MapPin,
+  Package,
+  Pencil,
+  Phone,
+  Plus,
+  Tag,
+  Trash2,
+} from "lucide-react";
 
 import { getProductsForCompany, deleteProduct } from "@/models/product.model";
 import { getCompanyById, deleteCompany } from "@/models/company.model";
 import TablePagination from "@/components/dashboard/TablePagination";
+import { NoResults, PageHeader, Panel, StatCard, btnPrimary, btnSecondary } from "@/components/dashboard/ui";
+import { Badge, LoadingRows, Monogram, SearchField, btnRow, btnRowDanger, tbody, td, th, thead, tr } from "@/components/admin/AdminUI";
+import { companyPath, productPath } from "@/lib/routes";
 
-// Modals are only needed once opened, so their code (and for the location
-// forms, country-state-city's ~2.3 MB dataset) is split out of this page's
-// first-load bundle.
+// Modals are only needed once opened, so their code is split out of this
+// page's first-load bundle.
 const ProductPopupForm = dynamic(() => import("@/components/popups/ProductPopupForm"), { ssr: false });
 const ProductEditPopup = dynamic(() => import("@/components/popups/ProductEditPopup"), { ssr: false });
 const ProductExcelUploadModal = dynamic(() => import("@/components/popups/ProductExcelUploadModal"), { ssr: false });
+
+/**
+ * One company at an exhibition, and its products.
+ *
+ * `company.createdBy` is the EXHIBITION this company was added to (not a
+ * user), which is where "back" and the post-delete redirect go.
+ */
+
+function price(p) {
+  if (p.price === undefined || p.price === null || p.price === "") return null;
+  const n = Number(p.price);
+  const amount = Number.isFinite(n) ? `₹${n.toLocaleString("en-IN")}` : String(p.price);
+  return p.unit ? `${amount} / ${p.unit}` : amount;
+}
 
 export default function CompanyProductsClient({ id }) {
   const router = useRouter();
   const [showForm, setShowForm] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
-  const [company, setCompany] = useState({});
-  const [products, setProducts] = useState([]);
+  const [company, setCompany] = useState(null);
+  const [products, setProducts] = useState(null);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [editingId, setEditingId] = useState(null);
+  const [confirmId, setConfirmId] = useState(null);
+  const [busyId, setBusyId] = useState(null);
 
-  /** ✅ Fetch products with memoized function */
   const fetchProducts = useCallback(async () => {
     try {
       const { data } = await getProductsForCompany(id);
       setProducts(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error("❌ Error fetching products:", error.message);
+      console.error("Error fetching products:", error.message);
+      setProducts([]);
     }
   }, [id]);
 
-   const deletecompany = async () => {
-    try {
-      if (!window.confirm("Are you sure you want to delete this company?"))
-        return;
-        console.log(company._id,id)
-      await deleteCompany(company._id);
-      toast.success("Company deleted successfully!");
-      router.push(`/exhibitions/${company.createdBy}`);
-    } catch (err) {
-      console.error("❌ Error deleting Company:", err);
-      toast.error("Failed to delete Company");
-    }
-  };
-  /** ✅ Fetch company with memoized function */
   const fetchCompany = useCallback(async () => {
     try {
       const { data } = await getCompanyById(id);
       setCompany(data || {});
     } catch (error) {
-      console.error("❌ Error fetching company:", error.message);
+      console.error("Error fetching company:", error.message);
+      setCompany({});
     }
   }, [id]);
 
-  /** ✅ Run both fetches on mount */
   useEffect(() => {
     fetchCompany();
     fetchProducts();
   }, [fetchCompany, fetchProducts]);
 
-  /** ✅ Filtered product list */
+  const removeCompany = async () => {
+    if (!window.confirm("Delete this company and all its products? This cannot be undone.")) return;
+    try {
+      await deleteCompany(company._id);
+      toast.success("Company deleted.");
+      router.push(company.createdBy ? `/exhibitions/${company.createdBy}` : "/organiser");
+    } catch (err) {
+      console.error("Error deleting company:", err);
+      toast.error("Could not delete the company.");
+    }
+  };
+
+  const removeProduct = async (productId) => {
+    setBusyId(productId);
+    try {
+      await deleteProduct(productId);
+      toast.success("Product deleted.");
+      fetchProducts();
+    } catch (err) {
+      console.error("Error deleting product:", err);
+      toast.error("Could not delete the product.");
+    } finally {
+      setBusyId(null);
+      setConfirmId(null);
+    }
+  };
+
   const filteredData = useMemo(() => {
-    const searchTerm = search.toLowerCase();
-    return products.filter((item) =>
-      [item.product_name, item.category, item.price].some((field) =>
-        field?.toString().toLowerCase().includes(searchTerm)
-      )
+    const q = search.toLowerCase();
+    return (products || []).filter((item) =>
+      [item.product_name, item.category, item.price].some((f) => f?.toString().toLowerCase().includes(q))
     );
   }, [products, search]);
 
-  /** ✅ Pagination logic */
   const totalPages = Math.max(1, Math.ceil(filteredData.length / itemsPerPage));
-  // A delete or a bigger page size can leave the current page past the end.
   useEffect(() => {
     if (currentPage > totalPages) setCurrentPage(totalPages);
   }, [currentPage, totalPages]);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedData = filteredData.slice(
-    startIndex,
-    startIndex + itemsPerPage
-  );
+  const paginatedData = filteredData.slice(startIndex, startIndex + itemsPerPage);
 
-  const handleDeleteProduct = async (productId) => {
-    if (!window.confirm("Are you sure you want to delete this product?")) return;
-    try {
-      await deleteProduct(productId);
-      toast.success("Product deleted successfully!");
-      fetchProducts();
-    } catch (err) {
-      console.error("❌ Error deleting product:", err);
-      toast.error("Failed to delete product");
-    }
-  };
-
-  /** ✅ Brochure handler */
-  const handleBrochureDownload = () => {
-    if (!company?._id) return console.error("Company ID not available yet");
-    window.open(`/api/brochure/${company._id}`, "_blank");
-  };
+  const categories = useMemo(() => new Set((products || []).map((p) => p.category).filter(Boolean)).size, [products]);
+  const c = company || {};
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-8 text-gray-900 sm:px-6 sm:py-12 dark:text-gray-100">
+    <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
+      {c.createdBy ? (
+        <Link
+          href={`/exhibitions/${c.createdBy}`}
+          className="mb-5 inline-flex items-center gap-1.5 text-sm font-medium text-gray-600 transition hover:text-[#2B3FB8] dark:text-gray-400 dark:hover:text-blue-300"
+        >
+          <ArrowLeft size={15} aria-hidden="true" />
+          Back to the exhibition
+        </Link>
+      ) : null}
 
-      <main className="flex-1 mt-2 md:mx-4 lg:mx-6 p-4 sm:p-6">
-        <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm shadow-gray-900/[0.03] sm:p-6 dark:border-gray-800 dark:bg-gray-900 dark:shadow-none">
-          {/* HEADER */}
-         <header className="flex flex-col items-start justify-between gap-4 border-b border-gray-200 pb-4 sm:flex-row sm:items-center dark:border-gray-800">
-
-  {/* Title */}
-  <h1 className="font-bold text-2xl sm:text-3xl">
-    {company.company_name || "Loading..."}
-  </h1>
-
-  {/* Button Group */}
-  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
-
-    {/* Delete Company */}
-    <button
-      className="px-4 py-2 border border-red-600 text-red-600 dark:text-red-400 bg-white dark:bg-gray-900 rounded-lg font-semibold
-                 hover:bg-red-600 hover:text-white transition-colors"
-      onClick={()=>deletecompany()  }
-    >
-      Delete Company
-    </button>
-
-    {/* Download Brochure */}
-    <button
-      onClick={handleBrochureDownload}
-      className="px-4 py-2 border border-[#131C55] text-[#131C55] dark:text-blue-300 bg-white dark:bg-gray-900 rounded-lg font-semibold
-                 hover:bg-[#131C55] hover:text-white transition-colors"
-    >
-      Download Brochure
-    </button>
-
-  </div>
-
-</header>
-
-          {/* SUMMARY */}
-          <section className="mt-6 flex flex-wrap gap-4">
-            <SummaryCard label="Products" value={products.length} />
-          </section>
-
-          {/* COMPANY INFO */}
-          <section className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="space-y-1 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-              <p>
-                <b>Phone:</b> {company.company_phone_number}
-              </p>
-              <p>
-                <b>E-Mail:</b> {company.company_email}
-              </p>
-              <p>
-                <b>Address:</b> {company.company_address}
-              </p>
-            </div>
-            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-              <p className="font-bold text-gray-800 dark:text-gray-100">About</p>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 leading-relaxed">
-                {company.about_company || "This is a demo about section."}
-              </p>
-            </div>
-          </section>
-
-          {/* PRODUCT LIST */}
-          <section className="mt-8 overflow-hidden rounded-2xl border border-gray-200 bg-white p-0 shadow-sm shadow-gray-900/[0.03] dark:border-gray-800 dark:bg-gray-900 dark:shadow-none">
-            {/* Controls */}
-            <div className="flex flex-col lg:flex-row justify-between gap-4 items-center">
-              <div className="text-center lg:text-left">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                  Product List
-                </h2>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
-                <input
-                  type="text"
-                  value={search}
-                  onChange={(e) => {
-                    setSearch(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                  placeholder="Search Products"
-                  className="h-10 w-full sm:w-64 border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800 rounded-lg px-3 text-gray-700 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500"
-                />
-                <button
-                  className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#131C55] to-[#2B3FB8] px-4 text-sm font-semibold text-white shadow-md shadow-indigo-900/20 transition hover:brightness-110 sm:w-48 motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500"
-                  onClick={() => setShowForm(true)}
-                >
-                  + Add Product
-                </button>
-                <button
-                  className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#131C55] to-[#2B3FB8] px-4 text-sm font-semibold text-white shadow-md shadow-indigo-900/20 transition hover:brightness-110 sm:w-48 motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500"
-                  onClick={() => setShowUploadModal(true)}
-                >
-                  Upload Excel
-                </button>
-              </div>
-            </div>
-
-            {/* Table */}
-            <ProductTable
-              paginatedData={paginatedData}
-              startIndex={startIndex}
-              onDelete={handleDeleteProduct}
-            />
-
-            {/* Pagination */}
-            <TablePagination
-            page={currentPage}
-            pageSize={itemsPerPage}
-            total={filteredData.length}
-            onPageChange={setCurrentPage}
-            onPageSizeChange={(size) => {
-              setItemsPerPage(size);
-              setCurrentPage(1);
-            }}
-            itemLabel="products"
-          />
-          </section>
-        </div>
-      </main>
-
-      {/* Popup Form */}
-      {showForm && (
-        <ProductPopupForm
-          Close={() => setShowForm(false)}
-          data={id}
-          refreshProducts={fetchProducts}
-          exid={company.createdBy}
-        />
-      )}
-
-      <ProductExcelUploadModal
-        isOpen={showUploadModal}
-        onClose={() => setShowUploadModal(false)}
-        onSuccess={fetchProducts}
-        companyId={id}
+      <PageHeader
+        eyebrow="Manage company"
+        title={company === null ? "Loading…" : c.company_name || "Company"}
+        intro={c.company_nature ? <Badge tone="violet">{c.company_nature}</Badge> : null}
+        actions={
+          <>
+            {c._id ? (
+              <Link href={companyPath(c.company_name, c._id)} target="_blank" rel="noopener" className={btnSecondary}>
+                <Eye size={16} aria-hidden="true" />
+                View public page
+              </Link>
+            ) : null}
+            <button
+              type="button"
+              className={btnSecondary}
+              onClick={() => c._id && window.open(`/api/brochure/${c._id}`, "_blank")}
+              disabled={!c._id}
+            >
+              <Download size={16} aria-hidden="true" />
+              Brochure
+            </button>
+            <button
+              type="button"
+              onClick={removeCompany}
+              disabled={!c._id}
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-red-300 bg-white px-4 text-sm font-semibold text-red-600 transition hover:bg-red-50 disabled:opacity-60 dark:border-red-500/40 dark:bg-gray-900 dark:text-red-400 dark:hover:bg-red-500/10"
+            >
+              <Trash2 size={16} aria-hidden="true" />
+              Delete
+            </button>
+          </>
+        }
       />
-    </div>
-  );
-}
 
-/* ----------------- SUBCOMPONENTS ----------------- */
+      <div className="mt-8 grid gap-4 lg:grid-cols-3">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:col-span-1 lg:grid-cols-1">
+          <StatCard accent icon={<Package size={16} />} label="Products" value={products ? products.length : undefined} />
+          <StatCard icon={<Tag size={16} />} tone="violet" label="Categories" value={products ? categories : undefined} />
+        </div>
 
-function SummaryCard({ label, value }) {
-  return (
-    <div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 py-4 dark:border-gray-800 dark:bg-gray-900 w-48">
-      <p className="text-[13px] font-medium text-gray-500 dark:text-gray-400">{label}</p>
-      <p className="bg-gradient-to-r from-[#131C55] to-[#2B3FB8] bg-clip-text text-4xl font-extrabold text-transparent dark:from-blue-300 dark:to-violet-300">{value}</p>
-    </div>
-  );
-}
-
-function ProductTable({ paginatedData, startIndex, onDelete }) {
-    const [editOpen, setEditOpen] = useState(false);
-const [selectedProductId, setSelectedProductId] = useState(null);
-const router = useRouter();
-  if (paginatedData.length === 0) {
-    return <p className="mt-6 px-5 py-12 text-center text-[15px] text-gray-500 dark:text-gray-400">No products found</p>;
-  }
-
-  return (
-    <div className="mt-6">
-      {/* Card list — phones only */}
-      <div className="flex flex-col gap-3 p-4 sm:hidden">
-        {paginatedData.map((item, index) => (
-          <div key={item._id || index} className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-            <p className="font-semibold text-gray-900 dark:text-gray-100">
-              {startIndex + index + 1}. {item.product_name}
-            </p>
-            <dl className="mt-2 space-y-1 text-sm text-gray-600 dark:text-gray-400">
-              <div className="flex gap-1">
-                <dt className="font-medium text-gray-500 dark:text-gray-400">Category:</dt>
-                <dd>{item.category || "—"}</dd>
-              </div>
-              <div className="flex gap-1">
-                <dt className="font-medium text-gray-500 dark:text-gray-400">Price:</dt>
-                <dd>₹{item.price}</dd>
-              </div>
+        <section className="rounded-2xl border border-gray-200 bg-white p-5 lg:col-span-2 dark:border-gray-800 dark:bg-gray-900">
+          <div className="flex items-start gap-4">
+            {c.company_image_url ? (
+              // eslint-disable-next-line @next/next/no-img-element -- uploaded logo
+              <img src={c.company_image_url} alt="" className="h-14 w-14 shrink-0 rounded-xl bg-white object-contain p-1 ring-1 ring-gray-200 dark:ring-gray-800" />
+            ) : (
+              <Monogram name={c.company_name} size="h-14 w-14" />
+            )}
+            <dl className="grid min-w-0 flex-1 gap-2 text-sm sm:grid-cols-2">
+              <Info icon={<Phone size={14} />} label="Phone" value={c.company_phone_number} />
+              <Info icon={<Mail size={14} />} label="Email" value={c.company_email} />
+              <Info icon={<Globe size={14} />} label="Website" value={c.company_website} />
+              <Info icon={<MapPin size={14} />} label="Address" value={c.company_address} wide />
             </dl>
-            <div className="flex items-center gap-2 mt-3">
-              <button
-                onClick={() => router.push(`/products/${item._id}`)}
-                className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-[13px] font-medium text-gray-700 transition hover:border-[#2B3FB8] hover:text-[#2B3FB8] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-blue-400 dark:hover:text-white flex-1"
-              >
-                View
-              </button>
-              <button
-                onClick={() => {
-                  setSelectedProductId(item._id);
-                  setEditOpen(true);
-                }}
-                className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 border border-gray-300 text-gray-700 dark:border-gray-700 dark:text-gray-300 rounded-lg hover:border-[#131C55] hover:text-[#131C55] dark:hover:border-gray-500 transition"
-              >
-                Edit
-              </button>
-              <button
-                onClick={() => onDelete(item._id)}
-                className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 border border-red-500 text-red-500 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-950 transition"
-              >
-                Delete
-              </button>
-            </div>
           </div>
-        ))}
+          <div className="mt-4 border-t border-gray-100 pt-4 dark:border-gray-800">
+            <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">About</p>
+            <p className="mt-1.5 text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+              {c.about_company || <span className="italic text-gray-400">No description yet. Add one with Edit on the exhibition page.</span>}
+            </p>
+          </div>
+        </section>
       </div>
 
-      {/* Table — sm and up */}
-      <div className="hidden max-h-[70vh] overflow-auto overscroll-contain sm:block">
-        <table className="w-full min-w-[700px] border-collapse text-sm">
-          <thead>
-            <tr className="bg-gray-50 dark:bg-gray-800/80 text-gray-500 dark:text-gray-400">
-              {["#", "Product Name", "Category", "Price", "Action"].map(
-                (header) => (
-                  <th
-                    key={header}
-                    className="border-b border-gray-100 px-4 py-3.5 text-gray-700 dark:border-gray-800 dark:text-gray-300"
-                  >
-                    {header}
-                  </th>
-                )
-              )}
-            </tr>
-          </thead>
-          <tbody>
-            {paginatedData.map((item, index) => (
-              <tr
-                key={item._id || index}
-                className={"bg-white transition-colors hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-white/[0.03]"}
-              >
-                <td className="border-b border-gray-100 px-4 py-3.5 text-center text-gray-700 dark:border-gray-800 dark:text-gray-300">
-                  {startIndex + index + 1}
-                </td>
+      <Panel
+        title="Products"
+        count={products ? filteredData.length : undefined}
+        toolbar={
+          <>
+            <SearchField
+              value={search}
+              onChange={(v) => {
+                setSearch(v);
+                setCurrentPage(1);
+              }}
+              placeholder="Search products"
+              className="sm:w-60"
+            />
+            <button type="button" className={btnSecondary} onClick={() => setShowUploadModal(true)}>
+              <FileSpreadsheet size={16} aria-hidden="true" />
+              Import Excel
+            </button>
+            <button type="button" className={btnPrimary} onClick={() => setShowForm(true)}>
+              <Plus size={16} aria-hidden="true" />
+              Add product
+            </button>
+          </>
+        }
+        footer={
+          filteredData.length ? (
+            <TablePagination
+              page={currentPage}
+              pageSize={itemsPerPage}
+              total={filteredData.length}
+              onPageChange={setCurrentPage}
+              onPageSizeChange={(size) => {
+                setItemsPerPage(size);
+                setCurrentPage(1);
+              }}
+              itemLabel="products"
+            />
+          ) : null
+        }
+      >
+        {products === null ? (
+          <LoadingRows rows={3} />
+        ) : paginatedData.length === 0 ? (
+          <NoResults title={search ? "No products match" : "No products yet"} icon={<Package size={22} aria-hidden="true" />}>
+            {search ? "Try another search." : "Add what this company is showing, one at a time or from a spreadsheet."}
+          </NoResults>
+        ) : (
+          <>
+            <div className="hidden overflow-x-auto md:block">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className={thead}>
+                    <th scope="col" className={th}>Product</th>
+                    <th scope="col" className={th}>Category</th>
+                    <th scope="col" className={`${th} text-right`}>Price</th>
+                    <th scope="col" className={th}><span className="sr-only">Actions</span></th>
+                  </tr>
+                </thead>
+                <tbody className={tbody}>
+                  {paginatedData.map((p) => (
+                    <tr key={p._id} className={tr}>
+                      <td className={td}>
+                        <ProductCell p={p} />
+                      </td>
+                      <td className={td}>{p.category ? <Badge tone="sky">{p.category}</Badge> : <span className="text-gray-400">—</span>}</td>
+                      <td className={`${td} whitespace-nowrap text-right font-semibold tabular-nums text-gray-900 dark:text-gray-100`}>
+                        {price(p) ?? <span className="font-normal text-gray-400">—</span>}
+                      </td>
+                      <td className={td}>
+                        <ProductActions
+                          p={p}
+                          confirming={confirmId === p._id}
+                          busy={busyId === p._id}
+                          onEdit={() => setEditingId(p._id)}
+                          onAsk={() => setConfirmId(p._id)}
+                          onCancel={() => setConfirmId(null)}
+                          onDelete={() => removeProduct(p._id)}
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <ul className={`md:hidden ${tbody}`}>
+              {paginatedData.map((p) => (
+                <li key={p._id} className="space-y-3 px-4 py-4">
+                  <ProductCell p={p} />
+                  <div className="flex flex-wrap items-center gap-2 text-[13px]">
+                    {p.category ? <Badge tone="sky">{p.category}</Badge> : null}
+                    {price(p) ? <span className="font-semibold tabular-nums text-gray-900 dark:text-gray-100">{price(p)}</span> : null}
+                  </div>
+                  <ProductActions
+                    p={p}
+                    wrap
+                    confirming={confirmId === p._id}
+                    busy={busyId === p._id}
+                    onEdit={() => setEditingId(p._id)}
+                    onAsk={() => setConfirmId(p._id)}
+                    onCancel={() => setConfirmId(null)}
+                    onDelete={() => removeProduct(p._id)}
+                  />
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+      </Panel>
 
-                <td className="border-b border-gray-100 px-4 py-3.5 text-center text-gray-700 dark:border-gray-800 dark:text-gray-300">
-                  {item.product_name}
-                </td>
-
-                <td className="border-b border-gray-100 px-4 py-3.5 text-center text-gray-700 dark:border-gray-800 dark:text-gray-300">
-                  {item.category}
-                </td>
-
-                <td className="border-b border-gray-100 px-4 py-3.5 text-center text-gray-700 dark:border-gray-800 dark:text-gray-300">
-                  ₹{item.price}
-                </td>
-
-                <td className="flex justify-center gap-2 border-b border-gray-100 px-4 py-3.5 dark:border-gray-800">
-                  <button
-                    onClick={() => router.push(`/products/${item._id}`)}
-                    className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-[13px] font-medium text-gray-700 transition hover:border-[#2B3FB8] hover:text-[#2B3FB8] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-blue-400 dark:hover:text-white"
-                  >
-                    View
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      setSelectedProductId(item._id);
-                      setEditOpen(true);
-                    }}
-                    className="flex items-center gap-1 px-3 py-1 border border-gray-300 text-gray-700 dark:border-gray-700 dark:text-gray-300 rounded-lg hover:border-[#131C55] hover:text-[#131C55] dark:hover:border-gray-500 transition"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => onDelete(item._id)}
-                    className="flex items-center gap-1 px-3 py-1 border border-red-500 text-red-500 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-950 transition"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
+      {showForm && (
+        <ProductPopupForm Close={() => setShowForm(false)} data={id} refreshProducts={fetchProducts} exid={c.createdBy} />
+      )}
+      <ProductExcelUploadModal isOpen={showUploadModal} onClose={() => setShowUploadModal(false)} onSuccess={fetchProducts} companyId={id} />
       <ProductEditPopup
-        open={editOpen}
-        productId={selectedProductId}
+        open={Boolean(editingId)}
+        productId={editingId}
         onClose={() => {
-          setEditOpen(false);
-          setSelectedProductId(null);
+          setEditingId(null);
+          fetchProducts();
         }}
       />
+    </div>
+  );
+}
+
+function Info({ icon, label, value, wide = false }) {
+  return (
+    <div className={`min-w-0 ${wide ? "sm:col-span-2" : ""}`}>
+      <dt className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+        <span aria-hidden="true">{icon}</span>
+        {label}
+      </dt>
+      <dd className={`mt-0.5 ${wide ? "" : "truncate"} text-gray-900 dark:text-gray-100`}>{value || <span className="text-gray-400">—</span>}</dd>
+    </div>
+  );
+}
+
+function ProductCell({ p }) {
+  const [broken, setBroken] = useState(false);
+  return (
+    <div className="flex min-w-0 items-center gap-3">
+      {p.product_url && !broken ? (
+        // eslint-disable-next-line @next/next/no-img-element -- uploaded images; failures fall back
+        <img src={p.product_url} alt="" loading="lazy" onError={() => setBroken(true)} className="h-11 w-11 shrink-0 rounded-xl bg-white object-cover ring-1 ring-gray-200 dark:ring-gray-800" />
+      ) : (
+        <Monogram name={p.product_name} size="h-11 w-11" />
+      )}
+      <div className="min-w-0">
+        <p className="truncate font-semibold text-gray-900 dark:text-gray-100">{p.product_name}</p>
+        {p.details ? <p className="line-clamp-1 text-xs text-gray-500 dark:text-gray-400">{p.details}</p> : null}
+      </div>
+    </div>
+  );
+}
+
+function ProductActions({ p, wrap = false, confirming, busy, onEdit, onAsk, onCancel, onDelete }) {
+  return (
+    <div className={`flex items-center gap-1.5 ${wrap ? "flex-wrap" : "justify-end"}`}>
+      <Link href={productPath(p.product_name, p._id)} target="_blank" rel="noopener" className={btnRow}>
+        <Eye size={13} aria-hidden="true" />
+        View
+      </Link>
+      <button type="button" className={btnRow} onClick={onEdit}>
+        <Pencil size={13} aria-hidden="true" />
+        Edit
+      </button>
+      {confirming ? (
+        <>
+          <button
+            type="button"
+            onClick={onDelete}
+            disabled={busy}
+            className="inline-flex items-center gap-1 rounded-lg bg-red-600 px-3 py-1.5 text-[13px] font-semibold text-white transition hover:bg-red-700 disabled:opacity-60"
+          >
+            {busy ? <Loader2 size={13} className="animate-spin" aria-hidden="true" /> : null}
+            Delete
+          </button>
+          <button type="button" onClick={onCancel} className={btnRow}>
+            Keep
+          </button>
+        </>
+      ) : (
+        <button type="button" className={btnRowDanger} onClick={onAsk} aria-label={`Delete ${p.product_name}`}>
+          <Trash2 size={13} aria-hidden="true" />
+        </button>
+      )}
     </div>
   );
 }

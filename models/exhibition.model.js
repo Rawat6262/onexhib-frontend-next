@@ -144,3 +144,25 @@ export const refreshExhibitionPage = (exhibitionId, { featured = false } = {}) =
 // by date). Paged at the API's 100 cap; the set is small and curated.
 export const getFeaturedExhibitionsPage = ({ page = 1, limit = 100 } = {}) =>
   axios.get("/api/exhibitions/featured", { params: { page, limit } });
+
+// The signed-in organiser's own exhibitions WITH dates and image (the plain
+// getExhibitions projection has neither). No paging params -> everything.
+export const getMyExhibitionDetails = (params) =>
+  axios.get("/api/exhibition/details", { params, withCredentials: true });
+
+/*
+ * ACCESS REQUESTS - an organiser asks to edit an exhibition they did not
+ * create; an admin approves (same result as "Give access") or rejects.
+ * Refusals are 409 with a message to show as-is.
+ */
+export const requestExhibitionAccess = (exhibitionId, message) =>
+  axios.post(`/api/exhibition/${exhibitionId}/access-requests`, { message });
+export const getMyAccessRequests = () => axios.get("/api/access-requests/mine");
+export const cancelAccessRequest = (requestId) => axios.delete(`/api/access-requests/${requestId}`);
+
+// Admin-only. status: "pending" (default) | "approved" | "rejected" | "all".
+export const getAdminAccessRequests = (status = "pending") =>
+  axios.get("/api/admin/access-requests", { params: { status } });
+export const approveAccessRequest = (requestId) => axios.post(`/api/admin/access-requests/${requestId}/approve`);
+export const rejectAccessRequest = (requestId, note) =>
+  axios.post(`/api/admin/access-requests/${requestId}/reject`, { note });

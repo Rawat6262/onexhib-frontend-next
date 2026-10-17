@@ -20,7 +20,9 @@ export const getAdminExhibitionServices = () => axios.get("/api/getexhibitionser
  * nobody. That is deliberate: backfilling them would mean guessing, and guessing wrong
  * hands one provider's record to someone else.
  */
-export const getMyExhibitionServices = () => axios.get("/api/myexhibitionservices");
+// Optional params page/limit/search/category/withStats page it on the server
+// (one account owns 1,323 listings); no params returns everything, as before.
+export const getMyExhibitionServices = (params) => axios.get("/api/myexhibitionservices", { params });
 
 /**
  * Bulk-create listings from a spreadsheet.

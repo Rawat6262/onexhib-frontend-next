@@ -15,6 +15,7 @@ import {
   Package,
   Pencil,
   Plus,
+  Settings2,
   Star,
   X,
 } from "lucide-react";
@@ -27,6 +28,7 @@ import {
   unfeatureExhibition,
 } from "@/models/exhibition.model";
 import TablePagination from "@/components/dashboard/TablePagination";
+import { exhibitionPath } from "@/lib/routes";
 import {
   AdminHeader,
   AdminPage,
@@ -455,9 +457,14 @@ function RowActions({ item, busy, onFeature, onEdit, onAccess, wrap = false }) {
   const cls = wrap ? btnRow : iconBtn;
   return (
     <div className={`flex items-center gap-1.5 ${wrap ? "flex-wrap" : "justify-end"}`}>
-      <Link href={`/exhibitions/${item._id}`} target="_blank" rel="noopener" className={cls} title="View public page" aria-label="View public page">
+      <Link href={exhibitionPath(item.exhibition_name, item._id)} target="_blank" rel="noopener" className={cls} title="View public page" aria-label="View public page">
         <Eye size={14} aria-hidden="true" />
         {label("View")}
+      </Link>
+      {/* /exhibitions/[id] is the manage screen: companies at the show, news, delete. */}
+      <Link href={`/exhibitions/${item._id}`} className={cls} title="Manage: companies, news, delete" aria-label="Manage">
+        <Settings2 size={14} aria-hidden="true" />
+        {label("Manage")}
       </Link>
       <button type="button" onClick={onEdit} className={cls} title="Edit details" aria-label="Edit details">
         <Pencil size={14} aria-hidden="true" />

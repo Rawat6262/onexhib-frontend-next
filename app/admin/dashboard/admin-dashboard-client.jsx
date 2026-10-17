@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 
 import { getOrganisers } from "@/models/organiser.model";
-import { getFeaturedExhibitionsPage } from "@/models/exhibition.model";
+import { getAdminAccessRequests, getFeaturedExhibitionsPage } from "@/models/exhibition.model";
 import { getAdminServicesPage } from "@/models/service.model";
 import TablePagination from "@/components/dashboard/TablePagination";
 import {
@@ -79,6 +79,7 @@ export default function AdminDashboardClient() {
   const [counts, setCounts] = useState({});
   const [featured, setFeatured] = useState(undefined);
   const [services, setServices] = useState(undefined);
+  const [pendingRequests, setPendingRequests] = useState(0);
   const [error, setError] = useState("");
 
   const [search, setSearch] = useState("");
@@ -92,11 +93,13 @@ export default function AdminDashboardClient() {
   const load = useCallback(async () => {
     setError("");
     // Three independent sources; one failing must not blank the others.
-    const [u, f, s] = await Promise.allSettled([
+    const [u, f, s, r] = await Promise.allSettled([
       getOrganisers(),
       getFeaturedExhibitionsPage({ page: 1, limit: 100 }),
       getAdminServicesPage({ page: 1, limit: 1 }),
+      getAdminAccessRequests("pending"),
     ]);
+    setPendingRequests(r.status === "fulfilled" ? r.value.data?.counts?.pending || 0 : 0);
     if (u.status === "fulfilled") {
       const body = u.value.data ?? {};
       setUsers(body.data || []);
@@ -157,6 +160,14 @@ export default function AdminDashboardClient() {
   const pageRows = filtered.slice((page - 1) * pageSize, page * pageSize);
 
   const attention = [];
+  if (pendingRequests) {
+    attention.push({
+      text: `${pendingRequests} access ${pendingRequests === 1 ? "request is" : "requests are"} waiting`,
+      sub: "Organisers asking to edit an exhibition. Approve or reject them.",
+      href: "/admin/requests",
+      cta: "Review",
+    });
+  }
   if (featured?.ended) {
     attention.push({
       text: `${featured.ended} featured ${featured.ended === 1 ? "exhibition has" : "exhibitions have"} ended`,

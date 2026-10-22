@@ -8,6 +8,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getProductDetail, deleteProduct } from "@/models/product.model";
+import { toast } from "sonner";
+import { confirmAction } from "@/lib/confirm";
 
 export default function ProductDetailClient({ id }) {
   const [product, setProduct] = useState(null);
@@ -30,7 +32,12 @@ export default function ProductDetailClient({ id }) {
   }, [id]);
 
   const handleDelete = async () => {
-    if (!window.confirm("Are you sure you want to delete this product?")) return;
+    const ok = await confirmAction({
+      title: "Delete this product?",
+      description: `“${product?.product_name || "This product"}” will be removed from its company page. This cannot be undone.`,
+      confirmLabel: "Delete product",
+    });
+    if (!ok) return;
 
     try {
       setDeleting(true);
@@ -39,11 +46,11 @@ export default function ProductDetailClient({ id }) {
       if (res.ok) {
         router.push(`/companies/${product.createdBy}`);
       } else {
-        alert("Delete failed");
+        toast.error("Could not delete the product. Please try again.");
       }
     } catch (error) {
       console.error(error);
-      alert("Delete failed");
+      toast.error("Could not delete the product. Please try again.");
     } finally {
       setDeleting(false);
     }

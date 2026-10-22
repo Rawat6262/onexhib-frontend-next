@@ -6,6 +6,11 @@ import { toast } from "sonner";
 import Select from 'react-select';
 import { createExhibition } from "@/models/exhibition.model";
 import LogoPicker from "@/components/popups/LogoPicker";
+import VenueField from "@/components/exhibition/VenueField";
+import { refreshCentrePages } from "@/models/exhibitionCentre.model";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { ROLES } from "@/lib/auth";
+import { matchLocation } from "@/lib/csc-match";
 
 // --- 1. Refined Label Component (Bold & Visible) ---
 const Label = ({ children, required, htmlFor }) => (
@@ -87,6 +92,11 @@ const ALLOWED_LAYOUT_TYPES = ["application/pdf", "image/jpeg", "image/png", "ima
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 const ExhibitionPopupForm = ({ onClose }) => {
+  const { role } = useAuth();
+  // The exhibition centre picked in the Venue field (null = typed venue only),
+  // and a city Google named that the city list does not have (e.g. "Sahnewal").
+  const [centre, setCentre] = useState(null);
+  const [extraCity, setExtraCity] = useState("");
   // --- State Variables ---
   const [exhibition_name, setName] = useState("");
   const [category, setCategory] = useState("");
@@ -229,16 +239,42 @@ const ExhibitionPopupForm = ({ onClose }) => {
     [countrys]
   );
 
-  const cities = useMemo(
-    () =>
+  const cities = useMemo(() => {
+    const list =
       countrys && state
         ? City.getCitiesOfState(countrys, state).map((c) => ({
             value: c.name,
             label: c.name,
           }))
-        : [],
-    [countrys,state]
-  );
+        : [];
+    // A venue picked from the map can sit in a town the list does not have;
+    // offer it rather than leaving the City dropdown blank and required.
+    if (extraCity && !list.some((c) => c.value === extraCity)) list.unshift({ value: extraCity, label: extraCity });
+    return list;
+  }, [countrys, state, extraCity]);
+
+  /*
+   * Fill the location fields from a venue (an exhibition centre, or a place
+   * picked on Google Maps). Names are matched to the dropdowns' ISO codes;
+   * anything that does not match is left for the user to choose.
+   */
+  const applyLocation = (loc) => {
+    if (loc.name) setVenue(loc.name);
+    if (loc.address) setAddress(loc.address);
+    const m = matchLocation(loc);
+    if (m.countryIso) {
+      setcountrys(m.countryIso);
+      setstate(m.stateIso || "");
+      setExtraCity(m.city && !m.cityKnown ? m.city : "");
+      setcity(m.stateIso ? m.city || "" : "");
+    }
+    setTouched((t) => ({ ...t, venue: true, exhibition_address: true }));
+  };
+
+  const selectCentre = (c) => {
+    setCentre({ id: c._id, name: c.name });
+    applyLocation({ name: c.name, address: c.address, country: c.country, state: c.state, city: c.city });
+  };
   // const SelectField = ({ label, options, value, onChange }) => (
   // <div>
   //   <label className="block mb-1 font-semibold">{label}</label>
@@ -394,6 +430,8 @@ const Dropdown = ({
       formData.append("exhibition_name", exhibition_name.trim());
       formData.append("category", category.trim());
       formData.append("venue", venue.trim());
+      // Linked exhibition centre, when one was picked; the backend checks it exists.
+      if (centre?.id) formData.append("exhibition_centre", centre.id);
       formData.append("exhibition_address", exhibition_address.trim());
       formData.append("email", email.trim());
       formData.append("starting_date", startDate);
@@ -426,6 +464,8 @@ const Dropdown = ({
       if (brochure) formData.append("Exhibition_Brochure", brochure);
 
       await createExhibition(formData);
+      // A new show at a centre appears on that centre's page straight away.
+      if (centre?.id) refreshCentrePages();
       
       toast.success("Exhibition saved successfully!");
       onClose?.();
@@ -559,13 +599,15 @@ const Dropdown = ({
           {/* <SelectField label="State" options={states} value={state} onChange={(e) => setstate(e.target.value)} />
           <SelectField label="City" options={cities} value={city} onChange={(e) => setcity(e.target.value)} /> */}
         </div>
-                <InputField
+                <VenueField
                   id="venue"
-                  label="Venue Name"
                   value={venue}
-                  onChange={(e) => setVenue(e.target.value)}
-                  placeholder="e.g. Grand Convention Center"
-                  required
+                  onChange={setVenue}
+                  centre={centre}
+                  onSelectCentre={selectCentre}
+                  onClearCentre={() => setCentre(null)}
+                  onUseLocation={applyLocation}
+                  canCreate={role === ROLES.ADMIN}
                   onBlur={() => markTouched("venue")}
                   error={touched.venue ? errors.venue : null}
                 />

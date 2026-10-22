@@ -341,3 +341,30 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .ox-form input, .ox-form select, .ox-form textarea { transition: none; }
 }
+
+/*
+ * Toasts (components/ui/sonner.jsx) run unstyled, but Sonner still positions its
+ * loading-icon wrapper absolutely. That pulled the spinner out of its badge and
+ * made the toast measure too short, so expanded stacks overlapped. Put it back
+ * in the flow like every other icon.
+ */
+[data-sonner-toast] [data-icon] .sonner-loader {
+  position: static;
+  transform: none;
+}
+
+/* A slow drift on the home page's photographs (components/home/HomeFeatureSections.jsx):
+   each settles from a slight zoom as it scrolls through the screen. Transform
+   only; off for reduced motion and in browsers without scroll timelines. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .ox-drift {
+      animation: ox-drift linear both;
+      animation-timeline: view();
+    }
+  }
+}
+@keyframes ox-drift {
+  from { transform: scale(1.12); }
+  to   { transform: scale(1); }
+}

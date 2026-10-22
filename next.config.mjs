@@ -55,14 +55,16 @@ const CSP_REPORT_ONLY = [
   // hundreds of report-only violations per page load and buried any real one.
   // A production build performs no eval, so production keeps the strict policy -
   // this is the one deliberate difference between the two environments.
-  `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : ""} https://www.googletagmanager.com`,
+  `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : ""} https://www.googletagmanager.com https://maps.googleapis.com https://maps.gstatic.com`,
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' data: https://fonts.gstatic.com",
   "img-src 'self' data: blob: https:",
   "media-src 'self' blob: https://res.cloudinary.com",
   // GA4 beacons go to google-analytics.com; the region endpoints on
   // analytics.google.com are used for some consent-mode traffic.
-  "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://www.googletagmanager.com",
+  // Google Maps (the exhibition-centre map picker and venue maps): the Maps
+  // JavaScript API script, its tiles and fonts, and the Places / Geocoding calls.
+  "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://www.googletagmanager.com https://maps.googleapis.com https://places.googleapis.com",
   "worker-src 'self' blob:",
   "manifest-src 'self'",
 ].join("; ");

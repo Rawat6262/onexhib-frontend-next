@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { getExhibitionById } from "@/models/exhibition.model";
+import { formatDate } from "@/lib/format";
 
 export default function ExhibitionPopup({ onClose, exhibitionId }) {
   const [exhibition, setExhibition] = useState(null);
@@ -77,11 +78,11 @@ export default function ExhibitionPopup({ onClose, exhibitionId }) {
               </p>
               <p>
                 <span className="font-medium text-gray-900 dark:text-gray-100">📅 Start Date:</span>{" "}
-                { exhibition.starting_date}
+                {formatDate(exhibition.starting_date) || "Not set"}
               </p>
               <p>
                 <span className="font-medium text-gray-900 dark:text-gray-100">⏳ End Date:</span>{" "}
-                {exhibition.ending_date}
+                {formatDate(exhibition.ending_date) || "Not set"}
               </p>
             </div>
 

@@ -61,6 +61,9 @@ export default function SocialClient() {
   const [deletePending, setDeletePending] = useState(false);
 
   const abortRef = useRef(null);
+  // "everyone": every public post + followers-only posts of people you follow.
+  // "following": only you and the people you follow.
+  const [scope, setScope] = useState("everyone");
 
   const load = useCallback(async (cursor) => {
     // One in-flight request at a time. A replacement fetch cancels the previous
@@ -79,11 +82,14 @@ export default function SocialClient() {
     }
 
     try {
-      const { data } = await getFeed({
-        limit: PAGE_SIZE,
-        cursor: cursor || undefined,
-        signal: controller.signal,
-      });
+      const { data } = await getFeed(
+        {
+          limit: PAGE_SIZE,
+          cursor: cursor || undefined,
+          signal: controller.signal,
+        },
+        scope
+      );
       const page = {
         items: Array.isArray(data?.posts) ? data.posts : [],
         nextCursor: data?.nextCursor ?? null,
@@ -104,7 +110,7 @@ export default function SocialClient() {
     } finally {
       setLoadingMore(false);
     }
-  }, []);
+  }, [scope]);
 
   useEffect(() => {
     // Wait for the cached session to resolve, or isOwnPost would be decided
@@ -143,7 +149,7 @@ export default function SocialClient() {
 
   if (status === "loading" || phase === "loading") {
     return (
-      <Shell>
+      <Shell tabs={<FeedTabs scope={scope} onChange={setScope} />}>
         <div aria-busy="true" className="space-y-4">
           {[0, 1, 2].map((i) => (
             <div
@@ -158,7 +164,7 @@ export default function SocialClient() {
 
   if (phase === "error") {
     return (
-      <Shell>
+      <Shell tabs={<FeedTabs scope={scope} onChange={setScope} />}>
         <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50 px-6 py-10 text-center dark:border-gray-700 dark:bg-gray-900/50">
           <p role="alert" className="text-sm text-gray-600 dark:text-gray-400">
             {initialError}
@@ -177,7 +183,7 @@ export default function SocialClient() {
 
   if (!feed.items.length) {
     return (
-      <Shell composer={<ComposePrompt user={user} />}>
+      <Shell tabs={<FeedTabs scope={scope} onChange={setScope} />} composer={<ComposePrompt user={user} />}>
         <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50 px-6 py-12 text-center dark:border-gray-700 dark:bg-gray-900/50">
           <MessageSquare size={22} aria-hidden="true" className="mx-auto text-gray-400" />
           <h2 className="mt-3 text-base font-semibold text-gray-900 dark:text-gray-50">
@@ -195,7 +201,7 @@ export default function SocialClient() {
   }
 
   return (
-    <Shell composer={<ComposePrompt user={user} />}>
+    <Shell tabs={<FeedTabs scope={scope} onChange={setScope} />} composer={<ComposePrompt user={user} />}>
       <div className="space-y-4">
         {feed.items.map((post) => (
           <PostCard
@@ -277,15 +283,16 @@ export default function SocialClient() {
 }
 
 /** Single bounded column — readable on a phone, not a three-column desktop layout. */
-function Shell({ children, composer = null }) {
+function Shell({ children, composer = null, tabs = null }) {
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-8 sm:px-6 sm:py-12">
       <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl dark:text-white">
         Community
       </h1>
       <p className="mt-2 text-[15px] leading-relaxed text-gray-600 dark:text-gray-400">
-        Posts from you and the people you follow.
+        Public posts from everyone on OneXhib, and posts from the people you follow.
       </p>
+      {tabs ? <div className="mt-5">{tabs}</div> : null}
       {/* Absent while the feed is loading or errored, so the page settles once
           rather than shifting the prompt down when the skeleton resolves. */}
       {composer ? <div className="mt-6">{composer}</div> : null}
@@ -319,5 +326,37 @@ function ComposePrompt({ user }) {
         <span className="sr-only sm:hidden">Create post</span>
       </span>
     </Link>
+  );
+}
+
+/** Everyone (public posts from all members) / Following (only people you follow). */
+function FeedTabs({ scope, onChange }) {
+  const tabs = [
+    { key: "everyone", label: "Everyone", hint: "Public posts from all members" },
+    { key: "following", label: "Following", hint: "Only you and people you follow" },
+  ];
+  return (
+    <div role="tablist" aria-label="Which posts to show" className="inline-flex gap-1 rounded-xl bg-gray-100 p-1 dark:bg-gray-800/70">
+      {tabs.map((t) => {
+        const active = scope === t.key;
+        return (
+          <button
+            key={t.key}
+            type="button"
+            role="tab"
+            aria-selected={active}
+            title={t.hint}
+            onClick={() => onChange(t.key)}
+            className={`rounded-lg px-4 py-1.5 text-sm font-semibold transition motion-reduce:transition-none ${
+              active
+                ? "bg-white text-[#131C55] shadow-sm dark:bg-gray-900 dark:text-white"
+                : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+            }`}
+          >
+            {t.label}
+          </button>
+        );
+      })}
+    </div>
   );
 }

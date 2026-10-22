@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import {
   BriefcaseBusiness,
   KeyRound,
+  Landmark,
   Building2,
   CalendarDays,
   LayoutDashboard,
@@ -33,6 +34,7 @@ const ITEMS = [
   { group: "Catalogue", label: "Companies", href: "/admin/companies", icon: <Building2 size={16} /> },
   { group: "Catalogue", label: "Products", href: "/admin/products", icon: <Package size={16} /> },
   { group: "Catalogue", label: "Services", href: "/admin/services", icon: <BriefcaseBusiness size={16} /> },
+  { group: "Catalogue", label: "Exhibition centres", href: "/admin/exhibition-centres", icon: <Landmark size={16} /> },
   { group: "People", label: "Access requests", href: "/admin/requests", icon: <KeyRound size={16} /> },
 ];
 

@@ -3,12 +3,10 @@ import {
   ArrowRight,
   Building2,
   CalendarDays,
-  Compass,
   Globe2,
   Handshake,
   Sparkles,
   MapPin,
-  Package,
   Search as SearchIcon,
   TrendingUp,
 } from "lucide-react";
@@ -28,13 +26,16 @@ import AiSearchBand from "@/components/public/AiSearchBand";
 import EmptyState from "@/components/public/EmptyState";
 import Faq from "@/components/public/Faq";
 import HomeJsonLd from "@/components/seo/HomeJsonLd";
+import { ComingUp, HowItWorks, OpenNow, PhotoCredits } from "@/components/home/HomeFeatureSections";
+import HomeServices from "@/components/home/HomeServices";
 
 import { PUBLIC_ROUTES, publicPageMetadata } from "@/lib/seo";
-import { categoryLandingPath, cityLandingPath, countryLandingPath, exhibitionsScopePath } from "@/lib/routes";
+import { categoryLandingPath, cityLandingPath, countryLandingPath } from "@/lib/routes";
 import { getLocationIndex } from "@/lib/locations";
 import { getBanners, getNews } from "@/lib/newsroom";
 import { getThisWeekExhibitions } from "@/lib/discovery";
 import { getCategoryIndex } from "@/lib/categories";
+import { getServiceDirectory } from "@/lib/services";
 import {
   getCompanies,
   getCounts,
@@ -79,7 +80,7 @@ export const revalidate = 300;
 export default async function HomePage() {
   // One parallel round of requests. Every fetcher fails soft, so a slow or
   // unreachable backend degrades individual sections instead of the page.
-  const [featured, ongoing, upcoming, previous, locations, industries, companies, products, counts, banners, thisWeek, news] = await Promise.all([
+  const [featured, ongoing, upcoming, previous, locations, industries, companies, products, counts, banners, thisWeek, news, services] = await Promise.all([
     getFeaturedForSlider({ limit: 20 }),
     getOngoingExhibitions({ limit: 8 }),
     getUpcomingExhibitions({ limit: 8 }),
@@ -102,6 +103,9 @@ export default async function HomePage() {
     // Quality-gated, so the section stays hidden while the feed holds only
     // test records.
     getNews(),
+    // The same directory the /exhibition-services pages render. Fails soft to
+    // null, and the section then simply does not appear.
+    getServiceDirectory().catch(() => null),
   ]);
 
   const cityCards = topCities(locations, 8);
@@ -143,74 +147,11 @@ export default async function HomePage() {
           a one-line sign-in prompt; nothing renders when there is nothing near. */}
       <NearbyExhibitions className="mt-16 sm:mt-20" />
 
-      {/* ── This week ───────────────────────────────────────────────────── */}
-      {/* Rendered only when the week holds something - an empty rail under a
-          "this week" heading reads as broken rather than quiet. */}
-      {thisWeek.length ? (
-        <Section
-          id="this-week"
-          eyebrow="This week"
-          title="Exhibitions this week"
-          intro="Opening between now and Sunday, worldwide."
-          cta="See the full week"
-          ctaHref={`${PUBLIC_ROUTES.exhibitions}/this-week`}
-          className="mt-16 sm:mt-20"
-        >
-          <Rail>
-            {thisWeek.slice(0, 8).map((exhibition) => (
-              <RailItem key={exhibition.id}>
-                <ExhibitionCard exhibition={exhibition} className="h-full" />
-              </RailItem>
-            ))}
-          </Rail>
-        </Section>
-      ) : null}
+      {/* ── Open this week, then Coming up ──────────────────────────────── */}
+      {/* See components/home/HomeFeatureSections.jsx. */}
+      <OpenNow thisWeek={thisWeek} ongoing={ongoing} className="mt-20 sm:mt-28" />
 
-      {/* ── Ongoing ─────────────────────────────────────────────────────── */}
-      <Section
-        id="ongoing"
-        eyebrow="Live now"
-        title="Exhibitions happening now"
-        intro="Trade shows and business exhibitions open to visitors today."
-        cta="All ongoing exhibitions"
-        ctaHref={exhibitionsScopePath("ongoing")}
-        className="mt-16 sm:mt-20"
-      >
-        {ongoing.items.length ? (
-          <Rail>
-            {ongoing.items.map((exhibition) => (
-              <RailItem key={exhibition.id}>
-                <ExhibitionCard exhibition={exhibition} className="h-full" />
-              </RailItem>
-            ))}
-          </Rail>
-        ) : (
-          <EmptyState>No exhibitions are running right now. Browse what is coming up next.</EmptyState>
-        )}
-      </Section>
-
-      {/* ── Upcoming ────────────────────────────────────────────────────── */}
-      <Section
-        id="upcoming"
-        eyebrow="Coming up"
-        title="Upcoming exhibitions"
-        intro="Plan ahead with exhibition dates, venues and categories from across the world."
-        cta="All upcoming exhibitions"
-        ctaHref={PUBLIC_ROUTES.exhibitions}
-        className="mt-16 sm:mt-20"
-      >
-        {upcoming.items.length ? (
-          <Rail>
-            {upcoming.items.map((exhibition) => (
-              <RailItem key={exhibition.id}>
-                <ExhibitionCard exhibition={exhibition} className="h-full" />
-              </RailItem>
-            ))}
-          </Rail>
-        ) : (
-          <EmptyState>Exhibition listings are temporarily unavailable. Please try again shortly.</EmptyState>
-        )}
-      </Section>
+      <ComingUp upcoming={upcoming} className="mt-20 sm:mt-28" />
 
       {/* ── Location discovery ──────────────────────────────────────────── */}
       {/* These link to /exhibitions-in/... landing pages, not to the noindex
@@ -394,9 +335,12 @@ export default async function HomePage() {
         )}
       </Section>
 
+      {/* ── Exhibition services ─────────────────────────────────────────── */}
+      <HomeServices directory={services} className="mt-16 sm:mt-20" />
+
       <WhyOneXhib archiveTotal={previous.total} />
       <ForBusinesses />
-      <HowItWorks />
+      <HowItWorks className="mt-20 sm:mt-28" />
 
       {/* ── Industry news ───────────────────────────────────────────────── */}
       {/* Hidden entirely while the feed holds nothing publishable, which is the
@@ -448,6 +392,8 @@ export default async function HomePage() {
       </Section>
 
       <FinalCta />
+
+      <PhotoCredits className="mt-10" />
     </>
   );
 }
@@ -728,51 +674,6 @@ function ForBusinesses() {
           <ArrowRight size={17} aria-hidden="true" />
         </Link>
       </div>
-    </Section>
-  );
-}
-
-function HowItWorks() {
-  const steps = [
-    {
-      icon: Compass,
-      title: "Discover",
-      body: "Search or browse exhibitions by name, category, venue, city or country, and open the ones worth your time.",
-    },
-    {
-      icon: Building2,
-      title: "Connect",
-      body: "See which companies are exhibiting and what they are showcasing, so you arrive knowing who you want to meet.",
-    },
-    {
-      icon: Package,
-      title: "Grow",
-      body: "List your own exhibition, company or products, and be found by the visitors and buyers already searching.",
-    },
-  ];
-
-  return (
-    <Section id="how-it-works" eyebrow="Three steps" title="How OneXhib works" className="mt-16 sm:mt-24">
-      {/* A dashed rail joins the three numbers on md+, so the steps read as a
-          sequence rather than as three unrelated cards. */}
-      <ol className="relative grid list-none gap-8 md:grid-cols-3 md:gap-6">
-        <span
-          aria-hidden="true"
-          className="absolute top-7 right-[16%] left-[16%] hidden border-t-2 border-dashed border-gray-200 md:block dark:border-gray-700"
-        />
-        {steps.map(({ icon: Icon, title, body }, i) => (
-          <li key={title} className="relative flex flex-col items-center text-center">
-            <span className="relative grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-[#131C55] to-[#2B3FB8] text-white shadow-lg ring-8 shadow-indigo-900/20 ring-white dark:ring-gray-950">
-              <Icon size={22} aria-hidden="true" />
-              <span className="absolute -top-2 -right-2 grid h-6 w-6 place-items-center rounded-full bg-amber-400 text-[11px] font-extrabold text-amber-950 shadow">
-                {i + 1}
-              </span>
-            </span>
-            <h3 className="mt-5 text-lg font-semibold text-gray-900 dark:text-gray-50">{title}</h3>
-            <p className="mt-1.5 max-w-xs text-[15px] leading-relaxed text-gray-600 dark:text-gray-400">{body}</p>
-          </li>
-        ))}
-      </ol>
     </Section>
   );
 }

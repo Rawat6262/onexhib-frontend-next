@@ -11,7 +11,7 @@ import SaveButton from "@/components/exhibition/SaveButton";
 
 import { PUBLIC_ROUTES, publicPageMetadata } from "@/lib/seo";
 import { breadcrumbNode, eventNode, graph, itemListNode } from "@/lib/jsonld";
-import { categoryLandingPath, cityLandingPath, companyPath, countryLandingPath, exhibitionPath } from "@/lib/routes";
+import { categoryLandingPath, cityLandingPath, companyPath, countryLandingPath, exhibitionCentrePath, exhibitionPath } from "@/lib/routes";
 import { getExhibitionsInPlace, resolvePlaceLinks } from "@/lib/locations";
 import { resolveCategoryLink } from "@/lib/categories";
 import { idFromSlug, isCanonicalSlug } from "@/lib/slug";
@@ -19,6 +19,7 @@ import { formatDateRange, formatLocation, toIsoDate } from "@/lib/format";
 import { getCompaniesForExhibition, getExhibitionById } from "@/lib/public-api";
 import ExhibitionCard from "@/components/public/ExhibitionCard";
 import EnquiryForm from "@/components/public/EnquiryForm";
+import VenueSection from "@/components/exhibition/VenueSection";
 
 /**
  * Public exhibition detail: /exhibition/[slug]
@@ -275,6 +276,16 @@ export default async function ExhibitionDetailPage({ params }) {
                       {exhibition.address}
                     </span>
                   ) : null}
+                  {/* Linked to an exhibition centre: its page has the map,
+                      directions and the venue's other shows. */}
+                  {exhibition.centre ? (
+                    <Link
+                      href={exhibitionCentrePath(exhibition.centre.slug)}
+                      className="mt-1 inline-flex items-center gap-1 text-sm font-semibold text-[#2B3FB8] hover:underline dark:text-blue-300"
+                    >
+                      View venue &amp; map: {exhibition.centre.name}
+                    </Link>
+                  ) : null}
                 </dd>
               </div>
             ) : null}
@@ -375,6 +386,9 @@ export default async function ExhibitionDetailPage({ params }) {
             ))}
         </section>
       ) : null}
+
+      {/* The linked exhibition centre: photo, address, live map, directions. */}
+      <VenueSection centre={exhibition.centre} exhibitionName={exhibition.name} className="mt-14" />
 
       {/* Visitor -> organiser. Shown only when the backend can deliver to this
           listing; the organiser's address never reaches the page. */}

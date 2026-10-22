@@ -3,6 +3,7 @@
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 import AuthProvider from "@/components/auth/AuthProvider";
+import ConfirmHost from "@/components/ui/ConfirmHost";
 
 /**
  * Client-only providers, isolated here so app/layout.jsx stays a Server
@@ -14,6 +15,7 @@ export default function Providers({ children }) {
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <AuthProvider>{children}</AuthProvider>
       <Toaster />
+      <ConfirmHost />
     </ThemeProvider>
   );
 }

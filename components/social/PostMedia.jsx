@@ -34,7 +34,34 @@ export default function PostMedia({ media }) {
   // purpose — the backend allows up to ten items, and ten full-width images would
   // make one post longer than a screen several times over.
   const grid = count === 1 ? "grid-cols-1" : "grid-cols-2";
-  const ratio = count === 1 ? "aspect-[16/10]" : "aspect-square";
+
+  /*
+   * NEVER CROPPED. Images used to fill a fixed 16:10 box with object-cover, which
+   * cut the top and bottom off anything squarer - a poster lost its last row of
+   * text. Now:
+   *   - one image shows at its own shape, full width, capped at ~75% of the
+   *     screen height for very tall ones;
+   *   - in a grid each tile is square but the WHOLE picture is shown inside it.
+   * Wherever the picture does not fill its box, the gap is a soft, dimmed copy
+   * of the same image rather than flat grey bars.
+   *
+   * The backdrop asks for a TINY rendition (sizes="24px": a ~32px-wide file from
+   * the optimiser). Stretched up it is already soft, so it needs only a light
+   * blur - a heavy blur over a full-size image is expensive to paint and made
+   * long feeds sluggish on modest phones.
+   */
+  const backdrop = (item) => (
+    <Image
+      src={item.url}
+      alt=""
+      aria-hidden="true"
+      fill
+      sizes="24px"
+      quality={40}
+      unoptimized={!isOptimisableMedia(item.url)}
+      className="scale-110 object-cover opacity-60 blur-md dark:opacity-45"
+    />
+  );
 
   return (
     <ul className={`mt-3 grid list-none gap-2 ${grid}`}>
@@ -45,16 +72,43 @@ export default function PostMedia({ media }) {
           // post does not leave a hole.
           className={count > 1 && count % 2 === 1 && index === count - 1 ? "col-span-2" : ""}
         >
-          <div className={`relative ${ratio} w-full overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-800`}>
-            {item.type === "IMAGE" ? (
+          {item.type === "IMAGE" && count === 1 ? (
+            <div className="relative flex w-full justify-center overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-800">
+              {backdrop(item)}
               <Image
                 src={item.url}
                 alt={mediaAlt(index, count, "IMAGE")}
-                fill
+                width={0}
+                height={0}
                 sizes="(min-width: 768px) 640px, 100vw"
                 unoptimized={!isOptimisableMedia(item.url)}
-                className="object-cover"
+                className="relative h-auto max-h-[min(75vh,720px)] w-auto max-w-full object-contain"
+                style={{ width: "auto", height: "auto" }}
               />
+            </div>
+          ) : (
+          <div
+            className={`relative ${
+              count === 1
+                ? "aspect-video"
+                : // The odd last tile spans both columns, so it is wide, not a huge square.
+                  count % 2 === 1 && index === count - 1
+                  ? "aspect-[2/1]"
+                  : "aspect-square"
+            } w-full overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-800`}
+          >
+            {item.type === "IMAGE" ? (
+              <>
+                {backdrop(item)}
+                <Image
+                  src={item.url}
+                  alt={mediaAlt(index, count, "IMAGE")}
+                  fill
+                  sizes="(min-width: 768px) 640px, 100vw"
+                  unoptimized={!isOptimisableMedia(item.url)}
+                  className="object-contain"
+                />
+              </>
             ) : (
               <video
                 src={item.url}
@@ -68,6 +122,7 @@ export default function PostMedia({ media }) {
               />
             )}
           </div>
+          )}
         </li>
       ))}
     </ul>

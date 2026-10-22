@@ -34,6 +34,7 @@ import TablePagination from "@/components/dashboard/TablePagination";
 import { NoResults, PageHeader, Panel, StatCard, btnPrimary, btnSecondary } from "@/components/dashboard/ui";
 import { Badge, Monogram, SearchField, btnRow, fmtDate, tbody, td, th, thead, tr } from "@/components/admin/AdminUI";
 import { exhibitionPath } from "@/lib/routes";
+import { confirmAction } from "@/lib/confirm";
 
 // Modals are only needed once opened, so their code (and for the location
 // forms, country-state-city's ~2.3 MB dataset) is split out of this page's
@@ -77,7 +78,12 @@ export default function ExhibitionManageClient({ id }) {
 
   const deleteExhibition = async () => {
     try {
-      if (!window.confirm("Are you sure you want to delete this exhibition?")) return;
+      const ok = await confirmAction({
+        title: "Delete this exhibition?",
+        description: `“${exhibition.exhibition_name || "This exhibition"}” and the companies listed at it will be removed from OneXhib. This cannot be undone.`,
+        confirmLabel: "Delete exhibition",
+      });
+      if (!ok) return;
 
       if (isAdmin) {
         await adminDeleteExhibition(id);

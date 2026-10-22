@@ -12,6 +12,10 @@ import React, { useEffect, useState } from "react";
 import { fetchExhibitionById, updateExhibition, adminUpdateExhibition, addExhibitionLogos, removeExhibitionLogo, refreshExhibitionPage } from "@/models/exhibition.model";
 import { toast } from "sonner";
 import LogoPicker from "@/components/popups/LogoPicker";
+import VenueField from "@/components/exhibition/VenueField";
+import { refreshCentrePages } from "@/models/exhibitionCentre.model";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { ROLES } from "@/lib/auth";
 
 export default function ExhibitionEditPopup({ open, onClose, exhibitionId, isAdmin = false }) {
   const [loading, setLoading] = useState(false);
@@ -25,6 +29,10 @@ export default function ExhibitionEditPopup({ open, onClose, exhibitionId, isAdm
    */
   const [logos, setLogos] = useState({ sponsor_logos: [], partner_logos: [] });
   const [logoBusy, setLogoBusy] = useState(null); // "sponsor" | "partner" | null
+  const { role } = useAuth();
+  // The linked exhibition centre ({ id, name }) or null. Loaded from the
+  // exhibition (the API populates it) and changed through the Venue field.
+  const [centre, setCentre] = useState(null);
   const [form, setForm] = useState({
     exhibition_name: "",
     addedBy: "",
@@ -72,6 +80,11 @@ export default function ExhibitionEditPopup({ open, onClose, exhibitionId, isAdm
       })
       .then((data) => {
         // map server fields to form fields
+        setCentre(
+          data.exhibition_centre && typeof data.exhibition_centre === "object" && data.exhibition_centre._id
+            ? { id: data.exhibition_centre._id, name: data.exhibition_centre.name }
+            : null
+        );
         setLogos({
           sponsor_logos: Array.isArray(data.sponsor_logos) ? data.sponsor_logos : [],
           partner_logos: Array.isArray(data.partner_logos) ? data.partner_logos : [],
@@ -155,9 +168,12 @@ export default function ExhibitionEditPopup({ open, onClose, exhibitionId, isAdm
     setError(null);
 
     try {
+      // The centre link travels with the form: an id links, "" unlinks
+      // (the backend keeps only an id of a centre that exists).
+      const payload = { ...form, exhibition_centre: centre?.id || "" };
       const res = isAdmin
-        ? await adminUpdateExhibition(exhibitionId, form)
-        : await updateExhibition(exhibitionId, form);
+        ? await adminUpdateExhibition(exhibitionId, payload)
+        : await updateExhibition(exhibitionId, payload);
 
       if (!res.ok) {
         const errText = await res.text();
@@ -166,6 +182,8 @@ export default function ExhibitionEditPopup({ open, onClose, exhibitionId, isAdm
 
       const updated = await res.json();
       refreshExhibitionPage(exhibitionId);
+      // The show's centre may have changed: centre pages list their shows.
+      refreshCentrePages();
       console.log("Saved:", updated);
       onClose && onClose();
     } catch (err) {
@@ -211,9 +229,39 @@ export default function ExhibitionEditPopup({ open, onClose, exhibitionId, isAdm
               <input name="category" value={form.category} onChange={handleChange} className="mt-1 w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded px-2 py-1" />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Venue</label>
-              <input name="venue" value={form.venue} onChange={handleChange} className="mt-1 w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded px-2 py-1" />
+            {/* Venue: pick an exhibition centre (fills address, city, state and
+                country below) or add a new one from Google Maps. Full width so
+                the dropdown and the map panel have room. */}
+            <div className="sm:col-span-2">
+              <VenueField
+                id="edit-venue"
+                value={form.venue}
+                onChange={(venue) => setForm((f) => ({ ...f, venue }))}
+                centre={centre}
+                onSelectCentre={(c) => {
+                  setCentre({ id: c._id, name: c.name });
+                  setForm((f) => ({
+                    ...f,
+                    venue: c.name,
+                    exhibition_address: c.address || f.exhibition_address,
+                    city: c.city || f.city,
+                    state: c.state || f.state,
+                    country: c.country || f.country,
+                  }));
+                }}
+                onClearCentre={() => setCentre(null)}
+                onUseLocation={(loc) =>
+                  setForm((f) => ({
+                    ...f,
+                    venue: loc.name || f.venue,
+                    exhibition_address: loc.address || f.exhibition_address,
+                    city: loc.city || f.city,
+                    state: loc.state || f.state,
+                    country: loc.country || f.country,
+                  }))
+                }
+                canCreate={isAdmin || role === ROLES.ADMIN}
+              />
             </div>
 
             <div>

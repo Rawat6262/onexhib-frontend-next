@@ -9,6 +9,7 @@ import {
   blogPostPath,
   serviceCategoryPath,
   servicePath,
+  exhibitionCentrePath,
 } from "@/lib/routes";
 import { getLocationIndex } from "@/lib/locations";
 import { getCategoryIndex } from "@/lib/categories";
@@ -17,6 +18,7 @@ import { getAllPosts } from "@/lib/blog";
 import { getIndexableMonths, getThisWeekExhibitions, monthSlug } from "@/lib/discovery";
 import { getNews } from "@/lib/newsroom";
 import {
+  getExhibitionCentres,
   getCompanies,
   getExhibitions,
   getOngoingExhibitions,
@@ -185,7 +187,7 @@ async function buildAllUrls() {
       ]
     : [];
 
-  const [locations, categories, services, upcoming, ongoing, previous, companies, products] = await Promise.all([
+  const [locations, categories, services, upcoming, ongoing, previous, companies, products, centres] = await Promise.all([
     // Only places that clear the quality threshold in lib/locations.js have a
     // page, so this adds ~96 URLs, not one per city in the data.
     getLocationIndex(),
@@ -203,6 +205,8 @@ async function buildAllUrls() {
     collect((page) => getExhibitions("previous", { page, limit: PAGE_SIZE }), BUDGET.previous),
     collect((page) => getCompanies({ page, limit: PAGE_SIZE }), BUDGET.companies),
     collect((page) => getProducts({ page, limit: PAGE_SIZE }), BUDGET.products),
+    // Exhibition centres: one small unpaginated list.
+    getExhibitionCentres(),
   ]);
 
   // Country pages rank above their cities: a country page links to every one
@@ -284,6 +288,19 @@ async function buildAllUrls() {
       ]
     : [];
 
+  // The centre directory is noindex while empty, so it is listed only with venues.
+  const centreEntries = centres.items.length
+    ? [
+        { url: `${SITE_URL}${PUBLIC_ROUTES.centres}`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
+        ...centres.items.map((c) => ({
+          url: `${SITE_URL}${exhibitionCentrePath(c.slug)}`,
+          lastModified: now,
+          changeFrequency: "weekly",
+          priority: 0.6,
+        })),
+      ]
+    : [];
+
   const entries = [
     ...staticEntries,
     ...dateEntries,
@@ -292,6 +309,7 @@ async function buildAllUrls() {
     ...locationEntries,
     ...categoryEntries,
     ...serviceEntries,
+    ...centreEntries,
     ...exhibitionEntries(ongoing, "daily", 0.9),
     ...exhibitionEntries(upcoming, "weekly", 0.8),
     ...exhibitionEntries(previous, "yearly", 0.4),

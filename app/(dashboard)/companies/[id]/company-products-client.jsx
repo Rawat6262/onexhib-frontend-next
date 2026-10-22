@@ -28,6 +28,7 @@ import TablePagination from "@/components/dashboard/TablePagination";
 import { NoResults, PageHeader, Panel, StatCard, btnPrimary, btnSecondary } from "@/components/dashboard/ui";
 import { Badge, LoadingRows, Monogram, SearchField, btnRow, btnRowDanger, tbody, td, th, thead, tr } from "@/components/admin/AdminUI";
 import { companyPath, productPath } from "@/lib/routes";
+import { confirmAction } from "@/lib/confirm";
 
 // Modals are only needed once opened, so their code is split out of this
 // page's first-load bundle.
@@ -88,7 +89,12 @@ export default function CompanyProductsClient({ id }) {
   }, [fetchCompany, fetchProducts]);
 
   const removeCompany = async () => {
-    if (!window.confirm("Delete this company and all its products? This cannot be undone.")) return;
+    const ok = await confirmAction({
+      title: "Delete this company?",
+      description: `“${company?.company_name || "This company"}” and all its products will be removed. This cannot be undone.`,
+      confirmLabel: "Delete company",
+    });
+    if (!ok) return;
     try {
       await deleteCompany(company._id);
       toast.success("Company deleted.");

@@ -113,7 +113,16 @@ export const removeProfileCover = () => axios.delete("/api/social/profile/cover"
  */
 export const createPost = (payload) => axios.post("/api/social/posts", payload);
 
-export const getFeed = (page) => axios.get("/api/social/feed", pageParams(page));
+/*
+ * scope: "everyone" (default on the server: every PUBLIC post plus FOLLOWERS-only
+ * posts of people you follow) or "following" (only you and people you follow).
+ * Omitted, the request is exactly what it always was.
+ */
+export const getFeed = (page, scope) => {
+  const config = pageParams(page);
+  if (scope) config.params = { ...(config.params || {}), scope };
+  return axios.get("/api/social/feed", config);
+};
 
 export const getMyPosts = (page) => axios.get("/api/social/posts/me", pageParams(page));
 

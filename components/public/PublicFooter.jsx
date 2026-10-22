@@ -133,6 +133,7 @@ export default function PublicFooter({ locations }) {
               <FooterLink href={PUBLIC_ROUTES.companies}>Companies</FooterLink>
               <FooterLink href={PUBLIC_ROUTES.products}>Products</FooterLink>
               <FooterLink href={PUBLIC_ROUTES.services}>Exhibition services</FooterLink>
+              <FooterLink href={PUBLIC_ROUTES.centres}>Exhibition centres</FooterLink>
               <FooterLink href="/news">Industry news</FooterLink>
               {/* Rendered only when there is something to read: the hub is
                   noindex while empty, and a site-wide link into a noindex page

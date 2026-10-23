@@ -1,9 +1,9 @@
 import axios from "axios";
 
 /**
- * Exhibition centres, admin side. Every call goes through the /api rewrite to
- * the backend; all of these are behind restrictToLoginUser + restrictToAdmin
- * there (Controller/exhibitionCentre.controller.js in Onexhib_backend).
+ * Exhibition centres. Every call goes through the /api rewrite to the backend
+ * (Controller/exhibitionCentre.controller.js in Onexhib_backend): the admin
+ * calls are behind restrictToAdmin, the organiser ones check the role there.
  */
 
 /**
@@ -53,3 +53,17 @@ export const refreshCentrePages = () => {
 
 export const unlinkCentreExhibitions = (id, exhibitionIds) =>
   axios.post(`/api/admin/exhibition-centres/${id}/unlink`, { exhibitionIds });
+
+/*
+ * ORGANISER side (/api/organiser/exhibition-centres). Lists every centre, each
+ * with `mine`; create, and edit or delete only the ones this account added.
+ * Admins may use these too (they own everything), which is why the exhibition
+ * form's "Add new venue" uses createMyCentre for both roles.
+ */
+export const getOrganiserCentres = (params) => axios.get("/api/organiser/exhibition-centres", { params });
+
+export const createMyCentre = (form, photo) => axios.post("/api/organiser/exhibition-centres", toFormData(form, photo));
+
+export const updateMyCentre = (id, form, photo) => axios.put(`/api/organiser/exhibition-centres/${id}`, toFormData(form, photo));
+
+export const deleteMyCentre = (id) => axios.delete(`/api/organiser/exhibition-centres/${id}`);

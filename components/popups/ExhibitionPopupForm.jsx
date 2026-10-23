@@ -607,7 +607,7 @@ const Dropdown = ({
                   onSelectCentre={selectCentre}
                   onClearCentre={() => setCentre(null)}
                   onUseLocation={applyLocation}
-                  canCreate={role === ROLES.ADMIN}
+                  canCreate={role === ROLES.ADMIN || role === ROLES.ORGANISER}
                   onBlur={() => markTouched("venue")}
                   error={touched.venue ? errors.venue : null}
                 />

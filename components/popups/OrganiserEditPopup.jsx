@@ -260,7 +260,7 @@ export default function ExhibitionEditPopup({ open, onClose, exhibitionId, isAdm
                     country: loc.country || f.country,
                   }))
                 }
-                canCreate={isAdmin || role === ROLES.ADMIN}
+                canCreate={isAdmin || role === ROLES.ADMIN || role === ROLES.ORGANISER}
               />
             </div>
 

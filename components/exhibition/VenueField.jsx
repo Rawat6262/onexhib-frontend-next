@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { Check, Landmark, Loader2, MapPin, Plus, X } from "lucide-react";
 import { toast } from "sonner";
 
-import { createCentre, refreshCentrePages, searchCentres } from "@/models/exhibitionCentre.model";
+import { createMyCentre, refreshCentrePages, searchCentres } from "@/models/exhibitionCentre.model";
 
 const LocationPicker = dynamic(() => import("@/components/maps/LocationPicker"), {
   ssr: false,
@@ -20,10 +20,10 @@ const LocationPicker = dynamic(() => import("@/components/maps/LocationPicker"),
  * and links the show to that centre (onSelectCentre).
  *
  * Not listed? "Add new venue" opens the Google Maps picker inside the form:
- * the picked place fills the same fields (onUseLocation). For admins it is
- * also saved as a new exhibition centre and linked, so the next show at that
- * venue can simply pick it. Organisers get the filled-in address only: adding
- * to the centre directory stays an admin job (it is a public page per venue).
+ * the picked place fills the same fields (onUseLocation). For organisers and
+ * admins (canCreate) it is also saved as a new exhibition centre and linked,
+ * so the next show at that venue can simply pick it. The centre is recorded as
+ * the organiser's own, which they can then edit under Exhibition centres.
  *
  * Typing over a picked centre's name unlinks it - the text no longer names it.
  */
@@ -240,7 +240,7 @@ function NewVenuePanel({ initialQuery, canCreate, onCancel, onDone }) {
     }
     setSaving(true);
     try {
-      const { data } = await createCentre({
+      const { data } = await createMyCentre({
         name: location.name,
         address: location.address,
         city: location.city,

@@ -10,7 +10,6 @@ import {
   Eye,
   FileSpreadsheet,
   KeyRound,
-  Loader2,
   MapPin,
   Pencil,
   Plus,
@@ -19,13 +18,7 @@ import {
   UserRound,
 } from "lucide-react";
 
-import {
-  cancelAccessRequest,
-  getExhibitions,
-  getMyAccessRequests,
-  getMyExhibitionDetails,
-  getSharedExhibitions,
-} from "@/models/exhibition.model";
+import { getExhibitions, getMyExhibitionDetails, getSharedExhibitions } from "@/models/exhibition.model";
 import { useAuth } from "@/components/auth/AuthProvider";
 import TablePagination from "@/components/dashboard/TablePagination";
 import { PageHeader, Panel, StatCard, btnPrimary, btnSecondary, pill } from "@/components/dashboard/ui";
@@ -51,7 +44,6 @@ const ExhibitionPopupForm = dynamic(() => import("@/components/popups/Exhibition
 const OrganiserPopup = dynamic(() => import("@/components/organiser/OrganiserDetailsPopup"), { ssr: false });
 const ExhibitionEditPopup = dynamic(() => import("@/components/popups/OrganiserEditPopup"), { ssr: false });
 const ExhibitionUploadModal = dynamic(() => import("@/components/popups/ExhibitionUploadModal"), { ssr: false });
-const RequestAccessDialog = dynamic(() => import("@/components/organiser/RequestAccessDialog"), { ssr: false });
 
 /**
  * The organiser's home: their own exhibitions, and any an admin shared with them.
@@ -109,17 +101,6 @@ export default function OrganiserClient() {
   const [showUpload, setShowUpload] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  const [showRequest, setShowRequest] = useState(false);
-  const [requests, setRequests] = useState([]);
-
-  const loadRequests = useCallback(async () => {
-    try {
-      const { data } = await getMyAccessRequests();
-      setRequests(Array.isArray(data?.data) ? data.data : []);
-    } catch {
-      setRequests([]);
-    }
-  }, []);
 
   /*
    * ONE PAGE AT A TIME, filtered on the server. An organiser can own thousands
@@ -183,8 +164,7 @@ export default function OrganiserClient() {
 
   useEffect(() => {
     loadShared();
-    loadRequests();
-  }, [loadShared, loadRequests]);
+  }, [loadShared]);
 
   const pageRows = items || [];
   const firstName = user?.first_name || "";
@@ -207,15 +187,10 @@ export default function OrganiserClient() {
               <FileSpreadsheet size={16} aria-hidden="true" />
               Import Excel
             </button>
-            <button
-              type="button"
-              className={btnSecondary}
-              onClick={() => setShowRequest(true)}
-              title="Your show is already listed? Ask to edit it"
-            >
+            <Link href="/organiser/request-access" className={btnSecondary} title="Your show is already listed? Ask to edit it">
               <KeyRound size={16} aria-hidden="true" />
               Request access
-            </button>
+            </Link>
             <button type="button" className={btnPrimary} onClick={() => setShowAdd(true)}>
               <Plus size={16} aria-hidden="true" />
               Add exhibition
@@ -225,7 +200,7 @@ export default function OrganiserClient() {
       />
 
       {isNew ? (
-        <Onboarding onAdd={() => setShowAdd(true)} onImport={() => setShowUpload(true)} onRequest={() => setShowRequest(true)} />
+        <Onboarding onAdd={() => setShowAdd(true)} onImport={() => setShowUpload(true)} />
       ) : (
         <>
           <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
@@ -365,18 +340,7 @@ export default function OrganiserClient() {
         </>
       )}
 
-      {requests.length > 0 && <MyRequests items={requests} onChange={loadRequests} onNew={() => setShowRequest(true)} />}
-
       {shared.length > 0 && <SharedWithYou items={shared} onEdit={setEditingId} />}
-
-      {showRequest && (
-        <RequestAccessDialog
-          onClose={() => setShowRequest(false)}
-          onSent={loadRequests}
-          pendingIds={new Set(requests.filter((r) => r.status === "pending").map((r) => r.exhibition?._id))}
-          sharedIds={new Set([...shared.map((s) => s._id), ...(items || []).map((i) => i._id)])}
-        />
-      )}
 
       {showProfile && <OrganiserPopup Cl={() => setShowProfile(false)} data={user?._id || null} />}
       <ExhibitionUploadModal isOpen={showUpload} onClose={() => setShowUpload(false)} onSuccess={load} />
@@ -450,7 +414,7 @@ function Actions({ it, onEdit, wrap = false }) {
 }
 
 /** First visit: no exhibitions yet - say what to do, not "nothing found". */
-function Onboarding({ onAdd, onImport, onRequest }) {
+function Onboarding({ onAdd, onImport }) {
   const steps = [
     { n: 1, title: "List your exhibition", text: "Name, dates, venue and category. Add a cover image and brochure if you have them." },
     { n: 2, title: "Add the exhibitors", text: "Open Manage on your show to add the companies exhibiting and their products." },
@@ -481,80 +445,11 @@ function Onboarding({ onAdd, onImport, onRequest }) {
       </div>
       <p className="mt-5 text-sm text-gray-600 dark:text-gray-400">
         Is your exhibition already on OneXhib?{" "}
-        <button type="button" onClick={onRequest} className="font-semibold text-[#2B3FB8] underline-offset-4 hover:underline dark:text-blue-300">
+        <Link href="/organiser/request-access" className="font-semibold text-[#2B3FB8] underline-offset-4 hover:underline dark:text-blue-300">
           Request access to edit it
-        </button>{" "}
+        </Link>{" "}
         instead of adding it again.
       </p>
-    </section>
-  );
-}
-
-const REQUEST_STATUS = {
-  pending: { label: "Waiting for review", tone: "amber" },
-  approved: { label: "Approved", tone: "emerald" },
-  rejected: { label: "Not approved", tone: "rose" },
-};
-
-/** The organiser's access requests and where each stands. */
-function MyRequests({ items, onChange, onNew }) {
-  const [busy, setBusy] = useState(null);
-  async function cancel(id) {
-    setBusy(id);
-    try {
-      await cancelAccessRequest(id);
-      onChange();
-    } catch {
-      /* the list refresh below shows the real state */
-      onChange();
-    } finally {
-      setBusy(null);
-    }
-  }
-  return (
-    <section aria-labelledby="requests-title" className="mt-10">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h2 id="requests-title" className="text-lg font-bold text-gray-900 dark:text-gray-50">
-            My access requests
-          </h2>
-          <p className="mt-0.5 text-sm text-gray-600 dark:text-gray-400">
-            Exhibitions you asked to edit. Approved ones appear under Shared with you.
-          </p>
-        </div>
-        <button type="button" className={btnRow} onClick={onNew}>
-          <Plus size={14} aria-hidden="true" />
-          New request
-        </button>
-      </div>
-      <ul className="mt-4 divide-y divide-gray-100 overflow-hidden rounded-2xl border border-gray-200 bg-white dark:divide-gray-800 dark:border-gray-800 dark:bg-gray-900">
-        {items.map((r) => {
-          const st = REQUEST_STATUS[r.status] || { label: r.status, tone: "gray" };
-          return (
-            <li key={r._id} className="flex flex-col gap-2 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:px-5">
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-2">
-                  <p className="font-semibold text-gray-900 dark:text-gray-100">{r.exhibition?.name || "Exhibition removed"}</p>
-                  <Badge tone={st.tone}>{st.label}</Badge>
-                </div>
-                <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-                  Asked {fmtDate(r.createdAt)}
-                  {r.decidedAt ? ` · decided ${fmtDate(r.decidedAt)}` : ""}
-                </p>
-                {r.status === "rejected" && r.note ? (
-                  <p className="mt-1.5 text-[13px] text-rose-700 dark:text-rose-300">Note from the team: {r.note}</p>
-                ) : null}
-              </div>
-              {r.status === "pending" ? (
-                <button type="button" className={`${btnRow} shrink-0`} onClick={() => cancel(r._id)} disabled={busy === r._id}>
-                  {busy === r._id ? <Loader2 size={13} className="animate-spin" aria-hidden="true" /> : null}
-                  Cancel request
-                </button>
-              ) : null}
-            </li>
-          );
-        })}
-      </ul>
     </section>
   );
 }

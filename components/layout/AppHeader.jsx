@@ -1,7 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Menu, Sparkles } from "lucide-react";
+import { ChevronDown, Menu, Sparkles } from "lucide-react";
 import ThemeToggle from "@/components/layout/ThemeToggle";
+import MegaNav from "@/components/layout/MegaNav";
+import { AI_LINK, DIRECTORY_MENU, EXHIBITIONS_MENU, NEWS_LINK } from "@/components/layout/nav-config";
 import { PUBLIC_ROUTES } from "@/lib/seo";
 
 /**
@@ -20,12 +22,15 @@ import { PUBLIC_ROUTES } from "@/lib/seo";
  * Login/Sign up links, signed-in gets the account menu. Everything else is
  * shared by construction rather than by two files agreeing to look alike.
  *
- * NOT a client component. It has no state of its own - the mobile menu is a
- * native <details> disclosure, so the public site still ships zero JavaScript
- * for navigation. When the dashboard imports it into a client tree it simply
- * becomes part of that bundle; nothing here forces a boundary either way.
+ * NOT a client component. The desktop menus (MegaNav) are a client island;
+ * the mobile menu is native <details> disclosures, one per group, so it needs
+ * no JavaScript. Both list the pages in nav-config.js.
  */
 
+/**
+ * The flat list of the main sections. No longer rendered as the header's row
+ * (MegaNav groups them), but kept for anything that wants the plain list.
+ */
 export const PUBLIC_NAV = [
   { href: PUBLIC_ROUTES.exhibitions, label: "Exhibitions" },
   { href: `${PUBLIC_ROUTES.exhibitions}/monthly`, label: "Calendar" },
@@ -40,7 +45,7 @@ export const PUBLIC_NAV = [
   { href: "/ai-search", label: "AI Search", highlight: true },
 ];
 
-export default function AppHeader({ nav = PUBLIC_NAV, right = null, mobileExtra = null }) {
+export default function AppHeader({ right = null, mobileExtra = null }) {
   return (
     <header className="sticky top-0 z-50 border-b border-gray-200 bg-white/85 backdrop-blur-md dark:border-gray-800 dark:bg-gray-950/85">
       <div className="mx-auto flex w-full max-w-6xl items-center gap-4 px-4 py-3 sm:px-6">
@@ -69,25 +74,7 @@ export default function AppHeader({ nav = PUBLIC_NAV, right = null, mobileExtra 
           />
         </Link>
 
-        {nav.length ? (
-          <nav aria-label="Primary" className="hidden xl:block">
-            <ul className="flex list-none items-center gap-1">
-              {nav.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className={item.highlight ? navLinkHighlight : navLink}
-                  >
-                    {item.highlight ? (
-                      <Sparkles size={14} aria-hidden="true" className="shrink-0" />
-                    ) : null}
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        ) : null}
+        <MegaNav />
 
         <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
           <ThemeToggle className="text-gray-500 dark:text-gray-400" />
@@ -103,26 +90,23 @@ export default function AppHeader({ nav = PUBLIC_NAV, right = null, mobileExtra 
             </summary>
             <nav
               aria-label="Mobile"
-              className="absolute right-0 top-full mt-2 w-56 rounded-xl border border-gray-200 bg-white p-2 shadow-xl dark:border-gray-800 dark:bg-gray-900"
+              className="absolute right-0 top-full mt-2 max-h-[calc(100vh-5rem)] w-72 overflow-y-auto rounded-2xl border border-gray-200 bg-white p-2 shadow-xl dark:border-gray-800 dark:bg-gray-900"
             >
               <ul className="list-none space-y-0.5">
-                {nav.map((item) => (
-                  <li key={item.href}>
-                    <Link
-                      href={item.href}
-                      className={
-                        item.highlight
-                          ? `${mobileLink} flex items-center gap-1.5 font-semibold text-[#131C55] dark:text-blue-300`
-                          : mobileLink
-                      }
-                    >
-                      {item.highlight ? (
-                        <Sparkles size={14} aria-hidden="true" className="shrink-0" />
-                      ) : null}
-                      {item.label}
-                    </Link>
-                  </li>
+                {[EXHIBITIONS_MENU, DIRECTORY_MENU].map((menu) => (
+                  <MobileGroup key={menu.key} label={menu.label} links={mobileLinksOf(menu)} />
                 ))}
+                <li>
+                  <Link href={NEWS_LINK.href} className={mobileLink}>
+                    {NEWS_LINK.label}
+                  </Link>
+                </li>
+                <li>
+                  <Link href={AI_LINK.href} className={`${mobileLink} flex items-center gap-1.5 font-semibold text-[#131C55] dark:text-blue-300`}>
+                    <Sparkles size={14} aria-hidden="true" className="shrink-0" />
+                    {AI_LINK.label}
+                  </Link>
+                </li>
                 {mobileExtra}
               </ul>
             </nav>
@@ -133,13 +117,38 @@ export default function AppHeader({ nav = PUBLIC_NAV, right = null, mobileExtra 
   );
 }
 
-const navLink =
-  "whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white";
-
-// whitespace-nowrap: at max-w-6xl the nav is tight, and "AI Search" was the
-// item that broke onto two lines first.
-const navLinkHighlight =
-  "inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-gradient-to-r from-[#2B3FB8] to-[#6D4CF0] px-3 py-2 text-sm font-semibold text-white shadow-sm shadow-indigo-500/25 transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none";
-
 export const mobileLink =
   "block rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800";
+
+/** A menu's links for the phone menu: its columns or cards, flattened. */
+export function mobileLinksOf(menu) {
+  if (menu.columns) return menu.columns.flatMap((c) => c.links);
+  return menu.cards.map((c) => ({ href: c.href, label: c.title, icon: c.icon }));
+}
+
+/**
+ * One collapsible group in the phone menu. A nested <details>, so it opens
+ * and closes without JavaScript like the menu around it.
+ */
+export function MobileGroup({ label, links }) {
+  return (
+    <li>
+      <details className="group/m">
+        <summary className="flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm font-semibold text-gray-900 marker:content-none hover:bg-gray-100 [&::-webkit-details-marker]:hidden dark:text-gray-100 dark:hover:bg-gray-800">
+          {label}
+          <ChevronDown size={15} aria-hidden="true" className="text-gray-400 transition-transform group-open/m:rotate-180 motion-reduce:transition-none" />
+        </summary>
+        <ul className="mb-1 ml-3 list-none space-y-0.5 border-l border-gray-100 pl-2 dark:border-gray-800">
+          {links.map((l) => (
+            <li key={l.href}>
+              <Link href={l.href} className="flex items-center gap-2.5 rounded-lg px-2 py-1.5 text-[13.5px] font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800">
+                {l.icon ? <l.icon size={15} aria-hidden="true" className="shrink-0 text-[#2B3FB8] dark:text-blue-300" /> : null}
+                {l.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </details>
+    </li>
+  );
+}

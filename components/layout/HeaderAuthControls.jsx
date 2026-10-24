@@ -1,12 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { LayoutGrid, MessagesSquare } from "lucide-react";
+import { LayoutGrid } from "lucide-react";
 
 import { useAuth } from "@/components/auth/AuthProvider";
 import { homeRouteForRole } from "@/lib/auth";
 import AccountMenu from "@/components/layout/AccountMenu";
-import { mobileLink } from "@/components/layout/AppHeader";
+import DashboardMenu from "@/components/layout/DashboardMenu";
+import { MobileGroup, mobileLinksOf, mobileLink } from "@/components/layout/AppHeader";
+import { COMMUNITY_MENU } from "@/components/layout/nav-config";
 
 /**
  * The auth-aware right-hand side of the public header.
@@ -39,40 +41,9 @@ export default function HeaderAuthControls() {
 
   return (
     <>
-      {/*
-        COMMUNITY, for signed-in visitors only, and from here rather than the
-        primary nav. PUBLIC_NAV is server-rendered and shared by every visitor, so
-        it cannot know who is signed in — and a guest clicking Community could
-        only be bounced to /login. This island already makes exactly that decision
-        for Dashboard, so the link rides along with it at no extra cost.
-
-        ICON-ONLY in the bar, with the name in a hover/focus tooltip and in
-        aria-label. The header is at capacity inside max-w-6xl: a sixth text item
-        here squeezes the primary nav until "AI Search" breaks across two lines.
-        The account menu and the mobile list carry the labelled version.
-      */}
-      <Link
-        href="/social"
-        aria-label="Community"
-        className="group relative hidden h-9 w-9 items-center justify-center rounded-lg text-gray-600 transition hover:bg-[#131C55]/[0.06] hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none sm:inline-flex dark:text-gray-300 dark:hover:bg-blue-400/10 dark:hover:text-blue-200"
-      >
-        <MessagesSquare size={18} aria-hidden="true" />
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute top-full left-1/2 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg transition group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none dark:bg-gray-700"
-        >
-          Community
-        </span>
-      </Link>
-      {/* The way back into the workspace. Without it, a signed-in user who
-          browses into the public site has no route home except the URL bar. */}
-      <Link
-        href={homeRouteForRole(role)}
-        className="hidden items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold text-gray-700 transition hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none sm:inline-flex dark:text-gray-300 dark:hover:text-white"
-      >
-        <LayoutGrid size={15} aria-hidden="true" />
-        Dashboard
-      </Link>
+      {/* Community is a menu in the primary nav now (MegaNav, signed-in only),
+          and Dashboard a menu here, so both are labelled and on every page. */}
+      <DashboardMenu />
       <AccountMenu />
     </>
   );
@@ -118,15 +89,12 @@ export function HeaderAuthMobileLinks() {
     <>
       <li aria-hidden="true" className="my-1 border-t border-gray-100 dark:border-gray-800" />
       <li>
-        <Link href={homeRouteForRole(role)} className={mobileLink}>
+        <Link href={homeRouteForRole(role)} className={`${mobileLink} flex items-center gap-2 font-semibold text-[#131C55] dark:text-blue-300`}>
+          <LayoutGrid size={15} aria-hidden="true" />
           Dashboard
         </Link>
       </li>
-      <li>
-        <Link href="/social" className={mobileLink}>
-          Community
-        </Link>
-      </li>
+      <MobileGroup label={COMMUNITY_MENU.label} links={mobileLinksOf(COMMUNITY_MENU).filter((l) => !l.profile)} />
     </>
   );
 }

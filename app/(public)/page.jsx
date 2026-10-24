@@ -18,6 +18,7 @@ import ExhibitionCard from "@/components/public/ExhibitionCard";
 import FeaturedSlider from "@/components/public/FeaturedSlider";
 import NearbyExhibitions from "@/components/public/NearbyExhibitions";
 import HeroShowcase from "@/components/public/HeroShowcase";
+import HeroVideo from "@/components/home/HeroVideo";
 import CompanyCard from "@/components/public/CompanyCard";
 import ProductCard from "@/components/public/ProductCard";
 import CountsStrip from "@/components/public/CountsStrip";
@@ -441,29 +442,44 @@ function topCities(locations, max) {
  */
 function Hero({ counts, upcoming }) {
   return (
-    <section className="relative overflow-hidden border-b border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950">
-      {/* Lightweight brand wash. A CSS gradient rather than an image: public/bg.png
-          is 2 MB and would dominate LCP for no design benefit. */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-gradient-to-br from-[#131C55]/[0.07] via-transparent to-[#0E1B6B]/[0.05] dark:from-[#131C55]/25 dark:to-transparent"
-      />
+    // `dark` on the section: everything inside (copy, buttons, search, counts,
+    // showcase) uses its existing dark-mode styles over the film, in both site
+    // themes, so the hero needs no second set of colours.
+    <section className="dark relative isolate overflow-hidden bg-[#0B1240] text-white">
+      {/* Background film (desktop and tablet; see HeroVideo for when it loads),
+          over the navy the section already paints. */}
+      <HeroVideo />
 
-      {/* Soft radial accents behind the showcase panel and under the headline,
-          so neither side of the band is flat colour on the widest viewports. */}
+      {/* One even look across the frame (the left used to be navy and the
+          right raw film, so the two halves read as different pictures):
+          1. a light navy grade over the whole film - one colour temperature;
+          2. a vignette that darkens every edge, so the frame looks intended;
+          3. a deeper shade behind the copy for reading (plus the glow on the
+             copy column below);
+          4. a soft fade at the bottom into the page colour - white in the
+             light theme, near-black in the dark one - instead of a hard cut. */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[#0B1240]/30" />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -right-24 -top-24 h-[30rem] w-[30rem] rounded-full bg-[radial-gradient(circle,rgba(43,63,184,0.16),transparent_65%)] dark:bg-[radial-gradient(circle,rgba(76,99,210,0.30),transparent_65%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_75%_70%_at_60%_45%,transparent_40%,rgba(11,18,64,0.55)_100%)]"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -bottom-40 -left-32 h-[26rem] w-[26rem] rounded-full bg-[radial-gradient(circle,rgba(124,58,237,0.10),transparent_65%)] dark:bg-[radial-gradient(circle,rgba(139,92,246,0.18),transparent_65%)]"
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(11,18,64,0.6)_0%,rgba(11,18,64,0.3)_35%,transparent_60%)]"
       />
-      {/* Fine grid, faded out towards the edges with a radial mask so it reads
-          as texture behind the copy rather than as graph paper. Inline SVG. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 text-[#131C55] opacity-[0.06] [mask-image:radial-gradient(ellipse_at_30%_40%,black,transparent_70%)] dark:text-white dark:opacity-[0.07]"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-44 bg-[linear-gradient(to_bottom,transparent_0%,rgba(255,255,255,0.06)_40%,rgba(255,255,255,0.35)_70%,rgba(255,255,255,0.8)_88%,#fff_100%)] [:root.dark_&]:bg-[linear-gradient(to_bottom,transparent_0%,rgba(3,7,18,0.35)_45%,rgba(3,7,18,0.8)_80%,#030712_100%)]"
+      />
+      {/* Texture for phones only, where there is no film: a soft glow and a
+          fine grid. Over the film they read as screen-door artefacts. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -left-32 -top-40 h-[30rem] w-[30rem] rounded-full bg-[radial-gradient(circle,rgba(76,99,210,0.30),transparent_65%)] md:hidden"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 text-white opacity-[0.06] [mask-image:radial-gradient(ellipse_at_20%_40%,black,transparent_60%)] md:hidden"
         style={{
           backgroundImage:
             "linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)",
@@ -475,7 +491,14 @@ function Hero({ counts, upcoming }) {
           band and leaves the right half empty. Below lg it is one column and the
           showcase removes itself — see HeroShowcase. */}
       <div className="relative mx-auto grid w-full max-w-6xl items-center gap-12 px-4 pb-14 pt-14 sm:px-6 sm:pb-20 sm:pt-20 lg:grid-cols-[1.05fr_0.95fr] lg:gap-10">
-        <div className="min-w-0">
+        <div className="relative isolate min-w-0">
+          {/* A soft navy glow that follows the copy column, so the text reads
+              over the bright hall at any screen width (a full-width shade can
+              only guess where the centred column is). */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -inset-x-16 -inset-y-14 -z-10 rounded-[4rem] bg-[#0B1240]/80 blur-3xl"
+          />
           <p className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white/70 py-1 pr-3 pl-1.5 text-xs font-medium text-gray-600 shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/5 dark:text-gray-300">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2 py-0.5 font-semibold text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-300">
               <span aria-hidden="true" className="relative flex h-1.5 w-1.5">
@@ -500,7 +523,7 @@ function Hero({ counts, upcoming }) {
             <br className="hidden sm:block" /> exhibitors and products
           </h1>
 
-          <p className="mt-5 max-w-xl text-base leading-relaxed text-gray-600 sm:text-lg dark:text-gray-400">
+          <p className="mt-5 max-w-xl text-base leading-relaxed text-gray-600 [text-shadow:0_1px_14px_rgba(11,18,64,0.9)] sm:text-lg dark:text-gray-200">
             OneXhib brings exhibitions and trade shows from around the world into one place — with
             their dates, venues and categories, the companies exhibiting at them, and the products
             those companies bring.

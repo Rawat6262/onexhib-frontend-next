@@ -1,4 +1,4 @@
-import AppHeader, { PUBLIC_NAV } from "@/components/layout/AppHeader";
+import AppHeader from "@/components/layout/AppHeader";
 import HeaderAuthControls, {
   HeaderAuthMobileLinks,
 } from "@/components/layout/HeaderAuthControls";
@@ -19,7 +19,6 @@ import HeaderAuthControls, {
 export default function PublicHeader() {
   return (
     <AppHeader
-      nav={PUBLIC_NAV}
       right={<HeaderAuthControls />}
       mobileExtra={<HeaderAuthMobileLinks />}
     />

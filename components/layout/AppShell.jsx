@@ -3,30 +3,20 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import AppHeader, { PUBLIC_NAV, mobileLink } from "@/components/layout/AppHeader";
+import AppHeader, { mobileLink } from "@/components/layout/AppHeader";
+import DashboardMenu from "@/components/layout/DashboardMenu";
+import { HeaderAuthMobileLinks } from "@/components/layout/HeaderAuthControls";
 import AccountMenu from "@/components/layout/AccountMenu";
 import NotificationProvider from "@/components/social/NotificationProvider";
 import NotificationBell from "@/components/social/NotificationBell";
 import PageBackdrop from "@/components/public/PageBackdrop";
 
-/**
- * Community sits in the SIGNED-IN header only, and this is the place that makes
- * that true without a single conditional.
- *
- * Every social endpoint requires the uid cookie, so a Community link shown to a
- * guest can only ever bounce them to /login. The obvious implementation — read
- * `status` from useAuth() inside AppHeader — would be wrong for a different
- * reason: AppHeader is deliberately NOT a client component, its mobile menu is a
- * native <details>, and the public site ships zero JavaScript for navigation.
- * Adding a hook there would opt every public page into a client bundle for a link
- * those visitors must not see anyway.
- *
- * AppShell already solves it. Its only three consumers are (dashboard), (social)
- * and admin, and all three wrap it in RequireAuth — so anything added to the nav
- * here is authenticated by construction. PublicHeader renders AppHeader directly
- * and never sees this entry.
+/*
+ * Community and Dashboard are menus in the shared header now: MegaNav shows
+ * Community to signed-in visitors on every page, and DashboardMenu (in the
+ * right-hand controls) is the way back to the workspace from anywhere,
+ * Community included - it used to have none.
  */
-const COMMUNITY_NAV = [{ href: "/social", label: "Community" }];
 
 /**
  * The signed-in shell: same header as the public site, plus a workspace sub-nav.
@@ -81,15 +71,17 @@ export default function AppShell({ items = [], variant = "tabs", navTitle, wide 
       {/* Below the sticky header and sub-nav (z-40/z-50) and behind content. */}
       <PageBackdrop />
       <AppHeader
-        nav={[...PUBLIC_NAV, ...COMMUNITY_NAV]}
         right={
           <>
             <NotificationBell />
+            <DashboardMenu />
             <AccountMenu />
           </>
         }
         mobileExtra={
-          items.length ? (
+          <>
+            <HeaderAuthMobileLinks />
+            {items.length ? (
             <>
               <li aria-hidden="true" className="my-1 border-t border-gray-100 dark:border-gray-800" />
               {items.map((item) => (
@@ -100,7 +92,8 @@ export default function AppShell({ items = [], variant = "tabs", navTitle, wide 
                 </li>
               ))}
             </>
-          ) : null
+            ) : null}
+          </>
         }
       />
 

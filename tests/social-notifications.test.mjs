@@ -820,14 +820,17 @@ check("PostCard still makes no read request",
 check("PostCard has no notification code", !/Notification|unreadCount/.test(cardSrc));
 check("the feed has no notification code", !/getNotifications|unreadCount|NotificationProvider/.test(feedSrc));
 check("the feed still reads no reaction per card", !/getPostReaction\(/.test(feedSrc));
-check("AppShell still renders the public nav",
-  /\[\.\.\.PUBLIC_NAV, \.\.\.COMMUNITY_NAV\]/.test(shellSrc));
+// The header's nav is MegaNav now (inside AppHeader), with Community as a
+// signed-in menu; AppShell renders the same shared header.
+check("AppShell still renders the shared header and its nav",
+  /<AppHeader/.test(shellSrc) && /<MegaNav \/>/.test(read("components/layout/AppHeader.jsx")) &&
+  /COMMUNITY_MENU/.test(read("components/layout/MegaNav.jsx")));
 check("AppHeader was not turned into a client component",
   !/"use client"/.test(read("components/layout/AppHeader.jsx")));
 check("AppHeader gained no notification code",
   !/Notification|unreadCount/.test(read("components/layout/AppHeader.jsx")));
-check("the bell sits in AppShell's existing right slot, beside AccountMenu",
-  /<NotificationBell \/>\s*<AccountMenu \/>/.test(shellSrc));
+check("the bell sits in AppShell's right slot, beside the Dashboard and account menus",
+  /<NotificationBell \/>\s*<DashboardMenu \/>\s*<AccountMenu \/>/.test(shellSrc));
 
 // ─────────────────────────────────────────────────────────────────────────────
 console.log("");

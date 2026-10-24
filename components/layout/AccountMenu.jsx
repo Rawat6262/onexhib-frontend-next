@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { LogOut, ChevronDown, UserCircle, MessagesSquare, PenSquare, BadgeCheck, Bookmark, CalendarClock, Store } from "lucide-react";
+import { LogOut, ChevronDown, UserCircle, MessagesSquare, PenSquare, BadgeCheck, Bookmark, CalendarClock, Store, UserRoundPen } from "lucide-react";
 
 import { logout } from "@/models/auth.model";
 import { useAuth } from "@/components/auth/AuthProvider";
@@ -94,6 +94,13 @@ export default function AccountMenu() {
             {email ? (
               <p className="truncate text-xs text-gray-500 dark:text-gray-400">{email}</p>
             ) : null}
+          </div>
+          {/* One editor for everything about you: account details and the
+              Community profile together (/account/profile). */}
+          <div className="border-b border-gray-100 py-1 dark:border-gray-800">
+            <MenuLink href="/account/profile" icon={UserRoundPen} onClick={() => setOpen(false)}>
+              Your profile
+            </MenuLink>
           </div>
           {/* Community entry points, labelled. The header shows Community as an
               icon only (it is out of room), so this is where the words live. Every

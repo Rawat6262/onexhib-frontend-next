@@ -7,7 +7,6 @@ import { UserX } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import ProfileHeader from "@/components/social/ProfileHeader";
 import RelationshipMenu from "@/components/social/RelationshipMenu";
-import ProfileEditSheet from "@/components/social/ProfileEditSheet";
 import UserList from "@/components/social/UserList";
 import ProfilePosts from "@/components/social/ProfilePosts";
 import { getSocialProfile, getFollowers, getFollowing, reportUser } from "@/models/social.model";
@@ -67,7 +66,6 @@ export default function ProfileClient({ userId }) {
   const [errorMessage, setErrorMessage] = useState(null);
   // The first tab (Posts) is the default - see TABS.
   const [tab, setTab] = useState(DEFAULT_TAB);
-  const [editing, setEditing] = useState(false);
   const [notice, setNotice] = useState(null);
 
   const abortRef = useRef(null);
@@ -194,7 +192,8 @@ export default function ProfileClient({ userId }) {
         profile={profile}
         isSelf={self}
         onFollowChange={handleFollowChange}
-        onEdit={() => setEditing(true)}
+        // One editor for the account and the Community profile together.
+        onEdit={() => router.push("/account/profile")}
         onProfileChange={setProfile}
         actions={
           <RelationshipMenu
@@ -275,16 +274,6 @@ export default function ProfileClient({ userId }) {
         ) : null}
       </div>
 
-      {/* Mounted only while open, so the form always starts from the current
-          profile rather than from stale state left by a previous edit. */}
-      {self && editing ? (
-        <ProfileEditSheet
-          open={editing}
-          onOpenChange={setEditing}
-          profile={profile}
-          onSaved={(next) => setProfile(next)}
-        />
-      ) : null}
     </div>
   );
 }

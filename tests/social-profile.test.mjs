@@ -430,7 +430,7 @@ check(
   (stripClasses(headerLive).match(/<FollowButton/g) || []).length === 1
 );
 check("the edit control is gated on isSelf", /isSelf/.test(headerLive));
-check("the edit sheet is gated on self", /self\s*&&\s*editing/.test(clientSrc));
+check("Edit profile opens the combined profile page", /router\.push\("\/account\/profile"\)/.test(clientSrc));
 
 console.log("");
 console.log("profile: forbidden endpoints and private fields");
@@ -442,7 +442,6 @@ const allNew = [
   rowSrc,
   followSrc,
   clientSrc,
-  stripComments(await read("../components/social/ProfileEditSheet.jsx")),
   stripComments(await read("../components/social/InitialsAvatar.jsx")),
   stripComments(await read("../app/(social)/social/profile/[userId]/page.jsx")),
 ].join("\n");
@@ -505,8 +504,8 @@ console.log("");
 console.log("profile: the edit form reports itself busy, like every other social form");
 
 check("the profile edit form has aria-busy",
-  /<form onSubmit=\{handleSubmit\} aria-busy=\{saving \|\| undefined\}/.test(
-    stripComments(await read("../components/social/ProfileEditSheet.jsx"))));
+  /<form onSubmit=\{save\}[^>]*aria-busy=\{saving \|\| undefined\}/.test(
+    stripComments(await read("../app/(public)/account/profile/profile-client.jsx"))));
 check("no markdown or HTML parser", !/marked|markdown|html-react-parser|DOMPurify/i.test(allNew));
 check("no tag notification types", !/POST_TAG|COMMENT_TAG/.test(allNew));
 // Photo and cover upload shipped: the old "no upload" guard is replaced by checks on HOW.

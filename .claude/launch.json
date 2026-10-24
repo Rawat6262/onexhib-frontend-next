@@ -6,6 +6,12 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": ["next", "dev", "-p", "3007"],
       "port": 3007
+    },
+    {
+      "name": "backend",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["-e", "process.chdir('C:/Projects/Onexhib_backend'); require('C:/Projects/Onexhib_backend/index.js')"],
+      "port": 8001
     }
   ]
 }

@@ -75,9 +75,11 @@ export const revokeExhibitionEditor = (id, userId) =>
 // Admin-only equivalent — deletes any exhibition regardless of owner.
 export const adminDeleteExhibition = (id) => axios.delete(`/api/admin/exhibition/${id}`);
 
-// Admin-only — marks an exhibition as featured (is_featured: true).
-export const featureExhibition = (id) =>
-  axios.put(`/api/admin/exhibition/${id}/feature`, {}, { withCredentials: true });
+// Admin-only — marks an exhibition as featured (is_featured: true) for `days`
+// days from today. Left out = until the show ends. The API refuses a window
+// that runs past the ending date (400, with `maxDays`).
+export const featureExhibition = (id, days) =>
+  axios.put(`/api/admin/exhibition/${id}/feature`, days ? { days } : {}, { withCredentials: true });
 
 // Admin-only — removes an exhibition from featured (is_featured: false).
 export const unfeatureExhibition = (id) =>
@@ -140,10 +142,10 @@ export const refreshExhibitionPage = (exhibitionId, { featured = false } = {}) =
   }).catch(() => {});
 };
 
-// Every featured exhibition, past ones included (the endpoint does not filter
-// by date). Paged at the API's 100 cap; the set is small and curated.
+// Every featured exhibition, past ones and expired feature windows included
+// (`all=1`). Paged at the API's 100 cap; the set is small and curated.
 export const getFeaturedExhibitionsPage = ({ page = 1, limit = 100 } = {}) =>
-  axios.get("/api/exhibitions/featured", { params: { page, limit } });
+  axios.get("/api/exhibitions/featured", { params: { page, limit, all: 1 } });
 
 // The signed-in organiser's own exhibitions WITH dates and image (the plain
 // getExhibitions projection has neither). No paging params -> everything.

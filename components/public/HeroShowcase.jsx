@@ -91,7 +91,7 @@ function ShowcaseRow({ exhibition, priority }) {
         <div className="w-14 shrink-0 overflow-hidden rounded-xl border border-gray-200/80 dark:border-gray-700/60">
           <CardMedia
             image={image}
-            alt=""
+            alt={`${name} logo`}
             label={name}
             aspect="aspect-square"
             sizes="56px"

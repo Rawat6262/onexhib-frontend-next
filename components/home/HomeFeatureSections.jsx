@@ -31,13 +31,13 @@ const TEXT_LINK =
   "group inline-flex items-center gap-1.5 whitespace-nowrap text-[15px] font-semibold text-[#131C55] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#131C55] dark:text-blue-300";
 
 /** A poster or logo; gone (not a broken-image icon) when a hotlinked file fails. */
-function Poster({ image, sizes }) {
+function Poster({ image, sizes, alt = "" }) {
   if (!image?.url) return null;
   return (
     <CardImage
       fallback={null}
       src={image.url}
-      alt=""
+      alt={alt}
       fill
       sizes={sizes}
       unoptimized={!image.optimized}
@@ -73,6 +73,10 @@ function ExhibitionRail({ items }) {
 export function OpenNow({ thisWeek, ongoing, className = "" }) {
   const week = thisWeek.slice(0, 8);
   if (!week.length && !ongoing.items.length) return null;
+  // A show that opened this week is also running today: list it once, in the
+  // week's row, so the page never repeats the same heading (and card) twice.
+  const weekIds = new Set(week.map((e) => e.id));
+  const running = ongoing.items.filter((e) => !weekIds.has(e.id));
   const lead = week.find((e) => e.image?.url) || ongoing.items.find((e) => e.image?.url);
 
   return (
@@ -90,7 +94,7 @@ export function OpenNow({ thisWeek, ongoing, className = "" }) {
             className="ox-reveal relative mt-8 ml-auto block w-[62vw] max-w-[420px] rotate-[3deg] bg-white p-2 shadow-sm transition-transform duration-200 hover:rotate-0 focus-visible:outline-2 focus-visible:outline-[#131C55] lg:absolute lg:top-[-2rem] lg:right-6 lg:mt-0 lg:w-[34vw] lg:rotate-[4deg] motion-reduce:transition-none dark:bg-gray-100"
           >
             <span className="relative block aspect-[4/3]">
-              <Poster image={lead.image} sizes="(min-width: 1024px) 420px, 46vw" />
+              <Poster image={lead.image} alt={lead.name} sizes="(min-width: 1024px) 420px, 46vw" />
             </span>
           </Link>
         ) : null}
@@ -120,8 +124,10 @@ export function OpenNow({ thisWeek, ongoing, className = "" }) {
       <div className={`${WRAP} mt-14`}>
         <RowHead title="Running today" cta="All ongoing exhibitions" href={exhibitionsScopePath("ongoing")} />
         <div className="mt-6">
-          {ongoing.items.length ? (
-            <ExhibitionRail items={ongoing.items} />
+          {running.length ? (
+            <ExhibitionRail items={running} />
+          ) : ongoing.items.length ? (
+            <EmptyState>Everything running today is in the row above.</EmptyState>
           ) : (
             <EmptyState>No exhibitions are running right now. Browse what is coming up next.</EmptyState>
           )}
@@ -150,7 +156,7 @@ export function ComingUp({ upcoming, className = "" }) {
             className={`absolute z-0 block bg-white p-2 shadow-sm transition-transform duration-200 hover:z-10 hover:rotate-0 focus-visible:outline-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:bg-gray-100 ${spots[i]}`}
           >
             <span className="relative block aspect-[3/4]">
-              <Poster image={e.image} sizes="(min-width: 1024px) 300px, 36vw" />
+              <Poster image={e.image} alt={e.name} sizes="(min-width: 1024px) 300px, 36vw" />
             </span>
           </Link>
         ))}

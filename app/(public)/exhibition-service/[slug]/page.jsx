@@ -11,6 +11,15 @@ import { PUBLIC_ROUTES, publicPageMetadata } from "@/lib/seo";
 import { breadcrumbNode, graph } from "@/lib/jsonld";
 import { serviceCategoryPath, servicePath } from "@/lib/routes";
 import { getServiceById, getServiceSiblings } from "@/lib/services";
+import { GENERAL_SUBCATEGORY } from "@/lib/service-taxonomy";
+
+/*
+ * The provider's speciality, or null. "General" is the taxonomy's fallback for
+ * "none chosen", not a speciality: shown as one it produced "provides general
+ * (stall design & fabrication)" in search results and a GENERAL chip.
+ */
+const specialtyOf = (provider) =>
+  provider.subcategory && provider.subcategory !== GENERAL_SUBCATEGORY ? provider.subcategory : null;
 import { idFromSlug, isCanonicalSlug } from "@/lib/slug";
 
 /**
@@ -68,8 +77,8 @@ export async function generateMetadata({ params }) {
    * also the breadcrumb a person scans in a tab strip, and the category is what
    * orients them.
    */
-  const offer = provider.subcategory
-    ? `${provider.subcategory.toLowerCase()} (${categoryName.toLowerCase()})`
+  const offer = specialtyOf(provider)
+    ? `${specialtyOf(provider).toLowerCase()} (${categoryName.toLowerCase()})`
     : categoryName.toLowerCase();
 
   return publicPageMetadata({
@@ -156,9 +165,9 @@ export default async function ServiceProviderPage({ params }) {
               The value comes from the taxonomy - lib/public-api.js nulls any pair
               that disagrees - so it cannot be used to write arbitrary text here.
             */}
-            {provider.subcategory ? (
+            {specialtyOf(provider) ? (
               <span className="ml-2 inline-flex items-center rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-gray-600 dark:border-gray-700 dark:text-gray-400">
-                {provider.subcategory}
+                {specialtyOf(provider)}
               </span>
             ) : null}
 
@@ -174,9 +183,9 @@ export default async function ServiceProviderPage({ params }) {
 
             <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-gray-600 dark:text-gray-400">
               {provider.name} offers{" "}
-              {provider.subcategory ? (
+              {specialtyOf(provider) ? (
                 <>
-                  {provider.subcategory.toLowerCase()} within {categoryName.toLowerCase()}
+                  {specialtyOf(provider).toLowerCase()} within {categoryName.toLowerCase()}
                 </>
               ) : (
                 categoryName.toLowerCase()

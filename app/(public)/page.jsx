@@ -152,7 +152,12 @@ export default async function HomePage() {
       {/* See components/home/HomeFeatureSections.jsx. */}
       <OpenNow thisWeek={thisWeek} ongoing={ongoing} className="mt-20 sm:mt-28" />
 
-      <ComingUp upcoming={upcoming} className="mt-20 sm:mt-28" />
+      {/* Shows already in "Opening this week" are left out of this rail, so no
+          exhibition appears twice on the page. */}
+      <ComingUp
+        upcoming={{ ...upcoming, items: upcoming.items.filter((e) => !thisWeek.slice(0, 8).some((w) => w.id === e.id)) }}
+        className="mt-20 sm:mt-28"
+      />
 
       {/* ── Location discovery ──────────────────────────────────────────── */}
       {/* These link to /exhibitions-in/... landing pages, not to the noindex

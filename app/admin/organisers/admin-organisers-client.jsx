@@ -191,8 +191,9 @@ export default function AdminOrganisersClient() {
       toast.success(next ? "Exhibition featured. It now shows in the home page slider." : "Removed from featured.");
       setRows((prev) => prev.map((r) => (r._id === item._id ? { ...r, is_featured: next } : r)));
       refreshExhibitionPage(item._id, { featured: true }); // home slider + the show's page
-    } catch {
-      toast.error(next ? "Could not feature it." : "Could not unfeature it.");
+    } catch (err) {
+      // A show that has already ended cannot be featured; the API says so.
+      toast.error(err?.response?.data?.message || (next ? "Could not feature it." : "Could not unfeature it."));
     } finally {
       setFeaturingIds((prev) => {
         const s = new Set(prev);

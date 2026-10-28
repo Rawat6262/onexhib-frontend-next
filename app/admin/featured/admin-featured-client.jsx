@@ -1,11 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
 import {
   CalendarClock,
   CalendarDays,
+  Hourglass,
   Loader2,
   Radio,
   MapPin,
@@ -38,12 +39,19 @@ import { btnPrimary, btnRow, btnRowDanger, btnSecondary, inputBase, pill } from 
  *
  * Feature/unfeature use the same admin endpoints as the Organiser list, and
  * both ask the home page to refresh its slider straight away.
+ *
+ * DURATION. Featuring asks for a number of days (today is day 1). The window
+ * can never run past the show's ending date - the picker caps it and the API
+ * refuses anything longer (Service/featureWindow.js in the backend). When the
+ * window runs out the show leaves the slider and is listed here as "Feature
+ * over", next to ended shows, until it is removed or featured again.
  */
 
 const STATUS = {
   live: { label: "Live now", tone: "bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-400/10 dark:text-emerald-300 dark:ring-emerald-400/25" },
   upcoming: { label: "Upcoming", tone: "bg-blue-50 text-blue-700 ring-blue-600/20 dark:bg-blue-400/10 dark:text-blue-300 dark:ring-blue-400/25" },
   ended: { label: "Ended", tone: "bg-amber-50 text-amber-800 ring-amber-600/25 dark:bg-amber-400/10 dark:text-amber-300 dark:ring-amber-400/25" },
+  expired: { label: "Feature over", tone: "bg-rose-50 text-rose-700 ring-rose-600/20 dark:bg-rose-400/10 dark:text-rose-300 dark:ring-rose-400/25" },
   undated: { label: "No dates", tone: "bg-gray-100 text-gray-600 ring-gray-500/20 dark:bg-gray-800 dark:text-gray-400 dark:ring-gray-600/30" },
 };
 
@@ -51,8 +59,12 @@ const TABS = [
   { key: "all", label: "All" },
   { key: "live", label: "Live now" },
   { key: "upcoming", label: "Upcoming" },
-  { key: "ended", label: "Ended" },
+  { key: "ended", label: "Ended / over" },
 ];
+
+const MAX_DAYS = 365;
+const PRESETS = [7, 14, 30];
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 const day = (v) => (v ? String(v).slice(0, 10) : "");
 const today = () => new Date().toISOString().slice(0, 10);
@@ -77,6 +89,22 @@ function dateRange(start, end) {
 
 const place = (...parts) => parts.filter(Boolean).join(", ");
 
+const fmtDay = (v) =>
+  new Date(`${day(v)}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
+
+/** Days from today through the show's last day, inclusive (0 once it has ended). Mirrors the API. */
+function daysLeftOf(start, end, now = today()) {
+  const last = day(end) || day(start);
+  if (!last) return 0;
+  return Math.max(0, Math.round((Date.parse(`${last}T00:00:00Z`) - Date.parse(`${now}T00:00:00Z`)) / DAY_MS) + 1);
+}
+
+/** The last featured day of an n-day window that starts today. */
+const untilFor = (n, now = today()) => new Date(Date.parse(`${now}T00:00:00Z`) + (n - 1) * DAY_MS).toISOString().slice(0, 10);
+
+/** Ended shows and run-out feature windows sit together: neither is in the slider. */
+const isOver = (status) => status === "ended" || status === "expired";
+
 /** The featured endpoint, every page of it. */
 async function loadAllFeatured() {
   const all = [];
@@ -86,16 +114,22 @@ async function loadAllFeatured() {
     all.push(...rows);
     if (page >= (data?.totalPages || 1) || rows.length === 0) break;
   }
-  return all.map((d) => ({
-    id: String(d._id),
-    name: d.exhibition_name || "Untitled exhibition",
-    start: d.starting_date || null,
-    end: d.ending_date || null,
-    image: d.exhibtion_url || "",
-    category: d.category || "",
-    where: place(d.city, d.country),
-    status: statusOf(d.starting_date, d.ending_date),
-  }));
+  const now = today();
+  return all.map((d) => {
+    const until = day(d.featured_until);
+    const status = statusOf(d.starting_date, d.ending_date, now);
+    return {
+      id: String(d._id),
+      name: d.exhibition_name || "Untitled exhibition",
+      start: d.starting_date || null,
+      end: d.ending_date || null,
+      image: d.exhibtion_url || "",
+      category: d.category || "",
+      where: place(d.city, d.country),
+      until,
+      status: status !== "ended" && until && until < now ? "expired" : status,
+    };
+  });
 }
 
 export default function AdminFeaturedClient() {
@@ -127,7 +161,8 @@ export default function AdminFeaturedClient() {
     const c = { all: 0, live: 0, upcoming: 0, ended: 0 };
     for (const it of items || []) {
       c.all += 1;
-      if (c[it.status] !== undefined) c[it.status] += 1;
+      if (isOver(it.status)) c.ended += 1;
+      else if (c[it.status] !== undefined) c[it.status] += 1;
     }
     return c;
   }, [items]);
@@ -135,14 +170,14 @@ export default function AdminFeaturedClient() {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return (items || [])
-      .filter((it) => tab === "all" || it.status === tab)
+      .filter((it) => tab === "all" || it.status === tab || (tab === "ended" && isOver(it.status)))
       .filter((it) => !q || [it.name, it.where, it.category].some((f) => f.toLowerCase().includes(q)))
       // Live first, then upcoming soonest-first, then ended most-recent-first.
       .sort((a, b) => {
-        const rank = { live: 0, upcoming: 1, undated: 2, ended: 3 };
+        const rank = { live: 0, upcoming: 1, undated: 2, expired: 3, ended: 4 };
         if (rank[a.status] !== rank[b.status]) return rank[a.status] - rank[b.status];
         const cmp = String(a.start).localeCompare(String(b.start));
-        return a.status === "ended" ? -cmp : cmp;
+        return isOver(a.status) ? -cmp : cmp;
       });
   }, [items, tab, query]);
 
@@ -178,7 +213,7 @@ export default function AdminFeaturedClient() {
   }
 
   async function clearEnded() {
-    const ended = (items || []).filter((it) => it.status === "ended");
+    const ended = (items || []).filter((it) => isOver(it.status));
     if (!ended.length) return;
     setClearing(true);
     let done = 0;
@@ -187,17 +222,33 @@ export default function AdminFeaturedClient() {
       if (await unfeature(it, { quiet: true })) done += 1;
     }
     setClearing(false);
-    if (done === ended.length) toast.success(`Removed ${done} ended ${done === 1 ? "show" : "shows"} from featured.`);
+    if (done === ended.length) toast.success(`Removed ${done} ${done === 1 ? "show" : "shows"} from featured.`);
     else toast.error(`Removed ${done} of ${ended.length}. Try again for the rest.`);
   }
 
   const onFeatured = useCallback(() => load(), [load]);
+  const [durationId, setDurationId] = useState(null);
+
+  async function changeDuration(it, days) {
+    setBusyFor(it.id, true);
+    try {
+      await featureExhibition(it.id, days);
+      refreshExhibitionPage(it.id, { featured: true });
+      toast.success(`"${it.name}" is featured until ${fmtDay(untilFor(days))}.`);
+      setDurationId(null);
+      await load();
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Could not change the duration. Please try again.");
+    } finally {
+      setBusyFor(it.id, false);
+    }
+  }
 
   return (
     <AdminPage>
       <AdminHeader
         title="Featured exhibitions"
-        description="The home page slider shows featured exhibitions that are live or upcoming, soonest first (up to 20). Ended shows drop out of the slider automatically but stay featured here until you remove them."
+        description="The home page slider shows featured exhibitions that are live or upcoming, soonest first (up to 20), for the number of days you choose - never past the show's ending date. Ended shows and finished feature windows drop out of the slider automatically but stay listed here until you remove them."
         actions={
           <button type="button" onClick={() => setShowAdd((v) => !v)} className={btnPrimary} aria-expanded={showAdd}>
             {showAdd ? <X size={16} aria-hidden="true" /> : <Plus size={16} aria-hidden="true" />}
@@ -206,7 +257,12 @@ export default function AdminFeaturedClient() {
         }
       />
 
-      {showAdd && <AddFeatured onFeatured={onFeatured} featuredIds={new Set((items || []).map((i) => i.id))} />}
+      {showAdd && (
+        <AddFeatured
+          onFeatured={onFeatured}
+          featuredIds={new Set((items || []).filter((i) => !isOver(i.status)).map((i) => i.id))}
+        />
+      )}
 
       <StatGrid>
         <StatCard icon={<Star size={16} />} tone="amber" label="Featured" value={items ? counts.all : undefined} />
@@ -215,7 +271,7 @@ export default function AdminFeaturedClient() {
         <StatCard
           icon={<StarOff size={16} />}
           tone="rose"
-          label="Ended"
+          label="Ended / over"
           value={items ? counts.ended : undefined}
           hint={counts.ended ? "not shown in the slider" : items ? "none" : ""}
           warn={counts.ended > 0}
@@ -226,7 +282,7 @@ export default function AdminFeaturedClient() {
         <div className="mt-4 flex flex-col gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 sm:flex-row sm:items-center sm:justify-between dark:border-amber-400/25 dark:bg-amber-400/10 dark:text-amber-200">
           <p>
             <strong className="font-semibold">
-              {counts.ended} featured {counts.ended === 1 ? "show has" : "shows have"} already ended.
+              {counts.ended} featured {counts.ended === 1 ? "show has" : "shows have"} ended or run out of featured days.
             </strong>{" "}
             They are no longer shown in the slider; remove them to keep this list tidy.
           </p>
@@ -349,7 +405,19 @@ export default function AdminFeaturedClient() {
                           </span>
                         ) : null}
                       </p>
-                      {it.category ? <p className={`${pill} mt-2 max-w-full truncate`}>{it.category}</p> : null}
+                      <div className="mt-2 flex flex-wrap items-center gap-2">
+                        <FeatureWindow it={it} />
+                        {it.category ? <p className={`${pill} max-w-full truncate`}>{it.category}</p> : null}
+                      </div>
+                      {durationId === it.id ? (
+                        <DurationPicker
+                          start={it.start}
+                          end={it.end}
+                          busy={isBusy}
+                          onConfirm={(n) => changeDuration(it, n)}
+                          onCancel={() => setDurationId(null)}
+                        />
+                      ) : null}
                     </div>
                   </div>
 
@@ -357,6 +425,18 @@ export default function AdminFeaturedClient() {
                     <Link href={exhibitionPath(it.name, it.id)} className={btnRow} target="_blank" rel="noopener">
                       View
                     </Link>
+                    {it.status !== "ended" && it.status !== "undated" && confirmId !== it.id ? (
+                      <button
+                        type="button"
+                        onClick={() => setDurationId((cur) => (cur === it.id ? null : it.id))}
+                        disabled={isBusy || clearing}
+                        className={btnRow}
+                        aria-expanded={durationId === it.id}
+                      >
+                        <Hourglass size={14} aria-hidden="true" />
+                        {it.status === "expired" ? "Feature again" : "Change days"}
+                      </button>
+                    ) : null}
                     {confirmId === it.id ? (
                       <>
                         <button
@@ -412,6 +492,130 @@ export default function AdminFeaturedClient() {
   );
 }
 
+/** "Featured until 3 Nov 2026 - 6 days left", or when the window ran out. */
+function FeatureWindow({ it }) {
+  if (it.status === "ended") return null;
+  const now = today();
+  let text;
+  let tone = "bg-amber-50 text-amber-800 ring-amber-600/20 dark:bg-amber-400/10 dark:text-amber-200 dark:ring-amber-400/25";
+  if (!it.until) {
+    text = "Featured until the show ends";
+  } else if (it.until < now) {
+    text = `Feature ended ${fmtDay(it.until)}`;
+    tone = "bg-gray-100 text-gray-600 ring-gray-500/20 dark:bg-gray-800 dark:text-gray-400 dark:ring-gray-600/30";
+  } else {
+    const left = daysLeftOf(null, it.until, now);
+    text = `Featured until ${fmtDay(it.until)} · ${left === 1 ? "last day" : `${left} days left`}`;
+  }
+  return (
+    <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ring-1 ${tone}`}>
+      <Hourglass size={11} aria-hidden="true" />
+      {text}
+    </span>
+  );
+}
+
+const chip = (on) =>
+  `h-9 rounded-lg px-2.5 text-xs font-semibold ring-1 transition ${
+    on
+      ? "bg-[#2B3FB8] text-white ring-[#2B3FB8] dark:bg-blue-500 dark:ring-blue-500"
+      : "bg-white text-gray-700 ring-gray-200 hover:bg-gray-50 dark:bg-gray-900 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-gray-800"
+  }`;
+
+/**
+ * How many days to feature a show for. Today is day 1; the longest window ends
+ * on the show's last day (and never beyond 365 days), and the confirm button
+ * stays disabled for anything outside 1..max. The API checks the same rule.
+ */
+function DurationPicker({ start, end, busy, onConfirm, onCancel }) {
+  const maxDays = Math.min(MAX_DAYS, daysLeftOf(start, end));
+  const [value, setValue] = useState(() => String(Math.min(7, maxDays) || ""));
+  const inputRef = useRef(null);
+  const id = useId();
+
+  useEffect(() => {
+    inputRef.current?.focus();
+    inputRef.current?.select();
+  }, []);
+
+  if (maxDays < 1) {
+    return <p className="mt-2 text-xs text-amber-700 dark:text-amber-300">This show has ended, so it cannot be featured.</p>;
+  }
+
+  const n = Number(value);
+  const valid = value !== "" && Number.isInteger(n) && n >= 1 && n <= maxDays;
+  const lastDay = fmtDay(day(end) || day(start));
+  const hint =
+    value === ""
+      ? `Enter 1 to ${maxDays} days.`
+      : !Number.isInteger(n) || n < 1
+        ? "Use a whole number of days, at least 1."
+        : n > maxDays
+          ? `Too long - the show ends on ${lastDay}, so at most ${maxDays} ${maxDays === 1 ? "day" : "days"}.`
+          : `In the slider until ${fmtDay(untilFor(n))}${n === maxDays ? " (the show's last day)" : ""}.`;
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (valid && !busy) onConfirm(n);
+      }}
+      className="mt-3 rounded-xl border border-[#2B3FB8]/20 bg-white p-3 dark:border-blue-400/20 dark:bg-gray-950/40"
+    >
+      <div className="flex flex-wrap items-end gap-2">
+        <div>
+          <label htmlFor={id} className="block text-xs font-semibold text-gray-700 dark:text-gray-300">
+            Feature for how many days?
+          </label>
+          <div className="mt-1 flex items-center gap-2">
+            <input
+              ref={inputRef}
+              id={id}
+              type="number"
+              inputMode="numeric"
+              min={1}
+              max={maxDays}
+              step={1}
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              aria-invalid={value !== "" && !valid}
+              aria-describedby={`${id}-hint`}
+              className={`${inputBase} h-9 w-24 tabular-nums`}
+            />
+            <span className="text-xs text-gray-500 dark:text-gray-400">max {maxDays}</span>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-1.5" role="group" aria-label="Quick choices">
+          {PRESETS.filter((d) => d < maxDays).map((d) => (
+            <button key={d} type="button" onClick={() => setValue(String(d))} aria-pressed={n === d} className={chip(n === d)}>
+              {d} days
+            </button>
+          ))}
+          <button type="button" onClick={() => setValue(String(maxDays))} aria-pressed={n === maxDays} className={chip(n === maxDays)}>
+            Until it ends ({maxDays} {maxDays === 1 ? "day" : "days"})
+          </button>
+        </div>
+      </div>
+      <p
+        id={`${id}-hint`}
+        aria-live="polite"
+        className={`mt-2 text-xs ${value !== "" && !valid ? "text-red-600 dark:text-red-400" : "text-gray-500 dark:text-gray-400"}`}
+      >
+        {hint}
+      </p>
+      <div className="mt-3 flex gap-2">
+        <button type="submit" disabled={!valid || busy} className={`${btnPrimary} h-9 px-3 text-[13px] disabled:opacity-50`}>
+          {busy ? <Loader2 size={14} className="animate-spin" aria-hidden="true" /> : <Star size={14} aria-hidden="true" />}
+          {valid ? `Feature for ${n} ${n === 1 ? "day" : "days"}` : "Feature"}
+        </button>
+        <button type="button" onClick={onCancel} className={btnRow}>
+          Cancel
+        </button>
+      </div>
+    </form>
+  );
+}
+
 function Thumb({ src }) {
   const [broken, setBroken] = useState(false);
   return (
@@ -436,6 +640,7 @@ function AddFeatured({ onFeatured, featuredIds }) {
   const [results, setResults] = useState(null);
   const [searching, setSearching] = useState(false);
   const [busyId, setBusyId] = useState(null);
+  const [pickingId, setPickingId] = useState(null);
   const [justAdded, setJustAdded] = useState(() => new Set());
   const inputRef = useRef(null);
   const reqRef = useRef(0);
@@ -467,16 +672,17 @@ function AddFeatured({ onFeatured, featuredIds }) {
     return () => clearTimeout(t);
   }, [q]);
 
-  async function feature(item) {
+  async function feature(item, days) {
     setBusyId(item.id);
     try {
-      await featureExhibition(item.id);
+      await featureExhibition(item.id, days);
       refreshExhibitionPage(item.id, { featured: true });
       setJustAdded((prev) => new Set(prev).add(item.id));
-      toast.success(`"${item.name}" is now featured.`);
+      setPickingId(null);
+      toast.success(`"${item.name}" is featured for ${days} ${days === 1 ? "day" : "days"}, until ${fmtDay(untilFor(days))}.`);
       onFeatured();
-    } catch {
-      toast.error("Could not feature it. Please try again.");
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Could not feature it. Please try again.");
     } finally {
       setBusyId(null);
     }
@@ -512,35 +718,51 @@ function AddFeatured({ onFeatured, featuredIds }) {
         <ul className="mt-3 divide-y divide-gray-100 overflow-hidden rounded-xl border border-gray-200 bg-white dark:divide-gray-800 dark:border-gray-800 dark:bg-gray-900">
           {results.map((r) => {
             const featured = r.isFeatured || featuredIds.has(r.id) || justAdded.has(r.id);
-            const s = STATUS[statusOf(r.startDate, r.endDate)];
+            const status = statusOf(r.startDate, r.endDate);
+            const s = STATUS[status];
             return (
-              <li key={r.id} className="flex items-center gap-3 px-3 py-2.5">
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-gray-900 dark:text-gray-100" title={r.name}>
-                    {r.name}
-                  </p>
-                  <p className="truncate text-xs text-gray-500 dark:text-gray-400">
-                    {dateRange(r.startDate, r.endDate)}
-                    {place(r.city, r.country) ? ` · ${place(r.city, r.country)}` : ""}
-                    <span className={`ml-2 inline-flex rounded-full px-1.5 text-[10px] font-semibold ring-1 ${s.tone}`}>{s.label}</span>
-                  </p>
+              <li key={r.id} className="px-3 py-2.5">
+                <div className="flex items-center gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold text-gray-900 dark:text-gray-100" title={r.name}>
+                      {r.name}
+                    </p>
+                    <p className="truncate text-xs text-gray-500 dark:text-gray-400">
+                      {dateRange(r.startDate, r.endDate)}
+                      {place(r.city, r.country) ? ` · ${place(r.city, r.country)}` : ""}
+                      <span className={`ml-2 inline-flex rounded-full px-1.5 text-[10px] font-semibold ring-1 ${s.tone}`}>{s.label}</span>
+                    </p>
+                  </div>
+                  {featured ? (
+                    <span className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-amber-50 px-2.5 py-1.5 text-[13px] font-semibold text-amber-700 ring-1 ring-amber-600/20 dark:bg-amber-400/10 dark:text-amber-300 dark:ring-amber-400/25">
+                      <Star size={13} className="fill-current" aria-hidden="true" />
+                      Featured
+                    </span>
+                  ) : status === "ended" || status === "undated" ? (
+                    <span className="shrink-0 px-1 text-xs text-gray-500 dark:text-gray-400" title="Only live or upcoming shows can be featured">
+                      Can’t feature
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setPickingId((cur) => (cur === r.id ? null : r.id))}
+                      aria-expanded={pickingId === r.id}
+                      className={`${btnSecondary} h-8 shrink-0 px-3 text-[13px]`}
+                    >
+                      <Star size={13} aria-hidden="true" />
+                      Feature
+                    </button>
+                  )}
                 </div>
-                {featured ? (
-                  <span className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-amber-50 px-2.5 py-1.5 text-[13px] font-semibold text-amber-700 ring-1 ring-amber-600/20 dark:bg-amber-400/10 dark:text-amber-300 dark:ring-amber-400/25">
-                    <Star size={13} className="fill-current" aria-hidden="true" />
-                    Featured
-                  </span>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => feature(r)}
-                    disabled={busyId === r.id}
-                    className={`${btnSecondary} h-8 shrink-0 px-3 text-[13px]`}
-                  >
-                    {busyId === r.id ? <Loader2 size={13} className="animate-spin" aria-hidden="true" /> : <Star size={13} aria-hidden="true" />}
-                    Feature
-                  </button>
-                )}
+                {pickingId === r.id && !featured ? (
+                  <DurationPicker
+                    start={r.startDate}
+                    end={r.endDate}
+                    busy={busyId === r.id}
+                    onConfirm={(n) => feature(r, n)}
+                    onCancel={() => setPickingId(null)}
+                  />
+                ) : null}
               </li>
             );
           })}

@@ -245,9 +245,11 @@ function Slide({ exhibition, active, priority, position, total, id }) {
       {/* ── Backdrop: the slide's own palette, then a scrim for contrast ── */}
       {image ? (
         <div aria-hidden="true" className="absolute inset-0 -z-10 overflow-hidden">
+          {/* Named rather than alt="": the wrapper is aria-hidden, so screen readers
+              skip it either way, and SEO checkers stop counting a blank alt. */}
           <Image
             src={image.url}
-            alt=""
+            alt={name}
             fill
             sizes="100vw"
             unoptimized={!image.optimized}

@@ -175,7 +175,7 @@ export default async function HomePage() {
           className="mt-16 sm:mt-20"
         >
           <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-            Top cities
+            Top cities for exhibitions
           </h3>
           {/* Cards rather than chips: the city is the decision here, so it gets
               the type size, and the count sits on a bar scaled to the busiest
@@ -224,7 +224,7 @@ export default async function HomePage() {
           </ul>
 
           <h3 className="mt-10 text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-            Top countries
+            Top countries for exhibitions
           </h3>
           <ul className="mt-3 flex list-none flex-wrap gap-2">
             {locations.countries.slice(0, 12).map((c) => (

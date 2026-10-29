@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { notFound, permanentRedirect } from "next/navigation";
-import { CalendarDays, MapPin, Building2, Tag } from "lucide-react";
+import { ArrowRight, CalendarDays, History, MapPin, Building2, Tag } from "lucide-react";
 
 import Breadcrumbs from "@/components/public/Breadcrumbs";
 import CompanyCard from "@/components/public/CompanyCard";
@@ -13,7 +13,8 @@ import { PUBLIC_ROUTES, publicPageMetadata } from "@/lib/seo";
 import { breadcrumbNode, eventNode, graph, itemListNode } from "@/lib/jsonld";
 import { categoryLandingPath, cityLandingPath, companyPath, countryLandingPath, exhibitionCentrePath, exhibitionPath } from "@/lib/routes";
 import { getExhibitionsInPlace, resolvePlaceLinks } from "@/lib/locations";
-import { resolveCategoryLink } from "@/lib/categories";
+import { getSimilarUpcoming, resolveCategoryLink } from "@/lib/categories";
+import { getEditions } from "@/lib/editions";
 import { idFromSlug, isCanonicalSlug } from "@/lib/slug";
 import { formatDateRange, formatLocation, toIsoDate } from "@/lib/format";
 import { getCompaniesForExhibition, getExhibitionById } from "@/lib/public-api";
@@ -127,7 +128,21 @@ export async function generateMetadata({ params }) {
     (p) => [exhibition.name, p].filter(Boolean).join(" — ").length <= titleBudget
   );
   const titleBits = [exhibition.name, fitting ?? ""].filter(Boolean).join(" — ");
+  // AN ENDED SHOW WITH A NEXT EDITION LEADS WITH IT. Someone searching the
+  // name of a show that has passed nearly always wants the next one; the
+  // snippet tells them it is listed before they click.
+  const isPast = exhibition.endDate ? new Date(exhibition.endDate) < new Date() : false;
+  const { next } = isPast ? await getEditions(exhibition) : { next: null };
+  const nextLine = next
+    ? trimToSentence(
+        `${exhibition.name} has ended. The next edition, ${next.name}, runs ${formatDateRange(next.startDate, next.endDate)}${
+          next.city ? ` in ${next.city}` : ""
+        }.`,
+        155
+      )
+    : "";
   const description =
+    nextLine ||
     trimToSentence(exhibition.about, 155) ||
     [
       exhibition.name,
@@ -162,21 +177,30 @@ export default async function ExhibitionDetailPage({ params }) {
   // `placeLinks` decides whether the location links point at an indexable
   // landing page or at the noindex filter; `nearby`
   // is what makes this page a hub rather than a dead end for a crawler.
-  const [companies, placeLinks, categoryLink, sameCity] = await Promise.all([
+  const [companies, placeLinks, categoryLink, sameCity, { editions, next: nextEdition }] = await Promise.all([
     getCompaniesForExhibition(exhibition.id),
     resolvePlaceLinks(exhibition),
     resolveCategoryLink(exhibition.category),
     exhibition.city && exhibition.country
       ? getExhibitionsInPlace({ country: exhibition.country, city: exhibition.city })
       : Promise.resolve([]),
+    getEditions(exhibition),
   ]);
+
+  // Same industry, coming up - the show's own editions are listed separately,
+  // so they are left out here rather than shown twice.
+  const editionIds = new Set(editions.map((e) => e.id));
+  const similar = await getSimilarUpcoming(exhibition, { limit: 4, exclude: editionIds });
 
   // Related = other upcoming exhibitions in the same city. Same city is the
   // only relationship the listing endpoints can actually express: category and
   // venue are absent from their projection (see lib/public-api.js), so a
   // "same category" or "same venue" section would need a backend change rather
   // than 2,000 detail fetches.
-  const nearby = sameCity.filter((e) => e.id !== exhibition.id).slice(0, 4);
+  const similarIds = new Set(similar.items.map((e) => e.id));
+  const nearby = sameCity
+    .filter((e) => e.id !== exhibition.id && !editionIds.has(e.id) && !similarIds.has(e.id))
+    .slice(0, 4);
 
   const path = exhibitionPath(exhibition.name, exhibition.id);
   const dates = formatDateRange(exhibition.startDate, exhibition.endDate);
@@ -248,10 +272,62 @@ export default async function ExhibitionDetailPage({ params }) {
             {exhibition.name}
           </h1>
 
+          {/*
+            AN ENDED SHOW POINTS ONWARDS. The next edition when one is listed;
+            otherwise the show's industry page, then its city. Never a dead end.
+          */}
           {isPast ? (
-            <p className="mt-3 inline-flex rounded-lg bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400">
-              This exhibition has already taken place.
-            </p>
+            <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-400/25 dark:bg-amber-400/10">
+              <p className="flex items-center gap-2 text-sm font-semibold text-amber-900 dark:text-amber-200">
+                <History size={16} aria-hidden="true" />
+                This exhibition has ended.
+              </p>
+              {nextEdition ? (
+                <>
+                  <p className="mt-1.5 text-[15px] text-gray-800 dark:text-gray-200">
+                    The next edition is{" "}
+                    <span className="font-semibold">{nextEdition.name}</span>,{" "}
+                    {formatDateRange(nextEdition.startDate, nextEdition.endDate)}
+                    {nextEdition.city ? <> in {nextEdition.city}</> : null}.
+                  </p>
+                  <Link
+                    href={exhibitionPath(nextEdition.name, nextEdition.id)}
+                    className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-[#131C55] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#0E1B6B] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none"
+                  >
+                    See the next edition
+                    <ArrowRight size={16} aria-hidden="true" />
+                  </Link>
+                </>
+              ) : similar.industry ? (
+                <p className="mt-1.5 text-[15px] text-gray-800 dark:text-gray-200">
+                  No next edition is listed yet.{" "}
+                  <Link
+                    href={categoryLandingPath(similar.industry.slug)}
+                    className="font-semibold text-[#131C55] underline-offset-4 hover:underline dark:text-blue-300"
+                  >
+                    See upcoming {similar.industry.label.toLowerCase()} exhibitions
+                  </Link>
+                  .
+                </p>
+              ) : nearby.length ? (
+                <p className="mt-1.5 text-[15px] text-gray-800 dark:text-gray-200">
+                  No next edition is listed yet. Upcoming shows in {exhibition.city} are below.
+                </p>
+              ) : (
+                <p className="mt-1.5 text-[15px] text-gray-800 dark:text-gray-200">
+                  No next edition is listed yet.{" "}
+                  <Link
+                    href={placeLinks.countrySlug ? countryLandingPath(placeLinks.countrySlug) : PUBLIC_ROUTES.exhibitions}
+                    className="font-semibold text-[#131C55] underline-offset-4 hover:underline dark:text-blue-300"
+                  >
+                    {placeLinks.countrySlug && exhibition.country
+                      ? `See upcoming exhibitions in ${exhibition.country}`
+                      : "See upcoming exhibitions"}
+                  </Link>
+                  .
+                </p>
+              )}
+            </div>
           ) : null}
 
           <dl className="mt-5 space-y-3 text-[15px]">
@@ -402,6 +478,84 @@ export default async function ExhibitionDetailPage({ params }) {
         />
       ) : null}
 
+      {editions.length ? (
+        <section aria-labelledby="editions-heading" className="mt-14">
+          <h2
+            id="editions-heading"
+            className="flex items-center gap-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white"
+          >
+            <History size={22} className="text-gray-400" aria-hidden="true" />
+            Other editions
+          </h2>
+          <p className="mt-2 text-[15px] text-gray-600 dark:text-gray-400">
+            Earlier and later editions of this show{exhibition.country ? <> in {exhibition.country}</> : null}.
+          </p>
+          <ol className="mt-5 divide-y divide-gray-200 overflow-hidden rounded-2xl border border-gray-200 bg-white dark:divide-gray-800 dark:border-gray-800 dark:bg-gray-900">
+            {editions.map((e) => {
+              const ended = e.endDate ? new Date(e.endDate) < new Date() : false;
+              return (
+                <li key={e.id}>
+                  <Link
+                    href={exhibitionPath(e.name, e.id)}
+                    className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-3 transition hover:bg-gray-50 motion-reduce:transition-none dark:hover:bg-white/[0.03]"
+                  >
+                    <span className="min-w-0">
+                      <span className="block font-semibold text-gray-900 dark:text-gray-50">{e.name}</span>
+                      <span className="block text-sm text-gray-600 dark:text-gray-400">
+                        {formatDateRange(e.startDate, e.endDate)}
+                        {e.city ? <> · {e.city}</> : null}
+                      </span>
+                    </span>
+                    <span
+                      className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                        e.id === nextEdition?.id
+                          ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/20 dark:bg-emerald-400/10 dark:text-emerald-300"
+                          : ended
+                            ? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                            : "bg-blue-50 text-blue-700 dark:bg-blue-400/10 dark:text-blue-300"
+                      }`}
+                    >
+                      {e.id === nextEdition?.id ? "Next edition" : ended ? "Ended" : "Upcoming"}
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ol>
+        </section>
+      ) : null}
+
+      {similar.items.length ? (
+        <section aria-labelledby="similar-heading" className="mt-14">
+          <h2
+            id="similar-heading"
+            className="flex items-center gap-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white"
+          >
+            <Tag size={22} className="text-gray-400" aria-hidden="true" />
+            Upcoming {similar.industry.label.toLowerCase()} exhibitions
+          </h2>
+          <p className="mt-2 text-[15px] text-gray-600 dark:text-gray-400">
+            {isPast ? "Shows like this one that are still to come" : "More shows in the same industry"}
+            {exhibition.country ? <>, starting with {exhibition.country}</> : null}.
+          </p>
+          <ul className="mt-6 grid list-none gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {similar.items.map((related) => (
+              <li key={related.id}>
+                <ExhibitionCard exhibition={related} className="h-full" />
+              </li>
+            ))}
+          </ul>
+          <p className="mt-5 text-[15px]">
+            <Link
+              href={categoryLandingPath(similar.industry.slug)}
+              className="font-semibold text-[#131C55] underline-offset-4 hover:underline dark:text-blue-300"
+            >
+              See all upcoming {similar.industry.label.toLowerCase()} exhibitions
+            </Link>
+          </p>
+        </section>
+      ) : null}
+
       {nearby.length ? (
         <section aria-labelledby="nearby-heading" className="mt-14">
           <h2
@@ -409,7 +563,7 @@ export default async function ExhibitionDetailPage({ params }) {
             className="flex items-center gap-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white"
           >
             <MapPin size={22} className="text-gray-400" aria-hidden="true" />
-            Other exhibitions in {exhibition.city}
+            {isPast ? "Upcoming exhibitions" : "Other exhibitions"} in {exhibition.city}
           </h2>
           <p className="mt-2 text-[15px] text-gray-600 dark:text-gray-400">
             More trade shows and business events coming up in the same city.

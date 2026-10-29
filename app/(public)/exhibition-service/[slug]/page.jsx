@@ -7,10 +7,10 @@ import CardMedia from "@/components/public/CardMedia";
 import ServiceContactPanel from "@/components/public/ServiceContactPanel";
 import JsonLd from "@/components/seo/JsonLd";
 
-import { PUBLIC_ROUTES, publicPageMetadata } from "@/lib/seo";
+import { NOINDEX_FOLLOW, PUBLIC_ROUTES, publicPageMetadata } from "@/lib/seo";
 import { breadcrumbNode, graph } from "@/lib/jsonld";
 import { serviceCategoryPath, servicePath } from "@/lib/routes";
-import { getServiceById, getServiceSiblings } from "@/lib/services";
+import { getServiceById, getServiceSiblings, hasServiceDescription } from "@/lib/services";
 import { GENERAL_SUBCATEGORY } from "@/lib/service-taxonomy";
 
 /*
@@ -61,6 +61,13 @@ export function generateStaticParams() {
   return [];
 }
 
+/** First ~155 characters of a description, cut at a word, for the meta description. */
+function snippet(text) {
+  const flat = text.replace(/\s+/g, " ").trim();
+  if (flat.length <= 158) return flat;
+  return `${flat.slice(0, 155).replace(/\s+\S*$/, "")}…`;
+}
+
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const entry = await getServiceById(idFromSlug(slug));
@@ -81,15 +88,28 @@ export async function generateMetadata({ params }) {
     ? `${specialtyOf(provider).toLowerCase()} (${categoryName.toLowerCase()})`
     : categoryName.toLowerCase();
 
-  return publicPageMetadata({
+  const described = hasServiceDescription(provider);
+  const meta = publicPageMetadata({
     title: place
       ? `${provider.name} — ${categoryName} in ${provider.city || provider.state}`
       : `${provider.name} — ${categoryName}`,
-    description: place
-      ? `${provider.name} provides ${offer} for exhibitions and trade shows in ${place}.`
-      : `${provider.name} provides ${offer} for exhibitions and trade shows.`,
+    // The provider's own words when they wrote some: a snippet unique to them,
+    // where the template sentence below is shared with every other listing.
+    description: described
+      ? snippet(provider.description)
+      : place
+        ? `${provider.name} provides ${offer} for exhibitions and trade shows in ${place}.`
+        : `${provider.name} provides ${offer} for exhibitions and trade shows.`,
     path: servicePath(provider.name, provider.id),
   });
+  /*
+   * NO DESCRIPTION, NO INDEX. Without one this page is a name, a category and a
+   * town - the same sentence as ~1,800 bulk-imported listings - so it stays out
+   * of search (and of the sitemap) until the provider writes about their service.
+   * `follow` keeps the links on it crawlable. The page still works for visitors.
+   */
+  if (!described) meta.robots = NOINDEX_FOLLOW;
+  return meta;
 }
 
 export default async function ServiceProviderPage({ params }) {
@@ -194,6 +214,19 @@ export default async function ServiceProviderPage({ params }) {
               {provider.city ? <> in and around {provider.city}</> : null}.
             </p>
           </header>
+
+          {/* The provider's own description. Plain React text with line breaks
+              kept by CSS - never an HTML sink. */}
+          {provider.description ? (
+            <section aria-labelledby="about-heading" className="mt-8">
+              <h2 id="about-heading" className="text-lg font-bold tracking-tight text-gray-900 dark:text-white">
+                About {provider.name}
+              </h2>
+              <p className="mt-2 max-w-2xl whitespace-pre-line text-[15px] leading-relaxed text-gray-700 dark:text-gray-300">
+                {provider.description}
+              </p>
+            </section>
+          ) : null}
 
           {siblings.length ? (
             <section aria-labelledby="also-offers-heading" className="mt-10">

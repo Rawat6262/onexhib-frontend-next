@@ -5,6 +5,7 @@ import React, { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { addExhibitionService } from "@/models/service.model";
 import { SERVICE_CATEGORIES, serviceSubcategories } from "@/lib/service-taxonomy";
+import ServiceDescriptionField from "@/components/popups/ServiceDescriptionField";
 
 // --- Shared Label ---
 const Label = ({ children, required, htmlFor }) => (
@@ -102,6 +103,7 @@ const ExhibitionServicePopupForm = ({ onClose }) => {
   const [country, setCountry] = useState("");
   const [state, setState] = useState("");
   const [city, setCity] = useState("");
+  const [description, setDescription] = useState("");
   const [image, setImage] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
@@ -205,6 +207,7 @@ const ExhibitionServicePopupForm = ({ onClose }) => {
       formData.append("country", countries.find((c) => c.value === country)?.label || country);
       formData.append("state", states.find((s) => s.value === state)?.label || state);
       formData.append("city", city);
+      formData.append("description", description.trim());
       if (image) formData.append("serviceimage", image);
 
       await addExhibitionService(formData);
@@ -390,6 +393,7 @@ const ExhibitionServicePopupForm = ({ onClose }) => {
                       <p className="text-xs text-red-600 mt-1">{errors.address}</p>
                     )}
                   </div>
+                  <ServiceDescriptionField value={description} onChange={setDescription} />
                 </div>
               </div>
             </div>

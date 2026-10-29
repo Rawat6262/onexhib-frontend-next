@@ -3,9 +3,10 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 import CardImage from "@/components/public/CardImage";
-import Rail, { RailItem } from "@/components/public/Rail";
-import ExhibitionCard from "@/components/public/ExhibitionCard";
 import EmptyState from "@/components/public/EmptyState";
+import { LiveBoard, ShowSpotlight, openingLabel } from "@/components/home/ShowLists";
+import TicketGrid from "@/components/home/TicketGrid";
+import { formatLocation } from "@/lib/format";
 import { PUBLIC_ROUTES } from "@/lib/seo";
 import { exhibitionPath, exhibitionsScopePath } from "@/lib/routes";
 
@@ -20,8 +21,9 @@ import { exhibitionPath, exhibitionsScopePath } from "@/lib/routes";
  *                 verb held in the middle of the screen while its picture passes.
  *
  * All three are Server Components; every exhibition in them is in the initial
- * HTML. The rails reuse the shared ExhibitionCard, so cards look the same here
- * as everywhere else.
+ * HTML. Each list has a layout suited to it (components/home/ShowLists.jsx):
+ * the week's openings as a spotlight and numbered list, today's shows as a live
+ * board with day progress, and the calendar as filterable ticket cards.
  */
 
 const WRAP = "mx-auto w-full max-w-6xl px-4 sm:px-6";
@@ -55,18 +57,6 @@ function RowHead({ title, cta, href }) {
         <ArrowRight size={16} aria-hidden="true" className="transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none" />
       </Link>
     </div>
-  );
-}
-
-function ExhibitionRail({ items }) {
-  return (
-    <Rail>
-      {items.map((exhibition) => (
-        <RailItem key={exhibition.id}>
-          <ExhibitionCard exhibition={exhibition} className="h-full" />
-        </RailItem>
-      ))}
-    </Rail>
   );
 }
 
@@ -116,7 +106,7 @@ export function OpenNow({ thisWeek, ongoing, className = "" }) {
         <div className={`${WRAP} mt-14`}>
           <RowHead title="Opening this week" cta="See the full week" href={`${PUBLIC_ROUTES.exhibitions}/this-week`} />
           <div className="mt-6">
-            <ExhibitionRail items={week} />
+            <ShowSpotlight items={week} skipId={lead?.id} />
           </div>
         </div>
       ) : null}
@@ -125,7 +115,7 @@ export function OpenNow({ thisWeek, ongoing, className = "" }) {
         <RowHead title="Running today" cta="All ongoing exhibitions" href={exhibitionsScopePath("ongoing")} />
         <div className="mt-6">
           {running.length ? (
-            <ExhibitionRail items={running} />
+            <LiveBoard items={running.slice(0, 8)} />
           ) : ongoing.items.length ? (
             <EmptyState>Everything running today is in the row above.</EmptyState>
           ) : (
@@ -181,7 +171,7 @@ export function ComingUp({ upcoming, className = "" }) {
         <RowHead title="Next on the calendar" cta="All upcoming exhibitions" href={PUBLIC_ROUTES.exhibitions} />
         <div className="mt-6">
           {upcoming.items.length ? (
-            <ExhibitionRail items={upcoming.items} />
+            <TicketGrid items={upcoming.items.map(toTicket)} />
           ) : (
             <EmptyState>Exhibition listings are temporarily unavailable. Please try again shortly.</EmptyState>
           )}
@@ -189,6 +179,32 @@ export function ComingUp({ upcoming, className = "" }) {
       </div>
     </section>
   );
+}
+
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+/** An upcoming show shaped for TicketGrid: plain data, dates already worked out on the server. */
+function toTicket(e) {
+  const a = new Date(e.startDate);
+  const b = new Date(e.endDate || e.startDate);
+  const ok = !Number.isNaN(a.getTime()) && !Number.isNaN(b.getTime());
+  const sameMonth = ok && a.getUTCMonth() === b.getUTCMonth() && a.getUTCFullYear() === b.getUTCFullYear();
+  const soon = openingLabel(e);
+  return {
+    id: e.id,
+    href: exhibitionPath(e.name, e.id),
+    name: e.name,
+    category: e.category,
+    country: e.country,
+    place: formatLocation(e, { includeVenue: false }),
+    image: e.image,
+    // "30 Oct" large, "to 1 Nov" small: a range split across months reads badly as "30–1 Oct–Nov".
+    day: ok ? `${a.getUTCDate()}` : "",
+    month: ok ? MONTHS[a.getUTCMonth()] : "",
+    until: ok && b.getTime() !== a.getTime() ? `to ${b.getUTCDate()}${sameMonth ? "" : ` ${MONTHS[b.getUTCMonth()]}`}` : "",
+    // Only near openings get a countdown; "Opens in 140 days" says nothing.
+    soon: /in ([2-9]|1[0-4]) days|tomorrow|today/.test(soon) ? soon : "",
+  };
 }
 
 const STAGES = [

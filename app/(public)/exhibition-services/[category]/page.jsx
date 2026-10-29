@@ -63,8 +63,12 @@ export async function generateMetadata({ params }) {
   const label = category.name.toLowerCase();
   const topPlaces = category.cities.slice(0, 3).map((c) => c.value);
 
+  // "Printing services for…", but "Security Services for…", not "Security
+  // Services services for…" - five category names already end in the word.
+  const noun = /\bservices$/i.test(category.name) ? category.name : `${category.name} services`;
+
   return publicPageMetadata({
-    title: `${category.name} services for exhibitions and trade shows`,
+    title: `${noun} for exhibitions and trade shows`,
     description: topPlaces.length
       ? `${category.count} ${label} providers for exhibition stands and trade shows, including ${topPlaces.join(", ")}. Filter by name and location.`
       : `${category.count} ${label} providers for exhibition stands and trade shows. Filter by name and location.`,

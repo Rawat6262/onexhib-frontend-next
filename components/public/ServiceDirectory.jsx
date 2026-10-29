@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ArrowDownAZ, RotateCcw, Search, X } from "lucide-react";
+import { ArrowDownAZ, ChevronDown, RotateCcw, Search, X } from "lucide-react";
 
 import ServiceProviderCard from "@/components/public/ServiceProviderCard";
 // From lib/service-alphabet.js, NOT lib/services.js: the latter reads the
@@ -40,7 +40,17 @@ import { slugifyName } from "@/lib/slug";
  * STATE IS DERIVED, NOT MIRRORED. The filtered list is computed from the two
  * selections on every render rather than kept in its own state, so there is no
  * second copy that can disagree with the controls.
+ *
+ * SHOWN IN STEPS OF PAGE_STEP. The data for every provider is still here, so
+ * the filters search the whole category; only the CARDS are drawn PAGE_STEP at
+ * a time, with "Show more" for the next step. Printing reached 555 providers,
+ * and drawing every card made a 2.2 MB page (1.9 MB of it card markup); the
+ * provider data itself is about 300 KB. A new filter selection starts again at
+ * one step. Crawlers reach every provider through its own page
+ * (/exhibition-service/...), which is in the sitemap.
  */
+const PAGE_STEP = 48;
+
 export default function ServiceDirectory({
   providers,
   letters,
@@ -74,6 +84,15 @@ export default function ServiceDirectory({
   const [query, setQuery] = useState("");
   /* The alphabet strip is collapsed until asked for - see the toolbar note. */
   const [showLetters, setShowLetters] = useState(false);
+  /*
+   * How many cards are drawn. Kept WITH the filter selection it was counted for,
+   * so a different selection starts at one step, without an effect or a reset in
+   * every handler. Going back to that selection finds the count where it was.
+   */
+  const filterKey = [subcategory, letter, state, city, query.trim()].join("|");
+  const [shown, setShown] = useState({ key: filterKey, count: PAGE_STEP });
+  const limit = shown.key === filterKey ? shown.count : PAGE_STEP;
+  const showMore = () => setShown({ key: filterKey, count: limit + PAGE_STEP });
 
   /*
    * City options follow the chosen state, so the dropdown cannot offer a
@@ -175,6 +194,23 @@ export default function ServiceDirectory({
    * the headings would just repeat what the page title already says.
    */
   const grouped = !subcategory && groups.length > 1;
+
+  /*
+   * The first `limit` providers in display order, cut across the groups: a group
+   * past the cut is left out, one the cut falls inside is drawn in part. Its
+   * heading still gives the group's full count.
+   */
+  const visibleGroups = useMemo(() => {
+    let left = limit;
+    const out = [];
+    for (const group of groups) {
+      if (left <= 0) break;
+      out.push({ ...group, visible: group.providers.slice(0, left) });
+      left -= group.providers.length;
+    }
+    return out;
+  }, [groups, limit]);
+  const drawn = Math.min(limit, filtered.length);
 
   /*
    * Whether a card should repeat its speciality.
@@ -416,7 +452,7 @@ export default function ServiceDirectory({
          */
         grouped ? (
           <div className="mt-5 space-y-10">
-            {groups.map((group, groupIndex) => (
+            {visibleGroups.map((group, groupIndex) => (
               <section key={group.key} aria-labelledby={`group-${group.key}`}>
                 <h3
                   id={`group-${group.key}`}
@@ -429,7 +465,7 @@ export default function ServiceDirectory({
                   </span>
                 </h3>
                 <ul className="mt-4 grid list-none gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                  {group.providers.map((provider, i) => (
+                  {group.visible.map((provider, i) => (
                     <li key={provider.id}>
                       {/* Eager only for the first row of the FIRST group: those are
                           the only cards above the fold. */}
@@ -446,7 +482,7 @@ export default function ServiceDirectory({
           </div>
         ) : (
           <ul className="mt-5 grid list-none gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {filtered.map((provider, i) => (
+            {filtered.slice(0, limit).map((provider, i) => (
               <li key={provider.id}>
                 {/* Eager only for the first row, and only unfiltered: after a
                     filter the user has already scrolled past the fold. */}
@@ -464,6 +500,27 @@ export default function ServiceDirectory({
           No providers match these filters. Try clearing one of them.
         </p>
       )}
+
+      {filtered.length > PAGE_STEP ? (
+        <div className="mt-8 flex flex-col items-center gap-3">
+          {/* Not "Showing x of y": the toolbar already uses that for how many
+              providers MATCH. This line is how many of those are drawn. */}
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            <span className="font-semibold text-gray-900 dark:text-gray-100">{drawn.toLocaleString("en-US")}</span> of{" "}
+            {filtered.length.toLocaleString("en-US")} shown
+          </p>
+          {drawn < filtered.length ? (
+            <button
+              type="button"
+              onClick={showMore}
+              className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-gray-300 bg-white px-5 text-sm font-semibold text-gray-900 transition hover:border-[#131C55] hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:hover:border-blue-300 dark:hover:text-blue-200"
+            >
+              Show {Math.min(PAGE_STEP, filtered.length - drawn)} more
+              <ChevronDown size={16} aria-hidden="true" />
+            </button>
+          ) : null}
+        </div>
+      ) : null}
     </div>
   );
 }

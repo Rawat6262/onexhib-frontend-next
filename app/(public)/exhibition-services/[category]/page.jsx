@@ -29,11 +29,10 @@ import { getServiceCategory, getServiceDirectory } from "@/lib/services";
  * and the largest well over a hundred, so each page is a directory rather than a
  * restatement of one card.
  *
- * WHY THE WHOLE CATEGORY RENDERS AT ONCE, with no pagination. The largest page is
- * a little over a hundred cards; the images below it lazy-load, so the cost of
- * the long tail is a few kilobytes of markup rather than a hundred image requests. Paginating would also
- * break the filters, which work across the full set precisely because the full
- * set is already on the client — see the note in ServiceDirectory.
+ * NO ?page= PAGINATION. The filters work across the whole category because
+ * every provider's data is on the client, and URL pages would break that. The
+ * page size problem (Printing grew to 555 providers, 2.2 MB) is solved in
+ * ServiceDirectory instead: it draws the cards 48 at a time with "Show more".
  */
 
 export const revalidate = 3600;

@@ -9,6 +9,7 @@ import {
   canonicalServiceCategory,
   serviceSubcategories,
 } from "@/lib/service-taxonomy";
+import ServiceDescriptionField from "@/components/popups/ServiceDescriptionField";
 
 const Label = ({ children, required, htmlFor }) => (
   <label htmlFor={htmlFor} className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-1.5 tracking-wide">
@@ -72,6 +73,7 @@ const ServiceEditPopup = ({ serviceId, onClose }) => {
   const [country, setCountry] = useState("");
   const [state, setState] = useState("");
   const [city, setCity] = useState("");
+  const [description, setDescription] = useState("");
   const [existingImage, setExistingImage] = useState(null);
   const [newImage, setNewImage] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -130,6 +132,7 @@ const ServiceEditPopup = ({ serviceId, onClose }) => {
           setServiceSubcategory(resolved && resolved.subcategory ? resolved.subcategory : "");
           setMobile(s.mobile_number || "");
           setAddress(s.address || "");
+          setDescription(typeof s.description === "string" ? s.description : "");
 
           // The dropdowns are driven by ISO codes, but saved records may hold
           // either a code (older records) or a full name (post-fix records).
@@ -218,6 +221,7 @@ const ServiceEditPopup = ({ serviceId, onClose }) => {
       formData.append("country", countries.find((c) => c.value === country)?.label || country);
       formData.append("state", states.find((s) => s.value === state)?.label || state);
       formData.append("city", city);
+      formData.append("description", description.trim());
       if (newImage) formData.append("serviceimage", newImage);
 
       await updateExhibitionService(serviceId, formData);
@@ -419,6 +423,7 @@ const ServiceEditPopup = ({ serviceId, onClose }) => {
                       <p className="text-xs text-red-600 mt-1">{errors.address}</p>
                     )}
                   </div>
+                  <ServiceDescriptionField value={description} onChange={setDescription} />
                 </div>
               </div>
 

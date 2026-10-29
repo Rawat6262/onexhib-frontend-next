@@ -277,8 +277,10 @@ async function buildAllUrls() {
          * links to every one of its providers, so crawling it first is the
          * cheaper path into the set.
          */
+        // Only providers with a description: the rest are noindex (see
+        // hasServiceDescription in lib/services.js).
         ...serviceCategories.flatMap((c) =>
-          c.providers.map((p) => ({
+          c.providers.filter((p) => p.described).map((p) => ({
             url: `${SITE_URL}${servicePath(p.name, p.id)}`,
             lastModified: now,
             changeFrequency: "monthly",

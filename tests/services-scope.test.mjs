@@ -170,9 +170,9 @@ console.log("services — what a public listing may and may not say");
     JSON.stringify(shaped));
   check("17. the image public_id — a deletion handle — is NOT published",
     !JSON.stringify(shaped).includes("public_id"), JSON.stringify(shaped));
-  check("18. the shape is exactly these seven keys",
+  check("18. the shape is exactly these keys (description is the provider's own public text)",
     JSON.stringify(Object.keys(shaped).sort())
-      === '["city","country","id","image","name","service","state","subcategory"]',
+      === '["city","country","description","id","image","name","service","state","subcategory"]',
     JSON.stringify(Object.keys(shaped).sort()));
   check("19. a document with no _id yields null rather than a half row",
     toPublicService({ full_name: "x" }) === null);
@@ -373,6 +373,11 @@ check("71d. the preview is computed once per card, not per use",
 check("73a. the category page DIVIDES providers into a section per speciality",
   /grouped \?/.test(dirSrc) && /visibleGroups\.map\(\(group, groupIndex\)/.test(dirSrc),
   "a flat grid of 381 cards gives a visitor nothing to scroll to");
+check("73a3. a provider page with no description is noindex and out of the sitemap",
+  /if \(!described\) meta\.robots = NOINDEX_FOLLOW;/.test(read("app/(public)/exhibition-service/[slug]/page.jsx")) &&
+    /c\.providers\.filter\(\(p\) => p\.described\)/.test(read("app/sitemap.js")));
+check("73a4. the directory sends a 'described' flag to the browser, never the description text",
+  /const toDirectoryRow = \(\{ description, \.\.\.row \}\)/.test(read("lib/services.js")));
 check("73a2. cards are drawn PAGE_STEP at a time with Show more, filters still over every provider",
   /const PAGE_STEP = 48;/.test(dirSrc) && /filtered\.slice\(0, limit\)/.test(dirSrc) &&
     /group\.providers\.slice\(0, left\)/.test(dirSrc) && /onClick=\{showMore\}/.test(dirSrc) &&

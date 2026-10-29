@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import Breadcrumbs from "@/components/public/Breadcrumbs";
 import ExhibitionCard from "@/components/public/ExhibitionCard";
+import Pagination from "@/components/public/Pagination";
 import JsonLd from "@/components/seo/JsonLd";
 
 import { NOINDEX_FOLLOW, PUBLIC_ROUTES, pageMetadata, publicPageMetadata } from "@/lib/seo";
@@ -35,23 +36,29 @@ import {
  * indexed it (Search Console: /exhibitions/monthly/2026/09). A month that has
  * started now includes the shows that already closed, and reads in the past
  * tense once it is over.
+ *
+ * PAGED, PER_PAGE TO A PAGE (?page=2)
+ * A busy month is hundreds of shows: October 2026 rendered 811 cards in one
+ * response, 7.2 MB of HTML. Pages follow the location pages' rules: page 1 is
+ * the indexable page and the canonical for every page; page 2+ is noindex,
+ * follow (every show on it is still reachable and in the sitemap); a page past
+ * the end is a 404. Day headings repeat on the page a day continues onto.
+ *
+ * Rendered on demand, not prerendered: a route that reads searchParams cannot
+ * be statically generated, and pairing it with generateStaticParams built a
+ * site that 500s in production (see app/(public)/exhibitions-in/[country]).
+ * The month's data underneath is still ISR-cached by its fetches, so a request
+ * is a cache read and a render of PER_PAGE cards.
  */
 
 export const revalidate = 3600;
-/*
- * TRUE, not false. With false the set of months was frozen at build time: as the
- * calendar rolled forward, a month that gained its listings after a deploy 404'd
- * (logged in production as "Internal: NoFallbackError") even though the calendar
- * page linked to it, until the next rebuild. The guards in MonthPage below -
- * parseParams, the empty-month 404 and noindex below MIN_MONTH_EXHIBITIONS -
- * still keep nonsense and thin months out of the index.
- */
-export const dynamicParams = true;
 
-export async function generateStaticParams() {
-  const months = await getIndexableMonths();
-  return months.map((m) => monthSlug(m.year, m.month));
-}
+const PER_PAGE = 60;
+
+const readPage = (sp) => {
+  const v = sp?.page;
+  return Math.max(1, Math.floor(Number(Array.isArray(v) ? v[0] : v)) || 1);
+};
 
 function parseParams(year, month) {
   const y = Number(year);
@@ -73,8 +80,9 @@ function isPastMonth({ year, month }, now = new Date()) {
   return Date.UTC(year, month, 1) <= now.getTime();
 }
 
-export async function generateMetadata({ params }) {
+export async function generateMetadata({ params, searchParams }) {
   const { year, month } = await params;
+  const page = readPage(await searchParams);
   const parsed = parseParams(year, month);
   if (!parsed) return { title: "Month not found", robots: { index: false, follow: true } };
 
@@ -92,20 +100,28 @@ export async function generateMetadata({ params }) {
       ),
     path: `${PUBLIC_ROUTES.exhibitions}/monthly/${slug.year}/${slug.month}`,
   };
+  if (page > 1) {
+    return pageMetadata({ ...meta, title: `Exhibitions in ${label} — page ${page}`, robots: NOINDEX_FOLLOW });
+  }
   return items.length >= MIN_MONTH_EXHIBITIONS
     ? publicPageMetadata(meta)
     : pageMetadata({ ...meta, robots: NOINDEX_FOLLOW });
 }
 
-export default async function MonthPage({ params }) {
+export default async function MonthPage({ params, searchParams }) {
   const { year, month } = await params;
   const parsed = parseParams(year, month);
   if (!parsed) notFound();
+  const page = readPage(await searchParams);
 
   const items = await getMonthExhibitions(parsed.year, parsed.month);
 
   // Nothing at all: a 404. A thin month still renders (noindex - see metadata).
   if (items.length === 0) notFound();
+  const totalPages = Math.ceil(items.length / PER_PAGE);
+  // Past the last page: a 404, not an empty 200 a crawler would keep.
+  if (page > totalPages) notFound();
+  const pageItems = items.slice((page - 1) * PER_PAGE, page * PER_PAGE);
   const past = isPastMonth(parsed);
 
   const label = monthLabel(parsed.year, parsed.month);
@@ -131,7 +147,7 @@ export default async function MonthPage({ params }) {
 
   // Grouped by start day, so a busy month reads as a schedule.
   const groups = new Map();
-  for (const item of items) {
+  for (const item of pageItems) {
     const key = String(item.startDate).slice(0, 10);
     if (!groups.has(key)) groups.set(key, []);
     groups.get(key).push(item);
@@ -145,7 +161,7 @@ export default async function MonthPage({ params }) {
         graph={graph(
           breadcrumbNode(trail),
           itemListNode(
-            items.map((e) => exhibitionPath(e.name, e.id)),
+            pageItems.map((e) => exhibitionPath(e.name, e.id)),
             { name: `Exhibitions in ${label}` }
           )
         )}
@@ -163,6 +179,9 @@ export default async function MonthPage({ params }) {
           {past ? "took place" : "open"} in {label}
           {countries.length > 1 ? ` across ${countries.length} countries` : ""}. Listings are ordered
           by opening date.
+          {totalPages > 1
+            ? ` Showing ${((page - 1) * PER_PAGE + 1).toLocaleString("en-US")}–${((page - 1) * PER_PAGE + pageItems.length).toLocaleString("en-US")}, page ${page} of ${totalPages}.`
+            : ""}
         </p>
       </header>
 
@@ -210,6 +229,8 @@ export default async function MonthPage({ params }) {
           );
         })}
       </div>
+
+      <Pagination page={page} totalPages={totalPages} buildHref={(p) => (p > 1 ? `${here}?page=${p}` : here)} />
 
       <nav
         aria-label="Nearby months"

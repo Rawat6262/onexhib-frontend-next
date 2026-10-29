@@ -15,9 +15,11 @@ import { getExhibitionCentres } from "@/lib/public-api";
 /**
  * The exhibition-centre directory: /exhibition-centres
  *
- * Every venue an admin has added (picked on Google Maps), on one map and as a
- * list grouped by country, each with its number of upcoming shows. A centre's
- * own page has its address, map, details and those shows.
+ * Every venue with something to show - an exhibition linked to it, coming up
+ * or past, or a description (centreHasListings) - on one map and as a list
+ * grouped by country. Venues with nothing yet are left out here and in the
+ * sitemap; their own pages still open, as noindex. A centre's own page has its
+ * address, map, details and shows.
  *
  * Refreshed hourly, and on demand through the CENTRES_TAG cache tag.
  */
@@ -133,7 +135,11 @@ export default async function ExhibitionCentresPage() {
                         <p className="mt-auto flex items-center justify-between gap-2 pt-2 text-sm">
                           <span className="inline-flex items-center gap-1.5 font-medium text-gray-800 dark:text-gray-200">
                             <CalendarDays size={15} aria-hidden="true" className="text-gray-400" />
-                            {c.upcomingCount ? `${c.upcomingCount} upcoming ${c.upcomingCount === 1 ? "show" : "shows"}` : "No upcoming shows listed"}
+                            {c.upcomingCount
+                              ? `${c.upcomingCount} upcoming ${c.upcomingCount === 1 ? "show" : "shows"}`
+                              : c.pastCount
+                                ? `${c.pastCount} past ${c.pastCount === 1 ? "show" : "shows"}`
+                                : "Venue details"}
                           </span>
                           <ArrowRight size={16} aria-hidden="true" className="text-gray-300 transition group-hover:translate-x-0.5 group-hover:text-[#2B3FB8] motion-reduce:transition-none" />
                         </p>

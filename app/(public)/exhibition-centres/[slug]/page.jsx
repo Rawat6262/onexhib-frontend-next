@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { Building, CalendarDays, ExternalLink, Globe, Mail, MapPin, Navigation, Phone, Plane, TrainFront } from "lucide-react";
+import { Building, CalendarDays, ExternalLink, Globe, History, Mail, MapPin, Navigation, Phone, Plane, TrainFront } from "lucide-react";
 
 import Breadcrumbs from "@/components/public/Breadcrumbs";
 import ExhibitionCard from "@/components/public/ExhibitionCard";
@@ -12,14 +12,18 @@ import { PUBLIC_ROUTES, publicPageMetadata } from "@/lib/seo";
 import { breadcrumbNode, graph, venueNode } from "@/lib/jsonld";
 import { exhibitionCentrePath } from "@/lib/routes";
 import { directionsUrl } from "@/lib/google-maps";
-import { getExhibitionCentre } from "@/lib/public-api";
+import { centreHasListings, getExhibitionCentre } from "@/lib/public-api";
 
 /**
  * One exhibition centre: /exhibition-centres/<slug>
  *
- * Address, map with directions, the venue's details, and the exhibitions
- * linked to it that have not ended yet. Shows are linked by an admin (Admin →
- * Exhibition centres), so a venue with no linked shows says so plainly.
+ * Address, map with directions, the venue's details, the exhibitions linked
+ * to it that have not ended yet, and the most recent ones held there. Shows
+ * are linked by an admin (Admin → Exhibition centres).
+ *
+ * A venue with no linked shows and no description has nothing to say beyond
+ * its address: the page still opens from a link, but is noindex and left out
+ * of the directory and the sitemap (centreHasListings in lib/public-api.js).
  */
 export const revalidate = 3600;
 export const dynamicParams = true;
@@ -31,16 +35,25 @@ export async function generateMetadata({ params }) {
   const { slug } = await params;
   const data = await getExhibitionCentre(slug);
   if (!data) return { title: "Exhibition centre not found", robots: { index: false, follow: true } };
-  const { centre, upcoming } = data;
+  const { centre, upcoming, pastCount } = data;
   const where = [centre.city, centre.country].filter(Boolean).join(", ");
-  return publicPageMetadata({
+  const shows = upcoming.length
+    ? ` and ${upcoming.length} upcoming exhibition${upcoming.length === 1 ? "" : "s"}`
+    : pastCount
+      ? ` and ${pastCount} past exhibition${pastCount === 1 ? "" : "s"}`
+      : "";
+  const meta = publicPageMetadata({
     title: `${centre.name}${where ? ` — ${where}` : ""}`,
     description:
       (centre.description && centre.description.slice(0, 155)) ||
-      `${centre.name}${where ? ` in ${where}` : ""}: address, map location${upcoming.length ? ` and ${upcoming.length} upcoming exhibition${upcoming.length === 1 ? "" : "s"}` : " and exhibitions"}.`,
+      `${centre.name}${where ? ` in ${where}` : ""}: address, map location${shows || " and exhibitions"}.`,
     path: exhibitionCentrePath(centre.slug),
     images: centre.image ? [centre.image.url] : undefined,
   });
+  if (!centreHasListings({ ...centre, upcomingCount: upcoming.length, pastCount })) {
+    meta.robots = { index: false, follow: true };
+  }
+  return meta;
 }
 
 const numberFmt = new Intl.NumberFormat("en-IN");
@@ -49,7 +62,7 @@ export default async function ExhibitionCentrePage({ params }) {
   const { slug } = await params;
   const data = await getExhibitionCentre(slug);
   if (!data) notFound();
-  const { centre, upcoming, pastCount } = data;
+  const { centre, upcoming, past, pastCount } = data;
 
   const path = exhibitionCentrePath(centre.slug);
   const trail = [
@@ -177,12 +190,28 @@ export default async function ExhibitionCentrePage({ params }) {
             <EmptyState>No upcoming exhibitions are listed at this venue yet.</EmptyState>
           </div>
         )}
-        {pastCount ? (
-          <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
-            {pastCount} past {pastCount === 1 ? "exhibition was" : "exhibitions were"} held here.
-          </p>
-        ) : null}
       </section>
+
+      {past.length ? (
+        <section aria-labelledby="centre-past" className="mt-14">
+          <h2 id="centre-past" className="flex items-center gap-2 text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl dark:text-gray-50">
+            <History size={22} aria-hidden="true" className="text-gray-400" />
+            Past exhibitions at {centre.name}
+          </h2>
+          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+            {pastCount > past.length
+              ? `The ${past.length} most recent of ${pastCount} exhibitions held here.`
+              : `${pastCount} ${pastCount === 1 ? "exhibition was" : "exhibitions were"} held here, most recent first.`}
+          </p>
+          <ul className="mt-6 grid list-none gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {past.map((exhibition) => (
+              <li key={exhibition.id}>
+                <ExhibitionCard exhibition={exhibition} className="h-full" />
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
     </div>
   );
 }

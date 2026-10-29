@@ -371,8 +371,13 @@ check("71c. and truncates a long list rather than printing all ten",
 check("71d. the preview is computed once per card, not per use",
   /const specialities = subcategoryPreview\(category\.name\);/.test(publicSrc));
 check("73a. the category page DIVIDES providers into a section per speciality",
-  /grouped \?/.test(dirSrc) && /groups\.map\(\(group, groupIndex\)/.test(dirSrc),
+  /grouped \?/.test(dirSrc) && /visibleGroups\.map\(\(group, groupIndex\)/.test(dirSrc),
   "a flat grid of 381 cards gives a visitor nothing to scroll to");
+check("73a2. cards are drawn PAGE_STEP at a time with Show more, filters still over every provider",
+  /const PAGE_STEP = 48;/.test(dirSrc) && /filtered\.slice\(0, limit\)/.test(dirSrc) &&
+    /group\.providers\.slice\(0, left\)/.test(dirSrc) && /onClick=\{showMore\}/.test(dirSrc) &&
+    /return providers\.filter\(/.test(dirSrc),
+  "Printing reached 557 providers and a 2.2 MB page when every card was drawn");
 check("73b. providers with no speciality get a trailing section, not deletion",
   /Speciality not stated/.test(dirSrc) && /providers: unspecified,/.test(dirSrc),
   "hiding a third of a directory behind a division nobody opted into");

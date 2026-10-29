@@ -29,6 +29,7 @@ import Faq from "@/components/public/Faq";
 import HomeJsonLd from "@/components/seo/HomeJsonLd";
 import { ComingUp, HowItWorks, OpenNow, PhotoCredits } from "@/components/home/HomeFeatureSections";
 import HomeServices from "@/components/home/HomeServices";
+import CentreCard from "@/components/exhibition-centres/CentreCard";
 
 import { PUBLIC_ROUTES, publicPageMetadata } from "@/lib/seo";
 import { categoryLandingPath, cityLandingPath, countryLandingPath } from "@/lib/routes";
@@ -40,6 +41,7 @@ import { getServiceDirectory } from "@/lib/services";
 import {
   getCompanies,
   getCounts,
+  getExhibitionCentres,
   getFeaturedForSlider,
   getOngoingExhibitions,
   getPreviousExhibitions,
@@ -81,7 +83,7 @@ export const revalidate = 300;
 export default async function HomePage() {
   // One parallel round of requests. Every fetcher fails soft, so a slow or
   // unreachable backend degrades individual sections instead of the page.
-  const [featured, ongoing, upcoming, previous, locations, industries, companies, products, counts, banners, thisWeek, news, services] = await Promise.all([
+  const [featured, ongoing, upcoming, previous, locations, industries, companies, products, counts, banners, thisWeek, news, services, centres] = await Promise.all([
     getFeaturedForSlider({ limit: 20 }),
     getOngoingExhibitions({ limit: 8 }),
     getUpcomingExhibitions({ limit: 8 }),
@@ -107,10 +109,17 @@ export default async function HomePage() {
     // The same directory the /exhibition-services pages render. Fails soft to
     // null, and the section then simply does not appear.
     getServiceDirectory().catch(() => null),
+    // The same cached call the /exhibition-centres directory makes. Fails soft
+    // to an empty list, and the venues section then does not appear.
+    getExhibitionCentres(),
   ]);
 
   const cityCards = topCities(locations, 8);
   const cityMax = Math.max(1, ...cityCards.map((c) => c.count));
+  const topCentres = [...centres.items]
+    .sort((a, b) => b.upcomingCount - a.upcomingCount || b.pastCount - a.pastCount || a.name.localeCompare(b.name))
+    .slice(0, 6);
+  const centreCountries = new Set(centres.items.map((c) => c.country).filter(Boolean)).size;
 
   return (
     <>
@@ -239,6 +248,31 @@ export default async function HomePage() {
                     {c.count}
                   </span>
                 </Link>
+              </li>
+            ))}
+          </ul>
+        </Section>
+      ) : null}
+
+      {/* ── Exhibition centres ──────────────────────────────────────────── */}
+      {/* The venues with the most upcoming shows, in the same card the
+          /exhibition-centres directory uses. Absent while the directory is empty. */}
+      {topCentres.length ? (
+        <Section
+          id="centres"
+          eyebrow="Venues"
+          title="Exhibition centres hosting the most shows"
+          intro={`Where trade shows are held — ${centres.total.toLocaleString("en-US")} venues in ${centreCountries} ${
+            centreCountries === 1 ? "country" : "countries"
+          }, each with its address, halls, map and the exhibitions coming up there.`}
+          cta="All exhibition centres"
+          ctaHref={PUBLIC_ROUTES.centres}
+          className="mt-16 sm:mt-20"
+        >
+          <ul className="grid list-none gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {topCentres.map((c) => (
+              <li key={c.id}>
+                <CentreCard centre={c} />
               </li>
             ))}
           </ul>

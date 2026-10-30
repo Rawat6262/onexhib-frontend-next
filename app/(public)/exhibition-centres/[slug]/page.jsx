@@ -5,6 +5,7 @@ import { Building, CalendarDays, ExternalLink, Globe, History, Mail, MapPin, Nav
 import Breadcrumbs from "@/components/public/Breadcrumbs";
 import ExhibitionCard from "@/components/public/ExhibitionCard";
 import EmptyState from "@/components/public/EmptyState";
+import Pagination from "@/components/public/Pagination";
 import CentresMap from "@/components/maps/CentresMap";
 import JsonLd from "@/components/seo/JsonLd";
 
@@ -24,6 +25,11 @@ import { centreHasListings, getExhibitionCentre } from "@/lib/public-api";
  * A venue with no linked shows and no description has nothing to say beyond
  * its address: the page still opens from a link, but is noindex and left out
  * of the directory and the sitemap (centreHasListings in lib/public-api.js).
+ *
+ * A busy venue has well over a hundred upcoming shows, so both lists are paged,
+ * PER_PAGE at a time, each on its own parameter (?page for upcoming, ?past for
+ * past) so paging one leaves the other where it was. Paged views keep the
+ * venue's canonical and are noindex; their links are still followed.
  */
 export const revalidate = 3600;
 export const dynamicParams = true;
@@ -31,8 +37,13 @@ export function generateStaticParams() {
   return [];
 }
 
-export async function generateMetadata({ params }) {
+const PER_PAGE = 12;
+
+const readPage = (v) => Math.max(1, Number(Array.isArray(v) ? v[0] : v) || 1);
+
+export async function generateMetadata({ params, searchParams }) {
   const { slug } = await params;
+  const sp = await searchParams;
   const data = await getExhibitionCentre(slug);
   if (!data) return { title: "Exhibition centre not found", robots: { index: false, follow: true } };
   const { centre, upcoming, pastCount } = data;
@@ -50,7 +61,11 @@ export async function generateMetadata({ params }) {
     path: exhibitionCentrePath(centre.slug),
     images: centre.image ? [centre.image.url] : undefined,
   });
-  if (!centreHasListings({ ...centre, upcomingCount: upcoming.length, pastCount })) {
+  if (
+    !centreHasListings({ ...centre, upcomingCount: upcoming.length, pastCount }) ||
+    readPage(sp?.page) > 1 ||
+    readPage(sp?.past) > 1
+  ) {
     meta.robots = { index: false, follow: true };
   }
   return meta;
@@ -58,11 +73,20 @@ export async function generateMetadata({ params }) {
 
 const numberFmt = new Intl.NumberFormat("en-IN");
 
-export default async function ExhibitionCentrePage({ params }) {
+export default async function ExhibitionCentrePage({ params, searchParams }) {
   const { slug } = await params;
+  const sp = await searchParams;
   const data = await getExhibitionCentre(slug);
   if (!data) notFound();
   const { centre, upcoming, past, pastCount } = data;
+
+  const page = readPage(sp?.page);
+  const pastPage = readPage(sp?.past);
+  const upcomingPages = Math.max(1, Math.ceil(upcoming.length / PER_PAGE));
+  const pastPages = Math.max(1, Math.ceil(past.length / PER_PAGE));
+  if (page > upcomingPages || pastPage > pastPages) notFound();
+  const upcomingShown = upcoming.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+  const pastShown = past.slice((pastPage - 1) * PER_PAGE, pastPage * PER_PAGE);
 
   const path = exhibitionCentrePath(centre.slug);
   const trail = [
@@ -70,6 +94,14 @@ export default async function ExhibitionCentrePage({ params }) {
     { name: "Exhibition centres", path: PUBLIC_ROUTES.centres },
     { name: centre.name, path },
   ];
+  // The section anchor brings the visitor back to the list they were paging.
+  const buildHref = (up, pp, anchor) => {
+    const qs = new URLSearchParams();
+    if (up > 1) qs.set("page", String(up));
+    if (pp > 1) qs.set("past", String(pp));
+    const s = qs.toString();
+    return `${path}${s ? `?${s}` : ""}#${anchor}`;
+  };
   const hasLocation = centre.lat !== null && centre.lng !== null;
 
   const facts = [
@@ -172,19 +204,28 @@ export default async function ExhibitionCentrePage({ params }) {
         </div>
       </div>
 
-      <section aria-labelledby="centre-shows" className="mt-14">
+      <section id="upcoming" aria-labelledby="centre-shows" className="mt-14 scroll-mt-24">
         <h2 id="centre-shows" className="flex items-center gap-2 text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl dark:text-gray-50">
           <CalendarDays size={22} aria-hidden="true" className="text-[#2B3FB8] dark:text-blue-300" />
           Upcoming exhibitions at {centre.name}
         </h2>
+        {upcoming.length > PER_PAGE ? (
+          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+            Showing {(page - 1) * PER_PAGE + 1}–{(page - 1) * PER_PAGE + upcomingShown.length} of {upcoming.length}{" "}
+            upcoming exhibitions, soonest first.
+          </p>
+        ) : null}
         {upcoming.length ? (
-          <ul className="mt-6 grid list-none gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {upcoming.map((exhibition) => (
-              <li key={exhibition.id}>
-                <ExhibitionCard exhibition={exhibition} className="h-full" />
-              </li>
-            ))}
-          </ul>
+          <>
+            <ul className="mt-6 grid list-none gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {upcomingShown.map((exhibition) => (
+                <li key={exhibition.id}>
+                  <ExhibitionCard exhibition={exhibition} className="h-full" />
+                </li>
+              ))}
+            </ul>
+            <Pagination page={page} totalPages={upcomingPages} buildHref={(p) => buildHref(p, pastPage, "upcoming")} />
+          </>
         ) : (
           <div className="mt-6">
             <EmptyState>No upcoming exhibitions are listed at this venue yet.</EmptyState>
@@ -193,7 +234,7 @@ export default async function ExhibitionCentrePage({ params }) {
       </section>
 
       {past.length ? (
-        <section aria-labelledby="centre-past" className="mt-14">
+        <section id="past" aria-labelledby="centre-past" className="mt-14 scroll-mt-24">
           <h2 id="centre-past" className="flex items-center gap-2 text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl dark:text-gray-50">
             <History size={22} aria-hidden="true" className="text-gray-400" />
             Past exhibitions at {centre.name}
@@ -204,12 +245,13 @@ export default async function ExhibitionCentrePage({ params }) {
               : `${pastCount} ${pastCount === 1 ? "exhibition was" : "exhibitions were"} held here, most recent first.`}
           </p>
           <ul className="mt-6 grid list-none gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {past.map((exhibition) => (
+            {pastShown.map((exhibition) => (
               <li key={exhibition.id}>
                 <ExhibitionCard exhibition={exhibition} className="h-full" />
               </li>
             ))}
           </ul>
+          <Pagination page={pastPage} totalPages={pastPages} buildHref={(p) => buildHref(page, p, "past")} />
         </section>
       ) : null}
     </div>

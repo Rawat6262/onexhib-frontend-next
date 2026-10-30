@@ -16,6 +16,7 @@ import { getExhibitionsInPlace, resolvePlaceLinks } from "@/lib/locations";
 import { getSimilarUpcoming, resolveCategoryLink } from "@/lib/categories";
 import { getEditions } from "@/lib/editions";
 import { idFromSlug, isCanonicalSlug } from "@/lib/slug";
+import { shortTitle } from "@/lib/seo-title";
 import { formatDateRange, formatLocation, toIsoDate } from "@/lib/format";
 import { getCompaniesForExhibition, getExhibitionById } from "@/lib/public-api";
 import ExhibitionCard from "@/components/public/ExhibitionCard";
@@ -117,17 +118,25 @@ export async function generateMetadata({ params }) {
   // signal, whereas a short title that never mentions the city cannot rank for
   // it at all. Raising it further keeps adding cities but stops buying
   // relevance, so this is the ceiling rather than the maximum.
+  //
+  // A name that alone overruns the budget (one in ten; some pass 190
+  // characters, and Bing flags every one) is shortened by shortTitle, which
+  // drops edition counters and marketing tails but keeps the distinctive name
+  // and the year. The page's <h1> and description still carry the full name.
   const titleBudget = 70 - 10; // 10 = the " · OneXhib" the layout template appends
+  const titleName = shortTitle(exhibition.name, titleBudget);
   const placeForms = [
     place,
     formatLocation({ city: exhibition.city, country: exhibition.country }),
     exhibition.country || "",
     "",
   ];
-  const fitting = placeForms.find(
-    (p) => [exhibition.name, p].filter(Boolean).join(" — ").length <= titleBudget
-  );
-  const titleBits = [exhibition.name, fitting ?? ""].filter(Boolean).join(" — ");
+  // A name already cut mid-phrase takes no place after it: "...Digital… 2026 —
+  // China" reads as two broken titles.
+  const fitting = titleName.includes("…")
+    ? ""
+    : placeForms.find((p) => [titleName, p].filter(Boolean).join(" — ").length <= titleBudget);
+  const titleBits = [titleName, fitting ?? ""].filter(Boolean).join(" — ");
   // AN ENDED SHOW WITH A NEXT EDITION LEADS WITH IT. Someone searching the
   // name of a show that has passed nearly always wants the next one; the
   // snippet tells them it is listed before they click.

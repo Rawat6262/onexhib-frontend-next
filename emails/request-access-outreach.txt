@@ -1,0 +1,31 @@
+Hello,
+
+We are OneXhib, an online directory of trade exhibitions, organisers, exhibitors and exhibition service providers, based in Ludhiana, India.
+
+Your exhibition, {{exhibition_name}}, is listed on our website. Please take a look and make sure the dates, venue and other details are correct.
+
+View your exhibition page: {{listing_url}}
+
+To edit it yourself, use our Request access feature:
+
+1. Sign up or log in with the account type "Organiser". If your account is another type, change it under "Account type" in your account menu.
+2. Verify your email with the code we send you.
+3. Click "Request access" in your dashboard, search for {{exhibition_name}}, select it and tell us your role at the show.
+4. We approve and give you access. You get an email, and the exhibition appears under "Shared with you" in My exhibitions, ready to edit.
+
+- No cost: getting access and updating your listing is free of cost. There is no fee, no subscription and we never ask for payment details.
+- Your data: we use your details only to confirm your role and manage your listing. We do not sell your information or share it with third parties for marketing. Privacy Policy: https://onexhib.com/privacy-policy
+- Nothing changes without you: your listing stays as it is until you edit it. If something is wrong and you would like us to fix or remove it, reply to this email.
+
+Log in: https://onexhib.com/login?next=/organiser/request-access
+Sign up: https://onexhib.com/signup
+Website: https://onexhib.com
+
+Questions? Just reply to this email.
+
+Regards,
+Team OneXhib
+
+--
+OneXhib, Ludhiana, Punjab, India | hello@onexhib.com | https://onexhib.com
+You received this one-time email because {{exhibition_name}} is listed on OneXhib and your address is its public contact. To stop hearing from us: {{unsubscribe_url}}

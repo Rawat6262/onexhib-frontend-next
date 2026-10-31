@@ -127,6 +127,18 @@ export const addExhibitionLogos = (exhibitionId, kind, files) => {
 export const removeExhibitionLogo = (exhibitionId, kind, logoId) =>
   axios.delete(`/api/exhibition/${encodeURIComponent(exhibitionId)}/logos/${kind}/${encodeURIComponent(logoId)}`);
 
+// Companies that listed themselves at this show from the exhibitor workspace.
+// Each call answers { approvalRequired, items } - the panel's whole state.
+export const getSelfListedExhibitors = (exhibitionId) =>
+  axios.get(`/api/exhibition/${encodeURIComponent(exhibitionId)}/self-listed`);
+
+export const setExhibitorApproval = (exhibitionId, enabled) =>
+  axios.put(`/api/exhibition/${encodeURIComponent(exhibitionId)}/exhibitor-approval`, { enabled });
+
+/** status: "approved" | "declined" */
+export const setSelfListedStatus = (exhibitionId, companyId, status) =>
+  axios.put(`/api/exhibition/${encodeURIComponent(exhibitionId)}/self-listed/${encodeURIComponent(companyId)}`, { status });
+
 /**
  * Ask the site to rebuild one exhibition's public page now rather than after its
  * 5-minute cache. Fire-and-forget: a failure only means the change appears a

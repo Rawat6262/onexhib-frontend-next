@@ -31,6 +31,7 @@ import { getCompaniesForExhibition } from "@/models/company.model";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { ROLES } from "@/lib/auth";
 import TablePagination from "@/components/dashboard/TablePagination";
+import SelfListedExhibitors from "@/components/dashboard/SelfListedExhibitors";
 import { NoResults, PageHeader, Panel, StatCard, btnPrimary, btnSecondary } from "@/components/dashboard/ui";
 import { Badge, Monogram, SearchField, btnRow, fmtDate, tbody, td, th, thead, tr } from "@/components/admin/AdminUI";
 import { exhibitionPath } from "@/lib/routes";
@@ -329,6 +330,9 @@ export default function ExhibitionManageClient({ id }) {
           </>
         )}
       </Panel>
+
+      {/* Approving or declining changes who appears in the table above. */}
+      <SelfListedExhibitors exhibitionId={id} onChange={fetchCompany} />
 
       {showFormnew && <AddNewsModal onClose={() => setShowFormnew(false)} />}
       {showForm && <CompanyPopupForm Close={() => setShowForm(false)} data={id} onCompanyAdded={fetchCompany} />}

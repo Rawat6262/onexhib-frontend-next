@@ -6,6 +6,7 @@ import Breadcrumbs from "@/components/public/Breadcrumbs";
 import ExhibitionCard from "@/components/public/ExhibitionCard";
 import EmptyState from "@/components/public/EmptyState";
 import Pagination from "@/components/public/Pagination";
+import AroundVenue from "@/components/maps/AroundVenue";
 import CentresMap from "@/components/maps/CentresMap";
 import JsonLd from "@/components/seo/JsonLd";
 
@@ -203,6 +204,11 @@ export default async function ExhibitionCentrePage({ params, searchParams }) {
           ) : null}
         </div>
       </div>
+
+      {/* Loaded only when a visitor picks a category (each search is billed). */}
+      {hasLocation ? (
+        <AroundVenue venue={{ name: centre.name, lat: centre.lat, lng: centre.lng }} saved={centre.nearby} className="mt-14" />
+      ) : null}
 
       <section id="upcoming" aria-labelledby="centre-shows" className="mt-14 scroll-mt-24">
         <h2 id="centre-shows" className="flex items-center gap-2 text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl dark:text-gray-50">

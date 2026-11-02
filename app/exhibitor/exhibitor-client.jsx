@@ -135,11 +135,17 @@ export default function ExhibitorClient() {
             : "Create your company profile to appear on OneXhib, add your products, and show visitors where to find your stand."
         }
         actions={
-          company ? (
+          // The public page exists only once the company is listed at a show
+          // (isListedCompany in lib/public-api.js) - before that it would 404.
+          company && shows.some((sh) => sh.status === "approved") ? (
             <Link href={companyPath(company.company_name, company._id)} className={btnSecondary} target="_blank">
               <ExternalLink size={15} aria-hidden="true" />
               View public page
             </Link>
+          ) : company ? (
+            <p className="max-w-56 text-xs text-gray-500 dark:text-gray-400">
+              Your public page goes live once you are listed at an exhibition.
+            </p>
           ) : null
         }
       />

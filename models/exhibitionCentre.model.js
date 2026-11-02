@@ -54,6 +54,16 @@ export const refreshCentrePages = () => {
 export const unlinkCentreExhibitions = (id, exhibitionIds) =>
   axios.post(`/api/admin/exhibition-centres/${id}/unlink`, { exhibitionIds });
 
+/**
+ * Around the venue (OpenStreetMap places stored on the centre). Refresh runs
+ * in the background on the server and answers at once (202); remove takes one
+ * place out for good - later refreshes leave it out too.
+ */
+export const refreshCentreNearby = (id) => axios.post(`/api/admin/exhibition-centres/${id}/nearby/refresh`);
+
+export const removeCentreNearby = (id, category, osmId) =>
+  axios.delete(`/api/admin/exhibition-centres/${id}/nearby/${category}/${encodeURIComponent(osmId)}`);
+
 /*
  * ORGANISER side (/api/organiser/exhibition-centres). Lists every centre, each
  * with `mine`; create, and edit or delete only the ones this account added.

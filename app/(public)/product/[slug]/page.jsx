@@ -11,7 +11,7 @@ import { breadcrumbNode, graph, productNode } from "@/lib/jsonld";
 import { companyPath, exhibitionPath, productPath } from "@/lib/routes";
 import { idFromSlug, isCanonicalSlug } from "@/lib/slug";
 import { formatPrice, truncate } from "@/lib/format";
-import { getCompanyById, getExhibitionById, getProductById, getProductsForCompany } from "@/lib/public-api";
+import { getCompanyById, getExhibitionById, getProductById, getProductsForCompany, isListedCompany } from "@/lib/public-api";
 import ProductCard from "@/components/public/ProductCard";
 import EnquiryForm from "@/components/public/EnquiryForm";
 
@@ -36,7 +36,15 @@ async function load(slugParam) {
   const id = idFromSlug(slugParam);
   if (!id) return null;
   const product = await getProductById(id);
-  return product?.name ? product : null;
+  if (!product?.name) return null;
+  // A product of a company in no exhibition is not public either (see
+  // isListedCompany). Only a company that loads and fails the rule hides it - a
+  // missing company reference keeps the product, as before.
+  if (product.companyId) {
+    const company = await getCompanyById(product.companyId);
+    if (company && !isListedCompany(company)) return null;
+  }
+  return product;
 }
 
 export async function generateMetadata({ params }) {

@@ -14,7 +14,7 @@ import { idFromSlug, isCanonicalSlug } from "@/lib/slug";
 import { formatDateRange, formatLocation, toIsoDate, truncate } from "@/lib/format";
 import { cityLandingPath } from "@/lib/routes";
 import { resolvePlaceLinks } from "@/lib/locations";
-import { getCompanyById, getExhibitionById, getProductsForCompany } from "@/lib/public-api";
+import { getCompanyById, getExhibitionById, getProductsForCompany, isListedCompany } from "@/lib/public-api";
 import EnquiryForm from "@/components/public/EnquiryForm";
 
 /**
@@ -42,7 +42,8 @@ async function load(slugParam) {
   const id = idFromSlug(slugParam);
   if (!id) return null;
   const company = await getCompanyById(id);
-  return company?.name ? company : null;
+  // A company in no exhibition is not public (see isListedCompany): 404.
+  return company?.name && isListedCompany(company) ? company : null;
 }
 
 export async function generateMetadata({ params }) {

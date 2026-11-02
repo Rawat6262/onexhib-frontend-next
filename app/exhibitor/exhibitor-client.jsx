@@ -20,6 +20,7 @@ import {
 import { toast } from "sonner";
 
 import { PageHeader, Panel, StatCard, btnPrimary, btnSecondary, btnRow, btnRowDanger, inputBase } from "@/components/dashboard/ui";
+import { Badge } from "@/components/admin/AdminUI";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import ConfirmDialog from "@/components/social/ConfirmDialog";
 import {
@@ -79,9 +80,12 @@ export default function ExhibitorClient() {
   const company = ws?.company || null;
   const products = ws?.products || [];
   const shows = ws?.participations || [];
+  // A declined listing stays in the list (so it cannot be re-requested) but is
+  // not a show you are attending.
+  const attending = shows.filter((sh) => sh.status !== "declined");
 
   const today = new Date().toISOString().slice(0, 10);
-  const nextShow = shows
+  const nextShow = attending
     .filter((sh) => String(sh.endDate || sh.startDate || "").slice(0, 10) >= today)
     .sort((a, b) => String(a.startDate).localeCompare(String(b.startDate)))[0];
   // Share of the profile fields filled in - logo counts as one.
@@ -98,7 +102,7 @@ export default function ExhibitorClient() {
   const steps = [
     { label: "Company profile", done: Boolean(company), tab: "company" },
     { label: "Add products", done: products.length > 0, tab: "products" },
-    { label: "Exhibitions you attend", done: shows.length > 0, tab: "shows" },
+    { label: "Exhibitions you attend", done: attending.length > 0, tab: "shows" },
   ];
 
   if (phase === "loading") {
@@ -131,11 +135,17 @@ export default function ExhibitorClient() {
             : "Create your company profile to appear on OneXhib, add your products, and show visitors where to find your stand."
         }
         actions={
-          company ? (
+          // The public page exists only once the company is listed at a show
+          // (isListedCompany in lib/public-api.js) - before that it would 404.
+          company && shows.some((sh) => sh.status === "approved") ? (
             <Link href={companyPath(company.company_name, company._id)} className={btnSecondary} target="_blank">
               <ExternalLink size={15} aria-hidden="true" />
               View public page
             </Link>
+          ) : company ? (
+            <p className="max-w-56 text-xs text-gray-500 dark:text-gray-400">
+              Your public page goes live once you are listed at an exhibition.
+            </p>
           ) : null
         }
       />
@@ -170,7 +180,7 @@ export default function ExhibitorClient() {
       {company ? (
         <div className="mt-4 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
           <StatCard accent icon={<Package size={16} />} label="Products" value={products.length} />
-          <StatCard icon={<CalendarDays size={16} />} tone="sky" label="Exhibitions you attend" value={shows.length} />
+          <StatCard icon={<CalendarDays size={16} />} tone="sky" label="Exhibitions you attend" value={attending.length} />
           <StatCard
             icon={<MapPin size={16} />}
             tone="emerald"
@@ -746,7 +756,7 @@ function Shows({ shows, onChange }) {
   const [adding, setAdding] = useState(null); // exhibition being added
   const [stand, setStand] = useState({ hall_no: "", stall_no: "" });
   const [busy, setBusy] = useState(false);
-  const listed = useMemo(() => new Set(shows.map((s) => s.exhibitionId)), [shows]);
+  const listed = useMemo(() => new Map(shows.map((s) => [s.exhibitionId, s.status])), [shows]);
 
   /*
    * Upcoming exhibitions through the public search route. With nothing typed it
@@ -785,7 +795,8 @@ function Shows({ shows, onChange }) {
       const { data } = await saveParticipation(exhibitionId, values);
       onChange(data);
       refreshExhibitionPage(exhibitionId); // the show's exhibitor list includes you now
-      done?.();
+      const saved = (data?.participations || []).find((p) => p.exhibitionId === exhibitionId);
+      done?.(saved?.status);
     } catch (err) {
       toast.error(message(err, "That exhibition could not be saved."));
     } finally {
@@ -823,6 +834,7 @@ function Shows({ shows, onChange }) {
             <p className="mt-3 font-semibold text-gray-900 dark:text-white">No exhibitions listed yet</p>
             <p className="mx-auto mt-1 max-w-sm text-sm text-gray-600 dark:text-gray-400">
               Search for the shows you are attending. Your company then appears in that exhibition&rsquo;s exhibitor list, with your stand.
+              Some organisers approve exhibitors first.
             </p>
           </div>
         )}
@@ -860,6 +872,7 @@ function Shows({ shows, onChange }) {
               <li className="py-3 text-sm text-gray-500 dark:text-gray-400">No upcoming exhibitions match.</li>
             ) : null}
             {results.map((ex) => {
+              const listedStatus = listed.get(ex.id);
               const isListed = listed.has(ex.id);
               const open = adding?.id === ex.id;
               return (
@@ -869,9 +882,15 @@ function Shows({ shows, onChange }) {
                     {[formatDateRange(ex.startDate, ex.endDate), [ex.city, ex.country].filter(Boolean).join(", ")].filter(Boolean).join(" · ")}
                   </p>
                   {isListed ? (
-                    <p className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-                      <Check size={13} aria-hidden="true" /> Already listed
-                    </p>
+                    <div className="mt-2">
+                      {listedStatus === "approved" ? (
+                        <p className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                          <Check size={13} aria-hidden="true" /> Already listed
+                        </p>
+                      ) : (
+                        <StatusBadge status={listedStatus} />
+                      )}
+                    </div>
                   ) : open ? (
                     <div className="mt-3 space-y-2">
                       <div className="grid grid-cols-2 gap-2">
@@ -883,8 +902,12 @@ function Shows({ shows, onChange }) {
                           type="button"
                           disabled={busy}
                           onClick={() =>
-                            save(ex.id, stand, () => {
-                              toast.success(`Added ${ex.name}.`);
+                            save(ex.id, stand, (status) => {
+                              toast.success(
+                                status === "pending"
+                                  ? `Sent to the organiser of ${ex.name} for approval.`
+                                  : `Added ${ex.name}.`
+                              );
                               setAdding(null);
                               setStand({ hall_no: "", stall_no: "" });
                             })
@@ -915,12 +938,25 @@ function Shows({ shows, onChange }) {
   );
 }
 
+/**
+ * Pending: the show's organiser approves exhibitors first, and has not yet.
+ * Declined: they said no. Approved listings need no badge.
+ */
+function StatusBadge({ status }) {
+  if (status === "pending") return <Badge tone="amber">Waiting for organiser approval</Badge>;
+  if (status === "declined") return <Badge tone="rose">Declined by the organiser</Badge>;
+  return null;
+}
+
 function ShowRow({ show, busy, onSave, onRemove }) {
   const [hall, setHall] = useState(show.hall_no || "");
   const [stall, setStall] = useState(show.stall_no || "");
   const dirty = hall !== (show.hall_no || "") || stall !== (show.stall_no || "");
+  // A declined listing can be neither edited nor removed - the server refuses
+  // both, so that it cannot be removed and requested again.
+  const declined = show.status === "declined";
   return (
-    <li className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center">
+    <li className={`flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center ${declined ? "opacity-70" : ""}`}>
       <div className="min-w-0 flex-1">
         <Link href={exhibitionPath(show.name, show.exhibitionId)} target="_blank" className="font-semibold text-gray-900 hover:text-[#2B3FB8] dark:text-gray-100 dark:hover:text-blue-300">
           {show.name}
@@ -929,19 +965,26 @@ function ShowRow({ show, busy, onSave, onRemove }) {
           <MapPin size={12} aria-hidden="true" />
           {[formatDateRange(show.startDate, show.endDate), [show.city, show.country].filter(Boolean).join(", ")].filter(Boolean).join(" · ")}
         </p>
-      </div>
-      <div className="flex items-center gap-2">
-        <input aria-label={`Hall at ${show.name}`} placeholder="Hall" maxLength={40} value={hall} onChange={(e) => setHall(e.target.value)} className={`${inputBase} w-24`} />
-        <input aria-label={`Stall at ${show.name}`} placeholder="Stall" maxLength={40} value={stall} onChange={(e) => setStall(e.target.value)} className={`${inputBase} w-24`} />
-        {dirty ? (
-          <button type="button" disabled={busy} onClick={() => onSave({ hall_no: hall, stall_no: stall })} className={btnRow} aria-label="Save stand">
-            <Check size={14} aria-hidden="true" />
-          </button>
+        {show.status && show.status !== "approved" ? (
+          <div className="mt-1.5">
+            <StatusBadge status={show.status} />
+          </div>
         ) : null}
-        <button type="button" disabled={busy} onClick={onRemove} className={btnRowDanger} aria-label={`Remove ${show.name}`}>
-          <Trash2 size={14} aria-hidden="true" />
-        </button>
       </div>
+      {declined ? null : (
+        <div className="flex items-center gap-2">
+          <input aria-label={`Hall at ${show.name}`} placeholder="Hall" maxLength={40} value={hall} onChange={(e) => setHall(e.target.value)} className={`${inputBase} w-24`} />
+          <input aria-label={`Stall at ${show.name}`} placeholder="Stall" maxLength={40} value={stall} onChange={(e) => setStall(e.target.value)} className={`${inputBase} w-24`} />
+          {dirty ? (
+            <button type="button" disabled={busy} onClick={() => onSave({ hall_no: hall, stall_no: stall })} className={btnRow} aria-label="Save stand">
+              <Check size={14} aria-hidden="true" />
+            </button>
+          ) : null}
+          <button type="button" disabled={busy} onClick={onRemove} className={btnRowDanger} aria-label={`Remove ${show.name}`}>
+            <Trash2 size={14} aria-hidden="true" />
+          </button>
+        </div>
+      )}
     </li>
   );
 }

@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { toast } from "sonner";
-import { Building, ExternalLink, Globe, ImagePlus, Landmark, Link2Off, Loader2, Mail, MapPin, Pencil, Phone, Plane, Plus, Ruler, TrainFront, Trash2, X } from "lucide-react";
+import { Building, ExternalLink, Globe, ImagePlus, Landmark, Link2Off, Loader2, Mail, MapPin, Pencil, Phone, Plane, Plus, Ruler, TrainFront, Trash2, Utensils, X } from "lucide-react";
 
 import {
   createCentre,
@@ -23,6 +23,7 @@ import { exhibitionCentrePath } from "@/lib/routes";
 import TablePagination from "@/components/dashboard/TablePagination";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import CentreEditor from "@/components/exhibition-centres/CentreEditor";
+import NearbyManager from "@/components/exhibition-centres/NearbyManager";
 import {
   AdminHeader,
   AdminPage,
@@ -93,6 +94,8 @@ export default function AdminCentresClient() {
 
   // Editor
   const [editor, setEditor] = useState(null); // { mode: "create" | "edit", centre?, from? }
+  // Around-the-venue places of one centre
+  const [nearbyOf, setNearbyOf] = useState(null);
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -242,12 +245,13 @@ export default function AdminCentresClient() {
             </EmptyState>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[760px] text-sm">
+              <table className="w-full min-w-[860px] text-sm">
                 <thead className={thead}>
                   <tr>
                     <th className={th}>Centre</th>
                     <th className={th}>Location</th>
                     <th className={th}>Shows linked</th>
+                    <th className={th}>Nearby</th>
                     <th className={th}>Added</th>
                     <th className={`${th} text-right`}>Actions</th>
                   </tr>
@@ -279,6 +283,15 @@ export default function AdminCentresClient() {
                       <td className={td}>
                         <Badge tone={c.linkedCount ? "brand" : "gray"}>{c.linkedCount || 0}</Badge>
                       </td>
+                      <td className={td}>
+                        {c.nearby?.fetched_at ? (
+                          <Badge tone="emerald">
+                            {["airports", "hotels", "restaurants", "hospitals"].reduce((n, k) => n + (c.nearby[k]?.length || 0), 0)} places
+                          </Badge>
+                        ) : (
+                          <Badge tone="gray">Not fetched</Badge>
+                        )}
+                      </td>
                       <td className={`${td} whitespace-nowrap text-gray-600 dark:text-gray-400`}>{fmtDate(c.createdAt)}</td>
                       <td className={`${td} text-right`}>
                         <div className="flex justify-end gap-2">
@@ -287,6 +300,9 @@ export default function AdminCentresClient() {
                           </Link>
                           <button type="button" className={btnRow} onClick={() => setEditor({ mode: "edit", centre: c })}>
                             <Pencil size={14} aria-hidden="true" /> Edit
+                          </button>
+                          <button type="button" className={btnRow} onClick={() => setNearbyOf(c)} aria-label={`Places around ${c.name}`}>
+                            <Utensils size={14} aria-hidden="true" /> Nearby
                           </button>
                           <button type="button" className={btnRowDanger} onClick={() => remove(c)} aria-label={`Delete ${c.name}`}>
                             <Trash2 size={14} aria-hidden="true" />
@@ -374,6 +390,18 @@ export default function AdminCentresClient() {
       <Sheet open={Boolean(editor)} onOpenChange={(open) => !open && setEditor(null)}>
         <SheetContent side="right" className="w-full gap-0 overflow-y-auto p-0 sm:max-w-3xl">
           {editor ? <CentreEditor key={editor.centre?._id || editor.from?.venue || "new"} editor={editor} api={ADMIN_API} onSaved={onSaved} onCancel={() => setEditor(null)} /> : null}
+        </SheetContent>
+      </Sheet>
+
+      <Sheet open={Boolean(nearbyOf)} onOpenChange={(open) => !open && setNearbyOf(null)}>
+        <SheetContent side="right" className="w-full gap-0 overflow-y-auto p-0 sm:max-w-xl">
+          {nearbyOf ? (
+            <NearbyManager
+              key={nearbyOf._id}
+              centre={nearbyOf}
+              onChanged={(nearby) => setRows((list) => list?.map((r) => (r._id === nearbyOf._id ? { ...r, nearby } : r)))}
+            />
+          ) : null}
         </SheetContent>
       </Sheet>
     </AdminPage>

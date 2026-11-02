@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Landmark, MapPin, Navigation } from "lucide-react";
 
+import AroundVenue from "@/components/maps/AroundVenue";
 import CentresMap from "@/components/maps/CentresMap";
 import { directionsUrl } from "@/lib/google-maps";
 import { exhibitionCentrePath } from "@/lib/routes";
@@ -106,6 +107,12 @@ export default function VenueSection({ centre, exhibitionName, className = "" })
           </div>
         ) : null}
       </div>
+
+      {/* Hotels, restaurants, airports and hospitals near the centre - loaded
+          only when a visitor picks a category. */}
+      {hasMap ? (
+        <AroundVenue venue={{ name: centre.name, lat: centre.lat, lng: centre.lng }} saved={centre.nearby} className="mt-10" />
+      ) : null}
     </section>
   );
 }

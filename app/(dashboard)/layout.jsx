@@ -1,6 +1,6 @@
 "use client";
 
-import { Briefcase, CalendarDays, KeyRound, Landmark } from "lucide-react";
+import { Briefcase, CalendarDays, KeyRound, Landmark, UserCheck } from "lucide-react";
 import AppShell from "@/components/layout/AppShell";
 import RequireAuth from "@/components/auth/RequireAuth";
 import { useAuth } from "@/components/auth/AuthProvider";
@@ -31,10 +31,19 @@ const SERVICES = { label: "My services", href: "/services", icon: <Briefcase siz
 const CENTRES = { label: "Exhibition centres", href: "/organiser/exhibition-centres", icon: <Landmark size={16} /> };
 const ACCESS = { label: "Request access", href: "/organiser/request-access", icon: <KeyRound size={16} /> };
 
+/*
+ * Exhibitors who listed themselves at one of the user's shows and wait for
+ * approval. Everyone here can own shows, so everyone gets the tab.
+ */
+const REQUESTS = { label: "Exhibitor requests", href: "/organiser/exhibitor-requests", icon: <UserCheck size={16} /> };
+
 export default function DashboardLayout({ children }) {
   const { role } = useAuth();
   // A service provider's own list first, so the strip opens on their home.
-  const items = role === ROLES.EXHIBITION_SERVICE ? [SERVICES, EXHIBITIONS] : [EXHIBITIONS, CENTRES, ACCESS, SERVICES];
+  const items =
+    role === ROLES.EXHIBITION_SERVICE
+      ? [SERVICES, EXHIBITIONS, REQUESTS]
+      : [EXHIBITIONS, REQUESTS, CENTRES, ACCESS, SERVICES];
 
   return (
     <RequireAuth roles={[ROLES.ORGANISER, ROLES.EXHIBITION_SERVICE, ROLES.ADMIN]}>

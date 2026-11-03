@@ -6,24 +6,19 @@ import { toast } from "sonner";
 
 import { Panel, NoResults, btnRow, btnRowDanger } from "@/components/dashboard/ui";
 import { Badge, Monogram, fmtDate } from "@/components/admin/AdminUI";
-import {
-  getSelfListedExhibitors,
-  refreshExhibitionPage,
-  setExhibitorApproval,
-  setSelfListedStatus,
-} from "@/models/exhibition.model";
+import { getSelfListedExhibitors, refreshExhibitionPage, setSelfListedStatus } from "@/models/exhibition.model";
 import { confirmAction } from "@/lib/confirm";
 
 /**
  * Companies that listed themselves at this exhibition from the exhibitor
  * workspace ("I'm exhibiting here"), and the organiser's say over them.
  *
- * THE SETTING: with "Approve exhibitors first" off (the default) a company that
- * lists itself is public at once; with it on, it waits here as pending. Either
- * way the organiser can decline a listing, which hides it from the show's
- * exhibitor list - and can approve it again later. Declining deletes nothing:
- * the company belongs to its exhibitor. Backend rules live in
- * Onexhib_backend/Controller/exhibitorApproval.controller.js.
+ * Every such company waits here as pending until the organiser approves it;
+ * only then does it appear in the show's public exhibitor list. The organiser
+ * can decline a listing, which hides it - and can approve it again later.
+ * Declining deletes nothing: the company belongs to its exhibitor. The same
+ * requests across all of an organiser's shows are on /organiser/exhibitor-requests.
+ * Backend rules live in Onexhib_backend/Controller/exhibitorApproval.controller.js.
  *
  * Renders nothing when the caller cannot manage this show (the API answers 404),
  * so it is safe to mount on any manage page.
@@ -37,9 +32,9 @@ const STATUS = {
 const message = (err, fallback) => err?.response?.data?.message || fallback;
 
 export default function SelfListedExhibitors({ exhibitionId, onChange }) {
-  const [state, setState] = useState(null); // { approvalRequired, items }
+  const [state, setState] = useState(null); // { items }
   const [hidden, setHidden] = useState(false);
-  const [busy, setBusy] = useState(null); // "setting" or a companyId
+  const [busy, setBusy] = useState(null); // a companyId
 
   const load = useCallback(async () => {
     try {
@@ -47,7 +42,7 @@ export default function SelfListedExhibitors({ exhibitionId, onChange }) {
       setState(data);
     } catch (err) {
       if (err?.response?.status === 404) setHidden(true);
-      else setState({ approvalRequired: false, items: [], error: true });
+      else setState({ items: [], error: true });
     }
   }, [exhibitionId]);
 
@@ -62,20 +57,6 @@ export default function SelfListedExhibitors({ exhibitionId, onChange }) {
     setState(data);
     refreshExhibitionPage(exhibitionId);
     onChange?.();
-  };
-
-  const toggle = async () => {
-    const enabled = !state.approvalRequired;
-    setBusy("setting");
-    try {
-      const { data } = await setExhibitorApproval(exhibitionId, enabled);
-      setState(data);
-      toast.success(enabled ? "New exhibitors now wait for your approval." : "New exhibitors are now listed at once.");
-    } catch (err) {
-      toast.error(message(err, "The setting could not be changed."));
-    } finally {
-      setBusy(null);
-    }
   };
 
   const decide = async (item, status) => {
@@ -104,39 +85,12 @@ export default function SelfListedExhibitors({ exhibitionId, onChange }) {
 
   const items = state?.items || [];
   const pending = items.filter((i) => i.status === "pending").length;
-  const on = Boolean(state?.approvalRequired);
 
   return (
     <Panel
       title="Self-listed exhibitors"
       count={pending ? `${pending} waiting` : items.length}
-      description="Companies that added themselves to this show from their exhibitor workspace."
-      toolbar={
-        state ? (
-          <button
-            type="button"
-            role="switch"
-            aria-checked={on}
-            disabled={busy === "setting"}
-            onClick={toggle}
-            className="inline-flex items-center gap-2.5 rounded-xl px-1 py-1 text-sm font-medium text-gray-700 disabled:opacity-60 dark:text-gray-300"
-          >
-            <span
-              aria-hidden="true"
-              className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors motion-reduce:transition-none ${
-                on ? "bg-[#2B3FB8] dark:bg-blue-500" : "bg-gray-300 dark:bg-gray-700"
-              }`}
-            >
-              <span
-                className={`inline-block h-5 w-5 rounded-full bg-white shadow transition-transform motion-reduce:transition-none ${
-                  on ? "translate-x-5" : "translate-x-0.5"
-                }`}
-              />
-            </span>
-            Approve exhibitors first
-          </button>
-        ) : null
-      }
+      description="Companies that added themselves to this show from their exhibitor workspace. They appear on the show's page only after you approve them."
     >
       {!state ? (
         <div className="flex items-center gap-2 px-5 py-6 text-sm text-gray-500">
@@ -151,9 +105,7 @@ export default function SelfListedExhibitors({ exhibitionId, onChange }) {
         </NoResults>
       ) : items.length === 0 ? (
         <NoResults title="No self-listed exhibitors yet" icon={<UserCheck size={22} aria-hidden="true" />}>
-          {on
-            ? "When a company lists itself at this show, it will wait here for your approval."
-            : "Companies that list themselves at this show appear in the exhibitor list at once. Turn on “Approve exhibitors first” to check them before they do."}
+          When a company lists itself at this show, it will wait here for your approval.
         </NoResults>
       ) : (
         <ul className="list-none divide-y divide-gray-100 dark:divide-gray-800">

@@ -128,12 +128,13 @@ export const removeExhibitionLogo = (exhibitionId, kind, logoId) =>
   axios.delete(`/api/exhibition/${encodeURIComponent(exhibitionId)}/logos/${kind}/${encodeURIComponent(logoId)}`);
 
 // Companies that listed themselves at this show from the exhibitor workspace.
-// Each call answers { approvalRequired, items } - the panel's whole state.
+// Each call answers { items } - the panel's whole state.
 export const getSelfListedExhibitors = (exhibitionId) =>
   axios.get(`/api/exhibition/${encodeURIComponent(exhibitionId)}/self-listed`);
 
-export const setExhibitorApproval = (exhibitionId, enabled) =>
-  axios.put(`/api/exhibition/${encodeURIComponent(exhibitionId)}/exhibitor-approval`, { enabled });
+// Every pending "I'm exhibiting here" request across the caller's shows (an
+// admin: all shows), newest first: { items: [{ exhibition, companyId, ... }], total }.
+export const getExhibitorRequests = () => axios.get("/api/exhibitor-requests");
 
 /** status: "approved" | "declined" */
 export const setSelfListedStatus = (exhibitionId, companyId, status) =>

@@ -2,7 +2,7 @@
  * Integrity tests for the duplicate-exhibition redirect map.
  *
  * WHY THIS EXISTS AS A TEST RATHER THAN A ONE-OFF SCRIPT
- * The map has grown in six reviewed batches to 78 entries, and every batch has
+ * The map has grown in reviewed batches to over 300 entries, and every batch has
  * been validated by hand with an ad-hoc script that was then thrown away. The
  * failure modes are specific and silent: a chain (A -> B where B is itself
  * redirected) wastes the link equity the redirect exists to preserve, a loop

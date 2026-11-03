@@ -31,12 +31,14 @@ import { centreHasListings, getExhibitionCentre } from "@/lib/public-api";
  * PER_PAGE at a time, each on its own parameter (?page for upcoming, ?past for
  * past) so paging one leaves the other where it was. Paged views keep the
  * venue's canonical and are noindex; their links are still followed.
+ *
+ * Rendered on demand, not prerendered: a route that reads searchParams cannot
+ * be statically generated, and pairing it with generateStaticParams built a
+ * page that 500s on every request in production (DYNAMIC_SERVER_USAGE) while
+ * working fine in dev. The data underneath is still cached - every fetch in
+ * lib/public-api.js carries its own revalidate and the CENTRES_TAG.
  */
 export const revalidate = 3600;
-export const dynamicParams = true;
-export function generateStaticParams() {
-  return [];
-}
 
 const PER_PAGE = 12;
 

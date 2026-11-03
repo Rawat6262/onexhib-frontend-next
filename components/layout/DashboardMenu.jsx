@@ -16,6 +16,7 @@ import {
   ShieldCheck,
   Sparkles,
   Store,
+  UserCheck,
   UserRoundPen,
 } from "lucide-react";
 
@@ -36,6 +37,7 @@ import { ROLES, homeRouteForRole } from "@/lib/auth";
 const WORKSPACE = {
   [ROLES.ORGANISER]: [
     { href: "/organiser", label: "My exhibitions", hint: "Manage your shows", icon: CalendarDays },
+    { href: "/organiser/exhibitor-requests", label: "Exhibitor requests", hint: "Exhibitors waiting for approval", icon: UserCheck },
     { href: "/organiser/exhibition-centres", label: "Exhibition centres", hint: "Venues you added", icon: Landmark },
     { href: "/organiser/request-access", label: "Request access", hint: "Edit a show already listed", icon: KeyRound },
     { href: "/services", label: "My services", hint: "Your service listings", icon: Briefcase },
@@ -43,11 +45,13 @@ const WORKSPACE = {
   [ROLES.EXHIBITION_SERVICE]: [
     { href: "/services", label: "My services", hint: "Your service listings", icon: Briefcase },
     { href: "/organiser", label: "My exhibitions", hint: "Shows you listed", icon: CalendarDays },
+    { href: "/organiser/exhibitor-requests", label: "Exhibitor requests", hint: "Exhibitors waiting for approval", icon: UserCheck },
   ],
   [ROLES.ADMIN]: [
     { href: "/admin/dashboard", label: "Admin console", hint: "Everything on OneXhib", icon: ShieldCheck },
     { href: "/admin/exhibition-centres", label: "Exhibition centres", hint: "All venues", icon: Landmark },
     { href: "/admin/requests", label: "Access requests", hint: "Waiting for a decision", icon: KeyRound },
+    { href: "/organiser/exhibitor-requests", label: "Exhibitor requests", hint: "Exhibitors waiting for approval", icon: UserCheck },
     { href: "/organiser", label: "My exhibitions", hint: "Organiser view", icon: CalendarDays },
   ],
   [ROLES.EXHIBITOR]: [{ href: "/exhibitor", label: "Exhibitor workspace", hint: "Company, products, shows", icon: Store }],

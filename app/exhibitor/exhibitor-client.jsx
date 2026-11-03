@@ -833,8 +833,8 @@ function Shows({ shows, onChange }) {
             <CalendarDays size={28} aria-hidden="true" className="mx-auto text-gray-400" />
             <p className="mt-3 font-semibold text-gray-900 dark:text-white">No exhibitions listed yet</p>
             <p className="mx-auto mt-1 max-w-sm text-sm text-gray-600 dark:text-gray-400">
-              Search for the shows you are attending. Your company then appears in that exhibition&rsquo;s exhibitor list, with your stand.
-              Some organisers approve exhibitors first.
+              Search for the shows you are attending. Once the show&rsquo;s organiser approves you, your company appears in its
+              exhibitor list, with your stand.
             </p>
           </div>
         )}

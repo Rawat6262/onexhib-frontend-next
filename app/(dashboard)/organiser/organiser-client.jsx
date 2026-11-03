@@ -7,6 +7,7 @@ import {
   CalendarCheck,
   CalendarClock,
   CalendarDays,
+  ArrowRight,
   Eye,
   FileSpreadsheet,
   KeyRound,
@@ -15,10 +16,11 @@ import {
   Plus,
   Radio,
   Settings2,
+  UserCheck,
   UserRound,
 } from "lucide-react";
 
-import { getExhibitions, getMyExhibitionDetails, getSharedExhibitions } from "@/models/exhibition.model";
+import { getExhibitions, getExhibitorRequests, getMyExhibitionDetails, getSharedExhibitions } from "@/models/exhibition.model";
 import { useAuth } from "@/components/auth/AuthProvider";
 import TablePagination from "@/components/dashboard/TablePagination";
 import { PageHeader, Panel, StatCard, btnPrimary, btnSecondary, pill } from "@/components/dashboard/ui";
@@ -166,6 +168,15 @@ export default function OrganiserClient() {
     loadShared();
   }, [loadShared]);
 
+  // Exhibitors waiting for approval on any of these shows. A failure only
+  // hides the banner; the requests tab still has the list.
+  const [waiting, setWaiting] = useState(0);
+  useEffect(() => {
+    getExhibitorRequests()
+      .then(({ data }) => setWaiting(data?.total || 0))
+      .catch(() => setWaiting(0));
+  }, []);
+
   const pageRows = items || [];
   const firstName = user?.first_name || "";
   // Brand new: nothing listed at all (not merely nothing matching a filter).
@@ -198,6 +209,24 @@ export default function OrganiserClient() {
           </>
         }
       />
+
+      {waiting > 0 ? (
+        <Link
+          href="/organiser/exhibitor-requests"
+          className="mt-8 flex items-center gap-3 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-4 text-amber-900 transition hover:border-amber-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-100"
+        >
+          <UserCheck size={20} aria-hidden="true" className="shrink-0" />
+          <span className="min-w-0 flex-1 text-[15px]">
+            <strong className="font-semibold">
+              {waiting} {waiting === 1 ? "exhibitor is" : "exhibitors are"} waiting for your approval.
+            </strong>{" "}
+            They appear on your show&apos;s page only after you approve them.
+          </span>
+          <span className="inline-flex shrink-0 items-center gap-1 text-sm font-semibold">
+            Review <ArrowRight size={15} aria-hidden="true" />
+          </span>
+        </Link>
+      ) : null}
 
       {isNew ? (
         <Onboarding onAdd={() => setShowAdd(true)} onImport={() => setShowUpload(true)} />

@@ -89,7 +89,7 @@ export default function ProfilePosts({ userId, viewerId, isSelf }) {
         <button
           type="button"
           onClick={() => load(null)}
-          className="mt-3 rounded-xl border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:border-[#131C55] hover:text-[#131C55] dark:border-gray-700 dark:text-gray-300"
+          className="mt-3 rounded-xl border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:border-ox-navy hover:text-ox-navy dark:border-gray-700 dark:text-gray-300"
         >
           Try again
         </button>
@@ -132,7 +132,7 @@ export default function ProfilePosts({ userId, viewerId, isSelf }) {
             type="button"
             onClick={() => load(list.nextCursor)}
             disabled={loadingMore}
-            className="rounded-xl border border-gray-300 px-5 py-2.5 text-sm font-semibold text-gray-700 transition hover:border-[#131C55] hover:text-[#131C55] disabled:opacity-60 motion-reduce:transition-none dark:border-gray-700 dark:text-gray-300"
+            className="rounded-xl border border-gray-300 px-5 py-2.5 text-sm font-semibold text-gray-700 transition hover:border-ox-navy hover:text-ox-navy disabled:opacity-60 motion-reduce:transition-none dark:border-gray-700 dark:text-gray-300"
           >
             {loadingMore ? "Loading…" : "Load more"}
           </button>

@@ -120,7 +120,7 @@ export default function AppShell({ items = [], variant = "tabs", navTitle, wide 
                       // blocks stacked read as two competing navigations.
                       className={`flex items-center gap-2 border-b-2 px-3 py-2.5 text-sm font-medium transition motion-reduce:transition-none ${
                         active
-                          ? "border-[#131C55] text-[#131C55] dark:border-blue-300 dark:text-blue-300"
+                          ? "border-ox-navy text-ox-navy dark:border-blue-300 dark:text-blue-300"
                           : "border-transparent text-gray-600 hover:border-gray-300 hover:text-gray-900 dark:text-gray-400 dark:hover:border-gray-600 dark:hover:text-white"
                       }`}
                     >
@@ -213,9 +213,9 @@ function SideNav({ items, activeHref, title }) {
                   <Link
                     href={item.href}
                     aria-current={active ? "page" : undefined}
-                    className={`group flex items-center gap-3 rounded-xl px-2 py-2 text-sm font-medium transition motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#131C55]/40 dark:focus-visible:ring-blue-400/50 ${
+                    className={`group flex items-center gap-3 rounded-xl px-2 py-2 text-sm font-medium transition motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ox-navy/40 dark:focus-visible:ring-blue-400/50 ${
                       active
-                        ? "bg-[#131C55]/[0.06] text-[#131C55] dark:bg-blue-400/10 dark:text-blue-200"
+                        ? "bg-ox-navy/[0.06] text-ox-navy dark:bg-blue-400/10 dark:text-blue-200"
                         : "text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800/70 dark:hover:text-white"
                     }`}
                   >
@@ -223,7 +223,7 @@ function SideNav({ items, activeHref, title }) {
                       aria-hidden="true"
                       className={`grid h-8 w-8 shrink-0 place-items-center rounded-lg transition motion-reduce:transition-none ${
                         active
-                          ? "bg-[#131C55] text-white shadow-sm dark:bg-blue-500"
+                          ? "bg-ox-navy text-white shadow-sm dark:bg-blue-500"
                           : "bg-gray-100 text-gray-500 group-hover:bg-white group-hover:text-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:group-hover:bg-gray-700 dark:group-hover:text-gray-200"
                       }`}
                     >

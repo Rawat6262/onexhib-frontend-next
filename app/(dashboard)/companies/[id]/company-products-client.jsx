@@ -142,7 +142,7 @@ export default function CompanyProductsClient({ id }) {
       {c.createdBy ? (
         <Link
           href={`/exhibitions/${c.createdBy}`}
-          className="mb-5 inline-flex items-center gap-1.5 text-sm font-medium text-gray-600 transition hover:text-[#2B3FB8] dark:text-gray-400 dark:hover:text-blue-300"
+          className="mb-5 inline-flex items-center gap-1.5 text-sm font-medium text-gray-600 transition hover:text-ox-blue dark:text-gray-400 dark:hover:text-blue-300"
         >
           <ArrowLeft size={15} aria-hidden="true" />
           Back to the exhibition

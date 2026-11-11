@@ -125,7 +125,7 @@ export default async function CategoryLandingPage({ params, searchParams }) {
       <Breadcrumbs trail={trail} />
 
       <header className="max-w-3xl">
-        <p className="inline-flex items-center gap-1.5 rounded-full bg-[#131C55]/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#131C55] dark:bg-blue-400/10 dark:text-blue-300">
+        <p className="inline-flex items-center gap-1.5 rounded-full bg-ox-navy/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-ox-navy dark:bg-blue-400/10 dark:text-blue-300">
           <Tag size={12} aria-hidden="true" />
           Industry
         </p>
@@ -158,14 +158,14 @@ export default async function CategoryLandingPage({ params, searchParams }) {
         <div className="mt-5 flex flex-wrap gap-2 text-sm">
           <Link
             href={PUBLIC_ROUTES.categories}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-2 font-medium text-gray-700 transition hover:border-[#131C55]/40 hover:text-[#131C55] motion-reduce:transition-none dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-gray-600 dark:hover:text-white"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-2 font-medium text-gray-700 transition hover:border-ox-navy/40 hover:text-ox-navy motion-reduce:transition-none dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-gray-600 dark:hover:text-white"
           >
             <Tag size={14} aria-hidden="true" />
             All industries
           </Link>
           <Link
             href={PUBLIC_ROUTES.exhibitions}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-2 font-medium text-gray-700 transition hover:border-[#131C55]/40 hover:text-[#131C55] motion-reduce:transition-none dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-gray-600 dark:hover:text-white"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-2 font-medium text-gray-700 transition hover:border-ox-navy/40 hover:text-ox-navy motion-reduce:transition-none dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-gray-600 dark:hover:text-white"
           >
             <CalendarDays size={14} aria-hidden="true" />
             Upcoming exhibitions worldwide
@@ -236,4 +236,4 @@ export default async function CategoryLandingPage({ params, searchParams }) {
 }
 
 const chip =
-  "inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3.5 py-1.5 text-[13px] font-medium text-gray-600 transition hover:border-[#131C55]/40 hover:text-[#131C55] motion-reduce:transition-none dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:border-gray-600 dark:hover:text-white";
+  "inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3.5 py-1.5 text-[13px] font-medium text-gray-600 transition hover:border-ox-navy/40 hover:text-ox-navy motion-reduce:transition-none dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:border-gray-600 dark:hover:text-white";

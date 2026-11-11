@@ -160,7 +160,7 @@ export default function ExhibitorClient() {
               className={`flex w-full items-center gap-3 rounded-2xl border p-4 text-left transition motion-reduce:transition-none ${
                 s.done
                   ? "border-emerald-200 bg-emerald-50 dark:border-emerald-500/20 dark:bg-emerald-500/10"
-                  : "border-gray-200 bg-white hover:border-[#2B3FB8]/40 dark:border-gray-800 dark:bg-gray-900"
+                  : "border-gray-200 bg-white hover:border-ox-blue/40 dark:border-gray-800 dark:bg-gray-900"
               }`}
             >
               <span
@@ -216,7 +216,7 @@ export default function ExhibitorClient() {
               onClick={() => setTab(t.key)}
               className={`-mb-px inline-flex shrink-0 items-center gap-2 border-b-2 px-4 py-2.5 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-40 motion-reduce:transition-none ${
                 on
-                  ? "border-[#2B3FB8] text-[#2B3FB8] dark:border-blue-300 dark:text-blue-300"
+                  ? "border-ox-blue text-ox-blue dark:border-blue-300 dark:text-blue-300"
                   : "border-transparent text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
               }`}
             >
@@ -356,7 +356,7 @@ function CompanyForm({ company, onSaved }) {
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
-              className="group relative grid aspect-square w-full max-w-[220px] place-items-center overflow-hidden rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50 transition hover:border-[#2B3FB8] dark:border-gray-700 dark:bg-gray-800/50"
+              className="group relative grid aspect-square w-full max-w-[220px] place-items-center overflow-hidden rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50 transition hover:border-ox-blue dark:border-gray-700 dark:bg-gray-800/50"
             >
               {shownLogo ? (
                 <img src={shownLogo} alt="" className="h-full w-full object-contain p-3" />
@@ -401,7 +401,7 @@ function CompanyForm({ company, onSaved }) {
                       }}
                       className={`rounded-lg px-3.5 py-1.5 text-sm font-semibold transition motion-reduce:transition-none ${
                         abroad === o.key
-                          ? "bg-white text-[#131C55] shadow-sm dark:bg-gray-950 dark:text-white"
+                          ? "bg-white text-ox-navy shadow-sm dark:bg-gray-950 dark:text-white"
                           : "text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
                       }`}
                     >
@@ -567,7 +567,7 @@ function Products({ products, onChange }) {
                 )}
               </div>
               <div className="flex flex-1 flex-col p-4">
-                <p className="text-[11px] font-bold tracking-wide text-[#2B3FB8] uppercase dark:text-blue-300">{p.category}</p>
+                <p className="text-[11px] font-bold tracking-wide text-ox-blue uppercase dark:text-blue-300">{p.category}</p>
                 <p className="mt-1 font-semibold text-gray-900 dark:text-gray-50">{p.product_name}</p>
                 {formatPrice(p.price, p.unit) ? (
                   <p className="mt-1 text-sm font-semibold text-gray-700 dark:text-gray-300">{formatPrice(p.price, p.unit)}</p>
@@ -686,7 +686,7 @@ function ProductSheet({ product, onClose, onSaved }) {
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
-              className="group relative grid aspect-[4/3] w-full place-items-center overflow-hidden rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50 transition hover:border-[#2B3FB8] dark:border-gray-700 dark:bg-gray-800/50"
+              className="group relative grid aspect-[4/3] w-full place-items-center overflow-hidden rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50 transition hover:border-ox-blue dark:border-gray-700 dark:bg-gray-800/50"
             >
               {shown ? (
                 <img src={shown} alt="" className="h-full w-full object-cover" />
@@ -958,7 +958,7 @@ function ShowRow({ show, busy, onSave, onRemove }) {
   return (
     <li className={`flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center ${declined ? "opacity-70" : ""}`}>
       <div className="min-w-0 flex-1">
-        <Link href={exhibitionPath(show.name, show.exhibitionId)} target="_blank" className="font-semibold text-gray-900 hover:text-[#2B3FB8] dark:text-gray-100 dark:hover:text-blue-300">
+        <Link href={exhibitionPath(show.name, show.exhibitionId)} target="_blank" className="font-semibold text-gray-900 hover:text-ox-blue dark:text-gray-100 dark:hover:text-blue-300">
           {show.name}
         </Link>
         <p className="mt-0.5 flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">

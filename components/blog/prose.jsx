@@ -64,7 +64,7 @@ export const Quote = (props) => (
 /** Internal link. External hrefs get a new tab and rel, as the MDX map did. */
 export function A({ href = "", children, ...rest }) {
   const cls =
-    "font-semibold text-[#131C55] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:text-blue-300 dark:focus-visible:outline-blue-300";
+    "font-semibold text-ox-navy underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:text-blue-300 dark:focus-visible:outline-blue-300";
   if (href.startsWith("/")) {
     return (
       <Link href={href} className={cls} {...rest}>

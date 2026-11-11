@@ -30,7 +30,7 @@ const WRAP = "mx-auto w-full max-w-6xl px-4 sm:px-6";
 const DISPLAY = "font-semibold tracking-[-0.045em] text-gray-900 dark:text-white";
 const LEAD = "text-[clamp(19px,1.5vw,22px)] leading-snug text-gray-900 dark:text-gray-100";
 const TEXT_LINK =
-  "group inline-flex items-center gap-1.5 whitespace-nowrap text-[15px] font-semibold text-[#131C55] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#131C55] dark:text-blue-300";
+  "group inline-flex items-center gap-1.5 whitespace-nowrap text-[15px] font-semibold text-ox-navy underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ox-navy dark:text-blue-300";
 
 /** A poster or logo; gone (not a broken-image icon) when a hotlinked file fails. */
 function Poster({ image, sizes, alt = "" }) {
@@ -81,7 +81,7 @@ export function OpenNow({ thisWeek, ongoing, className = "" }) {
           <Link
             href={exhibitionPath(lead.name, lead.id)}
             aria-label={`Open this week: ${lead.name}`}
-            className="ox-reveal relative mt-8 ml-auto block w-[62vw] max-w-[420px] rotate-[3deg] bg-white p-2 shadow-sm transition-transform duration-200 hover:rotate-0 focus-visible:outline-2 focus-visible:outline-[#131C55] lg:absolute lg:top-[-2rem] lg:right-6 lg:mt-0 lg:w-[34vw] lg:rotate-[4deg] motion-reduce:transition-none dark:bg-gray-100"
+            className="ox-reveal relative mt-8 ml-auto block w-[62vw] max-w-[420px] rotate-[3deg] bg-white p-2 shadow-sm transition-transform duration-200 hover:rotate-0 focus-visible:outline-2 focus-visible:outline-ox-navy lg:absolute lg:top-[-2rem] lg:right-6 lg:mt-0 lg:w-[34vw] lg:rotate-[4deg] motion-reduce:transition-none dark:bg-gray-100"
           >
             <span className="relative block aspect-[4/3]">
               <Poster image={lead.image} alt={lead.name} sizes="(min-width: 1024px) 420px, 46vw" />
@@ -143,7 +143,7 @@ export function ComingUp({ upcoming, className = "" }) {
             key={e.id}
             href={exhibitionPath(e.name, e.id)}
             aria-label={e.name}
-            className={`absolute z-0 block bg-white p-2 shadow-sm transition-transform duration-200 hover:z-10 hover:rotate-0 focus-visible:outline-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:bg-gray-100 ${spots[i]}`}
+            className={`absolute z-0 block bg-white p-2 shadow-sm transition-transform duration-200 hover:z-10 hover:rotate-0 focus-visible:outline-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:bg-gray-100 ${spots[i]}`}
           >
             <span className="relative block aspect-[3/4]">
               <Poster image={e.image} alt={e.name} sizes="(min-width: 1024px) 300px, 36vw" />
@@ -258,7 +258,7 @@ export function HowItWorks({ className = "" }) {
               {s.action ? (
                 <Link
                   href={s.action.href}
-                  className="inline-flex h-12 items-center gap-2 rounded-xl bg-white px-6 text-[15px] font-semibold text-[#131C55] transition-transform active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white motion-reduce:transition-none"
+                  className="inline-flex h-12 items-center gap-2 rounded-xl bg-white px-6 text-[15px] font-semibold text-ox-navy transition-transform active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white motion-reduce:transition-none"
                 >
                   {s.action.label}
                   <ArrowRight size={18} aria-hidden="true" />

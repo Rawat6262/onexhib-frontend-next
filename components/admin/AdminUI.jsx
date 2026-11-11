@@ -30,7 +30,7 @@ export function AdminHeader({ title, description, actions, eyebrow = "Admin cons
   return (
     <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div className="min-w-0">
-        <p className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#2B3FB8] dark:text-blue-300">
+        <p className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-ox-blue dark:text-blue-300">
           <span aria-hidden="true" className="h-px w-6 bg-current opacity-60" />
           {eyebrow}
         </p>
@@ -52,7 +52,7 @@ export function StatGrid({ children, cols = 4 }) {
 }
 
 const TONES = {
-  brand: "bg-[#2B3FB8]/10 text-[#2B3FB8] dark:bg-blue-400/15 dark:text-blue-300",
+  brand: "bg-ox-blue/10 text-ox-blue dark:bg-blue-400/15 dark:text-blue-300",
   emerald: "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-400/15 dark:text-emerald-300",
   amber: "bg-amber-500/10 text-amber-600 dark:bg-amber-400/15 dark:text-amber-300",
   violet: "bg-violet-500/10 text-violet-600 dark:bg-violet-400/15 dark:text-violet-300",
@@ -97,7 +97,7 @@ export function StatCard({ icon, label, value, hint, tone = "brand", href, warn 
   return href ? (
     <Link
       href={href}
-      className={`${cls} transition hover:-translate-y-0.5 hover:border-[#2B3FB8]/40 hover:shadow-md hover:shadow-indigo-900/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2B3FB8] motion-reduce:transition-none motion-reduce:hover:translate-y-0 dark:hover:border-blue-400/40`}
+      className={`${cls} transition hover:-translate-y-0.5 hover:border-ox-blue/40 hover:shadow-md hover:shadow-indigo-900/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-blue motion-reduce:transition-none motion-reduce:hover:translate-y-0 dark:hover:border-blue-400/40`}
     >
       {body}
     </Link>
@@ -199,7 +199,7 @@ export function Monogram({ name = "", icon, size = "h-10 w-10" }) {
   return (
     <span
       aria-hidden="true"
-      className={`grid ${size} shrink-0 place-items-center rounded-xl bg-gradient-to-br from-[#131C55]/10 to-[#2B3FB8]/15 text-xs font-bold text-[#2B3FB8] ring-1 ring-gray-200 dark:from-blue-400/10 dark:to-indigo-400/15 dark:text-blue-300 dark:ring-gray-800`}
+      className={`grid ${size} shrink-0 place-items-center rounded-xl bg-gradient-to-br from-ox-navy/10 to-ox-blue/15 text-xs font-bold text-ox-blue ring-1 ring-gray-200 dark:from-blue-400/10 dark:to-indigo-400/15 dark:text-blue-300 dark:ring-gray-800`}
     >
       {icon || letters || "?"}
     </span>
@@ -210,7 +210,7 @@ export function Monogram({ name = "", icon, size = "h-10 w-10" }) {
 export function Badge({ children, tone = "gray", className = "" }) {
   const tones = {
     gray: "bg-gray-100 text-gray-600 ring-gray-500/15 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-600/30",
-    brand: "bg-[#2B3FB8]/10 text-[#2B3FB8] ring-[#2B3FB8]/20 dark:bg-blue-400/10 dark:text-blue-300 dark:ring-blue-400/25",
+    brand: "bg-ox-blue/10 text-ox-blue ring-ox-blue/20 dark:bg-blue-400/10 dark:text-blue-300 dark:ring-blue-400/25",
     emerald: "bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-400/10 dark:text-emerald-300 dark:ring-emerald-400/25",
     amber: "bg-amber-50 text-amber-800 ring-amber-600/25 dark:bg-amber-400/10 dark:text-amber-300 dark:ring-amber-400/25",
     violet: "bg-violet-50 text-violet-700 ring-violet-600/20 dark:bg-violet-400/10 dark:text-violet-300 dark:ring-violet-400/25",
@@ -227,7 +227,7 @@ export function Badge({ children, tone = "gray", className = "" }) {
 /* ── Class strings for the pieces pages render themselves ─────────────────── */
 
 export const adminInput =
-  "h-10 w-full rounded-xl border border-gray-300 bg-white px-3.5 text-sm text-gray-900 placeholder-gray-500 transition focus:border-[#2B3FB8] focus:outline-none focus:ring-4 focus:ring-[#2B3FB8]/15 motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-blue-400 dark:focus:ring-blue-400/20";
+  "h-10 w-full rounded-xl border border-gray-300 bg-white px-3.5 text-sm text-gray-900 placeholder-gray-500 transition focus:border-ox-blue focus:outline-none focus:ring-4 focus:ring-ox-blue/15 motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-blue-400 dark:focus:ring-blue-400/20";
 
 export const adminSelect = `${adminInput} pr-8`;
 
@@ -239,11 +239,11 @@ export const tr = "transition-colors hover:bg-gray-50/80 dark:hover:bg-white/[0.
 export const tbody = "divide-y divide-gray-100 dark:divide-gray-800";
 
 export const btnPrimary =
-  "inline-flex h-10 items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-gradient-to-r from-[#131C55] to-[#2B3FB8] px-4 text-sm font-semibold text-white shadow-md shadow-indigo-900/20 transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] disabled:opacity-60 motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500";
+  "inline-flex h-10 items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-gradient-to-r from-ox-navy to-ox-blue px-4 text-sm font-semibold text-white shadow-md shadow-indigo-900/20 transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy disabled:opacity-60 motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500";
 export const btnSecondary =
-  "inline-flex h-10 items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-gray-300 bg-white px-4 text-sm font-semibold text-gray-800 transition hover:border-[#2B3FB8] hover:text-[#2B3FB8] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2B3FB8] disabled:opacity-60 motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:hover:border-blue-400 dark:hover:text-blue-300";
+  "inline-flex h-10 items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-gray-300 bg-white px-4 text-sm font-semibold text-gray-800 transition hover:border-ox-blue hover:text-ox-blue focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-blue disabled:opacity-60 motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:hover:border-blue-400 dark:hover:text-blue-300";
 export const btnRow =
-  "inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-[13px] font-medium text-gray-700 transition hover:border-[#2B3FB8] hover:text-[#2B3FB8] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2B3FB8] disabled:opacity-60 motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-blue-400 dark:hover:text-white";
+  "inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-[13px] font-medium text-gray-700 transition hover:border-ox-blue hover:text-ox-blue focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-blue disabled:opacity-60 motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-blue-400 dark:hover:text-white";
 export const btnRowDanger =
   "inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-[13px] font-medium text-gray-700 transition hover:border-red-400 hover:text-red-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500 disabled:opacity-60 motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-red-500 dark:hover:text-red-400";
 

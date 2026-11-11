@@ -78,10 +78,10 @@ export default function MediaPicker({
     <div>
       <div className="flex flex-wrap items-center gap-3">
         <label
-          className={`inline-flex items-center gap-2 rounded-xl border border-gray-300 px-3 py-2 text-sm font-semibold transition focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[#131C55] motion-reduce:transition-none dark:border-gray-700 ${
+          className={`inline-flex items-center gap-2 rounded-xl border border-gray-300 px-3 py-2 text-sm font-semibold transition focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-ox-navy motion-reduce:transition-none dark:border-gray-700 ${
             disabled || slots === 0
               ? "cursor-not-allowed text-gray-400 dark:text-gray-600"
-              : "cursor-pointer text-gray-700 hover:border-[#131C55] hover:text-[#131C55] dark:text-gray-200"
+              : "cursor-pointer text-gray-700 hover:border-ox-navy hover:text-ox-navy dark:text-gray-200"
           }`}
         >
           <ImagePlus size={16} aria-hidden="true" />

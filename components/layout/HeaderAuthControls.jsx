@@ -54,13 +54,13 @@ function SignedOutLinks() {
     <>
       <Link
         href="/login"
-        className="hidden rounded-lg px-3 py-2 text-sm font-semibold text-gray-700 transition hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none sm:block dark:text-gray-300 dark:hover:text-white"
+        className="hidden rounded-lg px-3 py-2 text-sm font-semibold text-gray-700 transition hover:text-ox-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none sm:block dark:text-gray-300 dark:hover:text-white"
       >
         Login
       </Link>
       <Link
         href="/signup"
-        className="rounded-lg bg-[#131C55] px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-[#0E1B6B] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none sm:px-4"
+        className="whitespace-nowrap rounded-lg bg-ox-navy px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-ox-navy-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none sm:px-4"
       >
         Sign up
       </Link>
@@ -89,7 +89,7 @@ export function HeaderAuthMobileLinks() {
     <>
       <li aria-hidden="true" className="my-1 border-t border-gray-100 dark:border-gray-800" />
       <li>
-        <Link href={homeRouteForRole(role)} className={`${mobileLink} flex items-center gap-2 font-semibold text-[#131C55] dark:text-blue-300`}>
+        <Link href={homeRouteForRole(role)} className={`${mobileLink} flex items-center gap-2 font-semibold text-ox-navy dark:text-blue-300`}>
           <LayoutGrid size={15} aria-hidden="true" />
           Dashboard
         </Link>

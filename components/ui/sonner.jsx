@@ -54,7 +54,7 @@ const Toaster = (props) => {
             "[--ox-accent:#4f46e5] dark:[--ox-accent:#818cf8]",
             "group/toast pointer-events-auto relative flex w-full items-start gap-3 overflow-hidden",
             "rounded-2xl border border-gray-200/80 bg-white/95 py-3.5 pl-5 pr-10 font-sans",
-            "shadow-[0_18px_40px_-14px_rgba(19,28,85,0.35)] backdrop-blur-xl",
+            "shadow-[0_18px_40px_-14px_color-mix(in_oklab,var(--color-ox-navy)_35%,transparent)] backdrop-blur-xl",
             "dark:border-white/10 dark:bg-gray-900/90 dark:shadow-[0_18px_40px_-12px_rgba(0,0,0,0.7)]",
             // Accent strip on the left edge, and a soft glow of the same colour.
             "before:absolute before:inset-y-0 before:left-0 before:w-1 before:bg-[var(--ox-accent)]",
@@ -77,7 +77,7 @@ const Toaster = (props) => {
             "dark:hover:bg-white/10 dark:hover:text-white [&>svg]:h-3.5 [&>svg]:w-3.5",
           ].join(" "),
           actionButton: [
-            "mt-1 shrink-0 self-center rounded-lg bg-gradient-to-r from-[#131C55] to-[#2B3FB8] px-3 py-1.5",
+            "mt-1 shrink-0 self-center rounded-lg bg-gradient-to-r from-ox-navy to-ox-blue px-3 py-1.5",
             "text-xs font-semibold text-white shadow-sm transition hover:brightness-110 dark:from-blue-600 dark:to-indigo-500",
           ].join(" "),
           cancelButton: [

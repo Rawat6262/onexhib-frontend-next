@@ -104,7 +104,7 @@ export function ShowSpotlight({ items, skipId }) {
     <div className="grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
       <Link
         href={exhibitionPath(lead.name, lead.id)}
-        className="group relative isolate flex min-h-[26rem] flex-col justify-end overflow-hidden rounded-3xl bg-[#0B1240] text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55]"
+        className="group relative isolate flex min-h-[26rem] flex-col justify-end overflow-hidden rounded-3xl bg-ox-night text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy"
       >
         {lead.image?.url ? (
           <>
@@ -118,7 +118,7 @@ export function ShowSpotlight({ items, skipId }) {
             </div>
           </>
         ) : null}
-        <div aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-t from-[#0B1240] via-[#0B1240]/60 to-transparent" />
+        <div aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-t from-ox-night via-ox-night/60 to-transparent" />
         <div className="p-6 sm:p-7">
           {opens ? <LivePill className="bg-white/90 dark:bg-white/90 dark:text-emerald-800">{opens}</LivePill> : null}
           <p className="mt-3 text-xs font-bold tracking-wide text-indigo-200 uppercase">
@@ -145,7 +145,7 @@ export function ShowSpotlight({ items, skipId }) {
                 </span>
                 <ShowMedia image={e.image} name={e.name} sizes="56px" className="h-14 w-14 shrink-0 rounded-xl" />
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-[15px] font-semibold text-gray-900 group-hover:text-[#2B3FB8] dark:text-gray-100 dark:group-hover:text-blue-300">
+                  <span className="block truncate text-[15px] font-semibold text-gray-900 group-hover:text-ox-blue dark:text-gray-100 dark:group-hover:text-blue-300">
                     {e.name}
                   </span>
                   <span className="block truncate text-[13px] text-gray-500 dark:text-gray-400">
@@ -176,14 +176,14 @@ export function LiveBoard({ items }) {
           <li key={e.id}>
             <Link
               href={exhibitionPath(e.name, e.id)}
-              className="ox-card group flex h-full items-center gap-4 rounded-2xl border border-gray-200 bg-white p-2.5 hover:border-[#131C55]/30 hover:shadow-lg dark:border-gray-800 dark:bg-gray-900"
+              className="ox-card group flex h-full items-center gap-4 rounded-2xl border border-gray-200 bg-white p-2.5 hover:border-ox-navy/30 hover:shadow-lg dark:border-gray-800 dark:bg-gray-900"
             >
               <ShowMedia image={e.image} name={e.name} sizes="128px" className="h-[84px] w-[120px] shrink-0 rounded-xl sm:w-32" />
               <span className="min-w-0 flex-1 pr-1">
                 {e.category ? (
-                  <span className="block truncate text-[11px] font-bold tracking-wide text-[#2B3FB8] uppercase dark:text-blue-300">{e.category}</span>
+                  <span className="block truncate text-[11px] font-bold tracking-wide text-ox-blue uppercase dark:text-blue-300">{e.category}</span>
                 ) : null}
-                <span className="mt-0.5 block truncate text-[15px] font-semibold text-gray-900 group-hover:text-[#2B3FB8] dark:text-gray-50 dark:group-hover:text-blue-200">
+                <span className="mt-0.5 block truncate text-[15px] font-semibold text-gray-900 group-hover:text-ox-blue dark:text-gray-50 dark:group-hover:text-blue-200">
                   {e.name}
                 </span>
                 <span className="mt-0.5 flex items-center gap-1 truncate text-[13px] text-gray-500 dark:text-gray-400">
@@ -194,7 +194,7 @@ export function LiveBoard({ items }) {
                   <span className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
                     <span aria-hidden="true" className="h-1.5 min-w-24 flex-1 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
                       <span
-                        className={`block h-full rounded-full bg-gradient-to-r ${last ? "from-amber-400 to-red-500" : "from-[#2B3FB8] to-[#8B5CF6]"}`}
+                        className={`block h-full rounded-full bg-gradient-to-r ${last ? "from-amber-400 to-red-500" : "from-ox-blue to-ox-violet"}`}
                         style={{ width: `${Math.round((p.day / p.days) * 100)}%` }}
                       />
                     </span>

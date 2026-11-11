@@ -4,6 +4,7 @@ import { ArrowRight, Landmark, MapPin, Navigation } from "lucide-react";
 
 import AroundVenue from "@/components/maps/AroundVenue";
 import CentresMap from "@/components/maps/CentresMap";
+import StayNearby from "@/components/hotels/StayNearby";
 import { directionsUrl } from "@/lib/google-maps";
 import { exhibitionCentrePath } from "@/lib/routes";
 
@@ -14,8 +15,11 @@ import { exhibitionCentrePath } from "@/lib/routes";
  *
  * Rendered only for shows linked to a centre - an unlinked show has a typed
  * venue and no coordinates, and a map guessed from free text could be wrong.
+ *
+ * `hotels`: partner hotels near the centre (getNearbyHotels), shown as "Stay
+ * nearby" above the OpenStreetMap places.
  */
-export default function VenueSection({ centre, exhibitionName, className = "" }) {
+export default function VenueSection({ centre, exhibitionName, hotels = [], className = "" }) {
   if (!centre?.slug) return null;
   const path = exhibitionCentrePath(centre.slug);
   const place = [centre.city, centre.state, centre.country].filter(Boolean).join(", ");
@@ -24,14 +28,14 @@ export default function VenueSection({ centre, exhibitionName, className = "" })
   return (
     <section aria-labelledby="venue-heading" className={className}>
       <h2 id="venue-heading" className="flex items-center gap-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-        <Landmark size={22} aria-hidden="true" className="text-[#2B3FB8] dark:text-blue-300" />
+        <Landmark size={22} aria-hidden="true" className="text-ox-blue dark:text-blue-300" />
         Venue
       </h2>
 
       <div className="mt-5 grid overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] dark:border-gray-800 dark:bg-gray-900">
         {/* Details */}
         <div className="flex flex-col">
-          <div className="relative aspect-[16/8] bg-gradient-to-br from-[#131C55] via-[#1B2A7A] to-[#2B3FB8]">
+          <div className="relative aspect-[16/8] bg-gradient-to-br from-ox-navy via-ox-royal to-ox-blue">
             {centre.image ? (
               <Image
                 src={centre.image.url}
@@ -53,12 +57,12 @@ export default function VenueSection({ centre, exhibitionName, className = "" })
           <div className="flex flex-1 flex-col gap-4 p-5 sm:p-6">
             {centre.address ? (
               <p className="flex items-start gap-2.5 text-[15px] leading-relaxed text-gray-700 dark:text-gray-300">
-                <MapPin size={18} aria-hidden="true" className="mt-0.5 shrink-0 text-[#2B3FB8] dark:text-blue-300" />
+                <MapPin size={18} aria-hidden="true" className="mt-0.5 shrink-0 text-ox-blue dark:text-blue-300" />
                 <span>{centre.address}</span>
               </p>
             ) : place ? (
               <p className="flex items-start gap-2.5 text-[15px] text-gray-700 dark:text-gray-300">
-                <MapPin size={18} aria-hidden="true" className="mt-0.5 shrink-0 text-[#2B3FB8] dark:text-blue-300" />
+                <MapPin size={18} aria-hidden="true" className="mt-0.5 shrink-0 text-ox-blue dark:text-blue-300" />
                 <span>{place}</span>
               </p>
             ) : null}
@@ -74,14 +78,14 @@ export default function VenueSection({ centre, exhibitionName, className = "" })
                   href={directionsUrl({ lat: centre.lat, lng: centre.lng })}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-xl bg-[#131C55] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#0E1B6B] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none"
+                  className="inline-flex items-center gap-2 rounded-xl bg-ox-navy px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-ox-navy-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none"
                 >
                   <Navigation size={16} aria-hidden="true" /> Get directions
                 </a>
               ) : null}
               <Link
                 href={path}
-                className="group inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-900 transition hover:border-[#131C55] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
+                className="group inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-900 transition hover:border-ox-navy motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
               >
                 About this venue
                 <ArrowRight size={15} aria-hidden="true" className="transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none" />
@@ -107,6 +111,8 @@ export default function VenueSection({ centre, exhibitionName, className = "" })
           </div>
         ) : null}
       </div>
+
+      <StayNearby hotels={hotels} venueName={centre.name} className="mt-10" />
 
       {/* Hotels, restaurants, airports and hospitals near the centre - loaded
           only when a visitor picks a category. */}

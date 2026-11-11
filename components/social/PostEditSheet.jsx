@@ -223,7 +223,7 @@ export default function PostEditSheet({ open, onOpenChange, post, onPostChange }
                   type="button"
                   onClick={handleUpload}
                   disabled={busy}
-                  className="mt-3 inline-flex items-center justify-center rounded-xl border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:border-gray-700 dark:text-gray-200"
+                  className="mt-3 inline-flex items-center justify-center rounded-xl border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:border-gray-700 dark:text-gray-200"
                 >
                   {uploading ? "Uploading…" : `Upload ${newFiles.length} file${newFiles.length === 1 ? "" : "s"}`}
                 </button>
@@ -241,7 +241,7 @@ export default function PostEditSheet({ open, onOpenChange, post, onPostChange }
             <button
               type="submit"
               disabled={busy}
-              className="inline-flex items-center justify-center rounded-xl bg-[#131C55] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#0E1B6B] disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:bg-blue-500 dark:text-gray-950 dark:hover:bg-blue-400"
+              className="inline-flex items-center justify-center rounded-xl bg-ox-navy px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-ox-navy-deep disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:bg-blue-500 dark:text-gray-950 dark:hover:bg-blue-400"
             >
               {saving ? "Saving…" : "Save changes"}
             </button>
@@ -249,7 +249,7 @@ export default function PostEditSheet({ open, onOpenChange, post, onPostChange }
               type="button"
               onClick={() => onOpenChange(false)}
               disabled={busy}
-              className="inline-flex items-center justify-center rounded-xl border border-gray-300 px-5 py-2.5 text-sm font-semibold text-gray-700 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:border-gray-700 dark:text-gray-200"
+              className="inline-flex items-center justify-center rounded-xl border border-gray-300 px-5 py-2.5 text-sm font-semibold text-gray-700 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:border-gray-700 dark:text-gray-200"
             >
               Cancel
             </button>

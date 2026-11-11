@@ -31,7 +31,7 @@ export default function BlogHero({ stats, items = [] }) {
         className="pointer-events-none absolute inset-0 opacity-[0.6] dark:opacity-[0.25]"
         style={{
           backgroundImage:
-            "linear-gradient(to right, rgba(19,28,85,.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(19,28,85,.05) 1px, transparent 1px)",
+            "linear-gradient(to right, color-mix(in oklab, var(--color-ox-navy) 5%, transparent) 1px, transparent 1px), linear-gradient(to bottom, color-mix(in oklab, var(--color-ox-navy) 5%, transparent) 1px, transparent 1px)",
           backgroundSize: "28px 28px",
           maskImage: "radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 100%)",
           WebkitMaskImage: "radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 100%)",
@@ -40,8 +40,8 @@ export default function BlogHero({ stats, items = [] }) {
 
       <div className="relative mx-auto grid w-full max-w-6xl gap-10 px-4 py-14 sm:px-6 sm:py-16 lg:grid-cols-[1.15fr_1fr] lg:items-center lg:py-20">
         <div className="ox-reveal">
-          <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#131C55] dark:text-blue-300">
-            <span aria-hidden="true" className="inline-block h-1.5 w-1.5 rounded-full bg-[#131C55] dark:bg-blue-300" />
+          <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-ox-navy dark:text-blue-300">
+            <span aria-hidden="true" className="inline-block h-1.5 w-1.5 rounded-full bg-ox-navy dark:bg-blue-300" />
             OneXhib Insights
           </p>
 
@@ -76,7 +76,7 @@ export default function BlogHero({ stats, items = [] }) {
           <div aria-label="Exhibitions currently listed on OneXhib" className="relative hidden lg:block">
             <span
               aria-hidden="true"
-              className="pointer-events-none absolute -inset-8 rounded-[3rem] bg-gradient-to-br from-[#131C55]/[0.10] via-transparent to-transparent blur-2xl dark:from-blue-500/15"
+              className="pointer-events-none absolute -inset-8 rounded-[3rem] bg-gradient-to-br from-ox-navy/[0.10] via-transparent to-transparent blur-2xl dark:from-blue-500/15"
             />
             <ul className="relative grid grid-cols-5 grid-rows-6 gap-3 [&>li]:overflow-hidden [&>li]:rounded-2xl">
               <li className="col-span-3 row-span-4 shadow-lg">
@@ -108,7 +108,7 @@ function Tile({ item, priority = false, sizes }) {
   return (
     <Link
       href={exhibitionPath(item.name, item.id)}
-      className="group relative block h-full w-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:focus-visible:outline-blue-300"
+      className="group relative block h-full w-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:focus-visible:outline-blue-300"
     >
       <CardMedia
         image={item.image}

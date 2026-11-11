@@ -170,7 +170,7 @@ export default async function ServiceProviderPage({ params }) {
           <header className="mt-6">
             <Link
               href={serviceCategoryPath(categorySlug)}
-              className="inline-flex items-center gap-1.5 rounded-full bg-[#131C55]/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#131C55] transition hover:bg-[#131C55]/20 motion-reduce:transition-none dark:bg-blue-400/10 dark:text-blue-300"
+              className="inline-flex items-center gap-1.5 rounded-full bg-ox-navy/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-ox-navy transition hover:bg-ox-navy/20 motion-reduce:transition-none dark:bg-blue-400/10 dark:text-blue-300"
             >
               <Briefcase size={12} aria-hidden="true" />
               {categoryName}
@@ -247,7 +247,7 @@ export default async function ServiceProviderPage({ params }) {
                   <li key={sibling.provider.id}>
                     <Link
                       href={servicePath(sibling.provider.name, sibling.provider.id)}
-                      className="ox-card flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-3 transition hover:border-[#131C55]/40 hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:border-gray-800 dark:bg-gray-900 dark:hover:border-gray-600"
+                      className="ox-card flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-3 transition hover:border-ox-navy/40 hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:border-gray-800 dark:bg-gray-900 dark:hover:border-gray-600"
                     >
                       <span className="w-14 shrink-0 overflow-hidden rounded-lg">
                         <CardMedia
@@ -284,7 +284,7 @@ export default async function ServiceProviderPage({ params }) {
 
           <Link
             href={serviceCategoryPath(categorySlug)}
-            className="mt-4 inline-flex w-full items-center justify-center rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:border-[#131C55]/40 hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-gray-600 dark:hover:text-white"
+            className="mt-4 inline-flex w-full items-center justify-center rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:border-ox-navy/40 hover:text-ox-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-gray-600 dark:hover:text-white"
           >
             All {categoryName.toLowerCase()} providers
           </Link>

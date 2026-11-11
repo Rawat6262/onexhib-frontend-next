@@ -71,7 +71,7 @@ export default function CommentRow({
           {author ? (
             <Link
               href={`/social/profile/${encodeURIComponent(String(author._id))}`}
-              className="truncate text-sm font-semibold text-gray-900 hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:text-gray-50 dark:hover:text-blue-400"
+              className="truncate text-sm font-semibold text-gray-900 hover:text-ox-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:text-gray-50 dark:hover:text-blue-400"
             >
               {name}
             </Link>
@@ -115,7 +115,7 @@ export default function CommentRow({
                   <Link
                     key={String(u._id)}
                     href={`/social/profile/${encodeURIComponent(String(u._id))}`}
-                    className="rounded-full bg-gray-100 px-2 py-0.5 font-medium text-gray-700 hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:bg-gray-800 dark:text-gray-200"
+                    className="rounded-full bg-gray-100 px-2 py-0.5 font-medium text-gray-700 hover:text-ox-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:bg-gray-800 dark:text-gray-200"
                   >
                     {displayName(u)}
                   </Link>
@@ -198,7 +198,7 @@ function RowAction({ label, disabled, onClick, icon, text, destructive = false }
       className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold transition disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none ${
         destructive
           ? "text-red-600 hover:bg-red-50 focus-visible:outline-red-600 dark:text-red-400 dark:hover:bg-red-950/40"
-          : "text-gray-600 hover:bg-gray-100 focus-visible:outline-[#131C55] dark:text-gray-400 dark:hover:bg-gray-800"
+          : "text-gray-600 hover:bg-gray-100 focus-visible:outline-ox-navy dark:text-gray-400 dark:hover:bg-gray-800"
       }`}
     >
       {icon}
@@ -253,7 +253,7 @@ function EditForm({ comment, pending, error, onCancel, onSubmit }) {
         rows={3}
         aria-describedby={hintId}
         aria-invalid={over || undefined}
-        className="w-full resize-y rounded-xl border border-gray-300 bg-white px-3 py-2 text-[15px] text-gray-900 placeholder:text-gray-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] disabled:opacity-60 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
+        className="w-full resize-y rounded-xl border border-gray-300 bg-white px-3 py-2 text-[15px] text-gray-900 placeholder:text-gray-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy disabled:opacity-60 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
       />
 
       {/* The counter doubles as the error slot, so there is ONE id in
@@ -270,7 +270,7 @@ function EditForm({ comment, pending, error, onCancel, onSubmit }) {
         <button
           type="submit"
           disabled={pending || !valid || unchanged}
-          className="rounded-lg bg-[#131C55] px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-[#0E1B6B] disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:bg-blue-500 dark:text-gray-950 dark:hover:bg-blue-400"
+          className="rounded-lg bg-ox-navy px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-ox-navy-deep disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:bg-blue-500 dark:text-gray-950 dark:hover:bg-blue-400"
         >
           {pending ? "Saving…" : "Save"}
         </button>
@@ -278,7 +278,7 @@ function EditForm({ comment, pending, error, onCancel, onSubmit }) {
           type="button"
           onClick={onCancel}
           disabled={pending}
-          className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-semibold text-gray-700 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:border-gray-700 dark:text-gray-200"
+          className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-semibold text-gray-700 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:border-gray-700 dark:text-gray-200"
         >
           Cancel
         </button>

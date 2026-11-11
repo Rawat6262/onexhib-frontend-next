@@ -39,7 +39,7 @@ function CategoryChip({ children, onDark = false }) {
       className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide ${
         onDark
           ? "bg-white/15 text-white ring-1 ring-inset ring-white/25"
-          : "bg-[#131C55]/[0.06] text-[#131C55] ring-1 ring-inset ring-[#131C55]/10 dark:bg-blue-400/10 dark:text-blue-300 dark:ring-blue-400/20"
+          : "bg-ox-navy/[0.06] text-ox-navy ring-1 ring-inset ring-ox-navy/10 dark:bg-blue-400/10 dark:text-blue-300 dark:ring-blue-400/20"
       }`}
     >
       {children}
@@ -53,7 +53,7 @@ export function FeaturedPostCard({ post, data }) {
     <article className="ox-reveal">
       <Link
         href={blogPostPath(post.slug)}
-        className="group grid overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#131C55] lg:grid-cols-2 dark:border-gray-800 dark:bg-gray-900 dark:focus-visible:outline-blue-300"
+        className="group grid overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ox-navy lg:grid-cols-2 dark:border-gray-800 dark:bg-gray-900 dark:focus-visible:outline-blue-300"
       >
         <div className="relative order-first aspect-[16/10] w-full lg:order-last lg:aspect-auto lg:min-h-[22rem]">
           <PostCover kind={post.cover} data={data} />
@@ -77,7 +77,7 @@ export function FeaturedPostCard({ post, data }) {
 
           <Meta post={post} />
 
-          <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#131C55] dark:text-blue-300">
+          <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-ox-navy dark:text-blue-300">
             Read article
             <ArrowRight
               size={16}
@@ -97,7 +97,7 @@ export function PostCard({ post, data }) {
     <article className="ox-reveal h-full">
       <Link
         href={blogPostPath(post.slug)}
-        className="group flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white transition-all hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#131C55] motion-reduce:hover:translate-y-0 dark:border-gray-800 dark:bg-gray-900 dark:focus-visible:outline-blue-300"
+        className="group flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white transition-all hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ox-navy motion-reduce:hover:translate-y-0 dark:border-gray-800 dark:bg-gray-900 dark:focus-visible:outline-blue-300"
       >
         <div className="relative aspect-[16/10] w-full">
           <PostCover kind={post.cover} data={data} compact />
@@ -119,7 +119,7 @@ export function PostCard({ post, data }) {
             <ArrowRight
               size={16}
               aria-hidden="true"
-              className="shrink-0 text-[#131C55] transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none dark:text-blue-300"
+              className="shrink-0 text-ox-navy transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none dark:text-blue-300"
             />
           </div>
         </div>
@@ -134,7 +134,7 @@ export function PostRow({ post, data }) {
     <article className="h-full">
       <Link
         href={blogPostPath(post.slug)}
-        className="group flex h-full gap-4 rounded-2xl border border-gray-200 bg-white p-3 transition-colors hover:border-[#131C55]/30 hover:bg-gray-50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#131C55] dark:border-gray-800 dark:bg-gray-900 dark:hover:bg-gray-800/60 dark:focus-visible:outline-blue-300"
+        className="group flex h-full gap-4 rounded-2xl border border-gray-200 bg-white p-3 transition-colors hover:border-ox-navy/30 hover:bg-gray-50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ox-navy dark:border-gray-800 dark:bg-gray-900 dark:hover:bg-gray-800/60 dark:focus-visible:outline-blue-300"
       >
         <div className="relative hidden h-20 w-28 shrink-0 overflow-hidden rounded-xl sm:block">
           <PostCover kind={post.cover} data={data} compact />

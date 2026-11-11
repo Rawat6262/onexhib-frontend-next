@@ -262,7 +262,7 @@ export default function LocationExplorer({ data, directory = [], today }) {
           <Link
             href={showHref}
             aria-disabled={filtering && total === 0}
-            className={`inline-flex h-10 items-center justify-center gap-2 self-end rounded-xl bg-gradient-to-r from-[#131C55] to-[#2B3FB8] px-4 text-sm font-semibold text-white shadow-lg shadow-indigo-900/25 transition hover:brightness-110 motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500 ${
+            className={`inline-flex h-10 items-center justify-center gap-2 self-end rounded-xl bg-gradient-to-r from-ox-navy to-ox-blue px-4 text-sm font-semibold text-white shadow-lg shadow-indigo-900/25 transition hover:brightness-110 motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500 ${
               filtering && total === 0 ? "pointer-events-none opacity-50" : ""
             }`}
           >
@@ -289,7 +289,7 @@ export default function LocationExplorer({ data, directory = [], today }) {
           )}
         </p>
         {filtering ? (
-          <button type="button" onClick={reset} className="inline-flex items-center gap-1 text-sm font-semibold text-[#2B3FB8] hover:underline dark:text-blue-300">
+          <button type="button" onClick={reset} className="inline-flex items-center gap-1 text-sm font-semibold text-ox-blue hover:underline dark:text-blue-300">
             <X size={14} aria-hidden="true" />
             Reset filters
           </button>
@@ -306,7 +306,7 @@ export default function LocationExplorer({ data, directory = [], today }) {
                 <li key={`${c.level}|${c.country}|${c.state}|${c.city}`}>
                   <Link
                     href={c.href}
-                    className="ox-card ox-card-accent group flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white p-5 hover:border-[#2B3FB8]/30 hover:shadow-xl hover:shadow-indigo-900/10 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-blue-400/30"
+                    className="ox-card ox-card-accent group flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white p-5 hover:border-ox-blue/30 hover:shadow-xl hover:shadow-indigo-900/10 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-blue-400/30"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <span className="grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-md">
@@ -317,7 +317,7 @@ export default function LocationExplorer({ data, directory = [], today }) {
                         <span className="text-[11px] font-medium text-gray-500 dark:text-gray-400">upcoming</span>
                       </span>
                     </div>
-                    <h2 className="mt-4 truncate text-base font-semibold text-gray-900 transition group-hover:text-[#2B3FB8] motion-reduce:transition-none dark:text-gray-50 dark:group-hover:text-blue-200">
+                    <h2 className="mt-4 truncate text-base font-semibold text-gray-900 transition group-hover:text-ox-blue motion-reduce:transition-none dark:text-gray-50 dark:group-hover:text-blue-200">
                       <Highlight text={c.title} query={q} />
                     </h2>
                     <p className="mt-0.5 truncate text-[13px] text-gray-500 dark:text-gray-400">{c.sub}</p>
@@ -336,7 +336,7 @@ export default function LocationExplorer({ data, directory = [], today }) {
             <button
               type="button"
               onClick={reset}
-              className="mt-4 rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-800 hover:border-[#2B3FB8] hover:text-[#2B3FB8] dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200"
+              className="mt-4 rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-800 hover:border-ox-blue hover:text-ox-blue dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200"
             >
               Reset filters
             </button>
@@ -348,15 +348,15 @@ export default function LocationExplorer({ data, directory = [], today }) {
             <li key={c.slug}>
               <section
                 aria-labelledby={`country-${c.slug}`}
-                className="ox-card ox-card-accent group relative flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white p-5 hover:border-[#2B3FB8]/30 hover:shadow-xl hover:shadow-indigo-900/10 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-blue-400/30"
+                className="ox-card ox-card-accent group relative flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white p-5 hover:border-ox-blue/30 hover:shadow-xl hover:shadow-indigo-900/10 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-blue-400/30"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex min-w-0 items-center gap-3">
                     <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-gray-100 text-2xl dark:bg-gray-800" aria-hidden="true">
-                      {c.flag || <Globe2 size={20} className="text-[#2B3FB8] dark:text-blue-300" />}
+                      {c.flag || <Globe2 size={20} className="text-ox-blue dark:text-blue-300" />}
                     </span>
                     <h2 id={`country-${c.slug}`} className="min-w-0 truncate text-lg font-bold text-gray-900 dark:text-white">
-                      <Link href={countryLandingPath(c.slug)} className="underline-offset-4 hover:text-[#2B3FB8] hover:underline dark:hover:text-blue-300">
+                      <Link href={countryLandingPath(c.slug)} className="underline-offset-4 hover:text-ox-blue hover:underline dark:hover:text-blue-300">
                         <span className="sr-only">Exhibitions in </span>
                         {c.country}
                       </Link>
@@ -378,7 +378,7 @@ export default function LocationExplorer({ data, directory = [], today }) {
                       <li key={city.slug}>
                         <Link
                           href={cityLandingPath(city.countrySlug, city.slug)}
-                          className="inline-flex items-center gap-1 rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-medium text-gray-700 transition hover:border-[#2B3FB8]/40 hover:bg-white hover:text-[#2B3FB8] motion-reduce:transition-none dark:border-gray-800 dark:bg-gray-800/60 dark:text-gray-300 dark:hover:border-blue-400/40 dark:hover:bg-blue-400/10 dark:hover:text-white"
+                          className="inline-flex items-center gap-1 rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-medium text-gray-700 transition hover:border-ox-blue/40 hover:bg-white hover:text-ox-blue motion-reduce:transition-none dark:border-gray-800 dark:bg-gray-800/60 dark:text-gray-300 dark:hover:border-blue-400/40 dark:hover:bg-blue-400/10 dark:hover:text-white"
                         >
                           <span className="sr-only">Exhibitions in </span>
                           {city.city}
@@ -393,7 +393,7 @@ export default function LocationExplorer({ data, directory = [], today }) {
 
                 <Link
                   href={countryLandingPath(c.slug)}
-                  className="mt-4 inline-flex w-fit items-center gap-1 text-sm font-semibold text-[#2B3FB8] dark:text-blue-300"
+                  className="mt-4 inline-flex w-fit items-center gap-1 text-sm font-semibold text-ox-blue dark:text-blue-300"
                 >
                   All exhibitions in {c.country}
                   <ArrowRight size={15} aria-hidden="true" className="transition group-hover:translate-x-0.5 motion-reduce:transform-none" />
@@ -421,7 +421,7 @@ function FilterSelect({ id, icon: Icon, label, value, onChange, options, placeho
         id={id}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="h-10 w-full cursor-pointer rounded-xl border border-gray-300 bg-white px-3 text-sm text-gray-900 transition focus:border-[#2B3FB8] focus:ring-4 focus:ring-[#2B3FB8]/15 focus:outline-none motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
+        className="h-10 w-full cursor-pointer rounded-xl border border-gray-300 bg-white px-3 text-sm text-gray-900 transition focus:border-ox-blue focus:ring-4 focus:ring-ox-blue/15 focus:outline-none motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
       >
         <option value={-1}>{placeholder}</option>
         {list.map((o) => (

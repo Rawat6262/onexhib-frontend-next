@@ -87,7 +87,7 @@ export default async function LocationsHubPage() {
           {MIN_CITY} or more. Smaller locations can still be found from the{" "}
           <Link
             href={PUBLIC_ROUTES.exhibitions}
-            className="underline underline-offset-4 hover:text-[#131C55] dark:hover:text-white"
+            className="underline underline-offset-4 hover:text-ox-navy dark:hover:text-white"
           >
             full exhibitions listing
           </Link>

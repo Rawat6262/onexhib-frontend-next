@@ -192,7 +192,7 @@ export default function CentreEditor({ editor, api, onSaved, onCancel }) {
   return (
     <form onSubmit={save} className="flex min-h-full flex-col bg-gray-50 dark:bg-gray-950">
       {/* Header: what this is, where the data comes from */}
-      <SheetHeader className="relative overflow-hidden bg-gradient-to-br from-[#131C55] via-[#1B2A7A] to-[#2B3FB8] px-6 pb-6 pt-7 text-white">
+      <SheetHeader className="relative overflow-hidden bg-gradient-to-br from-ox-navy via-ox-royal to-ox-blue px-6 pb-6 pt-7 text-white">
         <div aria-hidden="true" className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-white/10 blur-2xl" />
         <div className="relative flex items-start gap-4">
           <span aria-hidden="true" className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-white/15 ring-1 ring-white/20">
@@ -310,11 +310,11 @@ export default function CentreEditor({ editor, api, onSaved, onCancel }) {
               onDrop={onDropPhoto}
               className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed px-6 py-8 text-center transition motion-reduce:transition-none ${
                 dragOver
-                  ? "border-[#2B3FB8] bg-[#2B3FB8]/5"
-                  : "border-gray-300 bg-gray-50 hover:border-[#2B3FB8]/60 dark:border-gray-700 dark:bg-gray-900"
+                  ? "border-ox-blue bg-ox-blue/5"
+                  : "border-gray-300 bg-gray-50 hover:border-ox-blue/60 dark:border-gray-700 dark:bg-gray-900"
               }`}
             >
-              <span aria-hidden="true" className="grid h-11 w-11 place-items-center rounded-full bg-[#2B3FB8]/10 text-[#2B3FB8] dark:bg-blue-400/15 dark:text-blue-300">
+              <span aria-hidden="true" className="grid h-11 w-11 place-items-center rounded-full bg-ox-blue/10 text-ox-blue dark:bg-blue-400/15 dark:text-blue-300">
                 <ImagePlus size={20} />
               </span>
               <span className="text-sm font-semibold text-gray-900 dark:text-white">Drop a photo here, or click to upload</span>
@@ -369,7 +369,7 @@ function EditorCard({ step, title, subtitle, aside, children }) {
     <section className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-5 dark:border-gray-800 dark:bg-gray-900">
       <div className="mb-4 flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
-          <span aria-hidden="true" className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[#131C55] text-xs font-bold text-white dark:bg-blue-500">
+          <span aria-hidden="true" className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-ox-navy text-xs font-bold text-white dark:bg-blue-500">
             {step}
           </span>
           <div>

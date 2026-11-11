@@ -211,8 +211,8 @@ export default function ServicesClient() {
                     }}
                     className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[13px] font-medium transition ${
                       active
-                        ? "border-[#2B3FB8] bg-[#2B3FB8] text-white dark:border-blue-400 dark:bg-blue-500"
-                        : "border-gray-200 bg-white text-gray-700 hover:border-[#2B3FB8]/50 hover:text-[#2B3FB8] dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:text-blue-300"
+                        ? "border-ox-blue bg-ox-blue text-white dark:border-blue-400 dark:bg-blue-500"
+                        : "border-gray-200 bg-white text-gray-700 hover:border-ox-blue/50 hover:text-ox-blue dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:text-blue-300"
                     }`}
                   >
                     {c.name}
@@ -439,13 +439,13 @@ function Onboarding({ onAdd, onImport }) {
     { n: 3, title: "Get contacted", text: "Exhibitors find you by category and city, and open your details to call you." },
   ];
   return (
-    <section className="mt-8 overflow-hidden rounded-3xl border border-gray-200 bg-gradient-to-br from-white to-[#2B3FB8]/[0.04] p-6 sm:p-8 dark:border-gray-800 dark:from-gray-900 dark:to-blue-400/[0.05]">
+    <section className="mt-8 overflow-hidden rounded-3xl border border-gray-200 bg-gradient-to-br from-white to-ox-blue/[0.04] p-6 sm:p-8 dark:border-gray-800 dark:from-gray-900 dark:to-blue-400/[0.05]">
       <h2 className="text-xl font-bold text-gray-900 dark:text-white">Get your services in front of exhibitors</h2>
       <p className="mt-1 text-[15px] text-gray-600 dark:text-gray-400">It takes a couple of minutes.</p>
       <ol className="mt-6 grid gap-4 sm:grid-cols-3">
         {steps.map((s) => (
           <li key={s.n} className="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
-            <span className="grid h-8 w-8 place-items-center rounded-full bg-[#131C55] text-sm font-bold text-white dark:bg-blue-500">{s.n}</span>
+            <span className="grid h-8 w-8 place-items-center rounded-full bg-ox-navy text-sm font-bold text-white dark:bg-blue-500">{s.n}</span>
             <p className="mt-3 font-semibold text-gray-900 dark:text-gray-100">{s.title}</p>
             <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">{s.text}</p>
           </li>

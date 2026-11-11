@@ -126,7 +126,7 @@ export default function LoginForm({ stats, nextPath = "" }) {
               type="checkbox"
               checked={rememberMe}
               onChange={() => setRememberMe((prev) => !prev)}
-              className="h-4 w-4 rounded border-gray-300 accent-[#131C55] dark:border-gray-600"
+              className="h-4 w-4 rounded border-gray-300 accent-ox-navy dark:border-gray-600"
             />
             Remember me
           </label>
@@ -149,11 +149,11 @@ export default function LoginForm({ stats, nextPath = "" }) {
       </div>
 
       <p className="text-center text-xs text-gray-400 dark:text-gray-500">
-        <Link href="/privacy-policy" className="hover:text-[#131C55] hover:underline dark:hover:text-gray-300">
+        <Link href="/privacy-policy" className="hover:text-ox-navy hover:underline dark:hover:text-gray-300">
           Privacy policy
         </Link>
         <span className="mx-2">·</span>
-        <Link href="/delete-account" className="hover:text-[#131C55] hover:underline dark:hover:text-gray-300">
+        <Link href="/delete-account" className="hover:text-ox-navy hover:underline dark:hover:text-gray-300">
           Delete account
         </Link>
       </p>

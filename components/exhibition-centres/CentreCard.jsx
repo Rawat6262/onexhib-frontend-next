@@ -18,12 +18,12 @@ export default function CentreCard({ centre: c }) {
   return (
     <Link
       href={exhibitionCentrePath(c.slug)}
-      className="ox-card group flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white hover:border-[#131C55]/30 hover:shadow-lg dark:border-gray-800 dark:bg-gray-900"
+      className="ox-card group flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white hover:border-ox-navy/30 hover:shadow-lg dark:border-gray-800 dark:bg-gray-900"
     >
       {/* Most venues have no photo yet: a shorter banner with the city keeps
           the grid from turning into a wall of identical blue blocks. */}
       <div
-        className={`relative bg-gradient-to-br from-[#131C55] to-[#2B3FB8] ${c.image ? "aspect-[16/9]" : "aspect-[16/6]"}`}
+        className={`relative bg-gradient-to-br from-ox-navy to-ox-blue ${c.image ? "aspect-[16/9]" : "aspect-[16/6]"}`}
       >
         {c.image ? (
           <Image
@@ -43,7 +43,7 @@ export default function CentreCard({ centre: c }) {
           </span>
         )}
         {c.upcomingCount ? (
-          <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/95 px-2.5 py-1 text-xs font-semibold text-[#131C55] shadow-sm">
+          <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/95 px-2.5 py-1 text-xs font-semibold text-ox-navy shadow-sm">
             <CalendarDays size={13} aria-hidden="true" />
             {c.upcomingCount} upcoming
           </span>
@@ -51,7 +51,7 @@ export default function CentreCard({ centre: c }) {
       </div>
 
       <div className="flex flex-1 flex-col gap-2 p-4">
-        <h3 className="line-clamp-2 text-base font-semibold leading-snug text-gray-900 group-hover:text-[#2B3FB8] dark:text-gray-50 dark:group-hover:text-blue-200">
+        <h3 className="line-clamp-2 text-base font-semibold leading-snug text-gray-900 group-hover:text-ox-blue dark:text-gray-50 dark:group-hover:text-blue-200">
           {c.name}
         </h3>
         {place ? (
@@ -80,7 +80,7 @@ export default function CentreCard({ centre: c }) {
           <span className="text-gray-500 dark:text-gray-400">
             {c.pastCount ? `${c.pastCount} past ${c.pastCount === 1 ? "show" : "shows"}` : " "}
           </span>
-          <span className="inline-flex items-center gap-1 font-semibold text-[#131C55] dark:text-blue-200">
+          <span className="inline-flex items-center gap-1 font-semibold text-ox-navy dark:text-blue-200">
             View venue
             <ArrowRight
             size={16}

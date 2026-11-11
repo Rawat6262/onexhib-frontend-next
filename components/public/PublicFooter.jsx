@@ -50,7 +50,7 @@ export default function PublicFooter({ locations }) {
           the bottom - texture, not decoration you notice. Inline: no requests. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -top-40 left-1/2 -z-10 h-80 w-[60rem] -translate-x-1/2 rounded-full bg-[#2B3FB8]/30 blur-3xl"
+        className="pointer-events-none absolute -top-40 left-1/2 -z-10 h-80 w-[60rem] -translate-x-1/2 rounded-full bg-ox-blue/30 blur-3xl"
       />
       <div
         aria-hidden="true"
@@ -98,7 +98,7 @@ export default function PublicFooter({ locations }) {
             <div className="mt-6 flex flex-wrap items-center gap-3">
               <Link
                 href="/contact"
-                className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-sm font-semibold text-[#131C55] shadow-lg shadow-black/20 transition hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white motion-reduce:transition-none"
+                className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-sm font-semibold text-ox-navy shadow-lg shadow-black/20 transition hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white motion-reduce:transition-none"
               >
                 <Mail size={15} aria-hidden="true" />
                 Contact us
@@ -191,7 +191,7 @@ export default function PublicFooter({ locations }) {
                 the document in every browser. */}
             <a
               href="#"
-              className="group inline-flex items-center gap-1.5 rounded-full bg-white/[0.06] px-3 py-1.5 font-medium text-white/70 ring-1 ring-white/10 transition hover:bg-white hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white motion-reduce:transition-none"
+              className="group inline-flex items-center gap-1.5 rounded-full bg-white/[0.06] px-3 py-1.5 font-medium text-white/70 ring-1 ring-white/10 transition hover:bg-white hover:text-ox-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white motion-reduce:transition-none"
             >
               <ArrowUp
                 size={13}

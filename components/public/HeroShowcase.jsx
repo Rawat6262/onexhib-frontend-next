@@ -32,19 +32,19 @@ export default function HeroShowcase({ items = [], total }) {
           Both decorative, both aria-hidden, neither costs a request. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -inset-6 rounded-[2.5rem] bg-gradient-to-br from-[#131C55]/[0.12] via-[#131C55]/[0.04] to-transparent blur-2xl dark:from-[#4C63D2]/20"
+        className="pointer-events-none absolute -inset-6 rounded-[2.5rem] bg-gradient-to-br from-ox-navy/[0.12] via-ox-navy/[0.04] to-transparent blur-2xl dark:from-[#4C63D2]/20"
       />
       <div
         aria-hidden="true"
         className="absolute inset-x-4 -bottom-3 top-6 rotate-[1.5deg] rounded-3xl border border-gray-200/80 bg-white/60 dark:border-gray-800 dark:bg-gray-900/50"
       />
 
-      <div className="relative rounded-3xl border border-gray-200 bg-white/90 p-5 shadow-xl shadow-[#131C55]/[0.08] backdrop-blur dark:border-gray-800 dark:bg-gray-900/90 dark:shadow-black/40">
+      <div className="relative rounded-3xl border border-gray-200 bg-white/90 p-5 shadow-xl shadow-ox-navy/[0.08] backdrop-blur dark:border-gray-800 dark:bg-gray-900/90 dark:shadow-black/40">
         <div className="flex items-center justify-between gap-3 px-1">
-          <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide text-[#131C55] dark:text-blue-300">
+          <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide text-ox-navy dark:text-blue-300">
             <span
               aria-hidden="true"
-              className="inline-block h-1.5 w-1.5 rounded-full bg-[#131C55] dark:bg-blue-300"
+              className="inline-block h-1.5 w-1.5 rounded-full bg-ox-navy dark:bg-blue-300"
             />
             Happening next
           </p>
@@ -66,7 +66,7 @@ export default function HeroShowcase({ items = [], total }) {
 
         <Link
           href={exhibitionsScopePath("upcoming")}
-          className="mt-3 flex items-center justify-center gap-1.5 rounded-xl bg-gray-50 px-4 py-2.5 text-[13px] font-semibold text-[#131C55] transition hover:bg-gray-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:bg-gray-800/60 dark:text-blue-200 dark:hover:bg-gray-800"
+          className="mt-3 flex items-center justify-center gap-1.5 rounded-xl bg-gray-50 px-4 py-2.5 text-[13px] font-semibold text-ox-navy transition hover:bg-gray-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:bg-gray-800/60 dark:text-blue-200 dark:hover:bg-gray-800"
         >
           See all upcoming exhibitions
           <ArrowRight size={14} aria-hidden="true" />

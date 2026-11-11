@@ -213,7 +213,7 @@ export default function OrganiserClient() {
       {waiting > 0 ? (
         <Link
           href="/organiser/exhibitor-requests"
-          className="mt-8 flex items-center gap-3 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-4 text-amber-900 transition hover:border-amber-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-100"
+          className="mt-8 flex items-center gap-3 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-4 text-amber-900 transition hover:border-amber-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-100"
         >
           <UserCheck size={20} aria-hidden="true" className="shrink-0" />
           <span className="min-w-0 flex-1 text-[15px]">
@@ -271,7 +271,7 @@ export default function OrganiserClient() {
                           setPage(1);
                         }}
                         className={`inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-1.5 text-[13px] font-semibold transition ${
-                          active ? "bg-white text-[#131C55] shadow-sm dark:bg-gray-900 dark:text-white" : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+                          active ? "bg-white text-ox-navy shadow-sm dark:bg-gray-900 dark:text-white" : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
                         }`}
                       >
                         {t.label}
@@ -450,13 +450,13 @@ function Onboarding({ onAdd, onImport }) {
     { n: 3, title: "Get found", text: "Your show appears in search, the calendar and its city and industry pages." },
   ];
   return (
-    <section className="mt-8 overflow-hidden rounded-3xl border border-gray-200 bg-gradient-to-br from-white to-[#2B3FB8]/[0.04] p-6 sm:p-8 dark:border-gray-800 dark:from-gray-900 dark:to-blue-400/[0.05]">
+    <section className="mt-8 overflow-hidden rounded-3xl border border-gray-200 bg-gradient-to-br from-white to-ox-blue/[0.04] p-6 sm:p-8 dark:border-gray-800 dark:from-gray-900 dark:to-blue-400/[0.05]">
       <h2 className="text-xl font-bold text-gray-900 dark:text-white">Let’s get your first exhibition online</h2>
       <p className="mt-1 text-[15px] text-gray-600 dark:text-gray-400">Three steps, a few minutes each.</p>
       <ol className="mt-6 grid gap-4 sm:grid-cols-3">
         {steps.map((s) => (
           <li key={s.n} className="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
-            <span className="grid h-8 w-8 place-items-center rounded-full bg-[#131C55] text-sm font-bold text-white dark:bg-blue-500">{s.n}</span>
+            <span className="grid h-8 w-8 place-items-center rounded-full bg-ox-navy text-sm font-bold text-white dark:bg-blue-500">{s.n}</span>
             <p className="mt-3 font-semibold text-gray-900 dark:text-gray-100">{s.title}</p>
             <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">{s.text}</p>
           </li>
@@ -474,7 +474,7 @@ function Onboarding({ onAdd, onImport }) {
       </div>
       <p className="mt-5 text-sm text-gray-600 dark:text-gray-400">
         Is your exhibition already on OneXhib?{" "}
-        <Link href="/organiser/request-access" className="font-semibold text-[#2B3FB8] underline-offset-4 hover:underline dark:text-blue-300">
+        <Link href="/organiser/request-access" className="font-semibold text-ox-blue underline-offset-4 hover:underline dark:text-blue-300">
           Request access to edit it
         </Link>{" "}
         instead of adding it again.
@@ -488,7 +488,7 @@ function SharedWithYou({ items, onEdit }) {
   return (
     <section aria-labelledby="shared-title" className="mt-10">
       <div className="flex items-start gap-3">
-        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#2B3FB8]/10 text-[#2B3FB8] dark:bg-blue-400/15 dark:text-blue-300">
+        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-ox-blue/10 text-ox-blue dark:bg-blue-400/15 dark:text-blue-300">
           <KeyRound size={17} aria-hidden="true" />
         </span>
         <div>
@@ -508,7 +508,7 @@ function SharedWithYou({ items, onEdit }) {
           return (
             <li
               key={item._id}
-              className="flex flex-col rounded-2xl border border-gray-200 bg-white p-4 shadow-sm shadow-gray-900/[0.03] transition hover:border-[#2B3FB8]/40 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-blue-400/40"
+              className="flex flex-col rounded-2xl border border-gray-200 bg-white p-4 shadow-sm shadow-gray-900/[0.03] transition hover:border-ox-blue/40 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-blue-400/40"
             >
               <div className="flex items-start justify-between gap-2">
                 <p className="font-semibold text-gray-900 dark:text-gray-100">{item.exhibition_name}</p>

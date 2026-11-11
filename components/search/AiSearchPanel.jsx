@@ -136,7 +136,7 @@ export default function AiSearchPanel() {
   if (!signedIn || state.phase === "signed-out") {
     return (
       <div className="rounded-2xl border border-gray-200 bg-white p-6 text-center dark:border-gray-800 dark:bg-gray-900">
-        <Sparkles size={22} aria-hidden="true" className="mx-auto text-[#131C55] dark:text-blue-300" />
+        <Sparkles size={22} aria-hidden="true" className="mx-auto text-ox-navy dark:text-blue-300" />
         <h2 className="mt-3 text-base font-semibold text-gray-900 dark:text-gray-50">
           Sign in to use AI search
         </h2>
@@ -146,7 +146,7 @@ export default function AiSearchPanel() {
         </p>
         <Link
           href="/login"
-          className="mt-4 inline-flex items-center justify-center rounded-xl bg-[#131C55] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#0E1B6B] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55]"
+          className="mt-4 inline-flex items-center justify-center rounded-xl bg-ox-navy px-5 py-2.5 text-sm font-semibold text-white hover:bg-ox-navy-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy"
         >
           Sign in
         </Link>
@@ -154,7 +154,7 @@ export default function AiSearchPanel() {
           Or{" "}
           <Link
             href="/exhibitions"
-            className="font-semibold text-[#131C55] underline-offset-4 hover:underline dark:text-blue-300"
+            className="font-semibold text-ox-navy underline-offset-4 hover:underline dark:text-blue-300"
           >
             browse all exhibitions
           </Link>{" "}
@@ -181,12 +181,12 @@ export default function AiSearchPanel() {
             maxLength={MAX_QUERY_LENGTH}
             placeholder="Technology exhibitions in Germany in November"
             autoComplete="off"
-            className="min-w-0 flex-1 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-[15px] text-gray-900 placeholder:text-gray-400 focus:border-[#131C55] focus:outline-none focus:ring-2 focus:ring-[#131C55]/20 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
+            className="min-w-0 flex-1 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-[15px] text-gray-900 placeholder:text-gray-400 focus:border-ox-navy focus:outline-none focus:ring-2 focus:ring-ox-navy/20 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
           />
           <button
             type="submit"
             disabled={loading || !query.trim()}
-            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#131C55] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#0E1B6B] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-ox-navy px-5 py-2.5 text-sm font-semibold text-white hover:bg-ox-navy-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Search size={16} aria-hidden="true" />
             {loading ? "Searching…" : "Search"}
@@ -200,7 +200,7 @@ export default function AiSearchPanel() {
               key={example}
               type="button"
               onClick={() => setQuery(example)}
-              className="rounded-full border border-gray-200 px-3 py-1 text-xs text-gray-600 hover:border-[#131C55] hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:border-gray-700 dark:text-gray-400 dark:hover:border-blue-300 dark:hover:text-blue-300"
+              className="rounded-full border border-gray-200 px-3 py-1 text-xs text-gray-600 hover:border-ox-navy hover:text-ox-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:border-gray-700 dark:text-gray-400 dark:hover:border-blue-300 dark:hover:text-blue-300"
             >
               {example}
             </button>
@@ -248,10 +248,10 @@ export default function AiSearchPanel() {
                       <Link
                         href={exhibitionPath(r.exhibition_name, r._id)}
                         onClick={() => trackAiSearchResultClick(i + 1)}
-                        className="ox-card flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-4 hover:border-[#131C55]/30 hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:border-gray-800 dark:bg-gray-900 dark:hover:border-gray-600"
+                        className="ox-card flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-4 hover:border-ox-navy/30 hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:border-gray-800 dark:bg-gray-900 dark:hover:border-gray-600"
                       >
                         {r.category ? (
-                          <span className="line-clamp-1 text-[11px] font-semibold uppercase tracking-wide text-[#131C55] dark:text-blue-300">
+                          <span className="line-clamp-1 text-[11px] font-semibold uppercase tracking-wide text-ox-navy dark:text-blue-300">
                             {r.category}
                           </span>
                         ) : null}
@@ -287,7 +287,7 @@ export default function AiSearchPanel() {
                 or an industry, or{" "}
                 <Link
                   href="/exhibitions"
-                  className="font-semibold text-[#131C55] underline-offset-4 hover:underline dark:text-blue-300"
+                  className="font-semibold text-ox-navy underline-offset-4 hover:underline dark:text-blue-300"
                 >
                   browse everything
                 </Link>

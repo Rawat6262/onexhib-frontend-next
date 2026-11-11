@@ -28,11 +28,11 @@ export default function CardMedia({
   // and `bg` is the field the letterboxing shows — navy is right behind a photo,
   // wrong behind a logo drawn for a white page.
   fit = "cover",
-  bg = "bg-[#131C55]",
+  bg = "bg-ox-navy",
 }) {
   return (
     <div
-      className={`relative ${aspect} w-full overflow-hidden ${image ? bg : "bg-[#131C55]"} ${className}`}
+      className={`relative ${aspect} w-full overflow-hidden ${image ? bg : "bg-ox-navy"} ${className}`}
     >
       {image ? (
         // CardImage swaps to the placeholder if the image fails to load (a dead or
@@ -80,7 +80,7 @@ function Placeholder({ label }) {
   return (
     <div
       aria-hidden="true"
-      className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#131C55] via-[#22308F] to-[#4B2E9E]"
+      className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-ox-navy via-[#22308F] to-ox-grape"
     >
       {/* Faint grid, drawn once as an inline SVG data URI - no network request. */}
       <div

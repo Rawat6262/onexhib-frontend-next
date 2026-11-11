@@ -198,14 +198,14 @@ export default async function CityLandingPage({ params, searchParams }) {
         <div className="mt-5 flex flex-wrap gap-2 text-sm">
           <Link
             href={countryLandingPath(facet.countrySlug)}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-2 font-medium text-gray-700 transition hover:border-[#131C55]/40 hover:text-[#131C55] motion-reduce:transition-none dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-gray-600 dark:hover:text-white"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-2 font-medium text-gray-700 transition hover:border-ox-navy/40 hover:text-ox-navy motion-reduce:transition-none dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-gray-600 dark:hover:text-white"
           >
             <MapPin size={14} aria-hidden="true" />
             All exhibitions in {facet.country}
           </Link>
           <Link
             href={PUBLIC_ROUTES.exhibitions}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-2 font-medium text-gray-700 transition hover:border-[#131C55]/40 hover:text-[#131C55] motion-reduce:transition-none dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-gray-600 dark:hover:text-white"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 py-2 font-medium text-gray-700 transition hover:border-ox-navy/40 hover:text-ox-navy motion-reduce:transition-none dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-gray-600 dark:hover:text-white"
           >
             <CalendarDays size={14} aria-hidden="true" />
             Upcoming exhibitions worldwide
@@ -276,7 +276,7 @@ export default async function CityLandingPage({ params, searchParams }) {
               <li key={c.slug}>
                 <Link
                   href={cityLandingPath(c.countrySlug, c.slug)}
-                  className="ox-card inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-800 hover:border-[#131C55]/40 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 dark:text-gray-200 dark:hover:border-gray-600"
+                  className="ox-card inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-800 hover:border-ox-navy/40 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 dark:text-gray-200 dark:hover:border-gray-600"
                 >
                   <MapPin size={15} className="text-gray-400" aria-hidden="true" />
                   Exhibitions in {c.city}

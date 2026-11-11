@@ -39,7 +39,7 @@ export default function ServiceProviderCard({
   return (
     <Link
       href={servicePath(name, provider.id)}
-      className="ox-card flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white transition hover:border-[#131C55]/40 hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:border-gray-800 dark:bg-gray-900 dark:hover:border-gray-600"
+      className="ox-card flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white transition hover:border-ox-navy/40 hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:border-gray-800 dark:bg-gray-900 dark:hover:border-gray-600"
     >
       <CardMedia
         image={provider.image}
@@ -91,7 +91,7 @@ export default function ServiceProviderCard({
           a public page.
         */}
         {showSpeciality && provider.subcategory ? (
-          <p className="mt-1 line-clamp-1 text-xs font-medium text-[#131C55] dark:text-blue-300">
+          <p className="mt-1 line-clamp-1 text-xs font-medium text-ox-navy dark:text-blue-300">
             {provider.subcategory}
           </p>
         ) : null}

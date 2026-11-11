@@ -175,7 +175,7 @@ export default function ProfileClient({ userId }) {
           <button
             type="button"
             onClick={load}
-            className="mt-3 rounded-xl border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:border-[#131C55] hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:border-gray-700 dark:text-gray-300"
+            className="mt-3 rounded-xl border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:border-ox-navy hover:text-ox-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:border-gray-700 dark:text-gray-300"
           >
             Try again
           </button>
@@ -231,7 +231,7 @@ export default function ProfileClient({ userId }) {
             onClick={() => setTab(t.key)}
             className={`-mb-px border-b-2 px-3 py-2.5 text-sm font-medium transition motion-reduce:transition-none ${
               tab === t.key
-                ? "border-[#2B3FB8] font-semibold text-[#2B3FB8] dark:border-blue-300 dark:text-blue-300"
+                ? "border-ox-blue font-semibold text-ox-blue dark:border-blue-300 dark:text-blue-300"
                 : "border-transparent text-gray-600 hover:border-gray-300 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
             }`}
           >

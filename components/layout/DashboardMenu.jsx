@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import {
   ArrowRight,
+  BedDouble,
   Bookmark,
   Briefcase,
   CalendarClock,
@@ -51,10 +52,12 @@ const WORKSPACE = {
     { href: "/admin/dashboard", label: "Admin console", hint: "Everything on OneXhib", icon: ShieldCheck },
     { href: "/admin/exhibition-centres", label: "Exhibition centres", hint: "All venues", icon: Landmark },
     { href: "/admin/requests", label: "Access requests", hint: "Waiting for a decision", icon: KeyRound },
+    { href: "/admin/hotels", label: "Hotels", hint: "Listings waiting for review", icon: BedDouble },
     { href: "/organiser/exhibitor-requests", label: "Exhibitor requests", hint: "Exhibitors waiting for approval", icon: UserCheck },
     { href: "/organiser", label: "My exhibitions", hint: "Organiser view", icon: CalendarDays },
   ],
   [ROLES.EXHIBITOR]: [{ href: "/exhibitor", label: "Exhibitor workspace", hint: "Company, products, shows", icon: Store }],
+  [ROLES.HOTEL]: [{ href: "/hotel", label: "My hotels", hint: "Listings and review status", icon: BedDouble }],
   [ROLES.VISITOR]: [{ href: "/welcome", label: "Get started", hint: "Choose what you do on OneXhib", icon: Sparkles }],
 };
 
@@ -70,6 +73,7 @@ const ROLE_LABEL = {
   [ROLES.ADMIN]: "Admin",
   [ROLES.EXHIBITOR]: "Exhibitor",
   [ROLES.VISITOR]: "Visitor",
+  [ROLES.HOTEL]: "Hotel",
 };
 
 export default function DashboardMenu() {
@@ -117,8 +121,8 @@ export default function DashboardMenu() {
         aria-expanded={open}
         aria-haspopup="menu"
         onClick={() => setOpen((v) => !v)}
-        className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm font-semibold text-white shadow-sm transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none sm:px-3 ${
-          open ? "bg-[#0E1B6B]" : "bg-[#131C55] hover:bg-[#0E1B6B]"
+        className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm font-semibold text-white shadow-sm transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none sm:px-3 ${
+          open ? "bg-ox-navy-deep" : "bg-ox-navy hover:bg-ox-navy-deep"
         } dark:bg-blue-500 dark:hover:bg-blue-400`}
       >
         <LayoutGrid size={15} aria-hidden="true" />
@@ -129,13 +133,13 @@ export default function DashboardMenu() {
       {open ? (
         <div
           role="menu"
-          className="ox-menu-in absolute right-0 top-full z-50 mt-2 w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl shadow-[#131C55]/10 dark:border-gray-800 dark:bg-gray-900 dark:shadow-black/40"
+          className="ox-menu-in absolute right-0 top-full z-50 mt-2 w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl shadow-ox-navy/10 dark:border-gray-800 dark:bg-gray-900 dark:shadow-black/40"
         >
           {/* Who and where to: the account, its role, and its home. */}
           <Link
             href={home}
             role="menuitem"
-            className="group relative flex items-center gap-3 overflow-hidden bg-gradient-to-br from-[#131C55] via-[#1B2A7A] to-[#2B3FB8] px-4 py-4 text-white"
+            className="group relative flex items-center gap-3 overflow-hidden bg-gradient-to-br from-ox-navy via-ox-royal to-ox-blue px-4 py-4 text-white"
           >
             <span aria-hidden="true" className="pointer-events-none absolute -right-10 -top-12 h-32 w-32 rounded-full bg-blue-400/30 blur-2xl" />
             <span aria-hidden="true" className="relative grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white/15 text-sm font-bold ring-1 ring-white/25">
@@ -148,7 +152,7 @@ export default function DashboardMenu() {
             <ArrowRight size={16} aria-hidden="true" className="relative transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none" />
           </Link>
 
-          <p className="px-4 pb-1 pt-3 text-[11px] font-bold uppercase tracking-[0.16em] text-[#2B3FB8] dark:text-blue-300">Workspace</p>
+          <p className="px-4 pb-1 pt-3 text-[11px] font-bold uppercase tracking-[0.16em] text-ox-blue dark:text-blue-300">Workspace</p>
           <ul className="list-none px-2 pb-2">
             {items.map((item) => {
               const here = pathname === item.href;
@@ -159,10 +163,10 @@ export default function DashboardMenu() {
                     role="menuitem"
                     aria-current={here ? "page" : undefined}
                     className={`group flex items-center gap-3 rounded-xl px-2 py-2 transition motion-reduce:transition-none ${
-                      here ? "bg-[#2B3FB8]/[0.08] dark:bg-white/[0.06]" : "hover:bg-[#2B3FB8]/[0.06] dark:hover:bg-white/[0.05]"
+                      here ? "bg-ox-blue/[0.08] dark:bg-white/[0.06]" : "hover:bg-ox-blue/[0.06] dark:hover:bg-white/[0.05]"
                     }`}
                   >
-                    <span aria-hidden="true" className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#2B3FB8]/10 text-[#2B3FB8] transition group-hover:bg-[#2B3FB8] group-hover:text-white motion-reduce:transition-none dark:bg-blue-400/15 dark:text-blue-300">
+                    <span aria-hidden="true" className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-ox-blue/10 text-ox-blue transition group-hover:bg-ox-blue group-hover:text-white motion-reduce:transition-none dark:bg-blue-400/15 dark:text-blue-300">
                       <item.icon size={17} />
                     </span>
                     <span className="min-w-0">
@@ -181,7 +185,7 @@ export default function DashboardMenu() {
                 key={item.href}
                 href={item.href}
                 role="menuitem"
-                className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-[12.5px] font-medium text-gray-700 transition hover:bg-white hover:text-[#131C55] dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white"
+                className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-[12.5px] font-medium text-gray-700 transition hover:bg-white hover:text-ox-navy dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white"
               >
                 <item.icon size={14} aria-hidden="true" className="text-gray-400" />
                 {item.label}

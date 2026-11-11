@@ -212,15 +212,15 @@ export default function AdminServicesClient() {
                       onClick={() => apply(() => setCategory(active ? "" : c.name))}
                       aria-pressed={active}
                       className={`group grid w-full grid-cols-[minmax(0,11rem)_1fr_auto] items-center gap-3 rounded-lg px-1.5 py-1 text-left text-[13px] transition sm:grid-cols-[minmax(0,14rem)_1fr_auto] ${
-                        active ? "bg-[#2B3FB8]/10 dark:bg-blue-400/15" : "hover:bg-gray-50 dark:hover:bg-white/[0.03]"
+                        active ? "bg-ox-blue/10 dark:bg-blue-400/15" : "hover:bg-gray-50 dark:hover:bg-white/[0.03]"
                       }`}
                     >
-                      <span className={`truncate ${active ? "font-semibold text-[#2B3FB8] dark:text-blue-300" : "text-gray-700 dark:text-gray-300"}`}>
+                      <span className={`truncate ${active ? "font-semibold text-ox-blue dark:text-blue-300" : "text-gray-700 dark:text-gray-300"}`}>
                         {c.name}
                       </span>
                       <span className="h-2 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
                         <span
-                          className="block h-full rounded-full bg-gradient-to-r from-[#131C55] to-[#2B3FB8] dark:from-blue-500 dark:to-indigo-400"
+                          className="block h-full rounded-full bg-gradient-to-r from-ox-navy to-ox-blue dark:from-blue-500 dark:to-indigo-400"
                           style={{ width: `${Math.max(3, (c.count / maxCat) * 100)}%` }}
                         />
                       </span>
@@ -251,8 +251,8 @@ export default function AdminServicesClient() {
                     aria-pressed={active}
                     className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[13px] font-medium transition ${
                       active
-                        ? "border-[#2B3FB8] bg-[#2B3FB8] text-white dark:border-blue-400 dark:bg-blue-500"
-                        : "border-gray-200 text-gray-700 hover:border-[#2B3FB8]/50 hover:text-[#2B3FB8] dark:border-gray-700 dark:text-gray-300 dark:hover:border-blue-400/60 dark:hover:text-blue-300"
+                        ? "border-ox-blue bg-ox-blue text-white dark:border-blue-400 dark:bg-blue-500"
+                        : "border-gray-200 text-gray-700 hover:border-ox-blue/50 hover:text-ox-blue dark:border-gray-700 dark:text-gray-300 dark:hover:border-blue-400/60 dark:hover:text-blue-300"
                     }`}
                   >
                     {c.name}
@@ -265,7 +265,7 @@ export default function AdminServicesClient() {
               <button
                 type="button"
                 onClick={() => apply(() => setOwner(owner?.id === "none" ? null : { id: "none", name: "No owner" }))}
-                className="mt-5 block text-left text-xs text-gray-500 underline-offset-2 hover:text-[#2B3FB8] hover:underline dark:text-gray-400 dark:hover:text-blue-300"
+                className="mt-5 block text-left text-xs text-gray-500 underline-offset-2 hover:text-ox-blue hover:underline dark:text-gray-400 dark:hover:text-blue-300"
               >
                 {stats.unowned} older {stats.unowned === 1 ? "listing has" : "listings have"} no owner account (added
                 before ownership was recorded). Show them
@@ -310,7 +310,7 @@ export default function AdminServicesClient() {
                 type="checkbox"
                 checked={leadsOnly}
                 onChange={(e) => apply(() => setLeadsOnly(e.target.checked))}
-                className="h-4 w-4 accent-[#2B3FB8]"
+                className="h-4 w-4 accent-ox-blue"
               />
               Contacted only
             </label>
@@ -323,7 +323,7 @@ export default function AdminServicesClient() {
             {country ? <FilterChip label={`Country: ${country}`} onClear={() => apply(() => setCountry(""))} /> : null}
             {owner ? <FilterChip label={`Added by: ${owner.name}`} onClear={() => apply(() => setOwner(null))} /> : null}
             {filtersOn ? (
-              <button type="button" onClick={clearAll} className="ml-1 font-medium text-[#2B3FB8] hover:underline dark:text-blue-300">
+              <button type="button" onClick={clearAll} className="ml-1 font-medium text-ox-blue hover:underline dark:text-blue-300">
                 Clear all
               </button>
             ) : null}
@@ -380,7 +380,7 @@ export default function AdminServicesClient() {
                         <button
                           type="button"
                           onClick={() => apply(() => setCategory(r.service_name))}
-                          className="text-left text-[13px] font-medium text-gray-800 hover:text-[#2B3FB8] hover:underline dark:text-gray-200 dark:hover:text-blue-300"
+                          className="text-left text-[13px] font-medium text-gray-800 hover:text-ox-blue hover:underline dark:text-gray-200 dark:hover:text-blue-300"
                           title="Filter by this category"
                         >
                           {r.service_name}
@@ -474,9 +474,9 @@ export default function AdminServicesClient() {
 
 function FilterChip({ label, onClear }) {
   return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-[#2B3FB8]/10 py-0.5 pl-2.5 pr-1 font-medium text-[#2B3FB8] dark:bg-blue-400/15 dark:text-blue-300">
+    <span className="inline-flex items-center gap-1 rounded-full bg-ox-blue/10 py-0.5 pl-2.5 pr-1 font-medium text-ox-blue dark:bg-blue-400/15 dark:text-blue-300">
       {label}
-      <button type="button" onClick={onClear} aria-label={`Remove filter ${label}`} className="rounded-full p-0.5 hover:bg-[#2B3FB8]/15">
+      <button type="button" onClick={onClear} aria-label={`Remove filter ${label}`} className="rounded-full p-0.5 hover:bg-ox-blue/15">
         <X size={12} aria-hidden="true" />
       </button>
     </span>
@@ -487,12 +487,12 @@ function ProviderCell({ r }) {
   const [broken, setBroken] = useState(false);
   return (
     <div className="flex min-w-0 items-start gap-3">
-      <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-[#131C55]/10 to-[#2B3FB8]/15 ring-1 ring-gray-200 dark:from-blue-400/10 dark:to-indigo-400/10 dark:ring-gray-800">
+      <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-ox-navy/10 to-ox-blue/15 ring-1 ring-gray-200 dark:from-blue-400/10 dark:to-indigo-400/10 dark:ring-gray-800">
         {r.image && !broken ? (
           // eslint-disable-next-line @next/next/no-img-element -- provider uploads; failures fall back below
           <img src={r.image} alt="" loading="lazy" onError={() => setBroken(true)} className="h-full w-full object-cover" />
         ) : (
-          <BriefcaseBusiness size={18} className="text-[#2B3FB8]/60 dark:text-blue-300/60" aria-hidden="true" />
+          <BriefcaseBusiness size={18} className="text-ox-blue/60 dark:text-blue-300/60" aria-hidden="true" />
         )}
       </span>
       <div className="min-w-0">
@@ -523,7 +523,7 @@ function OwnerCell({ owner, onPick }) {
       <button
         type="button"
         onClick={() => onPick({ id: owner._id, name: owner.name })}
-        className="inline-flex max-w-full items-center gap-1.5 text-left text-[13px] font-medium text-gray-800 hover:text-[#2B3FB8] hover:underline dark:text-gray-200 dark:hover:text-blue-300"
+        className="inline-flex max-w-full items-center gap-1.5 text-left text-[13px] font-medium text-gray-800 hover:text-ox-blue hover:underline dark:text-gray-200 dark:hover:text-blue-300"
         title="Show everything this person added"
       >
         <UserRound size={13} aria-hidden="true" className="shrink-0 text-gray-400" />

@@ -58,7 +58,7 @@ export default function SearchBar({ scope = ALL_SCOPE, className = "" }) {
       action={PUBLIC_ROUTES.exhibitions}
       method="get"
       onSubmit={onSubmit}
-      className={`flex w-full items-center gap-2 rounded-xl border border-gray-300 bg-white p-1.5 shadow-sm focus-within:border-[#131C55] focus-within:ring-2 focus-within:ring-[#131C55]/15 dark:border-gray-700 dark:bg-gray-900 dark:focus-within:border-blue-400 ${className}`}
+      className={`flex w-full items-center gap-2 rounded-xl border border-gray-300 bg-white p-1.5 shadow-sm focus-within:border-ox-navy focus-within:ring-2 focus-within:ring-ox-navy/15 dark:border-gray-700 dark:bg-gray-900 dark:focus-within:border-blue-400 ${className}`}
     >
       {/* Carries the scope on the plain-HTML submit path, before hydration
           and with JavaScript off. Without it the server defaults to upcoming. */}
@@ -79,7 +79,7 @@ export default function SearchBar({ scope = ALL_SCOPE, className = "" }) {
       />
       <button
         type="submit"
-        className="shrink-0 rounded-lg bg-[#131C55] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#0E1B6B] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none"
+        className="shrink-0 rounded-lg bg-ox-navy px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-ox-navy-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none"
       >
         Search
       </button>

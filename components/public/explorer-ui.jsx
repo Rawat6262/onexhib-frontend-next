@@ -85,7 +85,7 @@ export function Segmented({ label, options, value, onChange }) {
             onClick={() => onChange(o.key)}
             className={`rounded-lg px-3 py-1.5 text-xs font-semibold whitespace-nowrap transition motion-reduce:transition-none ${
               on
-                ? "bg-white text-[#131C55] shadow-sm dark:bg-gray-950 dark:text-white"
+                ? "bg-white text-ox-navy shadow-sm dark:bg-gray-950 dark:text-white"
                 : "text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
             }`}
           >
@@ -105,8 +105,8 @@ export function Chip({ active, onClick, children }) {
       aria-pressed={active}
       className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-[13px] font-medium transition motion-reduce:transition-none ${
         active
-          ? "border-transparent bg-gradient-to-r from-[#131C55] to-[#2B3FB8] text-white shadow-sm shadow-indigo-900/20 dark:from-blue-500 dark:to-indigo-500"
-          : "border-gray-200 bg-white text-gray-700 hover:border-[#2B3FB8]/40 hover:text-[#2B3FB8] dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-blue-400/40 dark:hover:text-white"
+          ? "border-transparent bg-gradient-to-r from-ox-navy to-ox-blue text-white shadow-sm shadow-indigo-900/20 dark:from-blue-500 dark:to-indigo-500"
+          : "border-gray-200 bg-white text-gray-700 hover:border-ox-blue/40 hover:text-ox-blue dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-blue-400/40 dark:hover:text-white"
       }`}
     >
       {children}
@@ -126,7 +126,7 @@ export function MiniBars({ bins, today }) {
             key={m}
             title={`${n} ${n === 1 ? "event" : "events"}`}
             className={`flex-1 rounded-t-sm transition-colors ${
-              n ? "bg-gradient-to-t from-[#2B3FB8] to-[#8B5CF6] opacity-80 group-hover:opacity-100" : "bg-gray-100 dark:bg-gray-800"
+              n ? "bg-gradient-to-t from-ox-blue to-ox-violet opacity-80 group-hover:opacity-100" : "bg-gray-100 dark:bg-gray-800"
             }`}
             style={{ height: `${n ? Math.max(12, Math.round((n / peak) * 100)) : 8}%` }}
           />
@@ -158,7 +158,7 @@ export function ExplorerSearch({ id, inputRef, value, onChange, placeholder, lab
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         autoComplete="off"
-        className="h-11 w-full rounded-xl border border-gray-300 bg-white pr-12 pl-10 text-sm text-gray-900 placeholder-gray-400 transition focus:border-[#2B3FB8] focus:ring-4 focus:ring-[#2B3FB8]/15 focus:outline-none motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
+        className="h-11 w-full rounded-xl border border-gray-300 bg-white pr-12 pl-10 text-sm text-gray-900 placeholder-gray-400 transition focus:border-ox-blue focus:ring-4 focus:ring-ox-blue/15 focus:outline-none motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
       />
       {value ? (
         <button

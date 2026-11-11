@@ -45,7 +45,7 @@ export default function DataBars({ rows, hrefFor, unitLabel = "listings", scaleM
               className="mt-1.5 block h-1.5 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800"
             >
               <span
-                className="ox-bar block h-full rounded-full bg-gradient-to-r from-[#131C55] to-[#3B4BA8] dark:from-blue-400 dark:to-indigo-400"
+                className="ox-bar block h-full rounded-full bg-gradient-to-r from-ox-navy to-[#3B4BA8] dark:from-blue-400 dark:to-indigo-400"
                 style={{ width: `${pct}%`, animationDelay: `${i * 60}ms` }}
               />
             </span>
@@ -57,7 +57,7 @@ export default function DataBars({ rows, hrefFor, unitLabel = "listings", scaleM
             {href ? (
               <Link
                 href={href}
-                className="group block rounded-lg px-1 py-1 transition-colors hover:bg-gray-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:hover:bg-gray-900 dark:focus-visible:outline-blue-300"
+                className="group block rounded-lg px-1 py-1 transition-colors hover:bg-gray-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:hover:bg-gray-900 dark:focus-visible:outline-blue-300"
               >
                 {inner}
               </Link>

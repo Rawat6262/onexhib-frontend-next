@@ -62,7 +62,7 @@ export default function CommentComposer({ onSubmit, disabled = false, pending = 
         placeholder="Share your thoughts"
         aria-describedby="comment-composer-hint"
         aria-invalid={over || Boolean(error) || undefined}
-        className="mt-2 w-full resize-y rounded-xl border border-gray-300 bg-white px-3 py-2 text-[15px] text-gray-900 placeholder:text-gray-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] disabled:opacity-60 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
+        className="mt-2 w-full resize-y rounded-xl border border-gray-300 bg-white px-3 py-2 text-[15px] text-gray-900 placeholder:text-gray-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy disabled:opacity-60 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
       />
 
       <div className="mt-1.5 flex items-center justify-between gap-3">
@@ -79,7 +79,7 @@ export default function CommentComposer({ onSubmit, disabled = false, pending = 
         <button
           type="submit"
           disabled={busy || over || used === 0}
-          className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-[#131C55] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#0E1B6B] disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:bg-blue-500 dark:text-gray-950 dark:hover:bg-blue-400"
+          className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-ox-navy px-4 py-2 text-sm font-semibold text-white transition hover:bg-ox-navy-deep disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:bg-blue-500 dark:text-gray-950 dark:hover:bg-blue-400"
         >
           <Send size={14} aria-hidden="true" />
           {pending ? "Posting…" : "Comment"}

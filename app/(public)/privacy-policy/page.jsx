@@ -202,4 +202,4 @@ export default function PrivacyPolicyPage() {
 }
 
 const link =
-  "font-semibold text-[#131C55] underline-offset-4 hover:underline dark:text-blue-300";
+  "font-semibold text-ox-navy underline-offset-4 hover:underline dark:text-blue-300";

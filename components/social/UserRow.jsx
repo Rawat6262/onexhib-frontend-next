@@ -29,7 +29,7 @@ export default function UserRow({ user }) {
     <li>
       <Link
         href={`/social/profile/${encodeURIComponent(String(user._id))}`}
-        className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 transition hover:border-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:border-gray-800 dark:bg-gray-900 dark:hover:border-blue-400"
+        className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 transition hover:border-ox-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:border-gray-800 dark:bg-gray-900 dark:hover:border-blue-400"
       >
         <InitialsAvatar name={name} src={user.avatarUrl || null} size="sm" />
         <span className="min-w-0">

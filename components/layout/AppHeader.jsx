@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ChevronDown, Menu, Sparkles } from "lucide-react";
 import ThemeToggle from "@/components/layout/ThemeToggle";
+import ThemePicker from "@/components/layout/ThemePicker";
 import MegaNav from "@/components/layout/MegaNav";
 import { AI_LINK, DIRECTORY_MENU, EXHIBITIONS_MENU, NEWS_LINK } from "@/components/layout/nav-config";
 import { PUBLIC_ROUTES } from "@/lib/seo";
@@ -47,8 +48,8 @@ export const PUBLIC_NAV = [
 
 export default function AppHeader({ right = null, mobileExtra = null }) {
   return (
-    <header className="sticky top-0 z-50 border-b border-gray-200 bg-white/85 backdrop-blur-md dark:border-gray-800 dark:bg-gray-950/85">
-      <div className="mx-auto flex w-full max-w-6xl items-center gap-4 px-4 py-3 sm:px-6">
+    <header className="ox-header sticky top-0 z-50 border-b border-gray-200 bg-white/85 backdrop-blur-md dark:border-gray-800 dark:bg-gray-950/85">
+      <div className="mx-auto flex w-full max-w-6xl items-center gap-2 px-4 py-3 sm:gap-4 sm:px-6">
         <Link href="/" className="shrink-0" aria-label="OneXhib home">
           <Image
             src="/Dark.png"
@@ -63,20 +64,24 @@ export default function AppHeader({ right = null, mobileExtra = null }) {
             // "preloaded but not used" on every page. Lazy loads the visible one
             // straight away (it is at the top of the viewport) and never fetches
             // the display:none one at all.
-            className="h-8 w-auto object-contain dark:hidden sm:h-9"
+            className="h-7 w-auto object-contain dark:hidden sm:h-9"
           />
           <Image
             src="/Untitled-2-01 1.png"
             alt="OneXhib"
             width={124}
             height={42}
-            className="hidden h-8 w-auto object-contain dark:block sm:h-9"
+            className="hidden h-7 w-auto object-contain dark:block sm:h-9"
           />
         </Link>
 
         <MegaNav />
 
         <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
+          {/* Under 360px there is no room for it beside Sign up. */}
+          <div className="max-[359px]:hidden">
+            <ThemePicker className="text-gray-500 dark:text-gray-400" />
+          </div>
           <ThemeToggle className="text-gray-500 dark:text-gray-400" />
           {right}
 
@@ -102,7 +107,7 @@ export default function AppHeader({ right = null, mobileExtra = null }) {
                   </Link>
                 </li>
                 <li>
-                  <Link href={AI_LINK.href} className={`${mobileLink} flex items-center gap-1.5 font-semibold text-[#131C55] dark:text-blue-300`}>
+                  <Link href={AI_LINK.href} className={`${mobileLink} flex items-center gap-1.5 font-semibold text-ox-navy dark:text-blue-300`}>
                     <Sparkles size={14} aria-hidden="true" className="shrink-0" />
                     {AI_LINK.label}
                   </Link>
@@ -142,7 +147,7 @@ export function MobileGroup({ label, links }) {
           {links.map((l) => (
             <li key={l.href}>
               <Link href={l.href} className="flex items-center gap-2.5 rounded-lg px-2 py-1.5 text-[13.5px] font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800">
-                {l.icon ? <l.icon size={15} aria-hidden="true" className="shrink-0 text-[#2B3FB8] dark:text-blue-300" /> : null}
+                {l.icon ? <l.icon size={15} aria-hidden="true" className="shrink-0 text-ox-blue dark:text-blue-300" /> : null}
                 {l.label}
               </Link>
             </li>

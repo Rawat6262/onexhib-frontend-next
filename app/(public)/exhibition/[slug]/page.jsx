@@ -18,7 +18,7 @@ import { getEditions } from "@/lib/editions";
 import { idFromSlug, isCanonicalSlug } from "@/lib/slug";
 import { shortTitle } from "@/lib/seo-title";
 import { formatDateRange, formatLocation, toIsoDate } from "@/lib/format";
-import { getCompaniesForExhibition, getExhibitionById } from "@/lib/public-api";
+import { getCompaniesForExhibition, getExhibitionById, getNearbyHotels } from "@/lib/public-api";
 import ExhibitionCard from "@/components/public/ExhibitionCard";
 import EnquiryForm from "@/components/public/EnquiryForm";
 import VenueSection from "@/components/exhibition/VenueSection";
@@ -186,7 +186,7 @@ export default async function ExhibitionDetailPage({ params }) {
   // `placeLinks` decides whether the location links point at an indexable
   // landing page or at the noindex filter; `nearby`
   // is what makes this page a hub rather than a dead end for a crawler.
-  const [companies, placeLinks, categoryLink, sameCity, { editions, next: nextEdition }] = await Promise.all([
+  const [companies, placeLinks, categoryLink, sameCity, { editions, next: nextEdition }, hotels] = await Promise.all([
     getCompaniesForExhibition(exhibition.id),
     resolvePlaceLinks(exhibition),
     resolveCategoryLink(exhibition.category),
@@ -194,6 +194,8 @@ export default async function ExhibitionDetailPage({ params }) {
       ? getExhibitionsInPlace({ country: exhibition.country, city: exhibition.city })
       : Promise.resolve([]),
     getEditions(exhibition),
+    // Partner hotels near the linked centre, for the venue section.
+    exhibition.centre ? getNearbyHotels({ lat: exhibition.centre.lat, lng: exhibition.centre.lng }) : Promise.resolve([]),
   ]);
 
   // Same industry, coming up - the show's own editions are listed separately,
@@ -264,13 +266,13 @@ export default async function ExhibitionDetailPage({ params }) {
             categoryLink ? (
               <Link
                 href={categoryLandingPath(categoryLink.slug)}
-                className="inline-flex items-center gap-1.5 rounded-full bg-[#131C55]/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#131C55] transition hover:bg-[#131C55]/20 motion-reduce:transition-none dark:bg-blue-400/10 dark:text-blue-300 dark:hover:bg-blue-400/20"
+                className="inline-flex items-center gap-1.5 rounded-full bg-ox-navy/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-ox-navy transition hover:bg-ox-navy/20 motion-reduce:transition-none dark:bg-blue-400/10 dark:text-blue-300 dark:hover:bg-blue-400/20"
               >
                 <Tag size={12} aria-hidden="true" />
                 {categoryLink.label} exhibitions
               </Link>
             ) : (
-              <p className="inline-flex items-center gap-1.5 rounded-full bg-[#131C55]/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#131C55] dark:bg-blue-400/10 dark:text-blue-300">
+              <p className="inline-flex items-center gap-1.5 rounded-full bg-ox-navy/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-ox-navy dark:bg-blue-400/10 dark:text-blue-300">
                 <Tag size={12} aria-hidden="true" />
                 {exhibition.category}
               </p>
@@ -301,7 +303,7 @@ export default async function ExhibitionDetailPage({ params }) {
                   </p>
                   <Link
                     href={exhibitionPath(nextEdition.name, nextEdition.id)}
-                    className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-[#131C55] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#0E1B6B] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none"
+                    className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-ox-navy px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-ox-navy-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none"
                   >
                     See the next edition
                     <ArrowRight size={16} aria-hidden="true" />
@@ -312,7 +314,7 @@ export default async function ExhibitionDetailPage({ params }) {
                   No next edition is listed yet.{" "}
                   <Link
                     href={categoryLandingPath(similar.industry.slug)}
-                    className="font-semibold text-[#131C55] underline-offset-4 hover:underline dark:text-blue-300"
+                    className="font-semibold text-ox-navy underline-offset-4 hover:underline dark:text-blue-300"
                   >
                     See upcoming {similar.industry.label.toLowerCase()} exhibitions
                   </Link>
@@ -327,7 +329,7 @@ export default async function ExhibitionDetailPage({ params }) {
                   No next edition is listed yet.{" "}
                   <Link
                     href={placeLinks.countrySlug ? countryLandingPath(placeLinks.countrySlug) : PUBLIC_ROUTES.exhibitions}
-                    className="font-semibold text-[#131C55] underline-offset-4 hover:underline dark:text-blue-300"
+                    className="font-semibold text-ox-navy underline-offset-4 hover:underline dark:text-blue-300"
                   >
                     {placeLinks.countrySlug && exhibition.country
                       ? `See upcoming exhibitions in ${exhibition.country}`
@@ -366,7 +368,7 @@ export default async function ExhibitionDetailPage({ params }) {
                   {exhibition.centre ? (
                     <Link
                       href={exhibitionCentrePath(exhibition.centre.slug)}
-                      className="mt-1 inline-flex items-center gap-1 text-sm font-semibold text-[#2B3FB8] hover:underline dark:text-blue-300"
+                      className="mt-1 inline-flex items-center gap-1 text-sm font-semibold text-ox-blue hover:underline dark:text-blue-300"
                     >
                       View venue &amp; map: {exhibition.centre.name}
                     </Link>
@@ -388,7 +390,7 @@ export default async function ExhibitionDetailPage({ params }) {
                     ? cityLandingPath(placeLinks.countrySlug, placeLinks.citySlug)
                     : `${PUBLIC_ROUTES.exhibitions}?city=${encodeURIComponent(exhibition.city)}`
                 }
-                className="inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-900 transition hover:border-[#131C55] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:hover:border-gray-500"
+                className="inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-900 transition hover:border-ox-navy motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:hover:border-gray-500"
               >
                 <MapPin size={16} aria-hidden="true" />
                 More exhibitions in {exhibition.city}
@@ -398,7 +400,7 @@ export default async function ExhibitionDetailPage({ params }) {
             {placeLinks.countrySlug && exhibition.country ? (
               <Link
                 href={countryLandingPath(placeLinks.countrySlug)}
-                className="inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-900 transition hover:border-[#131C55] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:hover:border-gray-500"
+                className="inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-900 transition hover:border-ox-navy motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:hover:border-gray-500"
               >
                 Exhibitions in {exhibition.country}
               </Link>
@@ -473,7 +475,7 @@ export default async function ExhibitionDetailPage({ params }) {
       ) : null}
 
       {/* The linked exhibition centre: photo, address, live map, directions. */}
-      <VenueSection centre={exhibition.centre} exhibitionName={exhibition.name} className="mt-14" />
+      <VenueSection centre={exhibition.centre} exhibitionName={exhibition.name} hotels={hotels} className="mt-14" />
 
       {/* Visitor -> organiser. Shown only when the backend can deliver to this
           listing; the organiser's address never reaches the page. */}
@@ -557,7 +559,7 @@ export default async function ExhibitionDetailPage({ params }) {
           <p className="mt-5 text-[15px]">
             <Link
               href={categoryLandingPath(similar.industry.slug)}
-              className="font-semibold text-[#131C55] underline-offset-4 hover:underline dark:text-blue-300"
+              className="font-semibold text-ox-navy underline-offset-4 hover:underline dark:text-blue-300"
             >
               See all upcoming {similar.industry.label.toLowerCase()} exhibitions
             </Link>
@@ -588,7 +590,7 @@ export default async function ExhibitionDetailPage({ params }) {
             <p className="mt-5 text-[15px]">
               <Link
                 href={cityLandingPath(placeLinks.countrySlug, placeLinks.citySlug)}
-                className="font-semibold text-[#131C55] underline-offset-4 hover:underline dark:text-blue-300"
+                className="font-semibold text-ox-navy underline-offset-4 hover:underline dark:text-blue-300"
               >
                 See all upcoming exhibitions in {exhibition.city}
               </Link>

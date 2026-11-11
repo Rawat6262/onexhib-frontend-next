@@ -30,7 +30,7 @@ export default function NotificationBell() {
     <Link
       href="/social/notifications"
       aria-label={badgeAnnouncement(unreadCount)}
-      className="relative inline-flex h-9 w-9 items-center justify-center rounded-xl text-gray-600 transition hover:bg-gray-100 hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-blue-300"
+      className="relative inline-flex h-9 w-9 items-center justify-center rounded-xl text-gray-600 transition hover:bg-gray-100 hover:text-ox-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-blue-300"
     >
       <Bell size={18} aria-hidden="true" />
 

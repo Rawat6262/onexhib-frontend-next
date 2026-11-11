@@ -190,7 +190,7 @@
 //                       onChange={handleImageChange}
 //                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
 //                     />
-//                     <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-4 flex flex-col items-center justify-center text-center bg-gray-50 dark:bg-gray-800 group-hover:border-[#2B3FB8] group-hover:bg-[#2B3FB8]/5 dark:group-hover:border-blue-400 dark:group-hover:bg-blue-400/10 transition-all min-h-[160px]">
+//                     <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-4 flex flex-col items-center justify-center text-center bg-gray-50 dark:bg-gray-800 group-hover:border-ox-blue group-hover:bg-ox-blue/5 dark:group-hover:border-blue-400 dark:group-hover:bg-blue-400/10 transition-all min-h-[160px]">
 //                       {imagePreview ? (
 //                         <img
 //                           src={imagePreview}
@@ -217,7 +217,7 @@
 //                       onChange={handleVideoChange}
 //                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
 //                     />
-//                     <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-4 flex flex-col items-center justify-center text-center bg-gray-50 dark:bg-gray-800 group-hover:border-[#2B3FB8] group-hover:bg-[#2B3FB8]/5 dark:group-hover:border-blue-400 dark:group-hover:bg-blue-400/10 transition-all min-h-[160px]">
+//                     <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-4 flex flex-col items-center justify-center text-center bg-gray-50 dark:bg-gray-800 group-hover:border-ox-blue group-hover:bg-ox-blue/5 dark:group-hover:border-blue-400 dark:group-hover:bg-blue-400/10 transition-all min-h-[160px]">
 //                       {videoPreview ? (
 //                         <video
 //                           src={videoPreview}
@@ -251,7 +251,7 @@
 //             <button
 //               type="submit"
 //               disabled={isSubmitting}
-//               className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#131C55] to-[#2B3FB8] px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-900/25 transition hover:brightness-110 disabled:opacity-70 disabled:cursor-not-allowed motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500"
+//               className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-ox-navy to-ox-blue px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-900/25 transition hover:brightness-110 disabled:opacity-70 disabled:cursor-not-allowed motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500"
 //             >
 //               {isSubmitting && (
 //                 <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -474,7 +474,7 @@ const ProductPopupForm = ({ Close, data, exid, refreshProducts }) => {
                       onChange={handleImageChange}
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                     />
-                    <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-4 flex flex-col items-center justify-center text-center bg-gray-50 dark:bg-gray-800 group-hover:border-[#2B3FB8] group-hover:bg-[#2B3FB8]/5 dark:group-hover:border-blue-400 dark:group-hover:bg-blue-400/10 transition-all min-h-[160px]">
+                    <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-4 flex flex-col items-center justify-center text-center bg-gray-50 dark:bg-gray-800 group-hover:border-ox-blue group-hover:bg-ox-blue/5 dark:group-hover:border-blue-400 dark:group-hover:bg-blue-400/10 transition-all min-h-[160px]">
                       {imagePreview ? (
                         <img
                           src={imagePreview}
@@ -501,7 +501,7 @@ const ProductPopupForm = ({ Close, data, exid, refreshProducts }) => {
                       onChange={handleVideoChange}
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                     />
-                    <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-4 flex flex-col items-center justify-center text-center bg-gray-50 dark:bg-gray-800 group-hover:border-[#2B3FB8] group-hover:bg-[#2B3FB8]/5 dark:group-hover:border-blue-400 dark:group-hover:bg-blue-400/10 transition-all min-h-[160px]">
+                    <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-4 flex flex-col items-center justify-center text-center bg-gray-50 dark:bg-gray-800 group-hover:border-ox-blue group-hover:bg-ox-blue/5 dark:group-hover:border-blue-400 dark:group-hover:bg-blue-400/10 transition-all min-h-[160px]">
                       {videoPreview ? (
                         <video
                           src={videoPreview}
@@ -535,7 +535,7 @@ const ProductPopupForm = ({ Close, data, exid, refreshProducts }) => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#131C55] to-[#2B3FB8] px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-900/25 transition hover:brightness-110 disabled:opacity-70 disabled:cursor-not-allowed motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-ox-navy to-ox-blue px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-900/25 transition hover:brightness-110 disabled:opacity-70 disabled:cursor-not-allowed motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500"
             >
               {isSubmitting && (
                 <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

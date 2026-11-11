@@ -108,7 +108,7 @@ export default function ContactForm({ contactEmail }) {
             setForm((f) => ({ ...EMPTY, name: f.name, email: f.email }));
             setSent(false);
           }}
-          className="mt-6 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-800 transition hover:border-[#2B3FB8] hover:text-[#2B3FB8] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200"
+          className="mt-6 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-800 transition hover:border-ox-blue hover:text-ox-blue focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200"
         >
           Send another message
         </button>
@@ -124,7 +124,7 @@ export default function ContactForm({ contactEmail }) {
       noValidate
       className="relative overflow-hidden rounded-3xl border border-gray-200 bg-white p-6 shadow-xl shadow-indigo-900/[0.06] sm:p-8 dark:border-gray-800 dark:bg-gray-900 dark:shadow-black/30"
     >
-      <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#2B3FB8] via-[#5B5BF0] to-[#8B5CF6]" />
+      <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-ox-blue via-ox-indigo to-ox-violet" />
 
       <div className="grid gap-5 sm:grid-cols-2">
         <Field id="contact-name" label="Your name" error={errors.name}>
@@ -217,7 +217,7 @@ export default function ContactForm({ contactEmail }) {
         <button
           type="submit"
           disabled={sending}
-          className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#131C55] to-[#2B3FB8] px-6 py-3 text-[15px] font-semibold text-white shadow-lg shadow-indigo-900/25 transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] disabled:opacity-60 motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500"
+          className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-ox-navy to-ox-blue px-6 py-3 text-[15px] font-semibold text-white shadow-lg shadow-indigo-900/25 transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy disabled:opacity-60 motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500"
         >
           {sending ? <Loader2 size={17} aria-hidden="true" className="animate-spin" /> : <Send size={17} aria-hidden="true" />}
           {sending ? "Sending…" : "Send message"}
@@ -247,5 +247,5 @@ const input = (error) =>
   `w-full rounded-xl border bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition focus:outline-none focus:ring-4 motion-reduce:transition-none dark:bg-gray-950 dark:text-gray-100 dark:placeholder-gray-500 ${
     error
       ? "border-red-400 focus:border-red-500 focus:ring-red-500/15 dark:border-red-500/60"
-      : "border-gray-300 focus:border-[#2B3FB8] focus:ring-[#2B3FB8]/15 dark:border-gray-700 dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
+      : "border-gray-300 focus:border-ox-blue focus:ring-ox-blue/15 dark:border-gray-700 dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
   }`;

@@ -105,7 +105,7 @@ export default function ProfileHeader({ profile, isSelf, onFollowChange, onEdit,
           {profile.coverUrl ? (
             <img src={profile.coverUrl} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" />
           ) : (
-            <div aria-hidden="true" className="absolute inset-0 overflow-hidden bg-gradient-to-br from-[#0B1240] via-[#1B2A7A] to-[#4B2E9E]">
+            <div aria-hidden="true" className="absolute inset-0 overflow-hidden bg-gradient-to-br from-ox-night via-ox-royal to-ox-grape">
               <div className="absolute -top-16 -right-10 h-56 w-56 rounded-full bg-blue-400/30 blur-3xl" />
               <div className="absolute -bottom-20 left-10 h-56 w-56 rounded-full bg-violet-500/30 blur-3xl" />
               <div
@@ -172,7 +172,7 @@ export default function ProfileHeader({ profile, isSelf, onFollowChange, onEdit,
                 <button
                   type="button"
                   onClick={onEdit}
-                  className="inline-flex items-center gap-2 rounded-full border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:border-[#2B3FB8] hover:text-[#2B3FB8] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:border-gray-700 dark:text-gray-200 dark:hover:border-blue-400 dark:hover:text-white"
+                  className="inline-flex items-center gap-2 rounded-full border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:border-ox-blue hover:text-ox-blue focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:border-gray-700 dark:text-gray-200 dark:hover:border-blue-400 dark:hover:text-white"
                 >
                   <Pencil size={15} aria-hidden="true" />
                   Edit profile
@@ -205,7 +205,7 @@ export default function ProfileHeader({ profile, isSelf, onFollowChange, onEdit,
               <button
                 type="button"
                 onClick={onEdit}
-                className="mt-1 text-[15px] font-medium text-[#2B3FB8] underline-offset-4 hover:underline dark:text-blue-300"
+                className="mt-1 text-[15px] font-medium text-ox-blue underline-offset-4 hover:underline dark:text-blue-300"
               >
                 + Add a headline
               </button>
@@ -231,7 +231,7 @@ export default function ProfileHeader({ profile, isSelf, onFollowChange, onEdit,
                   // nofollow as well: a user-submitted URL is not an endorsement,
                   // matching how the site already treats organiser links.
                   rel="noopener noreferrer nofollow"
-                  className="inline-flex max-w-full items-baseline gap-1.5 break-all font-medium text-[#2B3FB8] underline-offset-4 hover:underline dark:text-blue-300"
+                  className="inline-flex max-w-full items-baseline gap-1.5 break-all font-medium text-ox-blue underline-offset-4 hover:underline dark:text-blue-300"
                 >
                   <Globe size={14} aria-hidden="true" className="shrink-0 self-center" />
                   {website}
@@ -291,10 +291,10 @@ function ProfileStrength({ profile, onEdit, onAddPhoto, onAddCover }) {
         <h2 id="strength-heading" className="text-base font-bold text-gray-900 dark:text-white">
           Profile strength
         </h2>
-        <span className="text-sm font-semibold text-[#2B3FB8] tabular-nums dark:text-blue-300">{pct}%</span>
+        <span className="text-sm font-semibold text-ox-blue tabular-nums dark:text-blue-300">{pct}%</span>
       </div>
       <div className="mt-3 h-2 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800" aria-hidden="true">
-        <div className="h-full rounded-full bg-gradient-to-r from-[#2B3FB8] to-[#8B5CF6] transition-all" style={{ width: `${pct}%` }} />
+        <div className="h-full rounded-full bg-gradient-to-r from-ox-blue to-ox-violet transition-all" style={{ width: `${pct}%` }} />
       </div>
       <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
         Complete profiles get more follows and messages. {steps.length - done} {steps.length - done === 1 ? "step" : "steps"} left:
@@ -307,7 +307,7 @@ function ProfileStrength({ profile, onEdit, onAddPhoto, onAddCover }) {
               <button
                 type="button"
                 onClick={s.action}
-                className="inline-flex items-center gap-1.5 rounded-full border border-dashed border-[#2B3FB8]/40 px-3 py-1.5 text-xs font-semibold text-[#2B3FB8] transition hover:border-solid hover:bg-[#2B3FB8]/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:border-blue-400/40 dark:text-blue-300 dark:hover:bg-blue-400/10"
+                className="inline-flex items-center gap-1.5 rounded-full border border-dashed border-ox-blue/40 px-3 py-1.5 text-xs font-semibold text-ox-blue transition hover:border-solid hover:bg-ox-blue/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:border-blue-400/40 dark:text-blue-300 dark:hover:bg-blue-400/10"
               >
                 + {s.label}
               </button>
@@ -337,7 +337,7 @@ function AvatarMenu({ hasPhoto, disabled, onUpload, onRemove }) {
   }, [open]);
 
   const button =
-    "absolute right-1 bottom-1 grid h-9 w-9 place-items-center rounded-full bg-gradient-to-br from-[#131C55] to-[#2B3FB8] text-white shadow-lg ring-4 ring-white transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] disabled:opacity-60 motion-reduce:transition-none sm:right-2 sm:bottom-2 dark:ring-gray-900";
+    "absolute right-1 bottom-1 grid h-9 w-9 place-items-center rounded-full bg-gradient-to-br from-ox-navy to-ox-blue text-white shadow-lg ring-4 ring-white transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy disabled:opacity-60 motion-reduce:transition-none sm:right-2 sm:bottom-2 dark:ring-gray-900";
 
   if (!hasPhoto) {
     return (

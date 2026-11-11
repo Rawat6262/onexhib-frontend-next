@@ -60,8 +60,8 @@ export default function NotificationRow({ notification, onActivate }) {
               change on the row background, AND the word "Unread" as real text, so
               the state survives a greyscale screen and reaches a screen reader. */}
           {unread ? (
-            <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#131C55] dark:text-blue-300">
-              <span aria-hidden="true" className="inline-block h-1.5 w-1.5 rounded-full bg-[#131C55] dark:bg-blue-300" />
+            <span className="inline-flex items-center gap-1 text-xs font-semibold text-ox-navy dark:text-blue-300">
+              <span aria-hidden="true" className="inline-block h-1.5 w-1.5 rounded-full bg-ox-navy dark:bg-blue-300" />
               Unread
             </span>
           ) : null}
@@ -85,7 +85,7 @@ export default function NotificationRow({ notification, onActivate }) {
         <Link
           href={href}
           onClick={() => onActivate && onActivate(notification)}
-          className={`${shell} transition hover:bg-gray-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:hover:bg-gray-800`}
+          className={`${shell} transition hover:bg-gray-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:hover:bg-gray-800`}
         >
           {body}
         </Link>

@@ -52,7 +52,7 @@ export default function MeetingsPage() {
         Looking for exhibitions you bookmarked?{" "}
         <Link
           href="/account/saved"
-          className="font-semibold text-[#131C55] underline-offset-4 hover:underline dark:text-blue-300"
+          className="font-semibold text-ox-navy underline-offset-4 hover:underline dark:text-blue-300"
         >
           Saved exhibitions
         </Link>

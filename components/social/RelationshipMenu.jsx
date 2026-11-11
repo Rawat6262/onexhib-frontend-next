@@ -159,7 +159,7 @@ export default function RelationshipMenu({
         aria-expanded={open}
         aria-haspopup="menu"
         aria-label={label}
-        className="rounded-lg p-1.5 text-gray-500 transition hover:bg-gray-100 hover:text-gray-900 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
+        className="rounded-lg p-1.5 text-gray-500 transition hover:bg-gray-100 hover:text-gray-900 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
       >
         <MoreHorizontal size={18} aria-hidden="true" />
       </button>

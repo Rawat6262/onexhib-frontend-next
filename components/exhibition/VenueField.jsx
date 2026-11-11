@@ -139,7 +139,7 @@ export default function VenueField({
           className={`w-full rounded-xl border px-4 py-3 pr-10 text-sm text-gray-900 outline-none transition focus:ring-4 dark:bg-gray-800 dark:text-gray-100 ${
             error
               ? "border-red-400 focus:border-red-500 focus:ring-red-500/15"
-              : "border-gray-300 focus:border-[#2B3FB8] focus:ring-[#2B3FB8]/15 dark:border-gray-700"
+              : "border-gray-300 focus:border-ox-blue focus:ring-ox-blue/15 dark:border-gray-700"
           }`}
         />
         {loading ? (
@@ -162,9 +162,9 @@ export default function VenueField({
                 >
                   {option.kind === "add" ? (
                     <>
-                      <Plus size={16} aria-hidden="true" className="mt-0.5 shrink-0 text-[#2B3FB8] dark:text-blue-300" />
+                      <Plus size={16} aria-hidden="true" className="mt-0.5 shrink-0 text-ox-blue dark:text-blue-300" />
                       <span className="min-w-0">
-                        <span className="block font-semibold text-[#2B3FB8] dark:text-blue-300">Add new venue “{typed}”</span>
+                        <span className="block font-semibold text-ox-blue dark:text-blue-300">Add new venue “{typed}”</span>
                         <span className="block text-xs text-gray-500 dark:text-gray-400">
                           Find it on Google Maps to fill the address{canCreate ? " and add it to Exhibition centres" : ""}
                         </span>
@@ -269,10 +269,10 @@ function NewVenuePanel({ initialQuery, canCreate, onCancel, onDone }) {
   };
 
   return (
-    <div className="mt-3 rounded-2xl border border-[#2B3FB8]/20 bg-[#2B3FB8]/[0.03] p-4 dark:border-blue-400/20 dark:bg-blue-400/[0.04]">
+    <div className="mt-3 rounded-2xl border border-ox-blue/20 bg-ox-blue/[0.03] p-4 dark:border-blue-400/20 dark:bg-blue-400/[0.04]">
       <div className="mb-3 flex items-center justify-between gap-3">
         <p className="inline-flex items-center gap-2 text-sm font-bold text-gray-900 dark:text-white">
-          <MapPin size={16} aria-hidden="true" className="text-[#2B3FB8] dark:text-blue-300" /> Find the venue on Google Maps
+          <MapPin size={16} aria-hidden="true" className="text-ox-blue dark:text-blue-300" /> Find the venue on Google Maps
         </p>
         <button type="button" onClick={onCancel} aria-label="Close" className="rounded-lg p-1 text-gray-500 hover:bg-gray-100 dark:hover:bg-white/10">
           <X size={16} />
@@ -305,7 +305,7 @@ function NewVenuePanel({ initialQuery, canCreate, onCancel, onDone }) {
             type="button"
             onClick={use}
             disabled={!place?.lat || saving}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#131C55] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0E1B6B] disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-xl bg-ox-navy px-4 py-2 text-sm font-semibold text-white hover:bg-ox-navy-deep disabled:opacity-50"
           >
             {saving ? <Loader2 size={15} className="animate-spin" aria-hidden="true" /> : null}
             Use this venue

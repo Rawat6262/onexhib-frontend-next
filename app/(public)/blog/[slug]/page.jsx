@@ -48,7 +48,7 @@ export async function generateMetadata({ params }) {
 /** Pill link used by the contextual aside. One class, so a country chip and
  *  an industry chip cannot drift apart visually. */
 const chip =
-  "inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-[13px] font-medium text-gray-700 transition-colors hover:border-[#131C55]/30 hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:text-blue-300 dark:focus-visible:outline-blue-300";
+  "inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-[13px] font-medium text-gray-700 transition-colors hover:border-ox-navy/30 hover:text-ox-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:text-blue-300 dark:focus-visible:outline-blue-300";
 
 export default async function BlogPostPage({ params }) {
   const { slug } = await params;
@@ -76,7 +76,7 @@ export default async function BlogPostPage({ params }) {
           className="pointer-events-none absolute inset-0 opacity-[0.55] dark:opacity-[0.22]"
           style={{
             backgroundImage:
-              "linear-gradient(to right, rgba(19,28,85,.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(19,28,85,.05) 1px, transparent 1px)",
+              "linear-gradient(to right, color-mix(in oklab, var(--color-ox-navy) 5%, transparent) 1px, transparent 1px), linear-gradient(to bottom, color-mix(in oklab, var(--color-ox-navy) 5%, transparent) 1px, transparent 1px)",
             backgroundSize: "28px 28px",
             maskImage: "radial-gradient(ellipse 70% 60% at 50% 0%, #000 40%, transparent 100%)",
             WebkitMaskImage: "radial-gradient(ellipse 70% 60% at 50% 0%, #000 40%, transparent 100%)",
@@ -88,7 +88,7 @@ export default async function BlogPostPage({ params }) {
 
           <div className="ox-reveal mt-6">
             {post.category ? (
-              <span className="inline-flex items-center rounded-full bg-[#131C55]/[0.06] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#131C55] ring-1 ring-inset ring-[#131C55]/10 dark:bg-blue-400/10 dark:text-blue-300 dark:ring-blue-400/20">
+              <span className="inline-flex items-center rounded-full bg-ox-navy/[0.06] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-ox-navy ring-1 ring-inset ring-ox-navy/10 dark:bg-blue-400/10 dark:text-blue-300 dark:ring-blue-400/20">
                 {post.category}
               </span>
             ) : null}
@@ -180,7 +180,7 @@ export default async function BlogPostPage({ params }) {
         <p className="mt-10 border-t border-gray-200 pt-6 dark:border-gray-800">
           <Link
             href={PUBLIC_ROUTES.blog}
-            className="group inline-flex items-center gap-1.5 text-[15px] font-semibold text-[#131C55] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#131C55] dark:text-blue-300 dark:focus-visible:outline-blue-300"
+            className="group inline-flex items-center gap-1.5 text-[15px] font-semibold text-ox-navy underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ox-navy dark:text-blue-300 dark:focus-visible:outline-blue-300"
           >
             <ArrowLeft
               size={16}
@@ -236,7 +236,7 @@ export default async function BlogPostPage({ params }) {
             </div>
             <Link
               href={PUBLIC_ROUTES.exhibitions}
-              className="group inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold text-[#131C55] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#131C55] dark:text-blue-300 dark:focus-visible:outline-blue-300"
+              className="group inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold text-ox-navy underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ox-navy dark:text-blue-300 dark:focus-visible:outline-blue-300"
             >
               Browse all exhibitions
               <ArrowRight

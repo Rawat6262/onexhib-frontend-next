@@ -107,7 +107,7 @@ export default async function CategoriesHubPage() {
               more specific sectors can still be found by searching the{" "}
               <Link
                 href={PUBLIC_ROUTES.exhibitions}
-                className="underline underline-offset-4 hover:text-[#131C55] dark:hover:text-white"
+                className="underline underline-offset-4 hover:text-ox-navy dark:hover:text-white"
               >
                 full exhibitions listing
               </Link>
@@ -128,14 +128,14 @@ export default async function CategoriesHubPage() {
             Industry listings are not available yet. Browse the{" "}
             <Link
               href={PUBLIC_ROUTES.exhibitions}
-              className="underline underline-offset-4 hover:text-[#131C55] dark:hover:text-white"
+              className="underline underline-offset-4 hover:text-ox-navy dark:hover:text-white"
             >
               full exhibitions listing
             </Link>{" "}
             or{" "}
             <Link
               href={PUBLIC_ROUTES.locations}
-              className="underline underline-offset-4 hover:text-[#131C55] dark:hover:text-white"
+              className="underline underline-offset-4 hover:text-ox-navy dark:hover:text-white"
             >
               browse by location
             </Link>{" "}

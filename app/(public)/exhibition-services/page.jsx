@@ -330,7 +330,7 @@ export default async function ExhibitionServicesPage() {
             const card = (
               <>
                 {Icon ? (
-                  <span className="inline-flex rounded-xl bg-[#131C55]/10 p-2.5 text-[#131C55] dark:bg-blue-400/10 dark:text-blue-300">
+                  <span className="inline-flex rounded-xl bg-ox-navy/10 p-2.5 text-ox-navy dark:bg-blue-400/10 dark:text-blue-300">
                     <Icon size={20} aria-hidden="true" />
                   </span>
                 ) : null}
@@ -381,7 +381,7 @@ export default async function ExhibitionServicesPage() {
                 ) : null}
 
                 {category.count ? (
-                  <p className="mt-3 text-sm font-semibold text-[#131C55] dark:text-blue-300">
+                  <p className="mt-3 text-sm font-semibold text-ox-navy dark:text-blue-300">
                     View {category.count} {category.count === 1 ? "provider" : "providers"} →
                   </p>
                 ) : null}
@@ -393,7 +393,7 @@ export default async function ExhibitionServicesPage() {
                 {category.count ? (
                   <Link
                     href={serviceCategoryPath(category.slug)}
-                    className="ox-card flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-5 transition hover:border-[#131C55]/40 hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:border-gray-800 dark:bg-gray-900 dark:hover:border-gray-600"
+                    className="ox-card flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-5 transition hover:border-ox-navy/40 hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:border-gray-800 dark:bg-gray-900 dark:hover:border-gray-600"
                   >
                     {card}
                   </Link>
@@ -441,7 +441,7 @@ export default async function ExhibitionServicesPage() {
         </ul>
       </section>
 
-      <section className="mt-14 overflow-hidden rounded-3xl bg-gradient-to-br from-[#131C55] to-[#0E1B6B] px-6 py-12 sm:px-10">
+      <section className="mt-14 overflow-hidden rounded-3xl bg-gradient-to-br from-ox-navy to-ox-navy-deep px-6 py-12 sm:px-10">
         <h2 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
           Offer services to exhibitors?
         </h2>
@@ -452,7 +452,7 @@ export default async function ExhibitionServicesPage() {
         <div className="mt-7 flex flex-col gap-3 sm:flex-row">
           <Link
             href="/signup"
-            className="inline-flex items-center justify-center rounded-xl bg-white px-6 py-3.5 text-[15px] font-semibold text-[#131C55] transition hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white motion-reduce:transition-none"
+            className="inline-flex items-center justify-center rounded-xl bg-white px-6 py-3.5 text-[15px] font-semibold text-ox-navy transition hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white motion-reduce:transition-none"
           >
             List your services
           </Link>
@@ -469,7 +469,7 @@ export default async function ExhibitionServicesPage() {
 }
 
 const planningLink =
-  "ox-card inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-800 hover:border-[#131C55]/40 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 dark:text-gray-200 dark:hover:border-gray-600";
+  "ox-card inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-800 hover:border-ox-navy/40 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 dark:text-gray-200 dark:hover:border-gray-600";
 
 /** How many subcategories a card names before it summarises the rest. */
 const SUBCATEGORY_PREVIEW = 6;

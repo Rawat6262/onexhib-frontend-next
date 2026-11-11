@@ -57,11 +57,11 @@ export default function DiscoverGrid({ counts, upcomingTotal }) {
         <li key={href} className="ox-reveal">
           <Link
             href={href}
-            className="group flex h-full flex-col gap-3 rounded-2xl border border-gray-200 bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-[#131C55]/30 hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#131C55] motion-reduce:hover:translate-y-0 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-blue-400/30 dark:focus-visible:outline-blue-300"
+            className="group flex h-full flex-col gap-3 rounded-2xl border border-gray-200 bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-ox-navy/30 hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ox-navy motion-reduce:hover:translate-y-0 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-blue-400/30 dark:focus-visible:outline-blue-300"
           >
             <span
               aria-hidden="true"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#131C55]/[0.06] text-[#131C55] transition-colors group-hover:bg-[#131C55] group-hover:text-white dark:bg-blue-400/10 dark:text-blue-300 dark:group-hover:bg-blue-400 dark:group-hover:text-gray-950"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-ox-navy/[0.06] text-ox-navy transition-colors group-hover:bg-ox-navy group-hover:text-white dark:bg-blue-400/10 dark:text-blue-300 dark:group-hover:bg-blue-400 dark:group-hover:text-gray-950"
             >
               <Icon size={19} />
             </span>
@@ -79,12 +79,12 @@ export default function DiscoverGrid({ counts, upcomingTotal }) {
                   <span className="font-normal text-gray-500 dark:text-gray-400">{unit}</span>
                 </span>
               ) : (
-                <span className="text-[13px] font-semibold text-[#131C55] dark:text-blue-300">Browse</span>
+                <span className="text-[13px] font-semibold text-ox-navy dark:text-blue-300">Browse</span>
               )}
               <ArrowRight
                 size={15}
                 aria-hidden="true"
-                className="shrink-0 text-[#131C55] transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none dark:text-blue-300"
+                className="shrink-0 text-ox-navy transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none dark:text-blue-300"
               />
             </span>
           </Link>

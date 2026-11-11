@@ -47,7 +47,7 @@ export default function PageJump({ current, totalPages, firstHref, template, sen
         value={draft}
         onChange={(e) => setDraft(e.target.value)}
         onBlur={() => setDraft(String(current))}
-        className="h-8 w-16 rounded-lg border border-gray-300 bg-white px-2 text-center text-sm font-medium text-gray-800 [appearance:textfield] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+        className="h-8 w-16 rounded-lg border border-gray-300 bg-white px-2 text-center text-sm font-medium text-gray-800 [appearance:textfield] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
       />
       <span className="whitespace-nowrap">of {totalPages.toLocaleString()}</span>
     </form>

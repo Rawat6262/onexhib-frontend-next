@@ -65,12 +65,12 @@ export default function ResetPasswordForm({ initialEmail = "", initialSmsTo = ""
         <p className="text-sm text-gray-500 dark:text-gray-400">
           We sent a 6-digit OTP to{smsTo ? " both of these" : ""}
         </p>
-        <p className="text-sm font-semibold text-[#131C55] dark:text-blue-300 break-all">{email}</p>
+        <p className="text-sm font-semibold text-ox-navy dark:text-blue-300 break-all">{email}</p>
         {/* Only when the server confirms the SMS left the gateway. The number is
             the one already on the account — a reset code is never sent to a
             number supplied with the request. */}
         {smsTo && (
-          <p className="text-sm font-semibold text-[#131C55] dark:text-blue-300">
+          <p className="text-sm font-semibold text-ox-navy dark:text-blue-300">
             and by SMS to {smsTo}
           </p>
         )}
@@ -81,7 +81,7 @@ export default function ResetPasswordForm({ initialEmail = "", initialSmsTo = ""
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full py-3 text-lg rounded-xl bg-[#131C55] text-white font-semibold hover:bg-[#0E1B6B] shadow-sm transition disabled:opacity-60 motion-reduce:transition-none"
+        className="w-full py-3 text-lg rounded-xl bg-ox-navy text-white font-semibold hover:bg-ox-navy-deep shadow-sm transition disabled:opacity-60 motion-reduce:transition-none"
       >
         {isSubmitting ? "Verifying..." : "Reset Password"}
       </button>
@@ -90,7 +90,7 @@ export default function ResetPasswordForm({ initialEmail = "", initialSmsTo = ""
         Didn&apos;t receive the OTP?{" "}
         <Link
           href={`/forgot-password?email=${encodeURIComponent(email)}`}
-          className="text-[#131C55] dark:text-blue-300 font-semibold underline-offset-4 hover:underline"
+          className="text-ox-navy dark:text-blue-300 font-semibold underline-offset-4 hover:underline"
         >
           Request a new one
         </Link>
@@ -99,7 +99,7 @@ export default function ResetPasswordForm({ initialEmail = "", initialSmsTo = ""
       <div className="text-center">
         <Link
           href="/login"
-          className="text-sm text-gray-400 dark:text-gray-500 hover:text-[#131C55] dark:hover:text-gray-300 hover:underline transition motion-reduce:transition-none"
+          className="text-sm text-gray-400 dark:text-gray-500 hover:text-ox-navy dark:hover:text-gray-300 hover:underline transition motion-reduce:transition-none"
         >
           ← Back to Login
         </Link>

@@ -65,7 +65,7 @@ export default function ConsentBanner() {
           exactly the same.{" "}
           <Link
             href="/privacy-policy"
-            className="font-medium text-[#131C55] underline underline-offset-2 hover:opacity-80 dark:text-blue-400"
+            className="font-medium text-ox-navy underline underline-offset-2 hover:opacity-80 dark:text-blue-400"
           >
             Privacy Policy
           </Link>
@@ -81,7 +81,7 @@ export default function ConsentBanner() {
           <button
             type="button"
             onClick={() => choose("granted")}
-            className="flex-1 rounded-lg bg-[#131C55] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#0E1B6B] sm:flex-none"
+            className="flex-1 rounded-lg bg-ox-navy px-4 py-2 text-sm font-medium text-white transition hover:bg-ox-navy-deep sm:flex-none"
           >
             Accept
           </button>

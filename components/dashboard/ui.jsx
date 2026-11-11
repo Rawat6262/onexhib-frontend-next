@@ -23,7 +23,7 @@ export function PageHeader({ title, intro, actions, eyebrow = "Dashboard" }) {
     <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div className="min-w-0">
         {eyebrow ? (
-          <p className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#2B3FB8] dark:text-blue-300">
+          <p className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-ox-blue dark:text-blue-300">
             <span aria-hidden="true" className="h-px w-6 bg-current opacity-60" />
             {eyebrow}
           </p>
@@ -53,7 +53,7 @@ export function StatCard({ label, value, accent = false, icon, tone, hint, href,
     return <AdminStatCard label={label} value={value} icon={icon} tone={tone} hint={hint} href={href} warn={warn} />;
   }
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#131C55] via-[#1B2A7A] to-[#3A2A9A] px-5 py-4 text-white shadow-lg shadow-indigo-900/20 ring-1 ring-white/10">
+    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-ox-navy via-ox-royal to-ox-grape-deep px-5 py-4 text-white shadow-lg shadow-indigo-900/20 ring-1 ring-white/10">
       <span aria-hidden="true" className="pointer-events-none absolute -top-10 -right-10 h-28 w-28 rounded-full bg-blue-400/30 blur-2xl" />
       <div className="relative flex items-center justify-between gap-2">
         <p className="truncate text-[13px] font-medium text-blue-100/80">{label}</p>
@@ -99,15 +99,15 @@ export function NoResults({ children, title, icon }) {
 
 /** Filled brand button — the primary action, same as the public site's CTA. */
 export const btnPrimary =
-  "inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#131C55] to-[#2B3FB8] px-4 text-sm font-semibold text-white shadow-md shadow-indigo-900/20 transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] disabled:opacity-60 motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500";
+  "inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-ox-navy to-ox-blue px-4 text-sm font-semibold text-white shadow-md shadow-indigo-900/20 transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy disabled:opacity-60 motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500";
 
 /** Outlined button — secondary actions, matching the public "Create account". */
 export const btnSecondary =
-  "inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-4 text-sm font-semibold text-gray-900 transition hover:border-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:hover:border-gray-500";
+  "inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-4 text-sm font-semibold text-gray-900 transition hover:border-ox-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:hover:border-gray-500";
 
 /** Small inline button used inside table rows and cards. */
 export const btnRow =
-  "inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-[13px] font-medium text-gray-700 transition hover:border-[#131C55] hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-gray-500 dark:hover:text-white";
+  "inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-[13px] font-medium text-gray-700 transition hover:border-ox-navy hover:text-ox-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-gray-500 dark:hover:text-white";
 
 /** Destructive row action. Red only on hover, so a table is not a wall of red. */
 export const btnRowDanger =
@@ -115,8 +115,8 @@ export const btnRowDanger =
 
 /** Text input. Same radius, border and focus treatment as the public SearchBar. */
 export const inputBase =
-  "h-10 w-full rounded-xl border border-gray-300 bg-white px-3.5 text-sm text-gray-900 placeholder-gray-500 transition focus:border-[#2B3FB8] focus:outline-none focus:ring-4 focus:ring-[#2B3FB8]/15 motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-blue-400 dark:focus:ring-blue-400/20";
+  "h-10 w-full rounded-xl border border-gray-300 bg-white px-3.5 text-sm text-gray-900 placeholder-gray-500 transition focus:border-ox-blue focus:outline-none focus:ring-4 focus:ring-ox-blue/15 motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-blue-400 dark:focus:ring-blue-400/20";
 
 /** Category/status pill. */
 export const pill =
-  "inline-flex items-center rounded-full bg-[#2B3FB8]/10 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide text-[#2B3FB8] ring-1 ring-[#2B3FB8]/15 dark:bg-blue-400/10 dark:text-blue-300 dark:ring-blue-400/20";
+  "inline-flex items-center rounded-full bg-ox-blue/10 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide text-ox-blue ring-1 ring-ox-blue/15 dark:bg-blue-400/10 dark:text-blue-300 dark:ring-blue-400/20";

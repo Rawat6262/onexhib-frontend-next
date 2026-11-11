@@ -72,7 +72,7 @@ export default function TablePagination({
             <select
               value={pageSize}
               onChange={(e) => onPageSizeChange(Number(e.target.value))}
-              className="h-8 cursor-pointer rounded-lg border border-gray-300 bg-white pr-7 pl-2.5 text-sm font-medium text-gray-800 transition hover:border-gray-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:border-gray-500"
+              className="h-8 cursor-pointer rounded-lg border border-gray-300 bg-white pr-7 pl-2.5 text-sm font-medium text-gray-800 transition hover:border-gray-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:border-gray-500"
             >
               {pageSizeOptions.map((n) => (
                 <option key={n} value={n}>
@@ -179,7 +179,7 @@ function JumpToPage({ current, totalPages, onGo }) {
         value={draft}
         onChange={(e) => setDraft(e.target.value)}
         onBlur={() => setDraft(String(current))}
-        className="h-8 w-16 rounded-lg border border-gray-300 bg-white px-2 text-center text-sm font-medium text-gray-800 [appearance:textfield] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+        className="h-8 w-16 rounded-lg border border-gray-300 bg-white px-2 text-center text-sm font-medium text-gray-800 [appearance:textfield] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
       />
       <span className="whitespace-nowrap">of {totalPages.toLocaleString()}</span>
     </form>
@@ -195,10 +195,10 @@ function IconBtn({ label, onClick, disabled, children }) {
 }
 
 const numBtn =
-  "flex h-8 min-w-8 items-center justify-center rounded-lg px-2 text-sm font-medium text-gray-600 transition hover:bg-white hover:text-[#131C55] hover:shadow-sm disabled:pointer-events-none disabled:opacity-35 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white";
+  "flex h-8 min-w-8 items-center justify-center rounded-lg px-2 text-sm font-medium text-gray-600 transition hover:bg-white hover:text-ox-navy hover:shadow-sm disabled:pointer-events-none disabled:opacity-35 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ox-navy motion-reduce:transition-none dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white";
 
 const numBtnActive =
-  "flex h-8 min-w-8 items-center justify-center rounded-lg bg-[#131C55] px-2 text-sm font-semibold text-white shadow-sm dark:bg-blue-500 dark:text-gray-950";
+  "flex h-8 min-w-8 items-center justify-center rounded-lg bg-ox-navy px-2 text-sm font-semibold text-white shadow-sm dark:bg-blue-500 dark:text-gray-950";
 
 const wideBtn =
-  "inline-flex h-9 items-center gap-1 rounded-lg border border-gray-300 px-3 text-sm font-medium text-gray-700 transition hover:border-[#131C55] hover:text-[#131C55] disabled:pointer-events-none disabled:opacity-40 motion-reduce:transition-none dark:border-gray-700 dark:text-gray-300 dark:hover:border-gray-500 dark:hover:text-white";
+  "inline-flex h-9 items-center gap-1 rounded-lg border border-gray-300 px-3 text-sm font-medium text-gray-700 transition hover:border-ox-navy hover:text-ox-navy disabled:pointer-events-none disabled:opacity-40 motion-reduce:transition-none dark:border-gray-700 dark:text-gray-300 dark:hover:border-gray-500 dark:hover:text-white";

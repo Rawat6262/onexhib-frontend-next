@@ -68,6 +68,7 @@ const ROLE_LABEL = {
   [ROLES.ADMIN]: "Admin",
   [ROLES.EXHIBITOR]: "Exhibitor",
   [ROLES.VISITOR]: "Visitor",
+  [ROLES.HOTEL]: "Hotel",
 };
 
 const toForm = (data) => ({
@@ -79,7 +80,7 @@ const toForm = (data) => ({
 const errMsg = (err, fallback) => err?.response?.data?.message || fallback;
 
 const input =
-  "w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-[#2B3FB8] focus:ring-4 focus:ring-[#2B3FB8]/15 motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100";
+  "w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-ox-blue focus:ring-4 focus:ring-ox-blue/15 motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100";
 
 export default function ProfileClient() {
   const { status, user, signIn } = useAuth();
@@ -214,9 +215,9 @@ export default function ProfileClient() {
   if (phase === "signed-out") {
     return (
       <div className="mt-6 rounded-3xl border border-gray-200 bg-white p-8 text-center dark:border-gray-800 dark:bg-gray-900">
-        <UserRound size={22} aria-hidden="true" className="mx-auto text-[#131C55] dark:text-blue-300" />
+        <UserRound size={22} aria-hidden="true" className="mx-auto text-ox-navy dark:text-blue-300" />
         <h1 className="mt-3 text-lg font-semibold text-gray-900 dark:text-white">Sign in to edit your profile</h1>
-        <Link href="/login" className="mt-4 inline-flex rounded-xl bg-[#131C55] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#0E1B6B]">
+        <Link href="/login" className="mt-4 inline-flex rounded-xl bg-ox-navy px-5 py-2.5 text-sm font-semibold text-white hover:bg-ox-navy-deep">
           Log in
         </Link>
       </div>
@@ -241,7 +242,7 @@ export default function ProfileClient() {
     <form onSubmit={save} aria-busy={saving || undefined} className="mt-6 pb-28" noValidate>
       {/* ── Identity: cover, photo, name - what people see ─────────────── */}
       <section className="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
-        <div className="relative h-40 bg-gradient-to-br from-[#131C55] via-[#1B2A7A] to-[#2B3FB8] sm:h-52">
+        <div className="relative h-40 bg-gradient-to-br from-ox-navy via-ox-royal to-ox-blue sm:h-52">
           {data.social.coverUrl ? (
             // eslint-disable-next-line @next/next/no-img-element -- Cloudinary URL from the upload endpoint
             <img src={data.social.coverUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
@@ -283,7 +284,7 @@ export default function ProfileClient() {
               aria-label={data.social.avatarUrl ? "Change profile photo" : "Add profile photo"}
               disabled={Boolean(photoBusy)}
               onClick={() => avatarInput.current?.click()}
-              className="absolute bottom-1 right-1 grid h-9 w-9 place-items-center rounded-full bg-[#131C55] text-white shadow-lg ring-2 ring-white transition hover:bg-[#0E1B6B] disabled:opacity-60 dark:ring-gray-900"
+              className="absolute bottom-1 right-1 grid h-9 w-9 place-items-center rounded-full bg-ox-navy text-white shadow-lg ring-2 ring-white transition hover:bg-ox-navy-deep disabled:opacity-60 dark:ring-gray-900"
             >
               {photoBusy === "avatar" ? <Loader2 size={16} className="animate-spin" aria-hidden="true" /> : <Camera size={16} aria-hidden="true" />}
             </button>
@@ -294,7 +295,7 @@ export default function ProfileClient() {
             <h1 className="break-words text-2xl font-extrabold tracking-tight text-gray-900 sm:text-3xl dark:text-white">{name}</h1>
             <p className="mt-1 text-[15px] text-gray-600 dark:text-gray-400">{form.headline || "Add a headline below"}</p>
             <div className="mt-2 flex flex-wrap items-center gap-2 text-[13px] text-gray-500 dark:text-gray-400">
-              <span className="inline-flex items-center gap-1 rounded-full bg-[#2B3FB8]/10 px-2.5 py-0.5 font-semibold text-[#2B3FB8] dark:bg-blue-400/15 dark:text-blue-300">
+              <span className="inline-flex items-center gap-1 rounded-full bg-ox-blue/10 px-2.5 py-0.5 font-semibold text-ox-blue dark:bg-blue-400/15 dark:text-blue-300">
                 <BadgeCheck size={13} aria-hidden="true" /> {ROLE_LABEL[account.designation] || "Member"}
               </span>
               {form.company_name ? (
@@ -323,7 +324,7 @@ export default function ProfileClient() {
             ) : null}
             <Link
               href={`/social/profile/${encodeURIComponent(String(account._id))}`}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-gray-300 px-3.5 py-2 text-[13px] font-semibold text-gray-800 hover:border-[#131C55] dark:border-gray-700 dark:text-gray-200"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-gray-300 px-3.5 py-2 text-[13px] font-semibold text-gray-800 hover:border-ox-navy dark:border-gray-700 dark:text-gray-200"
             >
               <ExternalLink size={14} aria-hidden="true" /> View Community profile
             </Link>
@@ -391,14 +392,14 @@ export default function ProfileClient() {
           <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-800 dark:bg-white/[0.03]">
             <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">Account type</p>
             <p className="mt-0.5 text-sm font-semibold text-gray-900 dark:text-white">{ROLE_LABEL[account.designation] || "Member"}</p>
-            <Link href="/welcome#account-type" className="mt-1 inline-block text-[12.5px] font-semibold text-[#2B3FB8] hover:underline dark:text-blue-300">
+            <Link href="/welcome#account-type" className="mt-1 inline-block text-[12.5px] font-semibold text-ox-blue hover:underline dark:text-blue-300">
               Change account type
             </Link>
           </div>
         </div>
         <p className="mt-3 text-[12.5px] text-gray-500 dark:text-gray-400">
           To change your email or mobile number, contact the OneXhib team. Forgot your password?{" "}
-          <Link href="/forgot-password" className="font-semibold text-[#2B3FB8] hover:underline dark:text-blue-300">
+          <Link href="/forgot-password" className="font-semibold text-ox-blue hover:underline dark:text-blue-300">
             Reset it
           </Link>
           .
@@ -426,7 +427,7 @@ export default function ProfileClient() {
             <button
               type="submit"
               disabled={saving || !changes.count}
-              className="inline-flex items-center gap-2 rounded-xl bg-[#131C55] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#0E1B6B] disabled:opacity-60 dark:bg-blue-500 dark:hover:bg-blue-400"
+              className="inline-flex items-center gap-2 rounded-xl bg-ox-navy px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-ox-navy-deep disabled:opacity-60 dark:bg-blue-500 dark:hover:bg-blue-400"
             >
               {saving ? <Loader2 size={15} className="animate-spin" aria-hidden="true" /> : null}
               Save profile
@@ -444,7 +445,7 @@ function Card({ step, title, subtitle, children }) {
   return (
     <section className="mt-5 rounded-3xl border border-gray-200 bg-white p-5 shadow-sm sm:p-7 dark:border-gray-800 dark:bg-gray-900">
       <div className="mb-5 flex items-start gap-3">
-        <span aria-hidden="true" className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#131C55] text-sm font-bold text-white dark:bg-blue-500">
+        <span aria-hidden="true" className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-ox-navy text-sm font-bold text-white dark:bg-blue-500">
           {step}
         </span>
         <div>

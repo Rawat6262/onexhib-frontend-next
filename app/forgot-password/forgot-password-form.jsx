@@ -68,7 +68,7 @@ export default function ForgotPasswordForm({ initialEmail = "" }) {
   const fieldClass = (hasError) =>
     `w-full px-4 py-2 rounded-lg border ${
       hasError ? "border-red-500" : "border-gray-300 dark:border-gray-700"
-    } bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-[#131C55] focus:ring-2 focus:ring-[#131C55]/20 dark:focus:border-blue-400 dark:focus:ring-blue-400/20 transition`;
+    } bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-ox-navy focus:ring-2 focus:ring-ox-navy/20 dark:focus:border-blue-400 dark:focus:ring-blue-400/20 transition`;
 
   return (
     <AuthCard formProps={{ onSubmit: handleSubmit }}>
@@ -130,7 +130,7 @@ export default function ForgotPasswordForm({ initialEmail = "" }) {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full py-3 mt-2 text-lg rounded-xl bg-[#131C55] text-white font-semibold hover:bg-[#0E1B6B] shadow-sm transition disabled:opacity-60 motion-reduce:transition-none"
+        className="w-full py-3 mt-2 text-lg rounded-xl bg-ox-navy text-white font-semibold hover:bg-ox-navy-deep shadow-sm transition disabled:opacity-60 motion-reduce:transition-none"
       >
         {isSubmitting ? "Sending OTP..." : "Send OTP"}
       </button>
@@ -138,7 +138,7 @@ export default function ForgotPasswordForm({ initialEmail = "" }) {
       <div className="text-center">
         <Link
           href="/login"
-          className="text-sm text-gray-400 dark:text-gray-500 hover:text-[#131C55] dark:hover:text-gray-300 hover:underline transition motion-reduce:transition-none"
+          className="text-sm text-gray-400 dark:text-gray-500 hover:text-ox-navy dark:hover:text-gray-300 hover:underline transition motion-reduce:transition-none"
         >
           ← Back to Login
         </Link>

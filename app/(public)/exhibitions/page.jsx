@@ -282,8 +282,8 @@ export default async function ExhibitionsPage({ searchParams }) {
                   aria-current={active ? "page" : undefined}
                   className={`inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition motion-reduce:transition-none ${
                     active
-                      ? "border-[#131C55] bg-[#131C55] text-white"
-                      : "border-gray-200 bg-white text-gray-700 hover:border-[#131C55]/40 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-gray-600"
+                      ? "border-ox-navy bg-ox-navy text-white"
+                      : "border-gray-200 bg-white text-gray-700 hover:border-ox-navy/40 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-gray-600"
                   }`}
                 >
                   {SCOPE_META[s].heading}
@@ -293,7 +293,7 @@ export default async function ExhibitionsPage({ searchParams }) {
                         active
                           ? "bg-white/20 text-white"
                           : count > 0
-                            ? "bg-[#131C55]/10 text-[#131C55] dark:bg-blue-400/15 dark:text-blue-300"
+                            ? "bg-ox-navy/10 text-ox-navy dark:bg-blue-400/15 dark:text-blue-300"
                             : "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-500"
                       }`}
                     >
@@ -396,6 +396,6 @@ export default async function ExhibitionsPage({ searchParams }) {
 const chip = (active) =>
   `inline-flex rounded-full border px-3.5 py-1.5 text-[13px] font-medium transition motion-reduce:transition-none ${
     active
-      ? "border-transparent bg-gradient-to-r from-[#131C55] to-[#2B3FB8] text-white shadow-sm shadow-indigo-900/20 dark:from-blue-500 dark:to-indigo-500"
-      : "border-gray-200 bg-white text-gray-600 hover:border-[#131C55]/40 hover:text-[#131C55] dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:border-gray-600 dark:hover:text-white"
+      ? "border-transparent bg-gradient-to-r from-ox-navy to-ox-blue text-white shadow-sm shadow-indigo-900/20 dark:from-blue-500 dark:to-indigo-500"
+      : "border-gray-200 bg-white text-gray-600 hover:border-ox-navy/40 hover:text-ox-navy dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:border-gray-600 dark:hover:text-white"
   }`;

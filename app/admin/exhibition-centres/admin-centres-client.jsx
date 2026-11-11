@@ -210,7 +210,7 @@ export default function AdminCentresClient() {
             aria-selected={tab === key}
             onClick={() => setTab(key)}
             className={`rounded-lg px-4 py-1.5 text-sm font-semibold transition motion-reduce:transition-none ${
-              tab === key ? "bg-white text-[#131C55] shadow-sm dark:bg-gray-900 dark:text-white" : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+              tab === key ? "bg-white text-ox-navy shadow-sm dark:bg-gray-900 dark:text-white" : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
             }`}
           >
             {label}

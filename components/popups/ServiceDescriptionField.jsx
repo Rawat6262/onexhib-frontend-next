@@ -29,7 +29,7 @@ export default function ServiceDescriptionField({ value, onChange }) {
         rows={4}
         aria-describedby="service-description-hint"
         placeholder="What you offer, the exhibitions and stand sizes you work on, your experience…"
-        className="w-full resize-y rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm outline-none transition placeholder-gray-400 focus:border-[#2B3FB8] focus:ring-4 focus:ring-[#2B3FB8]/15 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500"
+        className="w-full resize-y rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm outline-none transition placeholder-gray-400 focus:border-ox-blue focus:ring-4 focus:ring-ox-blue/15 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500"
       />
       <p id="service-description-hint" className="mt-1 flex justify-between gap-3 text-xs text-gray-500 dark:text-gray-400">
         <span>Shown on your public page. Listings with a description can appear in Google search.</span>

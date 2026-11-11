@@ -129,7 +129,7 @@ export default async function ProductDetailPage({ params }) {
 
         <div>
           {product.category ? (
-            <p className="inline-flex rounded-full bg-[#131C55]/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#131C55] dark:bg-blue-400/10 dark:text-blue-300">
+            <p className="inline-flex rounded-full bg-ox-navy/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-ox-navy dark:bg-blue-400/10 dark:text-blue-300">
               {product.category}
             </p>
           ) : null}
@@ -161,7 +161,7 @@ export default async function ProductDetailPage({ params }) {
                   <dd>
                     <Link
                       href={companyPath(company.name, company.id)}
-                      className="font-semibold text-[#131C55] underline-offset-4 hover:underline dark:text-blue-300"
+                      className="font-semibold text-ox-navy underline-offset-4 hover:underline dark:text-blue-300"
                     >
                       {company.name}
                     </Link>
@@ -175,7 +175,7 @@ export default async function ProductDetailPage({ params }) {
                   <dd>
                     <Link
                       href={exhibitionPath(exhibition.name, exhibition.id)}
-                      className="font-semibold text-[#131C55] underline-offset-4 hover:underline dark:text-blue-300"
+                      className="font-semibold text-ox-navy underline-offset-4 hover:underline dark:text-blue-300"
                     >
                       {exhibition.name}
                     </Link>
@@ -216,7 +216,7 @@ export default async function ProductDetailPage({ params }) {
           <p className="mt-5 text-[15px]">
             <Link
               href={companyPath(company.name, company.id)}
-              className="font-semibold text-[#131C55] underline-offset-4 hover:underline dark:text-blue-300"
+              className="font-semibold text-ox-navy underline-offset-4 hover:underline dark:text-blue-300"
             >
               See everything {company.name} is showcasing
             </Link>

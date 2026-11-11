@@ -67,6 +67,7 @@ export default function SignupForm({ stats }) {
     { value: "Exhibitor", label: "Exhibitor — I take a stand at exhibitions" },
     { value: "ORGANISER", label: "Organiser — I run exhibitions" },
     { value: "EXHIBITION_SERVICE", label: "Service provider — I offer services to exhibitions" },
+    { value: "HOTEL", label: "Hotel — I run a hotel near exhibition venues" },
   ];
 
   const countries = useMemo(

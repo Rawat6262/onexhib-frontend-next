@@ -87,13 +87,13 @@ export default function ServiceContactPanel({ serviceId }) {
               quickest way to lose them at the sign-in step. */}
           <Link
             href={`/login?next=${encodeURIComponent(pathname || "")}`}
-            className="inline-flex items-center justify-center rounded-xl bg-[#131C55] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#0E1B6B] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:bg-blue-600 dark:hover:bg-blue-500"
+            className="inline-flex items-center justify-center rounded-xl bg-ox-navy px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-ox-navy-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:bg-blue-600 dark:hover:bg-blue-500"
           >
             Sign in
           </Link>
           <Link
             href="/signup"
-            className="inline-flex items-center justify-center rounded-xl border border-gray-300 px-5 py-2.5 text-sm font-semibold text-gray-700 transition hover:border-[#131C55]/40 hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:border-gray-700 dark:text-gray-300 dark:hover:border-gray-500 dark:hover:text-white"
+            className="inline-flex items-center justify-center rounded-xl border border-gray-300 px-5 py-2.5 text-sm font-semibold text-gray-700 transition hover:border-ox-navy/40 hover:text-ox-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:border-gray-700 dark:text-gray-300 dark:hover:border-gray-500 dark:hover:text-white"
           >
             Create an account
           </Link>
@@ -143,7 +143,7 @@ export default function ServiceContactPanel({ serviceId }) {
                   that some dialers refuse. */}
               <a
                 href={`tel:${String(contact.mobile_number).replace(/[^\d+]/g, "")}`}
-                className="font-semibold text-[#131C55] underline-offset-4 hover:underline dark:text-blue-300"
+                className="font-semibold text-ox-navy underline-offset-4 hover:underline dark:text-blue-300"
               >
                 {contact.mobile_number}
               </a>

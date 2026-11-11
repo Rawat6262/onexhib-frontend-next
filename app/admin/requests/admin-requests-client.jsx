@@ -119,7 +119,7 @@ export default function AdminRequestsClient() {
                   aria-selected={active}
                   onClick={() => setTab(t.key)}
                   className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-1.5 text-[13px] font-semibold transition ${
-                    active ? "bg-white text-[#131C55] shadow-sm dark:bg-gray-900 dark:text-white" : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+                    active ? "bg-white text-ox-navy shadow-sm dark:bg-gray-900 dark:text-white" : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
                   }`}
                 >
                   {t.label}
@@ -275,7 +275,7 @@ function RequestRow({ r, onDecided }) {
       </div>
 
       {r.message ? (
-        <blockquote className="mt-3 rounded-xl border-l-4 border-[#2B3FB8]/40 bg-gray-50 px-4 py-2.5 text-sm leading-relaxed text-gray-700 dark:border-blue-400/40 dark:bg-white/[0.03] dark:text-gray-300">
+        <blockquote className="mt-3 rounded-xl border-l-4 border-ox-blue/40 bg-gray-50 px-4 py-2.5 text-sm leading-relaxed text-gray-700 dark:border-blue-400/40 dark:bg-white/[0.03] dark:text-gray-300">
           {r.message}
         </blockquote>
       ) : (

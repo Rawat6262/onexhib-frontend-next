@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import {
+  BedDouble,
   BriefcaseBusiness,
   KeyRound,
   Landmark,
@@ -16,6 +17,7 @@ import RequireAuth from "@/components/auth/RequireAuth";
 import { ROLES } from "@/lib/auth";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { getAdminAccessRequests } from "@/models/exhibition.model";
+import { getAdminHotels } from "@/models/hotel.model";
 
 /*
  * Admin-only area. The Vite app rendered these screens to anyone who typed the
@@ -35,23 +37,29 @@ const ITEMS = [
   { group: "Catalogue", label: "Products", href: "/admin/products", icon: <Package size={16} /> },
   { group: "Catalogue", label: "Services", href: "/admin/services", icon: <BriefcaseBusiness size={16} /> },
   { group: "Catalogue", label: "Exhibition centres", href: "/admin/exhibition-centres", icon: <Landmark size={16} /> },
+  { group: "Catalogue", label: "Hotels", href: "/admin/hotels", icon: <BedDouble size={16} /> },
   { group: "People", label: "Access requests", href: "/admin/requests", icon: <KeyRound size={16} /> },
 ];
 
 export default function AdminLayout({ children }) {
   const { role } = useAuth();
   const [pending, setPending] = useState(0);
+  const [hotelsPending, setHotelsPending] = useState(0);
 
-  // The pending count rides on the "Access requests" item, so a new request is
-  // visible from every admin page. Fetched once per visit to the console.
+  // Pending counts ride on the "Access requests" and "Hotels" items, so a new
+  // request or hotel is visible from every admin page. Fetched once per visit.
   useEffect(() => {
     if (role !== ROLES.ADMIN) return;
     getAdminAccessRequests("pending")
       .then(({ data }) => setPending(data?.counts?.pending || 0))
       .catch(() => setPending(0));
+    getAdminHotels({ status: "pending" })
+      .then(({ data }) => setHotelsPending(data?.counts?.pending || 0))
+      .catch(() => setHotelsPending(0));
   }, [role]);
 
-  const items = ITEMS.map((item) => (item.href === "/admin/requests" ? { ...item, badge: pending } : item));
+  const badges = { "/admin/requests": pending, "/admin/hotels": hotelsPending };
+  const items = ITEMS.map((item) => (item.href in badges ? { ...item, badge: badges[item.href] } : item));
 
   return (
     <RequireAuth roles={[ROLES.ADMIN]}>

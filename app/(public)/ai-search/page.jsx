@@ -51,7 +51,7 @@ export default function AiSearchPage() {
       <Breadcrumbs trail={trail} />
 
       <header className="max-w-2xl">
-        <span className="inline-flex items-center gap-2 rounded-full bg-[#131C55]/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#131C55] dark:bg-blue-400/10 dark:text-blue-300">
+        <span className="inline-flex items-center gap-2 rounded-full bg-ox-navy/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-ox-navy dark:bg-blue-400/10 dark:text-blue-300">
           <Sparkles size={13} aria-hidden="true" />
           Beta
         </span>
@@ -88,7 +88,7 @@ export default function AiSearchPage() {
             <Link
               key={item.href}
               href={item.href}
-              className="rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:border-[#131C55] hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:border-gray-700 dark:text-gray-300 dark:hover:border-blue-300 dark:hover:text-blue-300"
+              className="rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:border-ox-navy hover:text-ox-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:border-gray-700 dark:text-gray-300 dark:hover:border-blue-300 dark:hover:text-blue-300"
             >
               {item.label}
             </Link>

@@ -41,7 +41,7 @@ export default function CountsStrip({ counts, upcoming }) {
           }`}
         >
           <dt className="flex items-center gap-1.5 whitespace-nowrap text-[12px] font-medium text-gray-500 dark:text-gray-400">
-            <Icon size={14} aria-hidden="true" className="text-[#2B3FB8] dark:text-blue-300" />
+            <Icon size={14} aria-hidden="true" className="text-ox-blue dark:text-blue-300" />
             {label}
           </dt>
           <dd className="text-2xl font-extrabold tracking-tight text-gray-900 tabular-nums sm:text-[1.7rem] dark:text-white">

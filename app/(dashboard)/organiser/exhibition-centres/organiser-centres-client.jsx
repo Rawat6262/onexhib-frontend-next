@@ -144,7 +144,7 @@ export default function OrganiserCentresClient() {
                       setPage(1);
                     }}
                     className={`inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-1.5 text-[13px] font-semibold transition ${
-                      active ? "bg-white text-[#131C55] shadow-sm dark:bg-gray-900 dark:text-white" : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+                      active ? "bg-white text-ox-navy shadow-sm dark:bg-gray-900 dark:text-white" : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
                     }`}
                   >
                     {v.label}
@@ -223,8 +223,8 @@ export default function OrganiserCentresClient() {
 
 function CentreCard({ centre, onEdit, onDelete }) {
   return (
-    <li className="flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:border-[#2B3FB8]/40 hover:shadow-md motion-reduce:transition-none dark:border-gray-800 dark:bg-gray-900 dark:hover:border-blue-400/40">
-      <div className="relative aspect-[16/8] bg-gradient-to-br from-[#131C55] via-[#1B2A7A] to-[#2B3FB8]">
+    <li className="flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:border-ox-blue/40 hover:shadow-md motion-reduce:transition-none dark:border-gray-800 dark:bg-gray-900 dark:hover:border-blue-400/40">
+      <div className="relative aspect-[16/8] bg-gradient-to-br from-ox-navy via-ox-royal to-ox-blue">
         {centre.photo?.url ? (
           <Image src={centre.photo.url} alt="" fill sizes="(min-width: 1024px) 340px, (min-width: 640px) 50vw, 100vw" className="object-cover" unoptimized />
         ) : (
@@ -233,7 +233,7 @@ function CentreCard({ centre, onEdit, onDelete }) {
           </span>
         )}
         {centre.mine ? (
-          <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-semibold text-[#131C55] shadow">
+          <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-semibold text-ox-navy shadow">
             <UserRoundCheck size={12} aria-hidden="true" /> Added by you
           </span>
         ) : null}

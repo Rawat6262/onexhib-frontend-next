@@ -134,7 +134,7 @@ export default async function ThisWeekPage() {
                     })}
                   </time>
                   {isToday ? (
-                    <span className="rounded-full bg-[#131C55] px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-white">
+                    <span className="rounded-full bg-ox-navy px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-white">
                       Today
                     </span>
                   ) : null}
@@ -157,7 +157,7 @@ export default async function ThisWeekPage() {
         <div className="mt-10">
           <EmptyState>
             No exhibitions are listed as opening this week. Browse{" "}
-            <Link href={PUBLIC_ROUTES.exhibitions} className="font-semibold text-[#131C55] underline-offset-4 hover:underline dark:text-blue-300">
+            <Link href={PUBLIC_ROUTES.exhibitions} className="font-semibold text-ox-navy underline-offset-4 hover:underline dark:text-blue-300">
               all upcoming exhibitions
             </Link>{" "}
             instead.
@@ -168,19 +168,19 @@ export default async function ThisWeekPage() {
       <nav aria-label="Related views" className="mt-12 flex flex-wrap gap-3">
         <Link
           href={PUBLIC_ROUTES.exhibitions}
-          className="rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:border-[#131C55] hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:border-gray-700 dark:text-gray-300 dark:hover:border-blue-300 dark:hover:text-blue-300"
+          className="rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:border-ox-navy hover:text-ox-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:border-gray-700 dark:text-gray-300 dark:hover:border-blue-300 dark:hover:text-blue-300"
         >
           All upcoming exhibitions
         </Link>
         <Link
           href={`${PUBLIC_ROUTES.exhibitions}/monthly`}
-          className="rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:border-[#131C55] hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:border-gray-700 dark:text-gray-300 dark:hover:border-blue-300 dark:hover:text-blue-300"
+          className="rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:border-ox-navy hover:text-ox-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:border-gray-700 dark:text-gray-300 dark:hover:border-blue-300 dark:hover:text-blue-300"
         >
           Browse by month
         </Link>
         <Link
           href={`${PUBLIC_ROUTES.exhibitions}?scope=ongoing`}
-          className="rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:border-[#131C55] hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:border-gray-700 dark:text-gray-300 dark:hover:border-blue-300 dark:hover:text-blue-300"
+          className="rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:border-ox-navy hover:text-ox-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:border-gray-700 dark:text-gray-300 dark:hover:border-blue-300 dark:hover:text-blue-300"
         >
           Happening now
         </Link>

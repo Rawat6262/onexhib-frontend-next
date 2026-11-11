@@ -38,7 +38,7 @@ export default function PasswordInput({ className = "", id, ...props }) {
         aria-pressed={visible}
         aria-controls={id}
         title={label}
-        className="absolute inset-y-0 right-0 flex w-11 items-center justify-center rounded-r-xl text-gray-400 transition-colors hover:text-[#131C55] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#131C55] dark:text-gray-500 dark:hover:text-blue-300 dark:focus-visible:outline-blue-400"
+        className="absolute inset-y-0 right-0 flex w-11 items-center justify-center rounded-r-xl text-gray-400 transition-colors hover:text-ox-navy focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ox-navy dark:text-gray-500 dark:hover:text-blue-300 dark:focus-visible:outline-blue-400"
       >
         {visible ? <EyeOff size={18} aria-hidden="true" /> : <Eye size={18} aria-hidden="true" />}
       </button>

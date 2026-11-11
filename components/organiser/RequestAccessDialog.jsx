@@ -91,7 +91,7 @@ export default function RequestAccessDialog({ onClose, onSent, pendingIds = new 
         aria-labelledby="req-title"
         className="relative flex max-h-[92vh] w-full flex-col overflow-hidden rounded-t-3xl border border-gray-200 bg-white text-gray-900 shadow-2xl sm:max-w-xl sm:rounded-3xl dark:border-gray-800 dark:bg-gray-900 dark:text-gray-100"
       >
-        <div className="relative overflow-hidden bg-gradient-to-br from-[#131C55] to-[#2B3FB8] px-5 py-5 text-white sm:px-6">
+        <div className="relative overflow-hidden bg-gradient-to-br from-ox-navy to-ox-blue px-5 py-5 text-white sm:px-6">
           <div className="flex items-start gap-3">
             <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/15 ring-1 ring-white/20">
               <KeyRound size={18} aria-hidden="true" />
@@ -172,7 +172,7 @@ export default function RequestAccessDialog({ onClose, onSent, pendingIds = new 
                         ) : pending ? (
                           <span className="shrink-0 text-xs font-semibold text-amber-600 dark:text-amber-400">Requested</span>
                         ) : (
-                          <span className="shrink-0 text-xs font-semibold text-[#2B3FB8] dark:text-blue-300">Select</span>
+                          <span className="shrink-0 text-xs font-semibold text-ox-blue dark:text-blue-300">Select</span>
                         )}
                       </button>
                     </li>

@@ -134,10 +134,10 @@ function EdgeLink({ href, rel, label, wide = false, children }) {
 }
 
 const num =
-  "flex h-8 min-w-8 items-center justify-center rounded-lg px-2 text-sm font-medium text-gray-600 transition hover:bg-white hover:text-[#131C55] hover:shadow-sm focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white";
+  "flex h-8 min-w-8 items-center justify-center rounded-lg px-2 text-sm font-medium text-gray-600 transition hover:bg-white hover:text-ox-navy hover:shadow-sm focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ox-navy motion-reduce:transition-none dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white";
 
 const numActive =
-  "flex h-8 min-w-8 items-center justify-center rounded-lg bg-[#131C55] px-2 text-sm font-semibold text-white shadow-sm dark:bg-blue-500 dark:text-gray-950";
+  "flex h-8 min-w-8 items-center justify-center rounded-lg bg-ox-navy px-2 text-sm font-semibold text-white shadow-sm dark:bg-blue-500 dark:text-gray-950";
 
 const wideBtn =
-  "inline-flex h-9 items-center gap-1 rounded-lg border border-gray-300 px-3 text-sm font-medium text-gray-700 transition hover:border-[#131C55] hover:text-[#131C55] motion-reduce:transition-none dark:border-gray-700 dark:text-gray-300 dark:hover:border-gray-500 dark:hover:text-white";
+  "inline-flex h-9 items-center gap-1 rounded-lg border border-gray-300 px-3 text-sm font-medium text-gray-700 transition hover:border-ox-navy hover:text-ox-navy motion-reduce:transition-none dark:border-gray-700 dark:text-gray-300 dark:hover:border-gray-500 dark:hover:text-white";

@@ -294,7 +294,7 @@ export default function ServiceDirectory({
               onChange={(e) => setQuery(e.target.value)}
               placeholder={`Search ${providers.length} ${providers.length === 1 ? "provider" : "providers"}`}
               aria-label="Search providers by name"
-              className="h-9 w-full rounded-lg border border-transparent bg-gray-50 pl-9 pr-3 text-[13px] text-gray-900 placeholder-gray-400 transition focus:border-[#131C55]/40 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#131C55]/15 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-blue-400/40 dark:focus:bg-gray-800 dark:focus:ring-blue-400/20"
+              className="h-9 w-full rounded-lg border border-transparent bg-gray-50 pl-9 pr-3 text-[13px] text-gray-900 placeholder-gray-400 transition focus:border-ox-navy/40 focus:bg-white focus:outline-none focus:ring-2 focus:ring-ox-navy/15 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-blue-400/40 dark:focus:bg-gray-800 dark:focus:ring-blue-400/20"
             />
           </div>
 
@@ -342,9 +342,9 @@ export default function ServiceDirectory({
               onClick={() => setShowLetters((v) => !v)}
               aria-expanded={showLetters}
               aria-controls="letter-strip"
-              className={`inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg border px-3 text-[13px] font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none ${
+              className={`inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg border px-3 text-[13px] font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none ${
                 letter || showLetters
-                  ? "border-[#131C55]/30 bg-[#131C55]/5 text-[#131C55] dark:border-blue-400/30 dark:bg-blue-400/10 dark:text-blue-300"
+                  ? "border-ox-navy/30 bg-ox-navy/5 text-ox-navy dark:border-blue-400/30 dark:bg-blue-400/10 dark:text-blue-300"
                   : "border-gray-200 text-gray-600 hover:border-gray-300 hover:text-gray-900 dark:border-gray-800 dark:text-gray-400 dark:hover:border-gray-700 dark:hover:text-gray-100"
               }`}
             >
@@ -409,7 +409,7 @@ export default function ServiceDirectory({
                     type="button"
                     onClick={f.clear}
                     aria-label={`Remove filter: ${f.label}`}
-                    className="inline-flex items-center gap-1 rounded-md bg-[#131C55]/8 py-1 pl-2 pr-1.5 text-[12px] font-medium text-[#131C55] transition hover:bg-[#131C55]/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:bg-blue-400/10 dark:text-blue-300 dark:hover:bg-blue-400/20"
+                    className="inline-flex items-center gap-1 rounded-md bg-ox-navy/8 py-1 pl-2 pr-1.5 text-[12px] font-medium text-ox-navy transition hover:bg-ox-navy/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:bg-blue-400/10 dark:text-blue-300 dark:hover:bg-blue-400/20"
                   >
                     {f.label}
                     <X size={12} aria-hidden="true" />
@@ -420,7 +420,7 @@ export default function ServiceDirectory({
             <button
               type="button"
               onClick={clearAll}
-              className="inline-flex items-center gap-1 text-[12px] font-medium text-gray-500 underline-offset-2 transition hover:text-gray-900 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:text-gray-400 dark:hover:text-gray-100"
+              className="inline-flex items-center gap-1 text-[12px] font-medium text-gray-500 underline-offset-2 transition hover:text-gray-900 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:text-gray-400 dark:hover:text-gray-100"
             >
               <RotateCcw size={12} aria-hidden="true" />
               Clear all
@@ -513,7 +513,7 @@ export default function ServiceDirectory({
             <button
               type="button"
               onClick={showMore}
-              className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-gray-300 bg-white px-5 text-sm font-semibold text-gray-900 transition hover:border-[#131C55] hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:hover:border-blue-300 dark:hover:text-blue-200"
+              className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-gray-300 bg-white px-5 text-sm font-semibold text-gray-900 transition hover:border-ox-navy hover:text-ox-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:hover:border-blue-300 dark:hover:text-blue-200"
             >
               Show {Math.min(PAGE_STEP, filtered.length - drawn)} more
               <ChevronDown size={16} aria-hidden="true" />
@@ -535,9 +535,9 @@ function LetterChip({ active, onClick, children, label }) {
       /* aria-pressed, not just a colour change: a toggle that only reads as
          selected visually is not selected as far as a screen reader is concerned. */
       aria-pressed={active}
-      className={`inline-flex h-7 min-w-7 items-center justify-center rounded-md px-1.5 text-[12px] font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none ${
+      className={`inline-flex h-7 min-w-7 items-center justify-center rounded-md px-1.5 text-[12px] font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none ${
         active
-          ? "bg-[#131C55] text-white dark:bg-blue-500"
+          ? "bg-ox-navy text-white dark:bg-blue-500"
           : "text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100"
       }`}
     >
@@ -567,9 +567,9 @@ function CompactSelect({ id, label, value, onChange, allLabel, options }) {
       value={value}
       onChange={(e) => onChange(e.target.value)}
       aria-label={label}
-      className={`h-9 w-auto max-w-47.5 shrink-0 rounded-lg border bg-white px-2.5 text-[13px] transition focus:outline-none focus:ring-2 focus:ring-[#131C55]/15 dark:bg-gray-900 ${
+      className={`h-9 w-auto max-w-47.5 shrink-0 rounded-lg border bg-white px-2.5 text-[13px] transition focus:outline-none focus:ring-2 focus:ring-ox-navy/15 dark:bg-gray-900 ${
         value
-          ? "border-[#131C55]/30 font-medium text-[#131C55] dark:border-blue-400/30 dark:text-blue-300"
+          ? "border-ox-navy/30 font-medium text-ox-navy dark:border-blue-400/30 dark:text-blue-300"
           : "border-gray-200 text-gray-600 hover:border-gray-300 dark:border-gray-800 dark:text-gray-400 dark:hover:border-gray-700"
       }`}
     >

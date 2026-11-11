@@ -99,7 +99,7 @@ export default function SelfListedExhibitors({ exhibitionId, onChange }) {
       ) : state.error ? (
         <NoResults>
           Self-listed exhibitors could not be loaded.{" "}
-          <button type="button" onClick={load} className="font-semibold text-[#2B3FB8] hover:underline dark:text-blue-300">
+          <button type="button" onClick={load} className="font-semibold text-ox-blue hover:underline dark:text-blue-300">
             Try again
           </button>
         </NoResults>

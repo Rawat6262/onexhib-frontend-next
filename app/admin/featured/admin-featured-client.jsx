@@ -316,12 +316,12 @@ export default function AdminFeaturedClient() {
                   }}
                   className={`inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-1.5 text-[13px] font-semibold transition ${
                     active
-                      ? "bg-white text-[#131C55] shadow-sm dark:bg-gray-900 dark:text-white"
+                      ? "bg-white text-ox-navy shadow-sm dark:bg-gray-900 dark:text-white"
                       : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
                   }`}
                 >
                   {t.label}
-                  <span className={`rounded-full px-1.5 text-[11px] tabular-nums ${active ? "bg-[#2B3FB8]/10 text-[#2B3FB8] dark:bg-blue-400/15 dark:text-blue-300" : "bg-gray-200/80 text-gray-500 dark:bg-gray-700 dark:text-gray-400"}`}>
+                  <span className={`rounded-full px-1.5 text-[11px] tabular-nums ${active ? "bg-ox-blue/10 text-ox-blue dark:bg-blue-400/15 dark:text-blue-300" : "bg-gray-200/80 text-gray-500 dark:bg-gray-700 dark:text-gray-400"}`}>
                     {counts[t.key]}
                   </span>
                 </button>
@@ -518,7 +518,7 @@ function FeatureWindow({ it }) {
 const chip = (on) =>
   `h-9 rounded-lg px-2.5 text-xs font-semibold ring-1 transition ${
     on
-      ? "bg-[#2B3FB8] text-white ring-[#2B3FB8] dark:bg-blue-500 dark:ring-blue-500"
+      ? "bg-ox-blue text-white ring-ox-blue dark:bg-blue-500 dark:ring-blue-500"
       : "bg-white text-gray-700 ring-gray-200 hover:bg-gray-50 dark:bg-gray-900 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-gray-800"
   }`;
 
@@ -560,7 +560,7 @@ function DurationPicker({ start, end, busy, onConfirm, onCancel }) {
         e.preventDefault();
         if (valid && !busy) onConfirm(n);
       }}
-      className="mt-3 rounded-xl border border-[#2B3FB8]/20 bg-white p-3 dark:border-blue-400/20 dark:bg-gray-950/40"
+      className="mt-3 rounded-xl border border-ox-blue/20 bg-white p-3 dark:border-blue-400/20 dark:bg-gray-950/40"
     >
       <div className="flex flex-wrap items-end gap-2">
         <div>
@@ -619,12 +619,12 @@ function DurationPicker({ start, end, busy, onConfirm, onCancel }) {
 function Thumb({ src }) {
   const [broken, setBroken] = useState(false);
   return (
-    <div className="flex h-16 w-24 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-[#131C55]/10 to-[#2B3FB8]/15 ring-1 ring-gray-200 dark:from-blue-400/10 dark:to-indigo-400/10 dark:ring-gray-800">
+    <div className="flex h-16 w-24 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-ox-navy/10 to-ox-blue/15 ring-1 ring-gray-200 dark:from-blue-400/10 dark:to-indigo-400/10 dark:ring-gray-800">
       {src && !broken ? (
         // eslint-disable-next-line @next/next/no-img-element -- hotlinked hosts vary; a failed image falls back below
         <img src={src} alt="" loading="lazy" onError={() => setBroken(true)} className="h-full w-full object-cover" />
       ) : (
-        <Star size={18} className="text-[#2B3FB8]/50 dark:text-blue-300/50" aria-hidden="true" />
+        <Star size={18} className="text-ox-blue/50 dark:text-blue-300/50" aria-hidden="true" />
       )}
     </div>
   );
@@ -689,7 +689,7 @@ function AddFeatured({ onFeatured, featuredIds }) {
   }
 
   return (
-    <div className="mt-6 rounded-2xl border border-[#2B3FB8]/20 bg-gradient-to-b from-[#2B3FB8]/[0.04] to-transparent p-4 sm:p-5 dark:border-blue-400/20 dark:from-blue-400/[0.06]">
+    <div className="mt-6 rounded-2xl border border-ox-blue/20 bg-gradient-to-b from-ox-blue/[0.04] to-transparent p-4 sm:p-5 dark:border-blue-400/20 dark:from-blue-400/[0.06]">
       <label htmlFor="feature-search" className="text-sm font-semibold text-gray-900 dark:text-gray-100">
         Find an exhibition to feature
       </label>

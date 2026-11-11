@@ -88,7 +88,7 @@ export default function HomeServices({ directory, className = "" }) {
             <li key={c.slug}>
               <Link
                 href={serviceCategoryPath(c.slug)}
-                className="group inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white py-1.5 pr-1.5 pl-3.5 text-[13px] font-medium text-gray-700 transition hover:border-[#131C55]/40 hover:text-[#131C55] hover:shadow-sm motion-reduce:transition-none dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-blue-400/40 dark:hover:text-white"
+                className="group inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white py-1.5 pr-1.5 pl-3.5 text-[13px] font-medium text-gray-700 transition hover:border-ox-navy/40 hover:text-ox-navy hover:shadow-sm motion-reduce:transition-none dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-blue-400/40 dark:hover:text-white"
               >
                 {c.name}
                 <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-semibold text-gray-600 tabular-nums dark:bg-gray-800 dark:text-gray-400">
@@ -100,7 +100,7 @@ export default function HomeServices({ directory, className = "" }) {
           <li>
             <Link
               href={PUBLIC_ROUTES.services}
-              className="group inline-flex items-center gap-1.5 rounded-full py-1.5 pl-2 text-[13px] font-semibold text-[#131C55] hover:underline dark:text-blue-300"
+              className="group inline-flex items-center gap-1.5 rounded-full py-1.5 pl-2 text-[13px] font-semibold text-ox-navy hover:underline dark:text-blue-300"
             >
               Every category
               <ArrowRight size={14} aria-hidden="true" className="transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none" />

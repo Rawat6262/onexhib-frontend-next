@@ -90,7 +90,7 @@ export default function SavedClient() {
   if (phase === "signed-out") {
     return (
       <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center dark:border-gray-800 dark:bg-gray-900">
-        <Bookmark size={22} aria-hidden="true" className="mx-auto text-[#131C55] dark:text-blue-300" />
+        <Bookmark size={22} aria-hidden="true" className="mx-auto text-ox-navy dark:text-blue-300" />
         <h2 className="mt-3 text-base font-semibold text-gray-900 dark:text-gray-50">
           Sign in to see your saved exhibitions
         </h2>
@@ -99,7 +99,7 @@ export default function SavedClient() {
         </p>
         <Link
           href="/login?next=%2Faccount%2Fsaved"
-          className="mt-4 inline-flex items-center justify-center rounded-xl bg-[#131C55] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#0E1B6B] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55]"
+          className="mt-4 inline-flex items-center justify-center rounded-xl bg-ox-navy px-5 py-2.5 text-sm font-semibold text-white hover:bg-ox-navy-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy"
         >
           Sign in
         </Link>
@@ -116,7 +116,7 @@ export default function SavedClient() {
         <button
           type="button"
           onClick={load}
-          className="mt-3 rounded-xl border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:border-[#131C55] hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:border-gray-700 dark:text-gray-300"
+          className="mt-3 rounded-xl border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:border-ox-navy hover:text-ox-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:border-gray-700 dark:text-gray-300"
         >
           Try again
         </button>
@@ -136,7 +136,7 @@ export default function SavedClient() {
         </p>
         <Link
           href="/exhibitions"
-          className="mt-4 inline-flex items-center justify-center rounded-xl bg-[#131C55] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#0E1B6B] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55]"
+          className="mt-4 inline-flex items-center justify-center rounded-xl bg-ox-navy px-5 py-2.5 text-sm font-semibold text-white hover:bg-ox-navy-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy"
         >
           Browse exhibitions
         </Link>
@@ -164,14 +164,14 @@ export default function SavedClient() {
               className="ox-card flex flex-col rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900"
             >
               {item.category ? (
-                <span className="line-clamp-1 text-[11px] font-semibold uppercase tracking-wide text-[#131C55] dark:text-blue-300">
+                <span className="line-clamp-1 text-[11px] font-semibold uppercase tracking-wide text-ox-navy dark:text-blue-300">
                   {item.category}
                 </span>
               ) : null}
               <h2 className="mt-1 line-clamp-2 text-base font-semibold leading-snug text-gray-900 dark:text-gray-50">
                 <Link
                   href={exhibitionPath(item.name, item.id)}
-                  className="hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55]"
+                  className="hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy"
                 >
                   {item.name}
                 </Link>

@@ -113,7 +113,7 @@ export default function RequestAccessClient() {
       />
 
       {/* What it is */}
-      <section className="relative mt-8 overflow-hidden rounded-3xl bg-gradient-to-br from-[#131C55] via-[#1B2A7A] to-[#2B3FB8] p-6 text-white shadow-lg shadow-indigo-900/20 sm:p-8">
+      <section className="relative mt-8 overflow-hidden rounded-3xl bg-gradient-to-br from-ox-navy via-ox-royal to-ox-blue p-6 text-white shadow-lg shadow-indigo-900/20 sm:p-8">
         <span aria-hidden="true" className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-blue-400/25 blur-3xl" />
         <div className="relative grid gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:items-center">
           <div>
@@ -146,7 +146,7 @@ export default function RequestAccessClient() {
         <ul className="mt-5 grid list-none gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {BENEFITS.map(({ icon: Icon, title, text }) => (
             <li key={title} className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-              <span aria-hidden="true" className="grid h-10 w-10 place-items-center rounded-xl bg-[#2B3FB8]/10 text-[#2B3FB8] dark:bg-blue-400/15 dark:text-blue-300">
+              <span aria-hidden="true" className="grid h-10 w-10 place-items-center rounded-xl bg-ox-blue/10 text-ox-blue dark:bg-blue-400/15 dark:text-blue-300">
                 <Icon size={19} />
               </span>
               <p className="mt-4 font-semibold text-gray-900 dark:text-gray-100">{title}</p>
@@ -163,7 +163,7 @@ export default function RequestAccessClient() {
           {STEPS.map(({ icon: Icon, title, text }, i) => (
             <li key={title} className="relative rounded-2xl border border-gray-200 bg-gradient-to-b from-white to-gray-50 p-5 dark:border-gray-800 dark:from-gray-900 dark:to-gray-900/60">
               <div className="flex items-center gap-3">
-                <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#131C55] text-sm font-bold text-white dark:bg-blue-500">{i + 1}</span>
+                <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-ox-navy text-sm font-bold text-white dark:bg-blue-500">{i + 1}</span>
                 <Icon size={18} aria-hidden="true" className="text-gray-400" />
               </div>
               <p className="mt-4 font-semibold text-gray-900 dark:text-gray-100">{title}</p>
@@ -203,7 +203,7 @@ export default function RequestAccessClient() {
             <h2 className="text-lg font-bold text-gray-900 dark:text-white">No requests yet</h2>
             <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
               Find your exhibition and send your first request. Not on OneXhib at all?{" "}
-              <Link href="/organiser" className="font-semibold text-[#2B3FB8] underline-offset-4 hover:underline dark:text-blue-300">
+              <Link href="/organiser" className="font-semibold text-ox-blue underline-offset-4 hover:underline dark:text-blue-300">
                 Add it from My exhibitions
               </Link>
               .

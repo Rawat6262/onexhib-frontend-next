@@ -42,7 +42,7 @@ export default function CentresFilters({ q, country, sort, countries }) {
       }}
       className="flex flex-col gap-2 rounded-2xl border border-gray-200 bg-white p-2 shadow-sm sm:flex-row sm:items-center dark:border-gray-800 dark:bg-gray-900"
     >
-      <div className="flex min-w-0 flex-1 items-center gap-2 rounded-xl px-2 focus-within:ring-2 focus-within:ring-[#131C55]/15 dark:focus-within:ring-blue-400/30">
+      <div className="flex min-w-0 flex-1 items-center gap-2 rounded-xl px-2 focus-within:ring-2 focus-within:ring-ox-navy/15 dark:focus-within:ring-blue-400/30">
         <Search size={18} aria-hidden="true" className="shrink-0 text-gray-400" />
         <label htmlFor="centre-search" className="sr-only">
           Search exhibition centres by name or city
@@ -96,7 +96,7 @@ export default function CentresFilters({ q, country, sort, countries }) {
 
         <button
           type="submit"
-          className="inline-flex h-11 shrink-0 items-center justify-center rounded-xl bg-[#131C55] px-4 text-sm font-semibold text-white transition hover:bg-[#1d2a7a] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:bg-blue-500 dark:text-gray-950 dark:hover:bg-blue-400"
+          className="inline-flex h-11 shrink-0 items-center justify-center rounded-xl bg-ox-navy px-4 text-sm font-semibold text-white transition hover:bg-[#1d2a7a] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:bg-blue-500 dark:text-gray-950 dark:hover:bg-blue-400"
         >
           Search
         </button>
@@ -117,4 +117,4 @@ export default function CentresFilters({ q, country, sort, countries }) {
 }
 
 const selectCls =
-  "h-11 min-w-0 flex-1 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm font-medium text-gray-800 outline-none focus:border-[#131C55] focus:ring-2 focus:ring-[#131C55]/15 sm:w-44 sm:flex-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-blue-400";
+  "h-11 min-w-0 flex-1 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm font-medium text-gray-800 outline-none focus:border-ox-navy focus:ring-2 focus:ring-ox-navy/15 sm:w-44 sm:flex-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-blue-400";

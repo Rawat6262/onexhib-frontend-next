@@ -194,19 +194,19 @@ export default async function HomePage() {
               <li key={`${c.countrySlug}/${c.slug}`}>
                 <Link
                   href={cityLandingPath(c.countrySlug, c.slug)}
-                  className="ox-card group relative flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white p-4 hover:border-[#131C55]/30 hover:shadow-lg sm:p-5 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-blue-400/30"
+                  className="ox-card group relative flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white p-4 hover:border-ox-navy/30 hover:shadow-lg sm:p-5 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-blue-400/30"
                 >
                   <span
                     aria-hidden="true"
                     className={`pointer-events-none absolute -top-10 -right-10 h-28 w-28 rounded-full opacity-60 blur-2xl transition group-hover:opacity-100 motion-reduce:transition-none ${CITY_GLOWS[i % CITY_GLOWS.length]}`}
                   />
                   <span aria-hidden="true" className="relative flex items-center justify-between gap-2">
-                    <span className="grid h-9 w-9 place-items-center rounded-xl bg-[#131C55]/[0.06] text-[#2B3FB8] dark:bg-blue-400/10 dark:text-blue-300">
+                    <span className="grid h-9 w-9 place-items-center rounded-xl bg-ox-navy/[0.06] text-ox-blue dark:bg-blue-400/10 dark:text-blue-300">
                       <MapPin size={17} />
                     </span>
                     <ArrowRight
                       size={16}
-                      className="text-gray-300 transition group-hover:translate-x-0.5 group-hover:text-[#2B3FB8] motion-reduce:transition-none dark:text-gray-600 dark:group-hover:text-blue-300"
+                      className="text-gray-300 transition group-hover:translate-x-0.5 group-hover:text-ox-blue motion-reduce:transition-none dark:text-gray-600 dark:group-hover:text-blue-300"
                     />
                   </span>
                   {/* "Exhibitions in" stays in the anchor text (visually
@@ -219,7 +219,7 @@ export default async function HomePage() {
                   <span className="relative mt-4 flex items-center gap-2.5">
                     <span aria-hidden="true" className="h-1.5 flex-1 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
                       <span
-                        className="block h-full rounded-full bg-gradient-to-r from-[#2B3FB8] to-[#8B5CF6]"
+                        className="block h-full rounded-full bg-gradient-to-r from-ox-blue to-ox-violet"
                         style={{ width: `${Math.max(8, Math.round((c.count / cityMax) * 100))}%` }}
                       />
                     </span>
@@ -240,7 +240,7 @@ export default async function HomePage() {
               <li key={c.slug}>
                 <Link
                   href={countryLandingPath(c.slug)}
-                  className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white py-1.5 pr-1.5 pl-3.5 text-[13px] font-medium text-gray-700 transition hover:border-[#131C55]/40 hover:text-[#131C55] hover:shadow-sm motion-reduce:transition-none dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-blue-400/40 dark:hover:text-white"
+                  className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white py-1.5 pr-1.5 pl-3.5 text-[13px] font-medium text-gray-700 transition hover:border-ox-navy/40 hover:text-ox-navy hover:shadow-sm motion-reduce:transition-none dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-blue-400/40 dark:hover:text-white"
                 >
                   <Globe2 size={14} aria-hidden="true" className="text-gray-400" />
                   Exhibitions in {c.country}
@@ -300,7 +300,7 @@ export default async function HomePage() {
               <li key={c.slug}>
                 <Link
                   href={categoryLandingPath(c.slug)}
-                  className="ox-card group flex h-full items-center gap-3.5 rounded-2xl border border-gray-200 bg-white p-3.5 hover:border-[#131C55]/30 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 dark:hover:border-blue-400/30"
+                  className="ox-card group flex h-full items-center gap-3.5 rounded-2xl border border-gray-200 bg-white p-3.5 hover:border-ox-navy/30 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 dark:hover:border-blue-400/30"
                 >
                   <span
                     aria-hidden="true"
@@ -320,7 +320,7 @@ export default async function HomePage() {
                   <ArrowRight
                     size={16}
                     aria-hidden="true"
-                    className="shrink-0 text-gray-300 transition group-hover:translate-x-0.5 group-hover:text-[#2B3FB8] motion-reduce:transition-none dark:text-gray-600 dark:group-hover:text-blue-300"
+                    className="shrink-0 text-gray-300 transition group-hover:translate-x-0.5 group-hover:text-ox-blue motion-reduce:transition-none dark:text-gray-600 dark:group-hover:text-blue-300"
                   />
                 </Link>
               </li>
@@ -404,7 +404,7 @@ export default async function HomePage() {
                 className="ox-card flex flex-col rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900"
               >
                 {article.category ? (
-                  <span className="line-clamp-1 text-[11px] font-semibold uppercase tracking-wide text-[#131C55] dark:text-blue-300">
+                  <span className="line-clamp-1 text-[11px] font-semibold uppercase tracking-wide text-ox-navy dark:text-blue-300">
                     {article.category}
                   </span>
                 ) : null}
@@ -484,7 +484,7 @@ function Hero({ counts, upcoming }) {
     // `dark` on the section: everything inside (copy, buttons, search, counts,
     // showcase) uses its existing dark-mode styles over the film, in both site
     // themes, so the hero needs no second set of colours.
-    <section className="dark relative isolate overflow-hidden bg-[#0B1240] text-white">
+    <section className="dark relative isolate overflow-hidden bg-ox-night text-white">
       {/* Background film (desktop and tablet; see HeroVideo for when it loads),
           over the navy the section already paints. */}
       <HeroVideo />
@@ -497,24 +497,24 @@ function Hero({ counts, upcoming }) {
              copy column below);
           4. a soft fade at the bottom into the page colour - white in the
              light theme, near-black in the dark one - instead of a hard cut. */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[#0B1240]/30" />
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-ox-night/30" />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_75%_70%_at_60%_45%,transparent_40%,rgba(11,18,64,0.55)_100%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_75%_70%_at_60%_45%,transparent_40%,color-mix(in_oklab,var(--color-ox-night)_55%,transparent)_100%)]"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(11,18,64,0.6)_0%,rgba(11,18,64,0.3)_35%,transparent_60%)]"
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,color-mix(in_oklab,var(--color-ox-night)_60%,transparent)_0%,color-mix(in_oklab,var(--color-ox-night)_30%,transparent)_35%,transparent_60%)]"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-44 bg-[linear-gradient(to_bottom,transparent_0%,rgba(255,255,255,0.06)_40%,rgba(255,255,255,0.35)_70%,rgba(255,255,255,0.8)_88%,#fff_100%)] [:root.dark_&]:bg-[linear-gradient(to_bottom,transparent_0%,rgba(3,7,18,0.35)_45%,rgba(3,7,18,0.8)_80%,#030712_100%)]"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-44 bg-[linear-gradient(to_bottom,transparent_0%,color-mix(in_oklab,var(--color-white)_6%,transparent)_40%,color-mix(in_oklab,var(--color-white)_35%,transparent)_70%,color-mix(in_oklab,var(--color-white)_80%,transparent)_88%,var(--color-white)_100%)] [:root.dark_&]:bg-[linear-gradient(to_bottom,transparent_0%,color-mix(in_oklab,var(--color-gray-950)_35%,transparent)_45%,color-mix(in_oklab,var(--color-gray-950)_80%,transparent)_80%,var(--color-gray-950)_100%)]"
       />
       {/* Texture for phones only, where there is no film: a soft glow and a
           fine grid. Over the film they read as screen-door artefacts. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -left-32 -top-40 h-[30rem] w-[30rem] rounded-full bg-[radial-gradient(circle,rgba(76,99,210,0.30),transparent_65%)] md:hidden"
+        className="pointer-events-none absolute -left-32 -top-40 h-[30rem] w-[30rem] rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--color-ox-glow)_30%,transparent),transparent_65%)] md:hidden"
       />
       <div
         aria-hidden="true"
@@ -536,7 +536,7 @@ function Hero({ counts, upcoming }) {
               only guess where the centred column is). */}
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute -inset-x-16 -inset-y-14 -z-10 rounded-[4rem] bg-[#0B1240]/80 blur-3xl"
+            className="pointer-events-none absolute -inset-x-16 -inset-y-14 -z-10 rounded-[4rem] bg-ox-night/80 blur-3xl"
           />
           <p className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white/70 py-1 pr-3 pl-1.5 text-xs font-medium text-gray-600 shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/5 dark:text-gray-300">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2 py-0.5 font-semibold text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-300">
@@ -555,14 +555,14 @@ function Hero({ counts, upcoming }) {
             Discover{" "}
             {/* The one word the page is about, in the brand gradient. Text stays
                 real text: a crawler and a screen reader read the same h1. */}
-            <span className="bg-gradient-to-r from-[#2B3FB8] via-[#5B5BF0] to-[#8B5CF6] bg-clip-text text-transparent dark:from-blue-300 dark:via-indigo-300 dark:to-violet-300">
+            <span className="bg-gradient-to-r from-ox-blue via-ox-indigo to-ox-violet bg-clip-text text-transparent dark:from-blue-300 dark:via-indigo-300 dark:to-violet-300">
               exhibitions
             </span>
             ,
             <br className="hidden sm:block" /> exhibitors and products
           </h1>
 
-          <p className="mt-5 max-w-xl text-base leading-relaxed text-gray-600 [text-shadow:0_1px_14px_rgba(11,18,64,0.9)] sm:text-lg dark:text-gray-200">
+          <p className="mt-5 max-w-xl text-base leading-relaxed text-gray-600 [text-shadow:0_1px_14px_color-mix(in_oklab,var(--color-ox-night)_90%,transparent)] sm:text-lg dark:text-gray-200">
             OneXhib brings exhibitions and trade shows from around the world into one place — with
             their dates, venues and categories, the companies exhibiting at them, and the products
             those companies bring.
@@ -571,14 +571,14 @@ function Hero({ counts, upcoming }) {
           <div className="mt-7 flex flex-col gap-3 sm:flex-row">
             <Link
               href={PUBLIC_ROUTES.exhibitions}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#131C55] px-6 py-3.5 text-[15px] font-semibold text-white shadow-sm transition hover:bg-[#0E1B6B] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-ox-navy px-6 py-3.5 text-[15px] font-semibold text-white shadow-sm transition hover:bg-ox-navy-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none"
             >
               Explore exhibitions
               <ArrowRight size={17} aria-hidden="true" />
             </Link>
             <Link
               href="/signup"
-              className="inline-flex items-center justify-center rounded-xl border border-gray-300 bg-white px-6 py-3.5 text-[15px] font-semibold text-gray-900 transition hover:border-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:hover:border-gray-500"
+              className="inline-flex items-center justify-center rounded-xl border border-gray-300 bg-white px-6 py-3.5 text-[15px] font-semibold text-gray-900 transition hover:border-ox-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:hover:border-gray-500"
             >
               Create account
             </Link>
@@ -653,7 +653,7 @@ function WhyOneXhib({ archiveTotal }) {
               >
                 0{i + 1}
               </span>
-              <span className="relative inline-flex rounded-xl bg-gradient-to-br from-[#2B3FB8] to-[#8B5CF6] p-3 text-white shadow-md shadow-indigo-500/20">
+              <span className="relative inline-flex rounded-xl bg-gradient-to-br from-ox-blue to-ox-violet p-3 text-white shadow-md shadow-indigo-500/20">
                 <Icon size={20} aria-hidden="true" />
               </span>
               <h3 className="relative mt-4 text-lg font-semibold text-gray-900 dark:text-gray-50">{title}</h3>
@@ -714,7 +714,7 @@ function ForBusinesses() {
             <p className="mt-1.5 flex-1 text-[15px] leading-relaxed text-gray-600 dark:text-gray-400">{body}</p>
             <Link
               href="/signup"
-              className="group mt-5 inline-flex w-fit items-center gap-1.5 text-sm font-semibold text-[#2B3FB8] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#131C55] dark:text-blue-300"
+              className="group mt-5 inline-flex w-fit items-center gap-1.5 text-sm font-semibold text-ox-blue focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ox-navy dark:text-blue-300"
             >
               {action}
               <ArrowRight
@@ -730,7 +730,7 @@ function ForBusinesses() {
       <div className="mt-6">
         <Link
           href="/signup"
-          className="inline-flex items-center gap-2 rounded-xl bg-[#131C55] px-6 py-3.5 text-[15px] font-semibold text-white transition hover:bg-[#0E1B6B] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none"
+          className="inline-flex items-center gap-2 rounded-xl bg-ox-navy px-6 py-3.5 text-[15px] font-semibold text-white transition hover:bg-ox-navy-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none"
         >
           Join OneXhib
           <ArrowRight size={17} aria-hidden="true" />
@@ -746,7 +746,7 @@ function FinalCta() {
       aria-labelledby="cta-heading"
       className="mx-auto mt-20 w-full max-w-6xl px-4 sm:mt-24 sm:px-6"
     >
-      <div className="ox-reveal relative isolate overflow-hidden rounded-[28px] bg-gradient-to-br from-[#0B1240] via-[#131C55] to-[#2B1F7A] px-6 py-16 text-center shadow-[0_30px_80px_-30px_rgba(19,28,85,0.6)] ring-1 ring-white/10 sm:px-12 sm:py-20">
+      <div className="ox-reveal relative isolate overflow-hidden rounded-[var(--radius-feature)] bg-gradient-to-br from-ox-night via-ox-navy to-ox-plum px-6 py-16 text-center shadow-[0_30px_80px_-30px_color-mix(in_oklab,var(--color-ox-navy)_60%,transparent)] ring-1 ring-white/10 sm:px-12 sm:py-20">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute -top-24 left-1/2 -z-10 h-72 w-[36rem] -translate-x-1/2 rounded-full bg-blue-500/30 blur-3xl"
@@ -778,7 +778,7 @@ function FinalCta() {
         <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
           <Link
             href={PUBLIC_ROUTES.exhibitions}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3.5 text-[15px] font-semibold text-[#131C55] shadow-lg shadow-black/20 transition hover:-translate-y-0.5 hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white motion-reduce:transform-none motion-reduce:transition-none"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3.5 text-[15px] font-semibold text-ox-navy shadow-lg shadow-black/20 transition hover:-translate-y-0.5 hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white motion-reduce:transform-none motion-reduce:transition-none"
           >
             Explore exhibitions
             <ArrowRight size={17} aria-hidden="true" />

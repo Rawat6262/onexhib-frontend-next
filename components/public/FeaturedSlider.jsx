@@ -120,7 +120,7 @@ export default function FeaturedSlider({ items = [], className = "" }) {
       onBlurCapture={(e) => {
         if (!rootRef.current?.contains(e.relatedTarget)) setPaused(false);
       }}
-      className={`relative isolate overflow-hidden rounded-[28px] bg-gradient-to-br from-[#0B1240] via-[#131C55] to-[#1B2A7A] shadow-[0_30px_80px_-30px_rgba(19,28,85,0.65)] ring-1 ring-white/10 ${className}`}
+      className={`relative isolate overflow-hidden rounded-[var(--radius-feature)] bg-gradient-to-br from-ox-night via-ox-navy to-ox-royal shadow-[0_30px_80px_-30px_color-mix(in_oklab,var(--color-ox-navy)_65%,transparent)] ring-1 ring-white/10 ${className}`}
     >
       <div
         className={`flex ${reducedMotion ? "" : "transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"}`}
@@ -260,7 +260,7 @@ function Slide({ exhibition, active, priority, position, total, id }) {
       ) : null}
       <div
         aria-hidden="true"
-        className="absolute inset-0 -z-10 bg-gradient-to-r from-[#0B1240]/95 via-[#131C55]/80 to-[#131C55]/35"
+        className="absolute inset-0 -z-10 bg-gradient-to-r from-ox-night/95 via-ox-navy/80 to-ox-navy/35"
       />
       {/* Soft light from the top-left, and a dotted texture so large flat areas
           of the wash do not band. Inline SVG: no request. */}
@@ -367,10 +367,10 @@ function Slide({ exhibition, active, priority, position, total, id }) {
               real target, so this is aria-hidden to avoid a duplicate link. */}
           <span
             aria-hidden="true"
-            className="group/cta mt-8 inline-flex items-center gap-2 rounded-full bg-white py-3 pr-3 pl-6 text-[15px] font-semibold text-[#131C55] shadow-lg shadow-black/20"
+            className="group/cta mt-8 inline-flex items-center gap-2 rounded-full bg-white py-3 pr-3 pl-6 text-[15px] font-semibold text-ox-navy shadow-lg shadow-black/20"
           >
             View exhibition
-            <span className="grid h-8 w-8 place-items-center rounded-full bg-[#131C55] text-white">
+            <span className="grid h-8 w-8 place-items-center rounded-full bg-ox-navy text-white">
               <ArrowRight size={16} />
             </span>
           </span>
@@ -501,7 +501,7 @@ function SliderButton({ onClick, label, children }) {
       type="button"
       onClick={onClick}
       aria-label={label}
-      className="flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white backdrop-blur transition hover:scale-105 hover:bg-white hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white motion-reduce:transition-none motion-reduce:hover:scale-100"
+      className="flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white backdrop-blur transition hover:scale-105 hover:bg-white hover:text-ox-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white motion-reduce:transition-none motion-reduce:hover:scale-100"
     >
       {children}
     </button>

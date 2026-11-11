@@ -45,8 +45,28 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+/* Brand colours as named tokens (bg-ox-navy, text-ox-blue, ...). They were
+   arbitrary values like bg-[#131C55], which compile to a literal hex the
+   colour palettes below cannot reach. NOT `inline`, so every utility reads
+   var(--color-ox-*) and a palette can redefine it. */
+@theme {
+  --color-ox-navy: #131c55;
+  --color-ox-navy-deep: #0e1b6b;
+  --color-ox-royal: #1b2a7a;
+  --color-ox-night: #0b1240;
+  --color-ox-blue: #2b3fb8;
+  --color-ox-violet: #8b5cf6;
+  --color-ox-indigo: #5b5bf0;
+  --color-ox-iris: #6d4cf0;
+  --color-ox-plum: #2b1f7a;
+  --color-ox-grape: #4b2e9e;
+  --color-ox-grape-deep: #3a2a9a;
+  --color-ox-glow: #4c63d2;
+}
+
 :root {
   --radius: 0.625rem;
+  --radius-feature: 28px; /* the large featured panels (FeaturedSlider, home CTA) */
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -113,6 +133,278 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Colour palettes (components/layout/ThemePicker.jsx, lib/palettes.js).
+
+   The site is styled with Tailwind's own colours - bg-white, text-gray-600,
+   text-blue-600, bg-ox-navy - thousands of times, not with semantic tokens. So
+   a palette does not touch markup: it redefines the colour variables those
+   utilities read. Every page re-colours at once, and the light/dark `dark:`
+   variants keep working because the gray ramp still runs light → dark.
+
+   Each palette names two ends, --pal-paper (the light surface, which bg-white
+   becomes) and --pal-ink (the darkest surface, which gray-950 becomes), and
+   the gray ramp is mixed between them at roughly Tailwind's own lightness
+   steps. The accent ramp (blue, indigo, sky, violet) and the brand tokens are set per
+   palette, and the brand tokens again per mode so a navy button never sits on
+   a navy page. No data-palette attribute is the original OneXhib look.
+   ───────────────────────────────────────────────────────────────────────────*/
+:root[data-palette] {
+  --color-white: var(--pal-paper);
+  --color-black: var(--pal-ink);
+  --color-gray-50: color-mix(in oklab, var(--pal-ink) 3%, var(--pal-paper));
+  --color-gray-100: color-mix(in oklab, var(--pal-ink) 6%, var(--pal-paper));
+  --color-gray-200: color-mix(in oklab, var(--pal-ink) 11%, var(--pal-paper));
+  --color-gray-300: color-mix(in oklab, var(--pal-ink) 18%, var(--pal-paper));
+  --color-gray-400: color-mix(in oklab, var(--pal-ink) 35%, var(--pal-paper));
+  --color-gray-500: color-mix(in oklab, var(--pal-ink) 52%, var(--pal-paper));
+  --color-gray-600: color-mix(in oklab, var(--pal-ink) 64%, var(--pal-paper));
+  --color-gray-700: color-mix(in oklab, var(--pal-ink) 72%, var(--pal-paper));
+  --color-gray-800: color-mix(in oklab, var(--pal-ink) 83%, var(--pal-paper));
+  --color-gray-900: color-mix(in oklab, var(--pal-ink) 90%, var(--pal-paper));
+  --color-gray-950: var(--pal-ink);
+  --color-slate-50: var(--color-gray-50);
+  --color-slate-100: var(--color-gray-100);
+  --color-slate-200: var(--color-gray-200);
+  --color-slate-300: var(--color-gray-300);
+  --color-slate-400: var(--color-gray-400);
+  --color-slate-500: var(--color-gray-500);
+  --color-slate-600: var(--color-gray-600);
+  --color-slate-700: var(--color-gray-700);
+  --color-slate-800: var(--color-gray-800);
+  --color-slate-900: var(--color-gray-900);
+  --color-slate-950: var(--color-gray-950);
+  --color-indigo-50: var(--color-blue-50);
+  --color-indigo-100: var(--color-blue-100);
+  --color-indigo-200: var(--color-blue-200);
+  --color-indigo-300: var(--color-blue-300);
+  --color-indigo-400: var(--color-blue-400);
+  --color-indigo-500: var(--color-blue-500);
+  --color-indigo-600: var(--color-blue-600);
+  --color-indigo-700: var(--color-blue-700);
+  --color-indigo-800: var(--color-blue-800);
+  --color-indigo-900: var(--color-blue-900);
+  --color-indigo-950: var(--color-blue-950);
+  --color-sky-50: var(--color-blue-50);
+  --color-sky-100: var(--color-blue-100);
+  --color-sky-200: var(--color-blue-200);
+  --color-sky-300: var(--color-blue-300);
+  --color-sky-400: var(--color-blue-400);
+  --color-sky-500: var(--color-blue-500);
+  --color-sky-600: var(--color-blue-600);
+  --color-sky-700: var(--color-blue-700);
+  --color-sky-800: var(--color-blue-800);
+  --color-sky-900: var(--color-blue-900);
+  --color-sky-950: var(--color-blue-950);
+  --color-violet-50: var(--color-blue-50);
+  --color-violet-100: var(--color-blue-100);
+  --color-violet-200: var(--color-blue-200);
+  --color-violet-300: var(--color-blue-300);
+  --color-violet-400: var(--color-blue-400);
+  --color-violet-500: var(--color-blue-500);
+  --color-violet-600: var(--color-blue-600);
+  --color-violet-700: var(--color-blue-700);
+  --color-violet-800: var(--color-blue-800);
+  --color-violet-900: var(--color-blue-900);
+  --color-violet-950: var(--color-blue-950);
+}
+
+/* Midnight: midnight navy #0d1a33 surfaces, dusk blue #8fb4e3 accents. */
+:root[data-palette="midnight"] {
+  --pal-paper: #f4f7fc;
+  --pal-ink: #0d1a33;
+  --color-blue-50: #eef4fc;
+  --color-blue-100: #dce8f8;
+  --color-blue-200: #c2d6f1;
+  --color-blue-300: #8fb4e3;
+  --color-blue-400: #7aa3da;
+  --color-blue-500: #5b88c6;
+  --color-blue-600: #3f6aaa;
+  --color-blue-700: #30558d;
+  --color-blue-800: #244273;
+  --color-blue-900: #1a325e;
+  --color-blue-950: #0d1a33;
+  --color-ox-navy: #0d1a33;
+  --color-ox-navy-deep: #1a325e;
+  --color-ox-royal: #244273;
+  --color-ox-night: #0a1428;
+  --color-ox-blue: #3f6aaa;
+  --color-ox-violet: #8fb4e3;
+  --color-ox-indigo: #7aa3da;
+  --color-ox-iris: #5b88c6;
+  --color-ox-plum: #1a325e;
+  --color-ox-grape: #244273;
+  --color-ox-grape-deep: #1a325e;
+  --color-ox-glow: #8fb4e3;
+}
+:root[data-palette="midnight"].dark {
+  --color-ox-navy: #30558d;
+  --color-ox-navy-deep: #3f6aaa;
+  --color-ox-blue: #8fb4e3;
+}
+
+/* Chalk & Ink: chalk white #f3f2ee and ink black #0b0b0c, monochrome. */
+:root[data-palette="chalk"] {
+  --pal-paper: #f3f2ee;
+  --pal-ink: #0b0b0c;
+  --color-blue-50: #ebeae5;
+  --color-blue-100: #e0dfd9;
+  --color-blue-200: #cbcac3;
+  --color-blue-300: #a9a8a1;
+  --color-blue-400: #85847e;
+  --color-blue-500: #64635e;
+  --color-blue-600: #4a4945;
+  --color-blue-700: #363532;
+  --color-blue-800: #252423;
+  --color-blue-900: #171716;
+  --color-blue-950: #0b0b0c;
+  --color-ox-navy: #0b0b0c;
+  --color-ox-navy-deep: #252423;
+  --color-ox-royal: #363532;
+  --color-ox-night: #000000;
+  --color-ox-blue: #252423;
+  --color-ox-violet: #64635e;
+  --color-ox-indigo: #64635e;
+  --color-ox-iris: #4a4945;
+  --color-ox-plum: #171716;
+  --color-ox-grape: #363532;
+  --color-ox-grape-deep: #252423;
+  --color-ox-glow: #85847e;
+}
+:root[data-palette="chalk"].dark {
+  --color-ox-navy: #2c2b29;
+  --color-ox-navy-deep: #3a3936;
+  --color-ox-blue: #e0dfd9;
+}
+
+/* Rosso: carbon black rgb(20 21 24), pearl white rgb(238 236 230),
+   rosso corsa rgb(212 0 0) as the accent. */
+:root[data-palette="rosso"] {
+  --pal-paper: #eeece6;
+  --pal-ink: #141518;
+  --color-blue-50: #fbeeee;
+  --color-blue-100: #f7dada;
+  --color-blue-200: #efb5b5;
+  --color-blue-300: #e58585;
+  --color-blue-400: #dc4d4d;
+  --color-blue-500: #d81f1f;
+  --color-blue-600: #d40000;
+  --color-blue-700: #b00000;
+  --color-blue-800: #8a0000;
+  --color-blue-900: #640000;
+  --color-blue-950: #3a0000;
+  --color-ox-navy: #141518;
+  --color-ox-navy-deep: #2a2b30;
+  --color-ox-royal: #2a2b30;
+  --color-ox-night: #0a0a0c;
+  --color-ox-blue: #d40000;
+  --color-ox-violet: #d40000;
+  --color-ox-indigo: #e03030;
+  --color-ox-iris: #b00000;
+  --color-ox-plum: #3a0000;
+  --color-ox-grape: #640000;
+  --color-ox-grape-deep: #3a0000;
+  --color-ox-glow: #d40000;
+}
+:root[data-palette="rosso"].dark {
+  --color-ox-navy: #d40000;
+  --color-ox-navy-deep: #b00000;
+  /* Rosso corsa itself is under 4.5:1 on carbon, too dim for small link text. */
+  --color-ox-blue: #e85a5a;
+}
+
+/* Palette character. Colour alone made the three palettes read as recolours
+   of one site, so each also gets its own shape, heading face, surface and one
+   signature detail on the header:
+     Midnight    - soft corners, a dusk glow (and faint stars in dark) at the
+                   top of the page, a dusk hairline under the header.
+     Chalk & Ink - tighter corners, Fraunces serif headings, paper grain in
+                   light mode, a heavy ink rule under the header like a
+                   newspaper masthead.
+     Rosso       - near-square corners, Barlow Condensed headings, a carbon
+                   weave in dark mode, a rosso stripe along the top.
+   The textures sit on <body>, so they show only where a page has no surface
+   of its own; cards and sections cover them. Radii move through --radius
+   (sm-xl, via the @theme inline block above) and --radius-2xl/3xl. */
+:root[data-palette] {
+  accent-color: var(--color-ox-blue);
+  scrollbar-color: color-mix(in oklab, var(--color-ox-blue) 45%, var(--color-gray-400)) var(--color-gray-100);
+}
+:root[data-palette].dark {
+  scrollbar-color: color-mix(in oklab, var(--color-ox-blue) 45%, var(--color-gray-600)) var(--color-gray-950);
+}
+
+:root[data-palette="midnight"] {
+  --radius: 0.75rem;
+  --radius-feature: 32px;
+  --radius-2xl: 1.25rem;
+  --radius-3xl: 1.75rem;
+}
+:root[data-palette="midnight"] body {
+  background-image: radial-gradient(70rem 32rem at 50% -8rem, color-mix(in oklab, var(--color-blue-300) 16%, transparent), transparent 70%);
+  background-repeat: no-repeat;
+}
+:root[data-palette="midnight"].dark body {
+  background-image:
+    radial-gradient(70rem 32rem at 50% -8rem, color-mix(in oklab, var(--color-blue-300) 16%, transparent), transparent 70%),
+    radial-gradient(1px 1px at 12% 18%, rgb(255 255 255 / 0.55), transparent),
+    radial-gradient(1px 1px at 37% 64%, rgb(255 255 255 / 0.35), transparent),
+    radial-gradient(1.5px 1.5px at 58% 26%, rgb(255 255 255 / 0.5), transparent),
+    radial-gradient(1px 1px at 79% 72%, rgb(255 255 255 / 0.4), transparent),
+    radial-gradient(1px 1px at 91% 12%, rgb(255 255 255 / 0.45), transparent);
+  background-size: auto, 34rem 36rem, 34rem 36rem, 34rem 36rem, 34rem 36rem, 34rem 36rem;
+  /* Stars in a band across the top of the page only, not the whole scroll. */
+  background-repeat: no-repeat, repeat-x, repeat-x, repeat-x, repeat-x, repeat-x;
+}
+:root[data-palette="midnight"] .ox-header::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: -1px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-blue-300) 50%, transparent);
+  opacity: 0.7;
+  pointer-events: none;
+}
+:root[data-palette="midnight"] ::selection { background: var(--color-blue-300); color: var(--pal-ink); }
+
+:root[data-palette="chalk"] {
+  --radius: 0.375rem;
+  --radius-feature: 14px;
+  --radius-2xl: 0.625rem;
+  --radius-3xl: 0.875rem;
+}
+:root[data-palette="chalk"] :is(h1, h2, h3) {
+  font-family: var(--font-fraunces), ui-serif, Georgia, serif;
+  font-optical-sizing: auto;
+}
+:root[data-palette="chalk"]:not(.dark) body {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+:root[data-palette="chalk"] .ox-header { border-bottom: 2px solid var(--color-gray-950); }
+:root[data-palette="chalk"].dark .ox-header { border-bottom-color: var(--color-gray-600); }
+:root[data-palette="chalk"] ::selection { background: var(--pal-ink); color: var(--pal-paper); }
+:root[data-palette="chalk"].dark ::selection { background: var(--pal-paper); color: var(--pal-ink); }
+
+:root[data-palette="rosso"] {
+  --radius: 0.25rem;
+  --radius-feature: 8px;
+  --radius-2xl: 0.375rem;
+  --radius-3xl: 0.5rem;
+}
+:root[data-palette="rosso"] :is(h1, h2, h3) {
+  font-family: var(--font-barlow-condensed), var(--font-poppins), sans-serif;
+  /* The headings' tracking-tight is tuned for Poppins and cramps a condensed face. */
+  letter-spacing: 0.01em;
+}
+:root[data-palette="rosso"].dark body {
+  background-image:
+    repeating-linear-gradient(45deg, rgb(255 255 255 / 0.02) 0 2px, transparent 2px 4px),
+    repeating-linear-gradient(-45deg, rgb(0 0 0 / 0.22) 0 2px, transparent 2px 4px);
+}
+:root[data-palette="rosso"] .ox-header { box-shadow: inset 0 3px 0 var(--color-blue-600); }
+:root[data-palette="rosso"] ::selection { background: var(--color-blue-600); color: var(--pal-paper); }
 
 /* Fallback so pages that don't set their own background still flip in dark mode.
    Matches the Vite app's src/index.css exactly — deliberately NOT the token-based
@@ -243,7 +535,7 @@ body {
   top: 0;
   z-index: 1;
   height: 3px;
-  background: linear-gradient(90deg, #2b3fb8, #8b5cf6);
+  background: linear-gradient(90deg, var(--color-ox-blue), var(--color-ox-violet));
   transform: scaleX(0);
   transform-origin: left center;
   transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
@@ -268,10 +560,10 @@ body {
 .ox-form input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]):not([type="color"]):not([type="hidden"]):not(.sr-only),
 .ox-form select,
 .ox-form textarea {
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--color-gray-300);
   border-radius: 0.75rem;
-  background-color: #ffffff;
-  color: #111827;
+  background-color: var(--color-white);
+  color: var(--color-gray-900);
   padding: 0.625rem 0.875rem;
   font-size: 0.875rem;
   line-height: 1.25rem;
@@ -281,13 +573,13 @@ body {
 .ox-form select { padding-right: 2.25rem; cursor: pointer; }
 .ox-form textarea { min-height: 5.5rem; line-height: 1.5; }
 .ox-form input::placeholder,
-.ox-form textarea::placeholder { color: #9ca3af; }
+.ox-form textarea::placeholder { color: var(--color-gray-400); }
 .ox-form input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):focus,
 .ox-form select:focus,
 .ox-form textarea:focus {
   outline: none;
-  border-color: #2b3fb8;
-  box-shadow: 0 0 0 4px rgb(43 63 184 / 0.15);
+  border-color: var(--color-ox-blue);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--color-ox-blue) 15%, transparent);
 }
 .ox-form [aria-invalid="true"] { border-color: #f87171 !important; }
 .ox-form [aria-invalid="true"]:focus { box-shadow: 0 0 0 4px rgb(239 68 68 / 0.15) !important; }
@@ -297,16 +589,16 @@ body {
 
 .ox-form input[type="file"] {
   width: 100%;
-  border: 1px dashed #c7cbe0;
+  border: 1px dashed var(--color-gray-300);
   border-radius: 0.75rem;
-  background-color: #f8fafc;
+  background-color: var(--color-slate-50);
   padding: 0.375rem;
   font-size: 0.8125rem;
-  color: #6b7280;
+  color: var(--color-gray-500);
   cursor: pointer;
   transition: border-color 150ms ease, background-color 150ms ease;
 }
-.ox-form input[type="file"]:hover { border-color: #2b3fb8; background-color: #f1f4ff; }
+.ox-form input[type="file"]:hover { border-color: var(--color-ox-blue); background-color: var(--color-blue-50); }
 .ox-form input[type="file"]::file-selector-button {
   margin-right: 0.75rem;
   border: 0;
@@ -315,7 +607,7 @@ body {
   font-weight: 600;
   font-size: 0.8125rem;
   color: #ffffff;
-  background-image: linear-gradient(90deg, #131c55, #2b3fb8);
+  background-image: linear-gradient(90deg, var(--color-ox-navy), var(--color-ox-blue));
   cursor: pointer;
 }
 .ox-form input[type="file"]:hover::file-selector-button { filter: brightness(1.1); }
@@ -323,20 +615,20 @@ body {
 .dark .ox-form input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]):not([type="color"]):not([type="hidden"]):not(.sr-only),
 .dark .ox-form select,
 .dark .ox-form textarea {
-  border-color: #374151;
-  background-color: #030712;
-  color: #f3f4f6;
+  border-color: var(--color-gray-700);
+  background-color: var(--color-gray-950);
+  color: var(--color-gray-100);
   box-shadow: none;
 }
 .dark .ox-form input::placeholder,
-.dark .ox-form textarea::placeholder { color: #6b7280; }
+.dark .ox-form textarea::placeholder { color: var(--color-gray-500); }
 .dark .ox-form input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):focus,
 .dark .ox-form select:focus,
-.dark .ox-form textarea:focus { border-color: #60a5fa; box-shadow: 0 0 0 4px rgb(96 165 250 / 0.2); }
-.dark .ox-form select option { background-color: #111827; color: #f3f4f6; }
-.dark .ox-form input[type="file"] { border-color: #374151; background-color: #0b1120; color: #9ca3af; }
-.dark .ox-form input[type="file"]:hover { border-color: #60a5fa; background-color: #0f172a; }
-.dark .ox-form input[type="file"]::file-selector-button { background-image: linear-gradient(90deg, #2563eb, #6366f1); }
+.dark .ox-form textarea:focus { border-color: var(--color-blue-400); box-shadow: 0 0 0 4px color-mix(in oklab, var(--color-blue-400) 20%, transparent); }
+.dark .ox-form select option { background-color: var(--color-gray-900); color: var(--color-gray-100); }
+.dark .ox-form input[type="file"] { border-color: var(--color-gray-700); background-color: var(--color-gray-950); color: var(--color-gray-400); }
+.dark .ox-form input[type="file"]:hover { border-color: var(--color-blue-400); background-color: var(--color-slate-900); }
+.dark .ox-form input[type="file"]::file-selector-button { background-image: linear-gradient(90deg, var(--color-blue-600), var(--color-indigo-500)); }
 
 @media (prefers-reduced-motion: reduce) {
   .ox-form input, .ox-form select, .ox-form textarea { transition: none; }

@@ -28,7 +28,7 @@ export default function PostCover({ kind, data, compact = false }) {
     return (
       <div className={frame}>
         <Grid />
-        <p className="relative text-[11px] font-semibold uppercase tracking-wide text-[#131C55] dark:text-blue-300">
+        <p className="relative text-[11px] font-semibold uppercase tracking-wide text-ox-navy dark:text-blue-300">
           Listings by month
         </p>
         <div className="relative mt-3">
@@ -42,7 +42,7 @@ export default function PostCover({ kind, data, compact = false }) {
     return (
       <div className={frame}>
         <Grid />
-        <p className="relative text-[11px] font-semibold uppercase tracking-wide text-[#131C55] dark:text-blue-300">
+        <p className="relative text-[11px] font-semibold uppercase tracking-wide text-ox-navy dark:text-blue-300">
           Listings by country
         </p>
         <div className="relative mt-3">
@@ -55,7 +55,7 @@ export default function PostCover({ kind, data, compact = false }) {
   // No matching data: a branded field rather than a broken slot. Mirrors the
   // fallback contract in CardMedia.
   return (
-    <div className="relative flex h-full w-full items-center justify-center overflow-hidden bg-[#131C55]">
+    <div className="relative flex h-full w-full items-center justify-center overflow-hidden bg-ox-navy">
       <Grid light />
       <span className="relative text-[13px] font-semibold uppercase tracking-[0.2em] text-white/70">
         OneXhib
@@ -73,7 +73,7 @@ function Grid({ light = false }) {
       style={{
         backgroundImage: light
           ? "linear-gradient(to right, rgba(255,255,255,.5) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,.5) 1px, transparent 1px)"
-          : "linear-gradient(to right, rgba(19,28,85,.07) 1px, transparent 1px), linear-gradient(to bottom, rgba(19,28,85,.07) 1px, transparent 1px)",
+          : "linear-gradient(to right, color-mix(in oklab, var(--color-ox-navy) 7%, transparent) 1px, transparent 1px), linear-gradient(to bottom, color-mix(in oklab, var(--color-ox-navy) 7%, transparent) 1px, transparent 1px)",
         backgroundSize: "22px 22px",
       }}
     />

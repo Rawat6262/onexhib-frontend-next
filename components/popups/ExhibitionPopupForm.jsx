@@ -33,7 +33,7 @@ const InputField = ({ id, label, value, onChange, placeholder, type = "text", re
       placeholder={placeholder}
       aria-invalid={!!error}
       aria-describedby={error ? `${id}-error` : undefined}
-      className={`w-full rounded-md border px-3 py-2 text-gray-900 dark:text-gray-100 focus:border-[#2B3FB8] focus:ring-4 focus:ring-[#2B3FB8]/15 outline-none transition shadow-sm placeholder-gray-400 dark:placeholder-gray-500 ${
+      className={`w-full rounded-md border px-3 py-2 text-gray-900 dark:text-gray-100 focus:border-ox-blue focus:ring-4 focus:ring-ox-blue/15 outline-none transition shadow-sm placeholder-gray-400 dark:placeholder-gray-500 ${
         error ? "border-red-500" : "border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800"
       }`}
     />
@@ -54,7 +54,7 @@ const TextAreaField = ({ id, label, value, onChange, placeholder, rows = 3, requ
       rows={rows}
       aria-invalid={!!error}
       aria-describedby={error ? `${id}-error` : undefined}
-      className={`w-full rounded-md border px-3 py-2 text-gray-900 focus:border-[#2B3FB8] focus:ring-4 focus:ring-[#2B3FB8]/15 outline-none transition shadow-sm resize-none placeholder-gray-400 ${
+      className={`w-full rounded-md border px-3 py-2 text-gray-900 focus:border-ox-blue focus:ring-4 focus:ring-ox-blue/15 outline-none transition shadow-sm resize-none placeholder-gray-400 ${
         error ? "border-red-500" : "border-gray-300 bg-white"
       }`}
     />
@@ -310,7 +310,7 @@ const Dropdown = ({
         onBlur={onBlur}
         aria-invalid={!!error}
         aria-describedby={error ? `${id}-error` : undefined}
-        className={`w-full rounded-md border px-3 py-2 text-gray-900 dark:text-gray-100 focus:border-[#2B3FB8] focus:ring-4 focus:ring-[#2B3FB8]/15 outline-none transition shadow-sm ${
+        className={`w-full rounded-md border px-3 py-2 text-gray-900 dark:text-gray-100 focus:border-ox-blue focus:ring-4 focus:ring-ox-blue/15 outline-none transition shadow-sm ${
           error ? "border-red-500" : "border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800"
         }`}
       >
@@ -333,7 +333,7 @@ const Dropdown = ({
         placeholder={placeholder}
         aria-invalid={!!error}
         aria-describedby={error ? `${id}-error` : undefined}
-        className={`w-full rounded-md border px-3 py-2 text-gray-900 focus:border-[#2B3FB8] focus:ring-4 focus:ring-[#2B3FB8]/15 outline-none transition shadow-sm placeholder-gray-400 ${
+        className={`w-full rounded-md border px-3 py-2 text-gray-900 focus:border-ox-blue focus:ring-4 focus:ring-ox-blue/15 outline-none transition shadow-sm placeholder-gray-400 ${
           error ? "border-red-500" : "border-gray-300 bg-white"
         }`}
       />
@@ -504,7 +504,7 @@ const Dropdown = ({
             {/* === Left Column === */}
             <div className="space-y-6">
               <div className="space-y-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-                <h3 className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#2B3FB8] dark:text-blue-300">Basic Information</h3>
+                <h3 className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-ox-blue dark:text-blue-300">Basic Information</h3>
                 <InputField
                   id="exhibition_name"
                   label="Exhibition Name"
@@ -542,7 +542,7 @@ const Dropdown = ({
               </div>
 
               <div className="space-y-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-                <h3 className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#2B3FB8] dark:text-blue-300">Location</h3>
+                <h3 className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-ox-blue dark:text-blue-300">Location</h3>
                <div className="grid md:grid-cols-3 gap-6">
          {console.log(countries)}
  <Dropdown
@@ -627,7 +627,7 @@ const Dropdown = ({
 
 
               <div className="space-y-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-                <h3 className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#2B3FB8] dark:text-blue-300">Schedule Details</h3>
+                <h3 className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-ox-blue dark:text-blue-300">Schedule Details</h3>
                 <TextAreaField
                   id="speakers"
                   label="Speakers"
@@ -660,7 +660,7 @@ const Dropdown = ({
             <div className="space-y-6">
 
               <div className="space-y-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-                <h3 className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#2B3FB8] dark:text-blue-300">Dates & Media</h3>
+                <h3 className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-ox-blue dark:text-blue-300">Dates & Media</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <InputField
                     id="startDate"
@@ -708,7 +708,7 @@ const Dropdown = ({
               </div>
 
               <div className="space-y-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-                <h3 className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#2B3FB8] dark:text-blue-300">Additional Info</h3>
+                <h3 className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-ox-blue dark:text-blue-300">Additional Info</h3>
                 <TextAreaField
                   id="about_exhibition"
                   label="About Exhibition"
@@ -740,7 +740,7 @@ const Dropdown = ({
               </div>
 
               <div className="space-y-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-                <h3 className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#2B3FB8] dark:text-blue-300">Contact & Legal</h3>
+                <h3 className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-ox-blue dark:text-blue-300">Contact & Legal</h3>
                 <InputField
                   id="Support"
                   label="Support Contact"
@@ -771,7 +771,7 @@ const Dropdown = ({
                 </div>
               </div>
               <div className="space-y-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-                <h3 className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#2B3FB8] dark:text-blue-300">Exhibitor & vistor</h3>
+                <h3 className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-ox-blue dark:text-blue-300">Exhibitor & vistor</h3>
                 <TextAreaField
                   id="Exhibitor_Profile"
                   label="Exhibitor_Profile"
@@ -813,14 +813,14 @@ const Dropdown = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-6 py-2.5 text-sm font-semibold text-gray-700 transition hover:border-[#2B3FB8] hover:text-[#2B3FB8] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:border-blue-400 dark:hover:text-white"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-6 py-2.5 text-sm font-semibold text-gray-700 transition hover:border-ox-blue hover:text-ox-blue motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:border-blue-400 dark:hover:text-white"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#131C55] to-[#2B3FB8] px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-900/25 transition hover:brightness-110 disabled:opacity-70 disabled:cursor-not-allowed motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-ox-navy to-ox-blue px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-900/25 transition hover:brightness-110 disabled:opacity-70 disabled:cursor-not-allowed motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500"
               >
                 {isSubmitting ? "Saving..." : "Save Exhibition"}
               </button>

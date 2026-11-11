@@ -137,7 +137,7 @@ export default async function ExhibitionCentrePage({ params, searchParams }) {
                 href={directionsUrl({ lat: centre.lat, lng: centre.lng })}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-xl bg-[#131C55] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#0E1B6B] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none"
+                className="inline-flex items-center gap-2 rounded-xl bg-ox-navy px-5 py-3 text-sm font-semibold text-white transition hover:bg-ox-navy-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none"
               >
                 <Navigation size={16} aria-hidden="true" /> Get directions
               </a>
@@ -147,7 +147,7 @@ export default async function ExhibitionCentrePage({ params, searchParams }) {
                 href={centre.website}
                 target="_blank"
                 rel="noopener noreferrer nofollow"
-                className="inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-5 py-3 text-sm font-semibold text-gray-900 transition hover:border-[#131C55] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
+                className="inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-5 py-3 text-sm font-semibold text-gray-900 transition hover:border-ox-navy motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
               >
                 <Globe size={16} aria-hidden="true" /> Website <ExternalLink size={14} aria-hidden="true" className="text-gray-400" />
               </a>
@@ -158,7 +158,7 @@ export default async function ExhibitionCentrePage({ params, searchParams }) {
             <dl className="mt-8 grid gap-x-6 gap-y-4 sm:grid-cols-2">
               {facts.map(({ icon: Icon, label, value, href }) => (
                 <div key={label} className="flex items-start gap-3">
-                  <span aria-hidden="true" className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#131C55]/[0.06] text-[#2B3FB8] dark:bg-blue-400/10 dark:text-blue-300">
+                  <span aria-hidden="true" className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-ox-navy/[0.06] text-ox-blue dark:bg-blue-400/10 dark:text-blue-300">
                     <Icon size={17} />
                   </span>
                   <div className="min-w-0">
@@ -214,7 +214,7 @@ export default async function ExhibitionCentrePage({ params, searchParams }) {
 
       <section id="upcoming" aria-labelledby="centre-shows" className="mt-14 scroll-mt-24">
         <h2 id="centre-shows" className="flex items-center gap-2 text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl dark:text-gray-50">
-          <CalendarDays size={22} aria-hidden="true" className="text-[#2B3FB8] dark:text-blue-300" />
+          <CalendarDays size={22} aria-hidden="true" className="text-ox-blue dark:text-blue-300" />
           Upcoming exhibitions at {centre.name}
         </h2>
         {upcoming.length > PER_PAGE ? (

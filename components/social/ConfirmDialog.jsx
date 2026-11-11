@@ -46,7 +46,7 @@ export default function ConfirmDialog({
         className="max-w-[26rem] overflow-hidden rounded-3xl p-0 shadow-2xl shadow-indigo-950/20 dark:shadow-black/50"
       >
         {/* A thin coloured edge carries the tone, like the toasts. */}
-        <div aria-hidden="true" className={`h-1 w-full ${danger ? "bg-gradient-to-r from-red-500 to-rose-400" : "bg-gradient-to-r from-[#131C55] to-[#2B3FB8]"}`} />
+        <div aria-hidden="true" className={`h-1 w-full ${danger ? "bg-gradient-to-r from-red-500 to-rose-400" : "bg-gradient-to-r from-ox-navy to-ox-blue"}`} />
 
         <div className="flex gap-4 px-6 pb-2 pt-6">
           <span
@@ -54,7 +54,7 @@ export default function ConfirmDialog({
             className={`grid h-11 w-11 shrink-0 place-items-center rounded-2xl ring-1 ${
               danger
                 ? "bg-red-50 text-red-600 ring-red-100 dark:bg-red-500/10 dark:text-red-400 dark:ring-red-500/20"
-                : "bg-[#2B3FB8]/10 text-[#2B3FB8] ring-[#2B3FB8]/15 dark:bg-blue-400/10 dark:text-blue-300 dark:ring-blue-400/20"
+                : "bg-ox-blue/10 text-ox-blue ring-ox-blue/15 dark:bg-blue-400/10 dark:text-blue-300 dark:ring-blue-400/20"
             }`}
           >
             <Icon size={21} strokeWidth={2.2} />
@@ -74,7 +74,7 @@ export default function ConfirmDialog({
             type="button"
             onClick={() => onOpenChange(false)}
             disabled={pending}
-            className="inline-flex h-10 items-center justify-center rounded-xl border border-gray-300 bg-white px-4 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800"
+            className="inline-flex h-10 items-center justify-center rounded-xl border border-gray-300 bg-white px-4 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800"
           >
             {cancelLabel}
           </button>
@@ -85,7 +85,7 @@ export default function ConfirmDialog({
             className={`inline-flex h-10 items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold text-white shadow-md transition disabled:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none ${
               danger
                 ? "bg-gradient-to-r from-red-600 to-rose-500 shadow-red-900/20 hover:brightness-110 focus-visible:outline-red-600"
-                : "bg-gradient-to-r from-[#131C55] to-[#2B3FB8] shadow-indigo-900/20 hover:brightness-110 focus-visible:outline-[#131C55] dark:from-blue-600 dark:to-indigo-500"
+                : "bg-gradient-to-r from-ox-navy to-ox-blue shadow-indigo-900/20 hover:brightness-110 focus-visible:outline-ox-navy dark:from-blue-600 dark:to-indigo-500"
             }`}
           >
             {pending ? <Loader2 size={15} className="animate-spin" aria-hidden="true" /> : null}

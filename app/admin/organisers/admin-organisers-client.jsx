@@ -447,7 +447,7 @@ function NameCell({ item }) {
 }
 
 const iconBtn =
-  "grid h-8 w-8 place-items-center rounded-lg border border-gray-300 bg-white text-gray-600 transition hover:border-[#2B3FB8] hover:text-[#2B3FB8] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2B3FB8] dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-blue-400 dark:hover:text-white";
+  "grid h-8 w-8 place-items-center rounded-lg border border-gray-300 bg-white text-gray-600 transition hover:border-ox-blue hover:text-ox-blue focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-blue dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-blue-400 dark:hover:text-white";
 
 /**
  * In the table (`wrap` false) View/Edit/Access are icon buttons with tooltips

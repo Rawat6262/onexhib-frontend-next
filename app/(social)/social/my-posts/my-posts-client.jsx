@@ -186,14 +186,14 @@ export default function MyPostsClient() {
             <button
               type="button"
               onClick={() => load(null)}
-              className="mt-3 rounded-xl border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:border-[#131C55] hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:border-gray-700 dark:text-gray-300"
+              className="mt-3 rounded-xl border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:border-ox-navy hover:text-ox-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:border-gray-700 dark:text-gray-300"
             >
               Try again
             </button>
           </div>
         ) : !count ? (
           <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50 px-6 py-12 text-center dark:border-gray-700 dark:bg-gray-900/50">
-            <span className="mx-auto grid h-11 w-11 place-items-center rounded-xl bg-[#131C55]/[0.07] text-[#131C55] dark:bg-blue-400/10 dark:text-blue-300">
+            <span className="mx-auto grid h-11 w-11 place-items-center rounded-xl bg-ox-navy/[0.07] text-ox-navy dark:bg-blue-400/10 dark:text-blue-300">
               <PenSquare size={20} aria-hidden="true" />
             </span>
             <h3 className="mt-3 text-base font-semibold text-gray-900 dark:text-gray-50">
@@ -205,7 +205,7 @@ export default function MyPostsClient() {
             <button
               type="button"
               onClick={focusComposer}
-              className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#131C55] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#0E1B6B] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:bg-blue-500 dark:text-gray-950 dark:hover:bg-blue-400"
+              className="mt-4 inline-flex items-center gap-2 rounded-xl bg-ox-navy px-4 py-2 text-sm font-semibold text-white transition hover:bg-ox-navy-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:bg-blue-500 dark:text-gray-950 dark:hover:bg-blue-400"
             >
               <PenSquare size={16} aria-hidden="true" />
               Write your first post
@@ -238,7 +238,7 @@ export default function MyPostsClient() {
                   type="button"
                   onClick={() => load(posts.nextCursor)}
                   disabled={loadingMore}
-                  className="rounded-xl border border-gray-300 px-5 py-2.5 text-sm font-semibold text-gray-700 transition hover:border-[#131C55] hover:text-[#131C55] disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:border-gray-700 dark:text-gray-300"
+                  className="rounded-xl border border-gray-300 px-5 py-2.5 text-sm font-semibold text-gray-700 transition hover:border-ox-navy hover:text-ox-navy disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:border-gray-700 dark:text-gray-300"
                 >
                   {loadingMore ? "Loading…" : "Load more"}
                 </button>

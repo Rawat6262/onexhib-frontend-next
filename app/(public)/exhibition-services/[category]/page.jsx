@@ -109,7 +109,7 @@ export default async function ServiceCategoryPage({ params }) {
       <Breadcrumbs trail={trail} />
 
       <header className="max-w-3xl">
-        <p className="inline-flex items-center gap-1.5 rounded-full bg-[#131C55]/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#131C55] dark:bg-blue-400/10 dark:text-blue-300">
+        <p className="inline-flex items-center gap-1.5 rounded-full bg-ox-navy/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-ox-navy dark:bg-blue-400/10 dark:text-blue-300">
           <Briefcase size={12} aria-hidden="true" />
           Exhibition service
         </p>
@@ -196,4 +196,4 @@ export default async function ServiceCategoryPage({ params }) {
 }
 
 const chip =
-  "inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3.5 py-1.5 text-[13px] font-medium text-gray-600 transition hover:border-[#131C55]/40 hover:text-[#131C55] motion-reduce:transition-none dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:border-gray-600 dark:hover:text-white";
+  "inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3.5 py-1.5 text-[13px] font-medium text-gray-600 transition hover:border-ox-navy/40 hover:text-ox-navy motion-reduce:transition-none dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:border-gray-600 dark:hover:text-white";

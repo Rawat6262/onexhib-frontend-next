@@ -68,7 +68,7 @@ export default async function NewsPage() {
           on where and when trade shows happen, see the{" "}
           <Link
             href={PUBLIC_ROUTES.blog}
-            className="font-semibold text-[#131C55] underline-offset-4 hover:underline dark:text-blue-300"
+            className="font-semibold text-ox-navy underline-offset-4 hover:underline dark:text-blue-300"
           >
             OneXhib blog
           </Link>
@@ -84,7 +84,7 @@ export default async function NewsPage() {
               className="ox-card flex flex-col rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900"
             >
               {article.category ? (
-                <span className="line-clamp-1 text-[11px] font-semibold uppercase tracking-wide text-[#131C55] dark:text-blue-300">
+                <span className="line-clamp-1 text-[11px] font-semibold uppercase tracking-wide text-ox-navy dark:text-blue-300">
                   {article.category}
                 </span>
               ) : null}
@@ -101,7 +101,7 @@ export default async function NewsPage() {
                   href={article.link}
                   target="_blank"
                   rel="noopener noreferrer nofollow"
-                  className="mt-4 inline-flex items-center gap-1.5 self-start text-sm font-semibold text-[#131C55] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:text-blue-300"
+                  className="mt-4 inline-flex items-center gap-1.5 self-start text-sm font-semibold text-ox-navy underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:text-blue-300"
                 >
                   Read the full story
                   <ArrowUpRight size={15} aria-hidden="true" />
@@ -118,14 +118,14 @@ export default async function NewsPage() {
             No industry news has been published yet. In the meantime, the{" "}
             <Link
               href={PUBLIC_ROUTES.blog}
-              className="font-semibold text-[#131C55] underline-offset-4 hover:underline dark:text-blue-300"
+              className="font-semibold text-ox-navy underline-offset-4 hover:underline dark:text-blue-300"
             >
               blog
             </Link>{" "}
             covers where and when exhibitions happen, and{" "}
             <Link
               href={`${PUBLIC_ROUTES.exhibitions}/this-week`}
-              className="font-semibold text-[#131C55] underline-offset-4 hover:underline dark:text-blue-300"
+              className="font-semibold text-ox-navy underline-offset-4 hover:underline dark:text-blue-300"
             >
               this week&apos;s exhibitions
             </Link>{" "}

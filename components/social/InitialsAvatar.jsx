@@ -41,7 +41,7 @@ export default function InitialsAvatar({ name, src = null, size = "md", classNam
   return (
     <span
       aria-hidden="true"
-      className={`${dims} flex shrink-0 items-center justify-center rounded-full bg-[#131C55] font-bold text-white dark:bg-blue-600 ${className}`}
+      className={`${dims} flex shrink-0 items-center justify-center rounded-full bg-ox-navy font-bold text-white dark:bg-blue-600 ${className}`}
     >
       {initialsOf(name)}
     </span>

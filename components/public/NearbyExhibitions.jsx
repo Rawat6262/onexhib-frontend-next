@@ -73,9 +73,9 @@ export default function NearbyExhibitions({ className = "" }) {
   if (status === "guest") {
     return (
       <div className={`mx-auto w-full max-w-6xl px-4 sm:px-6 ${className}`}>
-        <div className="flex flex-col items-start gap-4 rounded-2xl border border-dashed border-[#2B3FB8]/30 bg-[#2B3FB8]/[0.03] p-5 sm:flex-row sm:items-center sm:justify-between dark:border-blue-400/25 dark:bg-blue-400/[0.04]">
+        <div className="flex flex-col items-start gap-4 rounded-2xl border border-dashed border-ox-blue/30 bg-ox-blue/[0.03] p-5 sm:flex-row sm:items-center sm:justify-between dark:border-blue-400/25 dark:bg-blue-400/[0.04]">
           <div className="flex items-center gap-3">
-            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-[#2B3FB8] to-[#8B5CF6] text-white shadow-md">
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-ox-blue to-ox-violet text-white shadow-md">
               <LocateFixed size={20} aria-hidden="true" />
             </span>
             <div>
@@ -85,7 +85,7 @@ export default function NearbyExhibitions({ className = "" }) {
           </div>
           <Link
             href="/login"
-            className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-gradient-to-r from-[#131C55] to-[#2B3FB8] px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-900/20 transition hover:brightness-110 motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500"
+            className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-gradient-to-r from-ox-navy to-ox-blue px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-900/20 transition hover:brightness-110 motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500"
           >
             Sign in
             <ArrowRight size={15} aria-hidden="true" />
@@ -132,8 +132,8 @@ export default function NearbyExhibitions({ className = "" }) {
                     onClick={() => setActive(i)}
                     className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-[13px] font-medium transition motion-reduce:transition-none ${
                       on
-                        ? "border-transparent bg-gradient-to-r from-[#131C55] to-[#2B3FB8] text-white shadow-sm shadow-indigo-900/20 dark:from-blue-500 dark:to-indigo-500"
-                        : "border-gray-200 bg-white text-gray-700 hover:border-[#2B3FB8]/40 hover:text-[#2B3FB8] dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-blue-400/40 dark:hover:text-white"
+                        ? "border-transparent bg-gradient-to-r from-ox-navy to-ox-blue text-white shadow-sm shadow-indigo-900/20 dark:from-blue-500 dark:to-indigo-500"
+                        : "border-gray-200 bg-white text-gray-700 hover:border-ox-blue/40 hover:text-ox-blue dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-blue-400/40 dark:hover:text-white"
                     }`}
                   >
                     <MapPin size={13} aria-hidden="true" />

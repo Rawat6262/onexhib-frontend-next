@@ -134,21 +134,21 @@ export default function MegaNav() {
                     clearTimeout(timer.current);
                     setOpen((cur) => (cur === menu.key ? null : menu.key));
                   }}
-                  className={`relative inline-flex items-center gap-1 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none ${
+                  className={`relative inline-flex items-center gap-1 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none ${
                     expanded
-                      ? "bg-[#2B3FB8]/[0.08] text-[#131C55] dark:bg-blue-400/10 dark:text-white"
+                      ? "bg-ox-blue/[0.08] text-ox-navy dark:bg-blue-400/10 dark:text-white"
                       : here
-                        ? "text-[#131C55] dark:text-white"
-                        : "text-gray-700 hover:bg-gray-100 hover:text-[#131C55] dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white"
+                        ? "text-ox-navy dark:text-white"
+                        : "text-gray-700 hover:bg-gray-100 hover:text-ox-navy dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white"
                   }`}
                 >
                   {menu.label}
                   <ChevronDown
                     size={14}
                     aria-hidden="true"
-                    className={`text-gray-400 transition-transform motion-reduce:transition-none ${expanded ? "rotate-180 text-[#2B3FB8] dark:text-blue-300" : ""}`}
+                    className={`text-gray-400 transition-transform motion-reduce:transition-none ${expanded ? "rotate-180 text-ox-blue dark:text-blue-300" : ""}`}
                   />
-                  {here ? <span aria-hidden="true" className="absolute inset-x-3 -bottom-[13px] h-0.5 rounded-full bg-[#2B3FB8] dark:bg-blue-300" /> : null}
+                  {here ? <span aria-hidden="true" className="absolute inset-x-3 -bottom-[13px] h-0.5 rounded-full bg-ox-blue dark:bg-blue-300" /> : null}
                 </button>
               </li>
             );
@@ -156,8 +156,8 @@ export default function MegaNav() {
           <li>
             <Link
               href={NEWS_LINK.href}
-              className={`whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none ${
-                isActive(pathname, [NEWS_LINK.href]) ? "text-[#131C55] dark:text-white" : "text-gray-700 hover:bg-gray-100 hover:text-[#131C55] dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white"
+              className={`whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none ${
+                isActive(pathname, [NEWS_LINK.href]) ? "text-ox-navy dark:text-white" : "text-gray-700 hover:bg-gray-100 hover:text-ox-navy dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white"
               }`}
             >
               {NEWS_LINK.label}
@@ -166,7 +166,7 @@ export default function MegaNav() {
           <li className="ml-1">
             <Link
               href={AI_LINK.href}
-              className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-gradient-to-r from-[#2B3FB8] to-[#6D4CF0] px-3 py-2 text-sm font-semibold text-white shadow-sm shadow-indigo-500/25 transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none"
+              className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-gradient-to-r from-ox-blue to-ox-iris px-3 py-2 text-sm font-semibold text-white shadow-sm shadow-indigo-500/25 transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none"
             >
               <Sparkles size={14} aria-hidden="true" className="shrink-0" />
               {AI_LINK.label}
@@ -183,7 +183,7 @@ export default function MegaNav() {
             id={`${baseId}-${active.key}`}
             role="region"
             aria-label={`${active.label} menu`}
-            className="ox-menu-in mx-auto w-full max-w-6xl overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-2xl shadow-[#131C55]/10 dark:border-gray-800 dark:bg-gray-900 dark:shadow-black/40"
+            className="ox-menu-in mx-auto w-full max-w-6xl overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-2xl shadow-ox-navy/10 dark:border-gray-800 dark:bg-gray-900 dark:shadow-black/40"
           >
             {active.key === "exhibitions" ? (
               <ExhibitionsPanel summary={summary} />
@@ -216,7 +216,7 @@ function ExhibitionsPanel({ summary }) {
               ? summary.next.map((e, i) => <NextShow key={e.id} show={e} tone={i} />)
               : [0, 1, 2].map((i) => <li key={i} className="h-[58px] animate-pulse rounded-2xl bg-gray-100 dark:bg-gray-800" />)}
           </ul>
-          <Link href={PUBLIC_ROUTES.exhibitions} className="mt-3 inline-flex items-center gap-1 px-1 text-[13px] font-semibold text-[#2B3FB8] hover:underline dark:text-blue-300">
+          <Link href={PUBLIC_ROUTES.exhibitions} className="mt-3 inline-flex items-center gap-1 px-1 text-[13px] font-semibold text-ox-blue hover:underline dark:text-blue-300">
             See all upcoming <ArrowRight size={14} aria-hidden="true" />
           </Link>
         </div>
@@ -229,7 +229,7 @@ function ExhibitionsPanel({ summary }) {
               <Link
                 key={p.href}
                 href={p.href}
-                className="rounded-full border border-gray-200 bg-white px-3 py-1 text-[12.5px] font-medium text-gray-700 transition hover:border-[#2B3FB8] hover:text-[#2B3FB8] dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-blue-300 dark:hover:text-blue-300"
+                className="rounded-full border border-gray-200 bg-white px-3 py-1 text-[12.5px] font-medium text-gray-700 transition hover:border-ox-blue hover:text-ox-blue dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-blue-300 dark:hover:text-blue-300"
               >
                 {p.label}
               </Link>
@@ -245,8 +245,8 @@ function ExhibitionsPanel({ summary }) {
               href={l.href}
               className={
                 i === 0
-                  ? "inline-flex items-center gap-1.5 rounded-xl bg-[#131C55] px-3.5 py-2 text-[13px] font-semibold text-white transition hover:bg-[#0E1B6B] dark:bg-blue-500 dark:hover:bg-blue-400"
-                  : "inline-flex items-center gap-1.5 rounded-xl border border-gray-200 px-3.5 py-2 text-[13px] font-semibold text-gray-800 transition hover:border-[#131C55] dark:border-gray-700 dark:text-gray-200"
+                  ? "inline-flex items-center gap-1.5 rounded-xl bg-ox-navy px-3.5 py-2 text-[13px] font-semibold text-white transition hover:bg-ox-navy-deep dark:bg-blue-500 dark:hover:bg-blue-400"
+                  : "inline-flex items-center gap-1.5 rounded-xl border border-gray-200 px-3.5 py-2 text-[13px] font-semibold text-gray-800 transition hover:border-ox-navy dark:border-gray-700 dark:text-gray-200"
               }
             >
               <l.icon size={14} aria-hidden="true" />
@@ -261,7 +261,7 @@ function ExhibitionsPanel({ summary }) {
 
 function SummaryCard({ summary }) {
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#131C55] via-[#1B2A7A] to-[#2B3FB8] p-5 text-white shadow-lg shadow-indigo-900/20">
+    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-ox-navy via-ox-royal to-ox-blue p-5 text-white shadow-lg shadow-indigo-900/20">
       <span aria-hidden="true" className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full bg-blue-400/30 blur-3xl" />
       <p className="relative text-[11px] font-bold uppercase tracking-[0.16em] text-blue-100/80">Exhibitions</p>
       <p className="relative mt-2 text-3xl font-extrabold tabular-nums leading-none">
@@ -303,7 +303,7 @@ function DirectoryPanel({ summary }) {
           <section key={card.title} className="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
             <Link
               href={card.href}
-              className="group relative flex h-[76px] items-end gap-2.5 overflow-hidden bg-gradient-to-br from-[#131C55] via-[#1B2A7A] to-[#2B3FB8] px-4 pb-3 text-white"
+              className="group relative flex h-[76px] items-end gap-2.5 overflow-hidden bg-gradient-to-br from-ox-navy via-ox-royal to-ox-blue px-4 pb-3 text-white"
             >
               <span aria-hidden="true" className="pointer-events-none absolute -right-8 -top-10 h-28 w-28 rounded-full bg-blue-400/30 blur-2xl" />
               <card.icon size={19} aria-hidden="true" className="relative" />
@@ -334,7 +334,7 @@ function CommunityPanel({ userId }) {
       <Column title={you.title} links={you.links.map(fix).filter(Boolean)} />
       <Link
         href="/social"
-        className="group relative flex flex-col justify-between overflow-hidden rounded-2xl bg-gradient-to-br from-[#131C55] via-[#1B2A7A] to-[#2B3FB8] p-5 text-white"
+        className="group relative flex flex-col justify-between overflow-hidden rounded-2xl bg-gradient-to-br from-ox-navy via-ox-royal to-ox-blue p-5 text-white"
       >
         <span aria-hidden="true" className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full bg-blue-400/30 blur-3xl" />
         <span className="relative text-[11px] font-bold uppercase tracking-[0.16em] text-blue-100/80">OneXhib community</span>
@@ -351,7 +351,7 @@ function CommunityPanel({ userId }) {
 
 function ColumnTitle({ children }) {
   return (
-    <p className="mb-2 flex items-center gap-2 px-1 text-[11px] font-bold uppercase tracking-[0.16em] text-[#2B3FB8] dark:text-blue-300">
+    <p className="mb-2 flex items-center gap-2 px-1 text-[11px] font-bold uppercase tracking-[0.16em] text-ox-blue dark:text-blue-300">
       <span aria-hidden="true" className="h-px w-4 bg-current opacity-60" />
       {children}
     </p>
@@ -379,9 +379,9 @@ function MenuItem({ link, summary }) {
   return (
     <Link
       href={link.href}
-      className="group flex items-center gap-3 rounded-xl px-2 py-2 transition hover:bg-[#2B3FB8]/[0.06] focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-[#2B3FB8] motion-reduce:transition-none dark:hover:bg-white/[0.05]"
+      className="group flex items-center gap-3 rounded-xl px-2 py-2 transition hover:bg-ox-blue/[0.06] focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-ox-blue motion-reduce:transition-none dark:hover:bg-white/[0.05]"
     >
-      <span aria-hidden="true" className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#2B3FB8]/10 text-[#2B3FB8] transition group-hover:bg-[#2B3FB8] group-hover:text-white motion-reduce:transition-none dark:bg-blue-400/15 dark:text-blue-300 dark:group-hover:bg-blue-500 dark:group-hover:text-white">
+      <span aria-hidden="true" className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-ox-blue/10 text-ox-blue transition group-hover:bg-ox-blue group-hover:text-white motion-reduce:transition-none dark:bg-blue-400/15 dark:text-blue-300 dark:group-hover:bg-blue-500 dark:group-hover:text-white">
         <Icon size={17} />
       </span>
       <span className="min-w-0 flex-1">
@@ -404,7 +404,7 @@ function MenuItem({ link, summary }) {
   );
 }
 
-const TONES = ["bg-[#131C55]", "bg-[#2B3FB8]", "bg-[#4F46E5]"];
+const TONES = ["bg-ox-navy", "bg-ox-blue", "bg-[#4F46E5]"];
 
 function NextShow({ show, tone }) {
   const d = show.startDate ? new Date(show.startDate) : null;
@@ -413,7 +413,7 @@ function NextShow({ show, tone }) {
     <li>
       <Link
         href={show.href}
-        className="flex items-center gap-3 rounded-2xl border border-gray-200 bg-white p-2 transition hover:border-[#2B3FB8]/40 hover:shadow-sm motion-reduce:transition-none dark:border-gray-800 dark:bg-gray-900 dark:hover:border-blue-400/40"
+        className="flex items-center gap-3 rounded-2xl border border-gray-200 bg-white p-2 transition hover:border-ox-blue/40 hover:shadow-sm motion-reduce:transition-none dark:border-gray-800 dark:bg-gray-900 dark:hover:border-blue-400/40"
       >
         <span aria-hidden="true" className={`flex h-[42px] w-[42px] shrink-0 flex-col items-center justify-center rounded-xl text-white ${TONES[tone % TONES.length]}`}>
           <span className="text-[15px] font-bold leading-none">{valid ? d.getUTCDate() : "–"}</span>

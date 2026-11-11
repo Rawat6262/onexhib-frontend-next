@@ -68,7 +68,7 @@ export default function ContactPage() {
               key={label}
               className="ox-card rounded-2xl border border-gray-200 bg-white p-5 hover:shadow-lg dark:border-gray-800 dark:bg-gray-900"
             >
-              <span className="inline-flex rounded-xl bg-gradient-to-br from-[#2B3FB8] to-[#8B5CF6] p-2.5 text-white shadow-md shadow-indigo-500/20">
+              <span className="inline-flex rounded-xl bg-gradient-to-br from-ox-blue to-ox-violet p-2.5 text-white shadow-md shadow-indigo-500/20">
                 <Icon size={18} aria-hidden="true" />
               </span>
               <p className="mt-3 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
@@ -77,7 +77,7 @@ export default function ContactPage() {
               {href ? (
                 <a
                   href={href}
-                  className="mt-1 block break-all text-[15px] font-semibold text-[#131C55] underline-offset-4 hover:underline dark:text-blue-300"
+                  className="mt-1 block break-all text-[15px] font-semibold text-ox-navy underline-offset-4 hover:underline dark:text-blue-300"
                 >
                   {value}
                 </a>
@@ -95,7 +95,7 @@ export default function ContactPage() {
           ))}
 
           <li className="ox-card rounded-2xl border border-gray-200 bg-white p-5 hover:shadow-lg dark:border-gray-800 dark:bg-gray-900">
-            <span className="inline-flex rounded-xl bg-gradient-to-br from-[#2B3FB8] to-[#8B5CF6] p-2.5 text-white shadow-md shadow-indigo-500/20">
+            <span className="inline-flex rounded-xl bg-gradient-to-br from-ox-blue to-ox-violet p-2.5 text-white shadow-md shadow-indigo-500/20">
               <Smartphone size={18} aria-hidden="true" />
             </span>
             <p className="mt-3 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
@@ -105,7 +105,7 @@ export default function ContactPage() {
               href={PLAY_STORE_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-1 block text-[15px] font-semibold text-[#131C55] underline-offset-4 hover:underline dark:text-blue-300"
+              className="mt-1 block text-[15px] font-semibold text-ox-navy underline-offset-4 hover:underline dark:text-blue-300"
             >
               OneXhib on Google Play
             </a>
@@ -113,7 +113,7 @@ export default function ContactPage() {
         </ul>
 
         <section id="message" aria-labelledby="message-heading" className="mt-12 scroll-mt-24">
-          <p className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#2B3FB8] dark:text-blue-300">
+          <p className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-ox-blue dark:text-blue-300">
             <span aria-hidden="true" className="h-px w-6 bg-current opacity-60" />
             Write to us
           </p>
@@ -182,4 +182,4 @@ export default function ContactPage() {
 }
 
 const link =
-  "font-semibold text-[#131C55] underline-offset-4 hover:underline dark:text-blue-300";
+  "font-semibold text-ox-navy underline-offset-4 hover:underline dark:text-blue-300";

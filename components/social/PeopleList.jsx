@@ -112,14 +112,14 @@ export default function PeopleList() {
           onChange={(e) => setTerm(e.target.value)}
           placeholder="Search people by name or company"
           aria-label="Search people by name or company"
-          className="w-full rounded-xl border border-gray-300 py-2.5 pl-9 pr-9 text-sm text-gray-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
+          className="w-full rounded-xl border border-gray-300 py-2.5 pl-9 pr-9 text-sm text-gray-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
         />
         {term ? (
           <button
             type="button"
             onClick={() => setTerm("")}
             aria-label="Clear search"
-            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg p-1 text-gray-400 hover:text-gray-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:hover:text-gray-200"
+            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg p-1 text-gray-400 hover:text-gray-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:hover:text-gray-200"
           >
             <X size={15} aria-hidden="true" />
           </button>
@@ -144,7 +144,7 @@ export default function PeopleList() {
             <button
               type="button"
               onClick={() => load(null, query)}
-              className="mt-3 rounded-xl border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:border-[#131C55] hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:border-gray-700 dark:text-gray-300"
+              className="mt-3 rounded-xl border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:border-ox-navy hover:text-ox-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:border-gray-700 dark:text-gray-300"
             >
               Try again
             </button>
@@ -178,7 +178,7 @@ export default function PeopleList() {
                         link, so following someone never navigates away from the list. */}
                     <Link
                       href={`/social/profile/${encodeURIComponent(id)}`}
-                      className="flex min-w-0 flex-1 items-center gap-3 rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55]"
+                      className="flex min-w-0 flex-1 items-center gap-3 rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy"
                     >
                       <InitialsAvatar name={name} src={user.avatarUrl || null} size="sm" />
                       <span className="min-w-0">
@@ -224,7 +224,7 @@ export default function PeopleList() {
                   type="button"
                   onClick={() => load(list.nextCursor, query)}
                   disabled={loadingMore}
-                  className="rounded-xl border border-gray-300 px-5 py-2.5 text-sm font-semibold text-gray-700 transition hover:border-[#131C55] hover:text-[#131C55] disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:border-gray-700 dark:text-gray-300"
+                  className="rounded-xl border border-gray-300 px-5 py-2.5 text-sm font-semibold text-gray-700 transition hover:border-ox-navy hover:text-ox-navy disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:border-gray-700 dark:text-gray-300"
                 >
                   {loadingMore ? "Loading…" : "Load more"}
                 </button>

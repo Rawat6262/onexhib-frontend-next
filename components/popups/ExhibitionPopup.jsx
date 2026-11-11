@@ -90,7 +90,7 @@ export default function ExhibitionPopup({ onClose, exhibitionId }) {
             <div className="mt-6 flex justify-end">
               <button
                 onClick={onClose}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#131C55] to-[#2B3FB8] px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-900/25 transition hover:brightness-110 disabled:opacity-70 disabled:cursor-not-allowed motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-ox-navy to-ox-blue px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-900/25 transition hover:brightness-110 disabled:opacity-70 disabled:cursor-not-allowed motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500"
               >
                 Close
               </button>

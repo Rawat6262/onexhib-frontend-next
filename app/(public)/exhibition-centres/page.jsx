@@ -211,7 +211,7 @@ export default async function ExhibitionCentresPage({ searchParams }) {
               <EmptyState>
                 No exhibition centres match {filtered ? "these filters" : "yet"}.{" "}
                 {filtered ? (
-                  <Link href={PUBLIC_ROUTES.centres} className="font-semibold text-[#2B3FB8] underline dark:text-blue-300">
+                  <Link href={PUBLIC_ROUTES.centres} className="font-semibold text-ox-blue underline dark:text-blue-300">
                     Show all venues
                   </Link>
                 ) : null}
@@ -233,7 +233,7 @@ function Stat({ icon: Icon, label, value }) {
         <Icon size={13} aria-hidden="true" />
         {label}
       </dt>
-      <dd className="mt-1 text-2xl font-extrabold tabular-nums text-[#131C55] dark:text-white">
+      <dd className="mt-1 text-2xl font-extrabold tabular-nums text-ox-navy dark:text-white">
         {value.toLocaleString("en-US")}
       </dd>
     </div>
@@ -248,8 +248,8 @@ function Chip({ href, active, children }) {
       aria-current={active ? "true" : undefined}
       className={
         active
-          ? "inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-full bg-[#131C55] px-3.5 text-sm font-semibold text-white dark:bg-blue-500 dark:text-gray-950"
-          : "inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-full border border-gray-200 bg-white px-3.5 text-sm font-medium text-gray-700 transition hover:border-[#131C55]/40 hover:text-[#131C55] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:text-white"
+          ? "inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-full bg-ox-navy px-3.5 text-sm font-semibold text-white dark:bg-blue-500 dark:text-gray-950"
+          : "inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-full border border-gray-200 bg-white px-3.5 text-sm font-medium text-gray-700 transition hover:border-ox-navy/40 hover:text-ox-navy motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:text-white"
       }
     >
       {children}

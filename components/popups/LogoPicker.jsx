@@ -59,7 +59,7 @@ export default function LogoPicker({ id, label, hint, items = [], max = 20, busy
             <img src={item.url} alt="" className="h-full w-full object-contain p-2" />
             {item.busy ? (
               <span className="absolute inset-0 grid place-items-center bg-white/70 dark:bg-black/50">
-                <Loader2 size={18} aria-hidden="true" className="animate-spin text-[#2B3FB8]" />
+                <Loader2 size={18} aria-hidden="true" className="animate-spin text-ox-blue" />
               </span>
             ) : (
               <button
@@ -82,7 +82,7 @@ export default function LogoPicker({ id, label, hint, items = [], max = 20, busy
               id={id}
               onClick={() => inputRef.current?.click()}
               disabled={busy}
-              className="flex aspect-[3/2] w-full flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-gray-300 text-xs font-semibold text-gray-500 transition hover:border-[#2B3FB8] hover:bg-[#2B3FB8]/5 hover:text-[#2B3FB8] disabled:opacity-50 dark:border-gray-700 dark:text-gray-400 dark:hover:border-blue-400 dark:hover:bg-blue-400/10 dark:hover:text-blue-300"
+              className="flex aspect-[3/2] w-full flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-gray-300 text-xs font-semibold text-gray-500 transition hover:border-ox-blue hover:bg-ox-blue/5 hover:text-ox-blue disabled:opacity-50 dark:border-gray-700 dark:text-gray-400 dark:hover:border-blue-400 dark:hover:bg-blue-400/10 dark:hover:text-blue-300"
             >
               {busy ? <Loader2 size={18} aria-hidden="true" className="animate-spin" /> : <ImagePlus size={18} aria-hidden="true" />}
               Add logos

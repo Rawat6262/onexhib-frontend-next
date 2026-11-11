@@ -1,9 +1,10 @@
-import { Poppins } from "next/font/google";
+import { Barlow_Condensed, Fraunces, Poppins } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import Providers from "./providers";
 import ConsentGate from "@/components/analytics/ConsentGate";
 import ConsentBanner from "@/components/analytics/ConsentBanner";
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/seo";
+import { PALETTE_SCRIPT } from "@/lib/palettes";
 import "./globals.css";
 
 /**
@@ -21,6 +22,24 @@ const poppins = Poppins({
   weight: ["300", "400", "500", "600", "700"],
   variable: "--font-poppins",
   display: "swap",
+});
+
+// Heading faces for two of the colour palettes (globals.css): Fraunces for
+// Chalk & Ink, Barlow Condensed for Rosso. Not preloaded - the browser only
+// fetches a @font-face when something on the page uses it, so visitors on the
+// default palette never download either.
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  variable: "--font-fraunces",
+  display: "swap",
+  preload: false,
+});
+const barlowCondensed = Barlow_Condensed({
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  variable: "--font-barlow-condensed",
+  display: "swap",
+  preload: false,
 });
 
 export const metadata = {
@@ -73,7 +92,13 @@ export default function RootLayout({ children }) {
     // suppressHydrationWarning is required by next-themes: it writes the theme
     // class onto <html> before React hydrates, which would otherwise mismatch.
     // (The old index.html hardcoded class="dark" here — deliberately dropped.)
-    <html lang="en" suppressHydrationWarning className={poppins.variable}>
+    <html lang="en" suppressHydrationWarning
+      className={`${poppins.variable} ${fraunces.variable} ${barlowCondensed.variable}`}
+    >
+      <head>
+        {/* Applies a saved colour palette before first paint (lib/palettes.js). */}
+        <script dangerouslySetInnerHTML={{ __html: PALETTE_SCRIPT }} />
+      </head>
       <body>
         {/* Consent defaults must be on the dataLayer before gtag.js loads, so
             ConsentGate is ordered ahead of GoogleAnalytics deliberately. */}

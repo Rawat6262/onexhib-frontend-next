@@ -119,10 +119,10 @@ export default function SaveButton({ exhibitionId, exhibitionName, className = "
             ? `${isSaved ? "Remove" : "Save"} ${exhibitionName || "this exhibition"}${isSaved ? " from" : " to"} your saved list`
             : "Sign in to save this exhibition"
         }
-        className={`inline-flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] disabled:cursor-not-allowed disabled:opacity-60 ${
+        className={`inline-flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy disabled:cursor-not-allowed disabled:opacity-60 ${
           isSaved
-            ? "border-[#131C55] bg-[#131C55] text-white hover:bg-[#0E1B6B]"
-            : "border-gray-300 bg-white text-gray-700 hover:border-[#131C55] hover:text-[#131C55] dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-blue-300 dark:hover:text-blue-300"
+            ? "border-ox-navy bg-ox-navy text-white hover:bg-ox-navy-deep"
+            : "border-gray-300 bg-white text-gray-700 hover:border-ox-navy hover:text-ox-navy dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-blue-300 dark:hover:text-blue-300"
         }`}
       >
         <Icon size={16} aria-hidden="true" />

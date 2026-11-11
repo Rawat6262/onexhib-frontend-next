@@ -157,7 +157,7 @@ export default function ExhibitionManageClient({ id }) {
     <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
       <Link
         href={backHref}
-        className="mb-5 inline-flex items-center gap-1.5 text-sm font-medium text-gray-600 transition hover:text-[#2B3FB8] dark:text-gray-400 dark:hover:text-blue-300"
+        className="mb-5 inline-flex items-center gap-1.5 text-sm font-medium text-gray-600 transition hover:text-ox-blue dark:text-gray-400 dark:hover:text-blue-300"
       >
         <ArrowLeft size={15} aria-hidden="true" />
         {isAdmin ? "All exhibitions" : "My exhibitions"}

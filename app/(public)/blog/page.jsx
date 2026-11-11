@@ -264,7 +264,7 @@ export default async function BlogIndexPage() {
 }
 
 const inlineLink =
-  "font-semibold text-[#131C55] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:text-blue-300 dark:focus-visible:outline-blue-300";
+  "font-semibold text-ox-navy underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:text-blue-300 dark:focus-visible:outline-blue-300";
 
 /** Panel frame for a data block. */
 function Panel({ icon: Icon, title, note, children, className = "" }) {
@@ -275,7 +275,7 @@ function Panel({ icon: Icon, title, note, children, className = "" }) {
       <div className="flex items-start gap-3">
         <span
           aria-hidden="true"
-          className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#131C55]/[0.06] text-[#131C55] dark:bg-blue-400/10 dark:text-blue-300"
+          className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-ox-navy/[0.06] text-ox-navy dark:bg-blue-400/10 dark:text-blue-300"
         >
           <Icon size={17} />
         </span>
@@ -346,7 +346,7 @@ function Workflow() {
             <div className="flex items-center gap-3">
               <span
                 aria-hidden="true"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-[#131C55] text-white dark:bg-blue-400 dark:text-gray-950"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-ox-navy text-white dark:bg-blue-400 dark:text-gray-950"
               >
                 <Icon size={17} />
               </span>
@@ -360,7 +360,7 @@ function Workflow() {
 
             <Link
               href={href}
-              className="mt-auto inline-flex items-center gap-1.5 pt-2 text-[13px] font-semibold text-[#131C55] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#131C55] dark:text-blue-300 dark:focus-visible:outline-blue-300"
+              className="mt-auto inline-flex items-center gap-1.5 pt-2 text-[13px] font-semibold text-ox-navy underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ox-navy dark:text-blue-300 dark:focus-visible:outline-blue-300"
             >
               {cta}
               <ArrowRight size={14} aria-hidden="true" />
@@ -381,7 +381,7 @@ function EmptyBlog() {
         No articles yet. In the meantime, browse{" "}
         <Link
           href={PUBLIC_ROUTES.exhibitions}
-          className="font-semibold text-[#131C55] underline-offset-4 hover:underline dark:text-blue-300"
+          className="font-semibold text-ox-navy underline-offset-4 hover:underline dark:text-blue-300"
         >
           upcoming exhibitions
         </Link>

@@ -165,7 +165,7 @@ export default function ExhibitionAccessDialog({ exhibitionId, exhibitionName, o
         className="relative flex max-h-[92vh] w-full flex-col overflow-hidden rounded-t-3xl border border-gray-200 bg-white text-gray-900 shadow-2xl sm:max-w-xl sm:rounded-3xl dark:border-gray-800 dark:bg-gray-900 dark:text-gray-100"
       >
         {/* Header */}
-        <div className="relative overflow-hidden bg-gradient-to-br from-[#131C55] to-[#2B3FB8] px-5 pb-5 pt-5 text-white sm:px-6">
+        <div className="relative overflow-hidden bg-gradient-to-br from-ox-navy to-ox-blue px-5 pb-5 pt-5 text-white sm:px-6">
           <div aria-hidden="true" className="pointer-events-none absolute -right-10 -top-12 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
           <div className="relative flex items-start gap-3">
             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/15 ring-1 ring-white/20">
@@ -274,7 +274,7 @@ export default function ExhibitionAccessDialog({ exhibitionId, exhibitionName, o
                   <li key={person._id} className="flex items-center gap-3 px-3 py-3">
                     <span
                       aria-hidden="true"
-                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#2B3FB8]/10 text-xs font-bold text-[#2B3FB8] dark:bg-blue-400/15 dark:text-blue-300"
+                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-ox-blue/10 text-xs font-bold text-ox-blue dark:bg-blue-400/15 dark:text-blue-300"
                     >
                       {initials(person.name)}
                     </span>
@@ -329,7 +329,7 @@ export default function ExhibitionAccessDialog({ exhibitionId, exhibitionName, o
                   <li key={i} className="relative text-[13px] leading-relaxed text-gray-600 dark:text-gray-400">
                     <span
                       aria-hidden="true"
-                      className="absolute -left-[21px] top-1.5 h-2 w-2 rounded-full bg-[#2B3FB8] ring-4 ring-white dark:bg-blue-400 dark:ring-gray-900"
+                      className="absolute -left-[21px] top-1.5 h-2 w-2 rounded-full bg-ox-blue ring-4 ring-white dark:bg-blue-400 dark:ring-gray-900"
                     />
                     <span className="font-semibold text-gray-900 dark:text-gray-100">{c.by}</span>
                     {c.role ? (

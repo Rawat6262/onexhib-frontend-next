@@ -240,7 +240,7 @@ export default async function MonthPage({ params, searchParams }) {
           <Link
             href={monthHref(prev)}
             rel="prev"
-            className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#131C55] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:text-blue-300"
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-ox-navy underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:text-blue-300"
           >
             <ChevronLeft size={16} aria-hidden="true" />
             {prev.label}
@@ -258,7 +258,7 @@ export default async function MonthPage({ params, searchParams }) {
           <Link
             href={monthHref(next)}
             rel="next"
-            className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#131C55] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:text-blue-300"
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-ox-navy underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:text-blue-300"
           >
             {next.label}
             <ChevronRight size={16} aria-hidden="true" />

@@ -107,7 +107,7 @@ export default function WelcomeClient() {
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
       {/* ---- Hero ---------------------------------------------------------- */}
-      <section className="relative overflow-hidden rounded-3xl bg-[#131C55] px-6 py-8 text-white shadow-lg sm:px-10 sm:py-10 dark:bg-gradient-to-br dark:from-[#131C55] dark:to-gray-900 dark:ring-1 dark:ring-white/10">
+      <section className="relative overflow-hidden rounded-3xl bg-ox-navy px-6 py-8 text-white shadow-lg sm:px-10 sm:py-10 dark:bg-gradient-to-br dark:from-ox-navy dark:to-gray-900 dark:ring-1 dark:ring-white/10">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute -top-24 -right-16 h-64 w-64 rounded-full bg-blue-400/20 blur-3xl"
@@ -130,7 +130,7 @@ export default function WelcomeClient() {
             {hasWorkspace ? (
               <Link
                 href={homeRouteForRole(role)}
-                className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-[#131C55] transition hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white motion-reduce:transition-none"
+                className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-ox-navy transition hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white motion-reduce:transition-none"
               >
                 {role === ROLES.EXHIBITOR ? "Open my exhibitor workspace" : "Go to my dashboard"}
                 <ArrowRight size={16} aria-hidden="true" />
@@ -138,7 +138,7 @@ export default function WelcomeClient() {
             ) : (
               <Link
                 href={PUBLIC_ROUTES.exhibitions}
-                className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-[#131C55] transition hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white motion-reduce:transition-none"
+                className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-ox-navy transition hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white motion-reduce:transition-none"
               >
                 Explore exhibitions
                 <ArrowRight size={16} aria-hidden="true" />
@@ -190,14 +190,14 @@ export default function WelcomeClient() {
             <li key={href}>
               <Link
                 href={href}
-                className="group flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-5 transition hover:-translate-y-0.5 hover:border-[#131C55]/30 hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transform-none motion-reduce:transition-none dark:border-gray-800 dark:bg-gray-900 dark:hover:border-blue-400/30"
+                className="group flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-5 transition hover:-translate-y-0.5 hover:border-ox-navy/30 hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transform-none motion-reduce:transition-none dark:border-gray-800 dark:bg-gray-900 dark:hover:border-blue-400/30"
               >
-                <span className="grid h-10 w-10 place-items-center rounded-xl bg-[#131C55]/[0.07] text-[#131C55] dark:bg-blue-400/10 dark:text-blue-300">
+                <span className="grid h-10 w-10 place-items-center rounded-xl bg-ox-navy/[0.07] text-ox-navy dark:bg-blue-400/10 dark:text-blue-300">
                   <Icon size={20} aria-hidden="true" />
                 </span>
                 <span className="mt-4 text-base font-semibold text-gray-900 dark:text-gray-50">{title}</span>
                 <span className="mt-1 flex-1 text-sm leading-relaxed text-gray-600 dark:text-gray-400">{body}</span>
-                <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#131C55] dark:text-blue-300">
+                <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-ox-navy dark:text-blue-300">
                   Open
                   <ArrowRight
                     size={14}
@@ -239,9 +239,9 @@ export default function WelcomeClient() {
                     aria-checked={checked}
                     onClick={() => setSelected(type.value)}
                     disabled={saving}
-                    className={`relative flex h-full flex-col rounded-2xl border-2 p-5 text-left transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] disabled:opacity-70 motion-reduce:transition-none ${
+                    className={`relative flex h-full flex-col rounded-2xl border-2 p-5 text-left transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy disabled:opacity-70 motion-reduce:transition-none ${
                       checked
-                        ? "border-[#131C55] bg-[#131C55]/[0.03] shadow-sm dark:border-blue-400 dark:bg-blue-400/[0.06]"
+                        ? "border-ox-navy bg-ox-navy/[0.03] shadow-sm dark:border-blue-400 dark:bg-blue-400/[0.06]"
                         : "border-gray-200 bg-white hover:border-gray-300 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-gray-700"
                     }`}
                   >
@@ -249,7 +249,7 @@ export default function WelcomeClient() {
                       <span
                         className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl transition motion-reduce:transition-none ${
                           checked
-                            ? "bg-[#131C55] text-white dark:bg-blue-500 dark:text-gray-950"
+                            ? "bg-ox-navy text-white dark:bg-blue-500 dark:text-gray-950"
                             : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300"
                         }`}
                       >
@@ -277,7 +277,7 @@ export default function WelcomeClient() {
                         aria-hidden="true"
                         className={`grid h-5 w-5 shrink-0 place-items-center rounded-full border-2 transition motion-reduce:transition-none ${
                           checked
-                            ? "border-[#131C55] bg-[#131C55] text-white dark:border-blue-400 dark:bg-blue-400 dark:text-gray-950"
+                            ? "border-ox-navy bg-ox-navy text-white dark:border-blue-400 dark:bg-blue-400 dark:text-gray-950"
                             : "border-gray-300 dark:border-gray-600"
                         }`}
                       >
@@ -313,7 +313,7 @@ export default function WelcomeClient() {
                 type="button"
                 onClick={handleSave}
                 disabled={!dirty || saving}
-                className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#131C55] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#0E1B6B] disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:bg-blue-500 dark:text-gray-950 dark:hover:bg-blue-400"
+                className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-ox-navy px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-ox-navy-deep disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:bg-blue-500 dark:text-gray-950 dark:hover:bg-blue-400"
               >
                 {saving ? <Loader2 size={16} aria-hidden="true" className="animate-spin" /> : null}
                 {saving ? "Saving…" : "Save account type"}

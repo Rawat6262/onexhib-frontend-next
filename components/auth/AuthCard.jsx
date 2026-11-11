@@ -41,9 +41,9 @@ export default function AuthCard({ children, wide = false, formProps, stats }) {
       {/* ── Form column ────────────────────────────────────────────────── */}
       <div className="relative isolate flex flex-col overflow-hidden">
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute -top-32 -right-24 h-96 w-96 rounded-full bg-[radial-gradient(circle,rgba(43,63,184,0.12),transparent_65%)] dark:bg-[radial-gradient(circle,rgba(76,99,210,0.22),transparent_65%)]" />
+          <div className="absolute -top-32 -right-24 h-96 w-96 rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--color-ox-blue)_12%,transparent),transparent_65%)] dark:bg-[radial-gradient(circle,color-mix(in_oklab,var(--color-ox-glow)_22%,transparent),transparent_65%)]" />
           <div
-            className="absolute inset-0 text-[#131C55] opacity-[0.04] [mask-image:radial-gradient(ellipse_at_top_right,black,transparent_70%)] dark:text-white dark:opacity-[0.05]"
+            className="absolute inset-0 text-ox-navy opacity-[0.04] [mask-image:radial-gradient(ellipse_at_top_right,black,transparent_70%)] dark:text-white dark:opacity-[0.05]"
             style={{
               backgroundImage:
                 "linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)",
@@ -54,7 +54,7 @@ export default function AuthCard({ children, wide = false, formProps, stats }) {
         {/* Mobile brand bar. The panel is hidden below lg, and an auth screen
             with no logo at all reads as an untrusted page asking for a
             password. */}
-        <div className="flex items-center justify-between bg-gradient-to-r from-[#0B1240] to-[#1B2A7A] px-4 py-3 lg:hidden">
+        <div className="flex items-center justify-between bg-gradient-to-r from-ox-night to-ox-royal px-4 py-3 lg:hidden">
           <Link href="/" aria-label="OneXhib home">
             <Image
               src="/Untitled-2-01 1.png"
@@ -74,7 +74,7 @@ export default function AuthCard({ children, wide = false, formProps, stats }) {
               button. */}
           <Link
             href="/"
-            className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm font-medium text-gray-500 transition hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:text-gray-400 dark:hover:text-white"
+            className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm font-medium text-gray-500 transition hover:text-ox-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:text-gray-400 dark:hover:text-white"
           >
             <ArrowLeft size={15} aria-hidden="true" />
             Back to site
@@ -113,7 +113,7 @@ export default function AuthCard({ children, wide = false, formProps, stats }) {
  */
 function BrandPanel({ stats, wide }) {
   return (
-    <aside className="relative hidden overflow-hidden bg-gradient-to-br from-[#0B1240] via-[#131C55] to-[#2B1F7A] lg:flex lg:flex-col">
+    <aside className="relative hidden overflow-hidden bg-gradient-to-br from-ox-night via-ox-navy to-ox-plum lg:flex lg:flex-col">
       <Image
         src="/bg2.jpg"
         alt=""
@@ -134,11 +134,11 @@ function BrandPanel({ stats, wide }) {
       {/* Warms the lower-left corner so the panel is not a flat rectangle. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -bottom-24 -left-24 h-[26rem] w-[26rem] rounded-full bg-[radial-gradient(circle,rgba(76,99,210,0.35),transparent_65%)]"
+        className="pointer-events-none absolute -bottom-24 -left-24 h-[26rem] w-[26rem] rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--color-ox-glow)_35%,transparent),transparent_65%)]"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -top-32 -right-20 h-[22rem] w-[22rem] rounded-full bg-[radial-gradient(circle,rgba(139,92,246,0.30),transparent_65%)]"
+        className="pointer-events-none absolute -top-32 -right-20 h-[22rem] w-[22rem] rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--color-ox-violet)_30%,transparent),transparent_65%)]"
       />
 
       <div className={`relative flex flex-1 flex-col justify-between p-10 ${wide ? "xl:p-12" : "xl:p-14"}`}>
@@ -212,13 +212,13 @@ export const authLabel =
   "mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300";
 
 export const authInput =
-  "w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition focus:border-[#2B3FB8] focus:outline-none focus:ring-4 focus:ring-[#2B3FB8]/15 motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-blue-400 dark:focus:ring-blue-400/20";
+  "w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition focus:border-ox-blue focus:outline-none focus:ring-4 focus:ring-ox-blue/15 motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-blue-400 dark:focus:ring-blue-400/20";
 
 export const authPrimaryBtn =
-  "inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#131C55] to-[#2B3FB8] px-5 py-3 text-[15px] font-semibold text-white shadow-lg shadow-indigo-900/25 transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] disabled:opacity-60 disabled:hover:brightness-100 motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500";
+  "inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-ox-navy to-ox-blue px-5 py-3 text-[15px] font-semibold text-white shadow-lg shadow-indigo-900/25 transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy disabled:opacity-60 disabled:hover:brightness-100 motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500";
 
 export const authSecondaryBtn =
-  "inline-flex w-full items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-5 py-3 text-[15px] font-semibold text-gray-900 transition hover:border-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:hover:border-gray-500";
+  "inline-flex w-full items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-5 py-3 text-[15px] font-semibold text-gray-900 transition hover:border-ox-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:hover:border-gray-500";
 
 export const authLink =
-  "font-semibold text-[#2B3FB8] underline-offset-4 hover:underline dark:text-blue-300";
+  "font-semibold text-ox-blue underline-offset-4 hover:underline dark:text-blue-300";

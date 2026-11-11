@@ -301,7 +301,7 @@ export default function LocationPicker({ value, initialQuery = "", onPick, class
           onBlur={() => setTimeout(() => setOpen(false), 150)}
           onKeyDown={onKeyDown}
           placeholder={status === "ready" ? "Search the venue, e.g. Bharat Mandapam, New Delhi" : "Loading Google Maps…"}
-          className="h-11 w-full rounded-xl border border-gray-300 bg-white pl-9 pr-10 text-sm text-gray-900 outline-none focus:border-[#131C55] focus:ring-2 focus:ring-[#131C55]/15 disabled:opacity-60 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
+          className="h-11 w-full rounded-xl border border-gray-300 bg-white pl-9 pr-10 text-sm text-gray-900 outline-none focus:border-ox-navy focus:ring-2 focus:ring-ox-navy/15 disabled:opacity-60 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
         />
         {busy ? <Loader2 size={16} aria-hidden="true" className="absolute right-3 top-1/2 -translate-y-1/2 animate-spin text-gray-400" /> : null}
 

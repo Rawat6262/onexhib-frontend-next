@@ -42,7 +42,7 @@ export default function PostFormFields({ form, errors, onChange, disabled, idPre
           maxLength={TITLE_MAX * 2}
           aria-invalid={titleOver || Boolean(errors.title) ? true : undefined}
           aria-describedby={`${titleId}-hint`}
-          className="mt-1.5 w-full rounded-xl border border-gray-300 px-3 py-2 text-sm disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:border-gray-700 dark:bg-gray-950"
+          className="mt-1.5 w-full rounded-xl border border-gray-300 px-3 py-2 text-sm disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:border-gray-700 dark:bg-gray-950"
         />
         {/* The counter doubles as the error slot, so one id associates both. */}
         <p
@@ -66,7 +66,7 @@ export default function PostFormFields({ form, errors, onChange, disabled, idPre
           maxLength={DESCRIPTION_MAX * 2}
           aria-invalid={descriptionOver || Boolean(errors.description) ? true : undefined}
           aria-describedby={`${descId}-hint`}
-          className="mt-1.5 w-full rounded-xl border border-gray-300 px-3 py-2 text-sm disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:border-gray-700 dark:bg-gray-950"
+          className="mt-1.5 w-full rounded-xl border border-gray-300 px-3 py-2 text-sm disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:border-gray-700 dark:bg-gray-950"
         />
         <p
           id={`${descId}-hint`}
@@ -86,7 +86,7 @@ export default function PostFormFields({ form, errors, onChange, disabled, idPre
           onChange={set("visibility")}
           disabled={disabled}
           aria-describedby={`${visId}-hint`}
-          className="mt-1.5 w-full rounded-xl border border-gray-300 px-3 py-2 text-sm disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:border-gray-700 dark:bg-gray-950"
+          className="mt-1.5 w-full rounded-xl border border-gray-300 px-3 py-2 text-sm disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:border-gray-700 dark:bg-gray-950"
         >
           {VISIBILITIES.map((value) => (
             <option key={value} value={value}>

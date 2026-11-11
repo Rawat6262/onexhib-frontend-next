@@ -123,7 +123,7 @@ export default function ReportDialog({
             {REPORT_REASONS.map((value, i) => (
               <label
                 key={value}
-                className="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-200 px-3 py-2 text-sm text-gray-800 transition hover:border-[#131C55] has-[:checked]:border-[#131C55] motion-reduce:transition-none dark:border-gray-700 dark:text-gray-200"
+                className="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-200 px-3 py-2 text-sm text-gray-800 transition hover:border-ox-navy has-[:checked]:border-ox-navy motion-reduce:transition-none dark:border-gray-700 dark:text-gray-200"
               >
                 <input
                   ref={i === 0 ? firstRadioRef : undefined}
@@ -133,7 +133,7 @@ export default function ReportDialog({
                   checked={reason === value}
                   disabled={pending}
                   onChange={() => { setReason(value); setError(null); }}
-                  className="h-4 w-4 accent-[#131C55]"
+                  className="h-4 w-4 accent-ox-navy"
                 />
                 {/* React text, not markup — these are our own labels, but the habit is
                     what keeps the reporter's details safe too. */}
@@ -162,7 +162,7 @@ export default function ReportDialog({
               aria-describedby={error ? errorId : undefined}
               aria-invalid={touched && !verdict.ok && verdict.field === "details" ? true : undefined}
               onChange={(e) => { setDetails(e.target.value); setError(null); }}
-              className="mt-1.5 w-full rounded-xl border border-gray-300 px-3 py-2 text-sm text-gray-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] disabled:opacity-60 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
+              className="mt-1.5 w-full rounded-xl border border-gray-300 px-3 py-2 text-sm text-gray-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy disabled:opacity-60 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
             />
             <p className="mt-1 text-xs text-gray-500 dark:text-gray-500" aria-live="polite">
               {remaining} characters left
@@ -180,7 +180,7 @@ export default function ReportDialog({
               type="button"
               onClick={() => onOpenChange(false)}
               disabled={pending}
-              className="rounded-xl border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:border-gray-400 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:border-gray-700 dark:text-gray-200"
+              className="rounded-xl border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:border-gray-400 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:border-gray-700 dark:text-gray-200"
             >
               Cancel
             </button>
@@ -189,7 +189,7 @@ export default function ReportDialog({
             <button
               type="submit"
               disabled={pending || !verdict.ok}
-              className="rounded-xl bg-[#131C55] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#1b2670] disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none"
+              className="rounded-xl bg-ox-navy px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#1b2670] disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none"
             >
               {pending ? "Sending…" : "Send report"}
             </button>

@@ -127,7 +127,7 @@ export default function PostCard({
           {authorId ? (
             <Link
               href={`/social/profile/${encodeURIComponent(authorId)}`}
-              className="block truncate text-sm font-semibold text-gray-900 hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:text-gray-50 dark:hover:text-blue-300"
+              className="block truncate text-sm font-semibold text-gray-900 hover:text-ox-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:text-gray-50 dark:hover:text-blue-300"
             >
               {name}
             </Link>
@@ -236,7 +236,7 @@ export default function PostCard({
             <Link
               key={String(u._id)}
               href={`/social/profile/${encodeURIComponent(String(u._id))}`}
-              className="rounded-full bg-gray-100 px-2 py-0.5 font-medium text-gray-700 hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:bg-gray-800 dark:text-gray-200"
+              className="rounded-full bg-gray-100 px-2 py-0.5 font-medium text-gray-700 hover:text-ox-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:bg-gray-800 dark:text-gray-200"
             >
               {displayName(u)}
             </Link>
@@ -304,7 +304,7 @@ function CommentCount({ count, postId, asLink }) {
     <Link
       href={`/social/posts/${encodeURIComponent(String(postId))}`}
       aria-label={`${n} ${noun} — open this post`}
-      className="ml-auto inline-flex items-center gap-1.5 rounded-xl px-2 py-1.5 text-sm text-gray-600 transition hover:bg-gray-100 hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-blue-400"
+      className="ml-auto inline-flex items-center gap-1.5 rounded-xl px-2 py-1.5 text-sm text-gray-600 transition hover:bg-gray-100 hover:text-ox-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-blue-400"
     >
       {inner}
     </Link>
@@ -345,7 +345,7 @@ function OwnerMenu({ open, onOpenChange, disabled, onEdit, onDelete }) {
         aria-expanded={open}
         aria-haspopup="menu"
         aria-label="Post options"
-        className="rounded-lg p-1.5 text-gray-500 transition hover:bg-gray-100 hover:text-gray-900 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
+        className="rounded-lg p-1.5 text-gray-500 transition hover:bg-gray-100 hover:text-gray-900 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
       >
         <MoreHorizontal size={18} aria-hidden="true" />
       </button>
@@ -398,9 +398,9 @@ function ReactionButton({ kind, active, count, pending, onClick }) {
       disabled={pending}
       aria-pressed={active}
       aria-label={label}
-      className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm font-medium transition disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none ${
+      className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm font-medium transition disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none ${
         active
-          ? "bg-[#131C55]/10 text-[#131C55] dark:bg-blue-400/15 dark:text-blue-300"
+          ? "bg-ox-navy/10 text-ox-navy dark:bg-blue-400/15 dark:text-blue-300"
           : "text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
       }`}
     >

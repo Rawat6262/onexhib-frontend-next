@@ -146,7 +146,7 @@ export default function PostComposer({ onCreated }) {
         <button
           type="submit"
           disabled={submitting}
-          className="inline-flex items-center gap-2 rounded-xl bg-[#131C55] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#0E1B6B] disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:bg-blue-500 dark:text-gray-950 dark:hover:bg-blue-400"
+          className="inline-flex items-center gap-2 rounded-xl bg-ox-navy px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-ox-navy-deep disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:bg-blue-500 dark:text-gray-950 dark:hover:bg-blue-400"
         >
           <Send size={15} aria-hidden="true" />
           {submitting ? "Publishing…" : "Post"}

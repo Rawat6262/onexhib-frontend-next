@@ -100,7 +100,7 @@ export default async function MonthlyHubPage() {
             No upcoming exhibitions are currently scheduled. Browse{" "}
             <Link
               href={PUBLIC_ROUTES.exhibitions}
-              className="font-semibold text-[#131C55] underline-offset-4 hover:underline dark:text-blue-300"
+              className="font-semibold text-ox-navy underline-offset-4 hover:underline dark:text-blue-300"
             >
               all exhibitions
             </Link>{" "}
@@ -112,13 +112,13 @@ export default async function MonthlyHubPage() {
       <nav aria-label="Related views" className="mt-12 flex flex-wrap gap-3">
         <Link
           href={`${PUBLIC_ROUTES.exhibitions}/this-week`}
-          className="rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:border-[#131C55] hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:border-gray-700 dark:text-gray-300 dark:hover:border-blue-300 dark:hover:text-blue-300"
+          className="rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:border-ox-navy hover:text-ox-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:border-gray-700 dark:text-gray-300 dark:hover:border-blue-300 dark:hover:text-blue-300"
         >
           This week
         </Link>
         <Link
           href={PUBLIC_ROUTES.locations}
-          className="rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:border-[#131C55] hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:border-gray-700 dark:text-gray-300 dark:hover:border-blue-300 dark:hover:text-blue-300"
+          className="rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:border-ox-navy hover:text-ox-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:border-gray-700 dark:text-gray-300 dark:hover:border-blue-300 dark:hover:text-blue-300"
         >
           Browse by country
         </Link>

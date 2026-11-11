@@ -155,7 +155,7 @@ export default function CalendarExplorer({ data, months = [], today, minForPage 
           {industry >= 0 ? <> · <strong className="text-gray-900 dark:text-white">{industries[industry]}</strong></> : null}
         </p>
         {filtering || view !== "all" ? (
-          <button type="button" onClick={reset} className="inline-flex items-center gap-1 text-sm font-semibold text-[#2B3FB8] hover:underline dark:text-blue-300">
+          <button type="button" onClick={reset} className="inline-flex items-center gap-1 text-sm font-semibold text-ox-blue hover:underline dark:text-blue-300">
             <X size={14} aria-hidden="true" />
             Reset filters
           </button>
@@ -170,7 +170,7 @@ export default function CalendarExplorer({ data, months = [], today, minForPage 
               <a
                 href={`#month-${c.key}`}
                 title={`${MONTH_NAMES[c.month - 1]} ${c.year}: ${c.count} exhibitions`}
-                className="group flex h-full w-full flex-col items-center justify-end gap-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55]"
+                className="group flex h-full w-full flex-col items-center justify-end gap-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy"
               >
                 <span className="text-[10px] font-semibold text-gray-500 tabular-nums opacity-0 transition group-hover:opacity-100 sm:text-[11px] dark:text-gray-400">
                   {c.count}
@@ -178,7 +178,7 @@ export default function CalendarExplorer({ data, months = [], today, minForPage 
                 <span
                   aria-hidden="true"
                   className={`w-full rounded-t-lg transition-all group-hover:brightness-110 motion-reduce:transition-none ${
-                    c.count ? (c.isNow ? "bg-gradient-to-t from-amber-500 to-amber-300" : "bg-gradient-to-t from-[#2B3FB8] to-[#8B5CF6]") : "bg-gray-100 dark:bg-gray-800"
+                    c.count ? (c.isNow ? "bg-gradient-to-t from-amber-500 to-amber-300" : "bg-gradient-to-t from-ox-blue to-ox-violet") : "bg-gray-100 dark:bg-gray-800"
                   }`}
                   style={{ height: `${c.count ? Math.max(6, Math.round((c.count / peak) * 100)) : 3}%` }}
                 />
@@ -205,7 +205,7 @@ export default function CalendarExplorer({ data, months = [], today, minForPage 
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">{c.year}</p>
-                    <h2 className="text-xl font-bold text-gray-900 transition group-hover:text-[#2B3FB8] motion-reduce:transition-none dark:text-white dark:group-hover:text-blue-200">
+                    <h2 className="text-xl font-bold text-gray-900 transition group-hover:text-ox-blue motion-reduce:transition-none dark:text-white dark:group-hover:text-blue-200">
                       {MONTH_NAMES[c.month - 1]}
                     </h2>
                   </div>
@@ -235,7 +235,7 @@ export default function CalendarExplorer({ data, months = [], today, minForPage 
                       <span
                         key={i}
                         title={`${i + 1} ${SHORT[c.month - 1]}: ${n}`}
-                        className={`flex-1 rounded-t-sm ${n ? "bg-gradient-to-t from-[#2B3FB8] to-[#8B5CF6] opacity-80 group-hover:opacity-100" : "bg-gray-100 dark:bg-gray-800"}`}
+                        className={`flex-1 rounded-t-sm ${n ? "bg-gradient-to-t from-ox-blue to-ox-violet opacity-80 group-hover:opacity-100" : "bg-gray-100 dark:bg-gray-800"}`}
                         style={{ height: `${n ? Math.max(14, Math.round((n / dayPeak) * 100)) : 10}%` }}
                       />
                     ))}
@@ -250,7 +250,7 @@ export default function CalendarExplorer({ data, months = [], today, minForPage 
                 {c.topIndustries.length ? (
                   <ul className="mt-4 flex list-none flex-wrap gap-1.5">
                     {c.topIndustries.map((t) => (
-                      <li key={t.label} className="rounded-full bg-[#2B3FB8]/[0.08] px-2.5 py-0.5 text-[11px] font-semibold text-[#2B3FB8] dark:bg-blue-400/10 dark:text-blue-300">
+                      <li key={t.label} className="rounded-full bg-ox-blue/[0.08] px-2.5 py-0.5 text-[11px] font-semibold text-ox-blue dark:bg-blue-400/10 dark:text-blue-300">
                         <Highlight text={t.label} query={q} /> · {t.c}
                       </li>
                     ))}
@@ -262,7 +262,7 @@ export default function CalendarExplorer({ data, months = [], today, minForPage 
                   </p>
                 ) : null}
 
-                <span className="mt-auto flex items-center gap-1 pt-4 text-sm font-semibold text-[#2B3FB8] dark:text-blue-300">
+                <span className="mt-auto flex items-center gap-1 pt-4 text-sm font-semibold text-ox-blue dark:text-blue-300">
                   {c.hasPage ? (
                     <>
                       View exhibitions
@@ -280,7 +280,7 @@ export default function CalendarExplorer({ data, months = [], today, minForPage 
             return (
               <li key={c.key} id={`month-${c.key}`} className="scroll-mt-40">
                 {c.hasPage ? (
-                  <Link href={c.href} className={`ox-card ox-card-accent ${cls} hover:border-[#2B3FB8]/30 hover:shadow-xl hover:shadow-indigo-900/10 dark:hover:border-blue-400/30`}>
+                  <Link href={c.href} className={`ox-card ox-card-accent ${cls} hover:border-ox-blue/30 hover:shadow-xl hover:shadow-indigo-900/10 dark:hover:border-blue-400/30`}>
                     {inner}
                   </Link>
                 ) : (
@@ -294,7 +294,7 @@ export default function CalendarExplorer({ data, months = [], today, minForPage 
         <div className="mt-6 rounded-2xl border border-dashed border-gray-300 bg-gray-50 px-6 py-14 text-center dark:border-gray-700 dark:bg-gray-900/50">
           <p className="text-[15px] font-semibold text-gray-900 dark:text-white">No exhibitions match these filters.</p>
           <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">Try another country, industry or spelling.</p>
-          <button type="button" onClick={reset} className="mt-4 rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-800 hover:border-[#2B3FB8] hover:text-[#2B3FB8] dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200">
+          <button type="button" onClick={reset} className="mt-4 rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-800 hover:border-ox-blue hover:text-ox-blue dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200">
             Reset filters
           </button>
         </div>

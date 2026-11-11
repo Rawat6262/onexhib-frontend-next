@@ -128,7 +128,7 @@ export default async function AboutPage() {
               },
             ].map(({ icon: Icon, title, body }) => (
               <li key={title} className="flex items-start gap-3">
-                <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#131C55]/10 text-[#131C55] dark:bg-blue-400/10 dark:text-blue-300">
+                <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-ox-navy/10 text-ox-navy dark:bg-blue-400/10 dark:text-blue-300">
                   <Icon size={17} aria-hidden="true" />
                 </span>
                 <span>
@@ -210,4 +210,4 @@ export default async function AboutPage() {
 }
 
 const link =
-  "font-semibold text-[#131C55] underline-offset-4 hover:underline dark:text-blue-300";
+  "font-semibold text-ox-navy underline-offset-4 hover:underline dark:text-blue-300";

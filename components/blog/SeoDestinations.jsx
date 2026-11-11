@@ -46,7 +46,7 @@ export default function SeoDestinations({ countries = [], industries = [], citie
               <li key={c.slug} className="ox-reveal">
                 <Link
                   href={countryLandingPath(c.slug)}
-                  className="group flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white transition-all hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#131C55] motion-reduce:hover:translate-y-0 dark:border-gray-800 dark:bg-gray-900 dark:focus-visible:outline-blue-300"
+                  className="group flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white transition-all hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ox-navy motion-reduce:hover:translate-y-0 dark:border-gray-800 dark:bg-gray-900 dark:focus-visible:outline-blue-300"
                 >
                   <div className="relative aspect-[16/10] w-full overflow-hidden">
                     <CardMedia
@@ -78,7 +78,7 @@ export default function SeoDestinations({ countries = [], industries = [], citie
                       {c.cityCount ? `, across ${c.cityCount} ${c.cityCount === 1 ? "city" : "cities"}` : ""}.
                     </p>
 
-                    <span className="mt-auto inline-flex items-center gap-1.5 pt-1 text-[13px] font-semibold text-[#131C55] dark:text-blue-300">
+                    <span className="mt-auto inline-flex items-center gap-1.5 pt-1 text-[13px] font-semibold text-ox-navy dark:text-blue-300">
                       Explore {c.country}
                       <ArrowRight
                         size={14}
@@ -109,11 +109,11 @@ export default function SeoDestinations({ countries = [], industries = [], citie
               <li key={c.slug}>
                 <Link
                   href={categoryLandingPath(c.slug)}
-                  className="group flex h-full items-start gap-3 rounded-xl border border-gray-200 bg-white p-4 transition-colors hover:border-[#131C55]/30 hover:bg-gray-50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#131C55] dark:border-gray-800 dark:bg-gray-900 dark:hover:bg-gray-800/60 dark:focus-visible:outline-blue-300"
+                  className="group flex h-full items-start gap-3 rounded-xl border border-gray-200 bg-white p-4 transition-colors hover:border-ox-navy/30 hover:bg-gray-50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ox-navy dark:border-gray-800 dark:bg-gray-900 dark:hover:bg-gray-800/60 dark:focus-visible:outline-blue-300"
                 >
                   <span
                     aria-hidden="true"
-                    className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#131C55]/[0.06] text-[#131C55] transition-colors group-hover:bg-[#131C55] group-hover:text-white dark:bg-blue-400/10 dark:text-blue-300 dark:group-hover:bg-blue-400 dark:group-hover:text-gray-950"
+                    className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-ox-navy/[0.06] text-ox-navy transition-colors group-hover:bg-ox-navy group-hover:text-white dark:bg-blue-400/10 dark:text-blue-300 dark:group-hover:bg-blue-400 dark:group-hover:text-gray-950"
                   >
                     <Building2 size={15} />
                   </span>
@@ -152,7 +152,7 @@ export default function SeoDestinations({ countries = [], industries = [], citie
               <li key={`${c.countrySlug}/${c.slug}`}>
                 <Link
                   href={cityLandingPath(c.countrySlug, c.slug)}
-                  className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3.5 py-2 text-[13px] font-medium text-gray-700 transition-colors hover:border-[#131C55]/30 hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:text-blue-300 dark:focus-visible:outline-blue-300"
+                  className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3.5 py-2 text-[13px] font-medium text-gray-700 transition-colors hover:border-ox-navy/30 hover:text-ox-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:text-blue-300 dark:focus-visible:outline-blue-300"
                 >
                   <MapPin size={13} aria-hidden="true" className="text-gray-400 dark:text-gray-500" />
                   {c.city}
@@ -165,7 +165,7 @@ export default function SeoDestinations({ countries = [], industries = [], citie
           <p className="mt-4 text-[13px] text-gray-500 dark:text-gray-400">
             <Link
               href={PUBLIC_ROUTES.locations}
-              className="font-semibold text-[#131C55] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:text-blue-300 dark:focus-visible:outline-blue-300"
+              className="font-semibold text-ox-navy underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:text-blue-300 dark:focus-visible:outline-blue-300"
             >
               See all locations
             </Link>{" "}

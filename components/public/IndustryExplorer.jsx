@@ -208,7 +208,7 @@ export default function IndustryExplorer({ industries = [], countries = [], toda
           {win.months ? <> · {win.label.toLowerCase()}</> : null}
         </p>
         {filtering ? (
-          <button type="button" onClick={reset} className="inline-flex items-center gap-1 text-sm font-semibold text-[#2B3FB8] hover:underline dark:text-blue-300">
+          <button type="button" onClick={reset} className="inline-flex items-center gap-1 text-sm font-semibold text-ox-blue hover:underline dark:text-blue-300">
             <X size={14} aria-hidden="true" />
             Reset filters
           </button>
@@ -224,7 +224,7 @@ export default function IndustryExplorer({ industries = [], countries = [], toda
               <li key={c.slug}>
                 <Link
                   href={categoryLandingPath(c.slug)}
-                  className="ox-card ox-card-accent group relative flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white p-5 hover:border-[#2B3FB8]/30 hover:shadow-xl hover:shadow-indigo-900/10 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-blue-400/30"
+                  className="ox-card ox-card-accent group relative flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white p-5 hover:border-ox-blue/30 hover:shadow-xl hover:shadow-indigo-900/10 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-blue-400/30"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <span className={`grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-br text-white shadow-md ${c.tone}`}>
@@ -238,7 +238,7 @@ export default function IndustryExplorer({ industries = [], countries = [], toda
                     </span>
                   </div>
 
-                  <h2 className="mt-4 text-base font-semibold text-gray-900 transition group-hover:text-[#2B3FB8] motion-reduce:transition-none dark:text-gray-50 dark:group-hover:text-blue-200">
+                  <h2 className="mt-4 text-base font-semibold text-gray-900 transition group-hover:text-ox-blue motion-reduce:transition-none dark:text-gray-50 dark:group-hover:text-blue-200">
                     <Highlight text={c.label} query={q} /> exhibitions
                   </h2>
                   {c.top.length && country < 0 ? (
@@ -249,7 +249,7 @@ export default function IndustryExplorer({ industries = [], countries = [], toda
                     <MiniBars bins={c.bins} today={today} />
                   </div>
 
-                  <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#2B3FB8] dark:text-blue-300">
+                  <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-ox-blue dark:text-blue-300">
                     Browse
                     <ArrowRight size={15} aria-hidden="true" className="transition group-hover:translate-x-0.5 motion-reduce:transform-none" />
                   </span>
@@ -265,7 +265,7 @@ export default function IndustryExplorer({ industries = [], countries = [], toda
           <button
             type="button"
             onClick={reset}
-            className="mt-4 rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-800 hover:border-[#2B3FB8] hover:text-[#2B3FB8] dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200"
+            className="mt-4 rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-800 hover:border-ox-blue hover:text-ox-blue dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200"
           >
             Reset filters
           </button>

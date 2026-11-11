@@ -184,13 +184,13 @@ export default function PostDetailClient({ postId }) {
             <button
               type="button"
               onClick={() => load()}
-              className="rounded-xl border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:border-[#131C55] hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:border-gray-700 dark:text-gray-300"
+              className="rounded-xl border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:border-ox-navy hover:text-ox-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:border-gray-700 dark:text-gray-300"
             >
               Try again
             </button>
             <Link
               href="/social"
-              className="rounded-xl bg-[#131C55] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0E1B6B] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:bg-blue-500 dark:text-gray-950"
+              className="rounded-xl bg-ox-navy px-4 py-2 text-sm font-semibold text-white hover:bg-ox-navy-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:bg-blue-500 dark:text-gray-950"
             >
               Back to feed
             </Link>
@@ -265,7 +265,7 @@ function Shell({ children }) {
     <div className="mx-auto w-full max-w-2xl px-4 py-8 sm:px-6 sm:py-12">
       <Link
         href="/social"
-        className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-600 hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] dark:text-gray-400 dark:hover:text-blue-400"
+        className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-600 hover:text-ox-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:text-gray-400 dark:hover:text-blue-400"
       >
         <ArrowLeft size={15} aria-hidden="true" />
         Back to feed

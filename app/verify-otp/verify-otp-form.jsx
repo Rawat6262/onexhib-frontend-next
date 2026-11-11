@@ -115,12 +115,12 @@ export default function VerifyOtpForm({ initialEmail = "", initialSmsTo = "" }) 
         <p className="text-sm text-gray-500 dark:text-gray-400">
           We sent a 6-digit OTP to{smsTo ? " both of these" : ""}
         </p>
-        <p className="text-sm font-semibold text-[#131C55] dark:text-blue-300 break-all">{email}</p>
+        <p className="text-sm font-semibold text-ox-navy dark:text-blue-300 break-all">{email}</p>
         {/* Rendered only when the server confirms the SMS left the gateway. The
             same code goes to both, so there is nothing to choose between them —
             whichever arrives first is the one to type. */}
         {smsTo && (
-          <p className="text-sm font-semibold text-[#131C55] dark:text-blue-300">
+          <p className="text-sm font-semibold text-ox-navy dark:text-blue-300">
             and by SMS to {smsTo}
           </p>
         )}
@@ -131,7 +131,7 @@ export default function VerifyOtpForm({ initialEmail = "", initialSmsTo = "" }) 
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full py-3 text-lg rounded-xl bg-[#131C55] text-white font-semibold hover:bg-[#0E1B6B] shadow-sm transition disabled:opacity-60 motion-reduce:transition-none"
+        className="w-full py-3 text-lg rounded-xl bg-ox-navy text-white font-semibold hover:bg-ox-navy-deep shadow-sm transition disabled:opacity-60 motion-reduce:transition-none"
       >
         {isSubmitting ? "Verifying..." : "Verify OTP"}
       </button>
@@ -142,7 +142,7 @@ export default function VerifyOtpForm({ initialEmail = "", initialSmsTo = "" }) 
           <button
             type="button"
             onClick={handleResend}
-            className="text-[#131C55] dark:text-blue-300 font-semibold underline-offset-4 hover:underline"
+            className="text-ox-navy dark:text-blue-300 font-semibold underline-offset-4 hover:underline"
           >
             Resend OTP
           </button>
@@ -156,7 +156,7 @@ export default function VerifyOtpForm({ initialEmail = "", initialSmsTo = "" }) 
       <div className="text-center">
         <Link
           href="/signup"
-          className="text-sm text-gray-400 dark:text-gray-500 hover:text-[#131C55] dark:hover:text-gray-300 hover:underline transition motion-reduce:transition-none"
+          className="text-sm text-gray-400 dark:text-gray-500 hover:text-ox-navy dark:hover:text-gray-300 hover:underline transition motion-reduce:transition-none"
         >
           ← Back to Signup
         </Link>

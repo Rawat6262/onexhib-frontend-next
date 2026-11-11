@@ -148,7 +148,7 @@ export default async function CompanyDetailPage({ params }) {
 
         <div className="min-w-0">
           {company.nature ? (
-            <p className="inline-flex items-center gap-1.5 rounded-full bg-[#131C55]/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#131C55] dark:bg-blue-400/10 dark:text-blue-300">
+            <p className="inline-flex items-center gap-1.5 rounded-full bg-ox-navy/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-ox-navy dark:bg-blue-400/10 dark:text-blue-300">
               <Building2 size={12} aria-hidden="true" />
               {company.nature}
             </p>
@@ -177,7 +177,7 @@ export default async function CompanyDetailPage({ params }) {
                     href={company.website}
                     target="_blank"
                     rel="noopener noreferrer nofollow"
-                    className="text-[#131C55] underline-offset-4 hover:underline dark:text-blue-300"
+                    className="text-ox-navy underline-offset-4 hover:underline dark:text-blue-300"
                   >
                     {company.website}
                   </a>
@@ -203,7 +203,7 @@ export default async function CompanyDetailPage({ params }) {
               Exhibiting at{" "}
               <Link
                 href={exhibitionPath(exhibition.name, exhibition.id)}
-                className="font-semibold text-[#131C55] underline-offset-4 hover:underline dark:text-blue-300"
+                className="font-semibold text-ox-navy underline-offset-4 hover:underline dark:text-blue-300"
               >
                 {exhibition.name}
               </Link>
@@ -219,7 +219,7 @@ export default async function CompanyDetailPage({ params }) {
                   {exhibitionCity?.citySlug ? (
                     <Link
                       href={cityLandingPath(exhibitionCity.countrySlug, exhibitionCity.citySlug)}
-                      className="underline underline-offset-4 hover:text-[#131C55] dark:hover:text-white"
+                      className="underline underline-offset-4 hover:text-ox-navy dark:hover:text-white"
                     >
                       {exhibitionPlace}
                     </Link>
@@ -244,14 +244,14 @@ export default async function CompanyDetailPage({ params }) {
               <li key={ex.id}>
                 <Link
                   href={exhibitionPath(ex.name, ex.id)}
-                  className="ox-card flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-4 hover:border-[#2B3FB8]/30 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 dark:hover:border-blue-400/30"
+                  className="ox-card flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-4 hover:border-ox-blue/30 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 dark:hover:border-blue-400/30"
                 >
                   <span className="font-semibold text-gray-900 dark:text-gray-50">{ex.name}</span>
                   <span className="mt-1 text-sm text-gray-600 dark:text-gray-400">
                     {[formatDateRange(ex.startDate, ex.endDate), formatLocation(ex, { includeVenue: false })].filter(Boolean).join(" · ")}
                   </span>
                   {hall || stall ? (
-                    <span className="mt-2 w-fit rounded-full bg-[#2B3FB8]/10 px-2.5 py-0.5 text-xs font-semibold text-[#2B3FB8] dark:bg-blue-400/10 dark:text-blue-300">
+                    <span className="mt-2 w-fit rounded-full bg-ox-blue/10 px-2.5 py-0.5 text-xs font-semibold text-ox-blue dark:bg-blue-400/10 dark:text-blue-300">
                       {[hall ? `Hall ${hall}` : null, stall ? `Stall ${stall}` : null].filter(Boolean).join(" · ")}
                     </span>
                   ) : null}

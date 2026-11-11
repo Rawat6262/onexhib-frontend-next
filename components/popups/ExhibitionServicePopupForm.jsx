@@ -26,7 +26,7 @@ const InputField = ({ id, label, value, onChange, placeholder, type = "text", re
       onChange={onChange}
       onBlur={onBlur}
       placeholder={placeholder}
-      className={`w-full rounded-md border px-3 py-2 text-gray-900 dark:text-gray-100 focus:border-[#2B3FB8] focus:ring-4 focus:ring-[#2B3FB8]/15 outline-none transition shadow-sm placeholder-gray-400 dark:placeholder-gray-500 ${
+      className={`w-full rounded-md border px-3 py-2 text-gray-900 dark:text-gray-100 focus:border-ox-blue focus:ring-4 focus:ring-ox-blue/15 outline-none transition shadow-sm placeholder-gray-400 dark:placeholder-gray-500 ${
         error ? "border-red-500" : "border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800"
       }`}
     />
@@ -44,7 +44,7 @@ const Dropdown = ({ id, label, value, onChange, options, placeholder, required, 
       value={value}
       onChange={onChange}
       onBlur={onBlur}
-      className={`w-full rounded-md border px-3 py-2 text-gray-900 dark:text-gray-100 focus:border-[#2B3FB8] focus:ring-4 focus:ring-[#2B3FB8]/15 outline-none transition shadow-sm ${
+      className={`w-full rounded-md border px-3 py-2 text-gray-900 dark:text-gray-100 focus:border-ox-blue focus:ring-4 focus:ring-ox-blue/15 outline-none transition shadow-sm ${
         error ? "border-red-500" : "border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800"
       }`}
     >
@@ -246,7 +246,7 @@ const ExhibitionServicePopupForm = ({ onClose }) => {
 
               {/* Basic Info */}
               <div className="space-y-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-                <h3 className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#2B3FB8] dark:text-blue-300">Basic Information</h3>
+                <h3 className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-ox-blue dark:text-blue-300">Basic Information</h3>
                 <InputField
                   id="full_name"
                   label="Full Name"
@@ -313,7 +313,7 @@ const ExhibitionServicePopupForm = ({ onClose }) => {
 
               {/* Image */}
               <div className="space-y-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-                <h3 className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#2B3FB8] dark:text-blue-300">Profile Image</h3>
+                <h3 className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-ox-blue dark:text-blue-300">Profile Image</h3>
                 <SimpleFileField
                   id="image"
                   label="Upload Image (JPG / PNG / WEBP)"
@@ -339,7 +339,7 @@ const ExhibitionServicePopupForm = ({ onClose }) => {
 
               {/* Location */}
               <div className="space-y-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-                <h3 className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#2B3FB8] dark:text-blue-300">Location</h3>
+                <h3 className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-ox-blue dark:text-blue-300">Location</h3>
                 <div className="grid grid-cols-1 gap-4">
                   <Dropdown
                     id="country"
@@ -385,7 +385,7 @@ const ExhibitionServicePopupForm = ({ onClose }) => {
                       onBlur={() => markTouched("address")}
                       placeholder="Street, Area, Zip Code"
                       rows={3}
-                      className={`w-full rounded-md border px-3 py-2 text-gray-900 dark:text-gray-100 focus:border-[#2B3FB8] focus:ring-4 focus:ring-[#2B3FB8]/15 outline-none transition shadow-sm resize-none placeholder-gray-400 dark:placeholder-gray-500 ${
+                      className={`w-full rounded-md border px-3 py-2 text-gray-900 dark:text-gray-100 focus:border-ox-blue focus:ring-4 focus:ring-ox-blue/15 outline-none transition shadow-sm resize-none placeholder-gray-400 dark:placeholder-gray-500 ${
                         touched.address && errors.address ? "border-red-500" : "border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800"
                       }`}
                     />
@@ -403,14 +403,14 @@ const ExhibitionServicePopupForm = ({ onClose }) => {
               <button
                 type="button"
                 onClick={onClose}
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-6 py-2.5 text-sm font-semibold text-gray-700 transition hover:border-[#2B3FB8] hover:text-[#2B3FB8] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:border-blue-400 dark:hover:text-white"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-6 py-2.5 text-sm font-semibold text-gray-700 transition hover:border-ox-blue hover:text-ox-blue motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:border-blue-400 dark:hover:text-white"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#131C55] to-[#2B3FB8] px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-900/25 transition hover:brightness-110 disabled:opacity-70 disabled:cursor-not-allowed motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-ox-navy to-ox-blue px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-900/25 transition hover:brightness-110 disabled:opacity-70 disabled:cursor-not-allowed motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500"
               >
                 {isSubmitting ? "Saving..." : "Save Service"}
               </button>

@@ -26,7 +26,7 @@ export default function Breadcrumbs({ trail }) {
               <>
                 <Link
                   href={path}
-                  className="underline-offset-4 transition hover:text-[#131C55] hover:underline motion-reduce:transition-none dark:hover:text-white"
+                  className="underline-offset-4 transition hover:text-ox-navy hover:underline motion-reduce:transition-none dark:hover:text-white"
                 >
                   {name}
                 </Link>

@@ -40,7 +40,7 @@ export default function SeasonCurve({ monthly, caption }) {
                 <span
                   className={`ox-col w-full rounded-t-md ${
                     isPeak
-                      ? "bg-gradient-to-t from-[#131C55] to-[#4C63D2] dark:from-blue-400 dark:to-indigo-300"
+                      ? "bg-gradient-to-t from-ox-navy to-[#4C63D2] dark:from-blue-400 dark:to-indigo-300"
                       : "bg-gray-200 dark:bg-gray-700"
                   }`}
                   style={{ height: `${pct}%`, animationDelay: `${i * 45}ms` }}

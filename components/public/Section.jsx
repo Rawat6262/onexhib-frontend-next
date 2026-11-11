@@ -33,7 +33,7 @@ export default function Section({
                 chapters (Discover, Explore, For business…) so the eye can tell
                 one block of rails from the next without reading the headings. */}
             {eyebrow ? (
-              <p className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#2B3FB8] dark:text-blue-300">
+              <p className="mb-2 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-ox-blue dark:text-blue-300">
                 <span aria-hidden="true" className="h-px w-6 bg-current opacity-60" />
                 {eyebrow}
               </p>
@@ -52,7 +52,7 @@ export default function Section({
           {cta && ctaHref ? (
             <Link
               href={ctaHref}
-              className="group inline-flex shrink-0 items-center gap-1.5 rounded-lg text-sm font-semibold text-[#131C55] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#131C55] dark:text-blue-300 dark:focus-visible:outline-blue-300"
+              className="group inline-flex shrink-0 items-center gap-1.5 rounded-lg text-sm font-semibold text-ox-navy underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ox-navy dark:text-blue-300 dark:focus-visible:outline-blue-300"
             >
               {cta}
               <ArrowRight

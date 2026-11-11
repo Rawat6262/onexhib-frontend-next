@@ -207,7 +207,7 @@ export default function NewsView({ onClose }) {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#131C55] to-[#2B3FB8] px-8 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-900/25 transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-ox-navy to-ox-blue px-8 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-900/25 transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500"
               >
                 {isSubmitting ? "Publishing..." : "Publish News"}
               </button>

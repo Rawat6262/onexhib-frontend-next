@@ -21,7 +21,7 @@ import { ArrowRight, Sparkles } from "lucide-react";
 export default function AiSearchBand() {
   return (
     <section aria-labelledby="ai-band-heading" className="mx-auto mt-16 w-full max-w-6xl px-4 sm:mt-20 sm:px-6">
-      <div className="overflow-hidden rounded-3xl border border-[#131C55]/15 bg-[#131C55] dark:border-blue-400/20 dark:bg-gray-900">
+      <div className="overflow-hidden rounded-3xl border border-ox-navy/15 bg-ox-navy dark:border-blue-400/20 dark:bg-gray-900">
         <div className="flex flex-col gap-6 p-7 sm:p-9 lg:flex-row lg:items-center lg:justify-between lg:gap-10">
           <div className="max-w-xl">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-white dark:bg-blue-400/15 dark:text-blue-300">
@@ -59,7 +59,7 @@ export default function AiSearchBand() {
 
           <Link
             href="/ai-search"
-            className="inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-xl bg-white px-6 py-3 text-sm font-semibold text-[#131C55] transition hover:bg-gray-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white motion-reduce:transition-none lg:self-auto dark:bg-blue-500 dark:text-gray-950 dark:hover:bg-blue-400"
+            className="inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-xl bg-white px-6 py-3 text-sm font-semibold text-ox-navy transition hover:bg-gray-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white motion-reduce:transition-none lg:self-auto dark:bg-blue-500 dark:text-gray-950 dark:hover:bg-blue-400"
           >
             Try AI search
             <ArrowRight size={16} aria-hidden="true" />

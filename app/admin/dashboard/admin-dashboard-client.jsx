@@ -269,7 +269,7 @@ export default function AdminDashboardClient() {
                     <ArrowUpRight size={14} aria-hidden="true" />
                   </>
                 );
-                const ctaCls = "inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-[#2B3FB8] hover:underline dark:text-blue-300";
+                const ctaCls = "inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-ox-blue hover:underline dark:text-blue-300";
                 return (
                   <li
                     key={a.text}
@@ -298,7 +298,7 @@ export default function AdminDashboardClient() {
         <section className="rounded-2xl border border-gray-200 bg-white p-5 lg:col-span-2 dark:border-gray-800 dark:bg-gray-900">
           <div className="flex items-baseline justify-between gap-3">
             <h2 className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-gray-100">
-              <Users size={15} aria-hidden="true" className="text-[#2B3FB8] dark:text-blue-300" />
+              <Users size={15} aria-hidden="true" className="text-ox-blue dark:text-blue-300" />
               Accounts
             </h2>
             <span className="text-2xl font-extrabold tabular-nums text-gray-900 dark:text-white">
@@ -329,13 +329,13 @@ export default function AdminDashboardClient() {
                     }}
                     aria-pressed={active}
                     className={`grid w-full grid-cols-[8.5rem_1fr_auto] items-center gap-3 rounded-lg px-1.5 py-1 text-left text-[13px] transition ${
-                      active ? "bg-[#2B3FB8]/10 dark:bg-blue-400/15" : "hover:bg-gray-50 dark:hover:bg-white/[0.03]"
+                      active ? "bg-ox-blue/10 dark:bg-blue-400/15" : "hover:bg-gray-50 dark:hover:bg-white/[0.03]"
                     }`}
                   >
-                    <span className={`truncate ${active ? "font-semibold text-[#2B3FB8] dark:text-blue-300" : "text-gray-700 dark:text-gray-300"}`}>{r.label}</span>
+                    <span className={`truncate ${active ? "font-semibold text-ox-blue dark:text-blue-300" : "text-gray-700 dark:text-gray-300"}`}>{r.label}</span>
                     <span className="h-2 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
                       <span
-                        className="block h-full rounded-full bg-gradient-to-r from-[#131C55] to-[#2B3FB8] dark:from-blue-500 dark:to-indigo-400"
+                        className="block h-full rounded-full bg-gradient-to-r from-ox-navy to-ox-blue dark:from-blue-500 dark:to-indigo-400"
                         style={{ width: `${insights ? Math.max(n ? 4 : 0, (n / maxRole) * 100) : 0}%` }}
                       />
                     </span>

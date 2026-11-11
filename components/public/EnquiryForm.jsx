@@ -65,11 +65,11 @@ export default function EnquiryForm({ targetType, targetId, recipientLabel, list
       aria-labelledby="enquiry-heading"
       className={`relative overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-xl shadow-indigo-900/[0.06] dark:border-gray-800 dark:bg-gray-900 dark:shadow-black/30 ${className}`}
     >
-      <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#2B3FB8] via-[#5B5BF0] to-[#8B5CF6]" />
+      <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-ox-blue via-ox-indigo to-ox-violet" />
 
       <div className="grid lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
         {/* ── Intro ───────────────────────────────────────────────────── */}
-        <div className="relative isolate overflow-hidden bg-gradient-to-br from-[#0B1240] via-[#131C55] to-[#2B1F7A] p-6 text-white sm:p-8">
+        <div className="relative isolate overflow-hidden bg-gradient-to-br from-ox-night via-ox-navy to-ox-plum p-6 text-white sm:p-8">
           <div aria-hidden="true" className="pointer-events-none absolute -top-16 -right-16 -z-10 h-56 w-56 rounded-full bg-blue-400/25 blur-3xl" />
           <span className="grid h-12 w-12 place-items-center rounded-2xl bg-white/10 ring-1 ring-white/20 backdrop-blur">
             <MessageSquareText size={22} aria-hidden="true" />
@@ -99,7 +99,7 @@ export default function EnquiryForm({ targetType, targetId, recipientLabel, list
             <div aria-busy="true" className="h-56 animate-pulse rounded-2xl bg-gray-100 dark:bg-gray-800" />
           ) : status !== "authed" ? (
             <div className="flex h-full flex-col items-center justify-center py-6 text-center">
-              <span className="grid h-12 w-12 place-items-center rounded-2xl bg-[#2B3FB8]/10 text-[#2B3FB8] dark:bg-blue-400/10 dark:text-blue-300">
+              <span className="grid h-12 w-12 place-items-center rounded-2xl bg-ox-blue/10 text-ox-blue dark:bg-blue-400/10 dark:text-blue-300">
                 <LockKeyhole size={22} aria-hidden="true" />
               </span>
               <p className="mt-4 text-lg font-semibold text-gray-900 dark:text-white">Sign in to send a message</p>
@@ -109,13 +109,13 @@ export default function EnquiryForm({ targetType, targetId, recipientLabel, list
               <div className="mt-5 flex flex-wrap justify-center gap-3">
                 <Link
                   href={`/login?next=${encodeURIComponent(pathname || "/")}`}
-                  className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#131C55] to-[#2B3FB8] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-900/25 transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500"
+                  className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-ox-navy to-ox-blue px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-900/25 transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:from-blue-600 dark:to-indigo-500"
                 >
                   Sign in
                 </Link>
                 <Link
                   href="/signup"
-                  className="inline-flex items-center rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-800 transition hover:border-[#2B3FB8] hover:text-[#2B3FB8] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200"
+                  className="inline-flex items-center rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-800 transition hover:border-ox-blue hover:text-ox-blue focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200"
                 >
                   Create account
                 </Link>
@@ -137,7 +137,7 @@ export default function EnquiryForm({ targetType, targetId, recipientLabel, list
                   setSentTo("");
                   setMessage("");
                 }}
-                className="mt-5 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-800 transition hover:border-[#2B3FB8] hover:text-[#2B3FB8] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200"
+                className="mt-5 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-800 transition hover:border-ox-blue hover:text-ox-blue focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200"
               >
                 Send another message
               </button>
@@ -147,7 +147,7 @@ export default function EnquiryForm({ targetType, targetId, recipientLabel, list
               <div className="flex items-center gap-3 rounded-2xl bg-gray-50 px-4 py-3 ring-1 ring-gray-200 dark:bg-white/[0.03] dark:ring-white/10">
                 <span
                   aria-hidden="true"
-                  className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#131C55] text-xs font-bold text-white"
+                  className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-ox-navy text-xs font-bold text-white"
                 >
                   {initials(senderName)}
                 </span>
@@ -175,7 +175,7 @@ export default function EnquiryForm({ targetType, targetId, recipientLabel, list
                 className={`w-full resize-y rounded-xl border bg-white px-3.5 py-3 text-sm leading-relaxed text-gray-900 placeholder-gray-400 transition focus:outline-none focus:ring-4 motion-reduce:transition-none dark:bg-gray-950 dark:text-gray-100 dark:placeholder-gray-500 ${
                   error
                     ? "border-red-400 focus:border-red-500 focus:ring-red-500/15"
-                    : "border-gray-300 focus:border-[#2B3FB8] focus:ring-[#2B3FB8]/15 dark:border-gray-700 dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
+                    : "border-gray-300 focus:border-ox-blue focus:ring-ox-blue/15 dark:border-gray-700 dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
                 }`}
               />
               <p id="enquiry-count" className="mt-1.5 text-right text-xs text-gray-400 tabular-nums dark:text-gray-500">
@@ -191,7 +191,7 @@ export default function EnquiryForm({ targetType, targetId, recipientLabel, list
               <button
                 type="submit"
                 disabled={sending}
-                className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#131C55] to-[#2B3FB8] px-6 py-3 text-[15px] font-semibold text-white shadow-lg shadow-indigo-900/25 transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] disabled:opacity-60 motion-reduce:transition-none sm:w-auto dark:from-blue-600 dark:to-indigo-500"
+                className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-ox-navy to-ox-blue px-6 py-3 text-[15px] font-semibold text-white shadow-lg shadow-indigo-900/25 transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy disabled:opacity-60 motion-reduce:transition-none sm:w-auto dark:from-blue-600 dark:to-indigo-500"
               >
                 {sending ? <Loader2 size={17} aria-hidden="true" className="animate-spin" /> : <Send size={17} aria-hidden="true" />}
                 {sending ? "Sending…" : `Send to ${recipientLabel}`}

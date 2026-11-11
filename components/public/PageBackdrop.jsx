@@ -13,10 +13,10 @@
 export default function PageBackdrop() {
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[34rem] overflow-hidden">
-      <div className="absolute -top-40 -right-24 h-[28rem] w-[28rem] rounded-full bg-[radial-gradient(circle,rgba(43,63,184,0.14),transparent_65%)] dark:bg-[radial-gradient(circle,rgba(76,99,210,0.26),transparent_65%)]" />
-      <div className="absolute -top-24 -left-40 h-[24rem] w-[24rem] rounded-full bg-[radial-gradient(circle,rgba(124,58,237,0.08),transparent_65%)] dark:bg-[radial-gradient(circle,rgba(139,92,246,0.14),transparent_65%)]" />
+      <div className="absolute -top-40 -right-24 h-[28rem] w-[28rem] rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--color-ox-blue)_14%,transparent),transparent_65%)] dark:bg-[radial-gradient(circle,color-mix(in_oklab,var(--color-ox-glow)_26%,transparent),transparent_65%)]" />
+      <div className="absolute -top-24 -left-40 h-[24rem] w-[24rem] rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--color-violet-600)_8%,transparent),transparent_65%)] dark:bg-[radial-gradient(circle,color-mix(in_oklab,var(--color-ox-violet)_14%,transparent),transparent_65%)]" />
       <div
-        className="absolute inset-0 text-[#131C55] opacity-[0.05] [mask-image:linear-gradient(to_bottom,black,transparent)] dark:text-white dark:opacity-[0.06]"
+        className="absolute inset-0 text-ox-navy opacity-[0.05] [mask-image:linear-gradient(to_bottom,black,transparent)] dark:text-white dark:opacity-[0.06]"
         style={{
           backgroundImage:
             "linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)",

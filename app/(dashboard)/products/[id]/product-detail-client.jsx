@@ -146,7 +146,7 @@ export default function ProductDetailClient({ id }) {
               {/* Details */}
               <div className="p-6 sm:p-10 flex flex-col">
                 {product.category && (
-                  <span className="mb-4 inline-block self-start rounded-full bg-[#2B3FB8]/10 px-3 py-1 text-xs font-bold tracking-wide text-[#2B3FB8] uppercase ring-1 ring-[#2B3FB8]/15 dark:bg-blue-400/10 dark:text-blue-300 dark:ring-blue-400/20">
+                  <span className="mb-4 inline-block self-start rounded-full bg-ox-blue/10 px-3 py-1 text-xs font-bold tracking-wide text-ox-blue uppercase ring-1 ring-ox-blue/15 dark:bg-blue-400/10 dark:text-blue-300 dark:ring-blue-400/20">
                     {product.category}
                   </span>
                 )}

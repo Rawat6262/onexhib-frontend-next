@@ -75,9 +75,9 @@ const SOCIAL_LINKS = [
  */
 const TONES = {
   default:
-    "inline-flex text-gray-500 transition hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#131C55] motion-reduce:transition-none dark:text-gray-400 dark:hover:text-white",
+    "inline-flex text-gray-500 transition hover:text-ox-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none dark:text-gray-400 dark:hover:text-white",
   onDark:
-    "grid h-10 w-10 place-items-center rounded-full bg-white/[0.06] text-white/70 ring-1 ring-white/10 transition hover:-translate-y-0.5 hover:bg-white hover:text-[#131C55] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white motion-reduce:transform-none motion-reduce:transition-none",
+    "grid h-10 w-10 place-items-center rounded-full bg-white/[0.06] text-white/70 ring-1 ring-white/10 transition hover:-translate-y-0.5 hover:bg-white hover:text-ox-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white motion-reduce:transform-none motion-reduce:transition-none",
 };
 
 export default function SocialLinks({ className = "", tone = "default" }) {

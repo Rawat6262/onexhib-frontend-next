@@ -4,6 +4,7 @@ import { ArrowRight, Landmark, MapPin, Navigation } from "lucide-react";
 
 import AroundVenue from "@/components/maps/AroundVenue";
 import CentresMap from "@/components/maps/CentresMap";
+import StayNearby from "@/components/hotels/StayNearby";
 import { directionsUrl } from "@/lib/google-maps";
 import { exhibitionCentrePath } from "@/lib/routes";
 
@@ -14,8 +15,11 @@ import { exhibitionCentrePath } from "@/lib/routes";
  *
  * Rendered only for shows linked to a centre - an unlinked show has a typed
  * venue and no coordinates, and a map guessed from free text could be wrong.
+ *
+ * `hotels`: partner hotels near the centre (getNearbyHotels), shown as "Stay
+ * nearby" above the OpenStreetMap places.
  */
-export default function VenueSection({ centre, exhibitionName, className = "" }) {
+export default function VenueSection({ centre, exhibitionName, hotels = [], className = "" }) {
   if (!centre?.slug) return null;
   const path = exhibitionCentrePath(centre.slug);
   const place = [centre.city, centre.state, centre.country].filter(Boolean).join(", ");
@@ -107,6 +111,8 @@ export default function VenueSection({ centre, exhibitionName, className = "" })
           </div>
         ) : null}
       </div>
+
+      <StayNearby hotels={hotels} venueName={centre.name} className="mt-10" />
 
       {/* Hotels, restaurants, airports and hospitals near the centre - loaded
           only when a visitor picks a category. */}

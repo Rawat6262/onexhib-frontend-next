@@ -7,6 +7,7 @@ import ExhibitionCard from "@/components/public/ExhibitionCard";
 import EmptyState from "@/components/public/EmptyState";
 import Pagination from "@/components/public/Pagination";
 import AroundVenue from "@/components/maps/AroundVenue";
+import StayNearby from "@/components/hotels/StayNearby";
 import CentresMap from "@/components/maps/CentresMap";
 import JsonLd from "@/components/seo/JsonLd";
 
@@ -14,7 +15,7 @@ import { PUBLIC_ROUTES, publicPageMetadata } from "@/lib/seo";
 import { breadcrumbNode, graph, venueNode } from "@/lib/jsonld";
 import { exhibitionCentrePath } from "@/lib/routes";
 import { directionsUrl } from "@/lib/google-maps";
-import { centreHasListings, getExhibitionCentre } from "@/lib/public-api";
+import { centreHasListings, getExhibitionCentre, getNearbyHotels } from "@/lib/public-api";
 
 /**
  * One exhibition centre: /exhibition-centres/<slug>
@@ -106,6 +107,7 @@ export default async function ExhibitionCentrePage({ params, searchParams }) {
     return `${path}${s ? `?${s}` : ""}#${anchor}`;
   };
   const hasLocation = centre.lat !== null && centre.lng !== null;
+  const hotels = hasLocation ? await getNearbyHotels({ lat: centre.lat, lng: centre.lng }) : [];
 
   const facts = [
     centre.halls !== null ? { icon: Building, label: "Halls", value: numberFmt.format(centre.halls) } : null,
@@ -206,6 +208,10 @@ export default async function ExhibitionCentrePage({ params, searchParams }) {
           ) : null}
         </div>
       </div>
+
+      {/* Hotels listed on OneXhib near the venue, then every hotel/restaurant
+          around it from OpenStreetMap. */}
+      <StayNearby hotels={hotels} venueName={centre.name} className="mt-14" />
 
       {/* Loaded only when a visitor picks a category (each search is billed). */}
       {hasLocation ? (

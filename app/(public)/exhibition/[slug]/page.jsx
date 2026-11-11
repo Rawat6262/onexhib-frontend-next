@@ -18,7 +18,7 @@ import { getEditions } from "@/lib/editions";
 import { idFromSlug, isCanonicalSlug } from "@/lib/slug";
 import { shortTitle } from "@/lib/seo-title";
 import { formatDateRange, formatLocation, toIsoDate } from "@/lib/format";
-import { getCompaniesForExhibition, getExhibitionById } from "@/lib/public-api";
+import { getCompaniesForExhibition, getExhibitionById, getNearbyHotels } from "@/lib/public-api";
 import ExhibitionCard from "@/components/public/ExhibitionCard";
 import EnquiryForm from "@/components/public/EnquiryForm";
 import VenueSection from "@/components/exhibition/VenueSection";
@@ -186,7 +186,7 @@ export default async function ExhibitionDetailPage({ params }) {
   // `placeLinks` decides whether the location links point at an indexable
   // landing page or at the noindex filter; `nearby`
   // is what makes this page a hub rather than a dead end for a crawler.
-  const [companies, placeLinks, categoryLink, sameCity, { editions, next: nextEdition }] = await Promise.all([
+  const [companies, placeLinks, categoryLink, sameCity, { editions, next: nextEdition }, hotels] = await Promise.all([
     getCompaniesForExhibition(exhibition.id),
     resolvePlaceLinks(exhibition),
     resolveCategoryLink(exhibition.category),
@@ -194,6 +194,8 @@ export default async function ExhibitionDetailPage({ params }) {
       ? getExhibitionsInPlace({ country: exhibition.country, city: exhibition.city })
       : Promise.resolve([]),
     getEditions(exhibition),
+    // Partner hotels near the linked centre, for the venue section.
+    exhibition.centre ? getNearbyHotels({ lat: exhibition.centre.lat, lng: exhibition.centre.lng }) : Promise.resolve([]),
   ]);
 
   // Same industry, coming up - the show's own editions are listed separately,
@@ -473,7 +475,7 @@ export default async function ExhibitionDetailPage({ params }) {
       ) : null}
 
       {/* The linked exhibition centre: photo, address, live map, directions. */}
-      <VenueSection centre={exhibition.centre} exhibitionName={exhibition.name} className="mt-14" />
+      <VenueSection centre={exhibition.centre} exhibitionName={exhibition.name} hotels={hotels} className="mt-14" />
 
       {/* Visitor -> organiser. Shown only when the backend can deliver to this
           listing; the organiser's address never reaches the page. */}

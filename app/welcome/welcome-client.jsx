@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   ArrowRight,
+  BedDouble,
   Bookmark,
   Briefcase,
   CalendarClock,
@@ -32,6 +33,7 @@ const TYPE_ICONS = {
   [ROLES.EXHIBITOR]: Store,
   [ROLES.ORGANISER]: Presentation,
   [ROLES.EXHIBITION_SERVICE]: Briefcase,
+  [ROLES.HOTEL]: BedDouble,
 };
 
 const QUICK_LINKS = [

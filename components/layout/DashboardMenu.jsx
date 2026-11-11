@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import {
   ArrowRight,
+  BedDouble,
   Bookmark,
   Briefcase,
   CalendarClock,
@@ -51,10 +52,12 @@ const WORKSPACE = {
     { href: "/admin/dashboard", label: "Admin console", hint: "Everything on OneXhib", icon: ShieldCheck },
     { href: "/admin/exhibition-centres", label: "Exhibition centres", hint: "All venues", icon: Landmark },
     { href: "/admin/requests", label: "Access requests", hint: "Waiting for a decision", icon: KeyRound },
+    { href: "/admin/hotels", label: "Hotels", hint: "Listings waiting for review", icon: BedDouble },
     { href: "/organiser/exhibitor-requests", label: "Exhibitor requests", hint: "Exhibitors waiting for approval", icon: UserCheck },
     { href: "/organiser", label: "My exhibitions", hint: "Organiser view", icon: CalendarDays },
   ],
   [ROLES.EXHIBITOR]: [{ href: "/exhibitor", label: "Exhibitor workspace", hint: "Company, products, shows", icon: Store }],
+  [ROLES.HOTEL]: [{ href: "/hotel", label: "My hotels", hint: "Listings and review status", icon: BedDouble }],
   [ROLES.VISITOR]: [{ href: "/welcome", label: "Get started", hint: "Choose what you do on OneXhib", icon: Sparkles }],
 };
 
@@ -70,6 +73,7 @@ const ROLE_LABEL = {
   [ROLES.ADMIN]: "Admin",
   [ROLES.EXHIBITOR]: "Exhibitor",
   [ROLES.VISITOR]: "Visitor",
+  [ROLES.HOTEL]: "Hotel",
 };
 
 export default function DashboardMenu() {

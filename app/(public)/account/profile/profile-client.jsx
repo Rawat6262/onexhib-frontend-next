@@ -68,6 +68,7 @@ const ROLE_LABEL = {
   [ROLES.ADMIN]: "Admin",
   [ROLES.EXHIBITOR]: "Exhibitor",
   [ROLES.VISITOR]: "Visitor",
+  [ROLES.HOTEL]: "Hotel",
 };
 
 const toForm = (data) => ({

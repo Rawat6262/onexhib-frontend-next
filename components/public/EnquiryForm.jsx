@@ -28,7 +28,9 @@ import { sendEnquiry } from "@/models/enquiry.model";
 const MIN = 10;
 const MAX = 2000;
 
-export default function EnquiryForm({ targetType, targetId, recipientLabel, listingName, className = "" }) {
+// `topics` and `placeholder` override the wording for a listing type whose
+// questions differ (a hotel is asked about dates and rooms, not stands).
+export default function EnquiryForm({ targetType, targetId, recipientLabel, listingName, topics, placeholder, className = "" }) {
   const pathname = usePathname();
   const { user, status } = useAuth();
 
@@ -78,7 +80,7 @@ export default function EnquiryForm({ targetType, targetId, recipientLabel, list
             Contact {recipientLabel}
           </h2>
           <p className="mt-2 text-[15px] leading-relaxed text-blue-100/85">
-            Ask about <span className="font-semibold text-white">{listingName}</span> — stands, pricing, availability,
+            Ask about <span className="font-semibold text-white">{listingName}</span> — {topics || "stands, pricing, availability"},
             or anything else. Your message goes straight to their inbox.
           </p>
           <ul className="mt-6 list-none space-y-2.5 text-sm text-blue-100/80">
@@ -169,7 +171,7 @@ export default function EnquiryForm({ targetType, targetId, recipientLabel, list
                   setMessage(e.target.value);
                   if (error) setError("");
                 }}
-                placeholder={`Hi, I'm interested in ${listingName}. Could you tell me more about…`}
+                placeholder={placeholder || `Hi, I'm interested in ${listingName}. Could you tell me more about…`}
                 aria-invalid={Boolean(error)}
                 aria-describedby="enquiry-count"
                 className={`w-full resize-y rounded-xl border bg-white px-3.5 py-3 text-sm leading-relaxed text-gray-900 placeholder-gray-400 transition focus:outline-none focus:ring-4 motion-reduce:transition-none dark:bg-gray-950 dark:text-gray-100 dark:placeholder-gray-500 ${

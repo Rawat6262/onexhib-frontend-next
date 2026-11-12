@@ -110,10 +110,28 @@ export const getExhibitionServiceContact = (serviceId) =>
 /*
  * ADMIN - every listing with its owner, lead count and catalogue stats.
  * params: { page, limit (<=100), search, category, country, owner ("none" or a
- * user id), leads ("yes"), sort ("newest" | "oldest" | "leads" | "name"), stats ("0" to skip) }
+ * user id), leads ("yes"), featured ("yes"), sort ("newest" | "oldest" | "leads" | "name"), stats ("0" to skip) }
  * Answers { data, total, totalPages, categories, stats }.
  */
 export const getAdminServicesPage = (params) => axios.get("/api/admin/services", { params });
 
 // Admin-only: remove any listing (spam, duplicates). Its image is deleted too.
 export const adminDeleteService = (id) => axios.delete(`/api/admin/services/${id}`);
+
+/*
+ * ADMIN - feature a listing on the home page for `days` days (1-365, today is
+ * day 1), or stop featuring it. Featuring again replaces the window. A refusal
+ * is a 400 with a message to show as-is. getAdminServicesPage({ featured: "yes" })
+ * lists every featured listing, run-out windows included.
+ */
+export const adminFeatureService = (id, days) => axios.put(`/api/admin/services/${id}/feature`, { days });
+export const adminUnfeatureService = (id) => axios.put(`/api/admin/services/${id}/unfeature`);
+
+/**
+ * Drop the cached featured-services list so the home page shows a change on the
+ * next visit, not after the 5-minute revalidate. Fire and forget.
+ * See app/api/revalidate/featured-services/route.js.
+ */
+export const refreshFeaturedServices = () => {
+  fetch("/api/revalidate/featured-services", { method: "POST", credentials: "include" }).catch(() => {});
+};

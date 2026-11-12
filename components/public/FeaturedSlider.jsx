@@ -3,13 +3,13 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, ChevronLeft, ChevronRight, MapPin, Sparkles } from "lucide-react";
+import { ArrowRight, BriefcaseBusiness, ChevronLeft, ChevronRight, MapPin, Sparkles, Wrench } from "lucide-react";
 
-import { exhibitionPath } from "@/lib/routes";
+import { exhibitionPath, servicePath } from "@/lib/routes";
 import { formatDateRange, formatLocation, toIsoDate } from "@/lib/format";
 
 /**
- * Featured exhibitions, as a slider.
+ * Featured exhibitions - and featured service providers (kind="service") - as a slider.
  *
  * WHY THE SLIDE IS TYPOGRAPHY-FIRST, NOT IMAGE-FIRST
  * The record images are logos and posters of wildly varying shape, hotlinked
@@ -45,7 +45,20 @@ import { formatDateRange, formatLocation, toIsoDate } from "@/lib/format";
 const AUTOPLAY_MS = 6000;
 const DAY_MS = 86_400_000;
 
-export default function FeaturedSlider({ items = [], className = "" }) {
+/*
+ * WHAT IS BEING FEATURED. One carousel serves both featured exhibitions and
+ * featured service providers (getFeaturedServices), so the two home page
+ * spotlights look and behave the same. Only the slide's copy differs: a show
+ * has dates and a status, a provider has a category, speciality and a line
+ * about what it does.
+ */
+const KINDS = {
+  exhibition: { label: "Featured exhibitions", noun: "exhibition", Slide: ExhibitionSlide },
+  service: { label: "Featured services", noun: "service", Slide: ServiceSlide },
+};
+
+export default function FeaturedSlider({ items = [], kind = "exhibition", className = "" }) {
+  const { label, noun, Slide } = KINDS[kind] || KINDS.exhibition;
   const slides = items.filter(Boolean);
   const count = slides.length;
 
@@ -112,7 +125,7 @@ export default function FeaturedSlider({ items = [], className = "" }) {
       ref={rootRef}
       role="region"
       aria-roledescription="carousel"
-      aria-label="Featured exhibitions"
+      aria-label={label}
       onKeyDown={onKeyDown}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
@@ -126,10 +139,10 @@ export default function FeaturedSlider({ items = [], className = "" }) {
         className={`flex ${reducedMotion ? "" : "transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"}`}
         style={{ transform: `translateX(-${index * 100}%)` }}
       >
-        {slides.map((exhibition, i) => (
+        {slides.map((item, i) => (
           <Slide
-            key={exhibition.id}
-            exhibition={exhibition}
+            key={item.id}
+            item={item}
             active={i === index}
             // No preload: the slider sits below the hero, so on load nothing in it
             // is visible and a preload here only triggers Chrome's unused-preload
@@ -162,14 +175,14 @@ export default function FeaturedSlider({ items = [], className = "" }) {
 
               {/* Many slides do not fit as dots on a phone; the counter says enough there. */}
               <div className={`pointer-events-auto items-center gap-1.5 ${count > 8 ? "hidden sm:flex" : "flex"}`}>
-                {slides.map((exhibition, i) => {
+                {slides.map((item, i) => {
                   const active = i === index;
                   return (
                     <button
-                      key={exhibition.id}
+                      key={item.id}
                       type="button"
                       onClick={() => go(i)}
-                      aria-label={`Go to slide ${i + 1}: ${exhibition.name}`}
+                      aria-label={`Go to slide ${i + 1}: ${item.name}`}
                       aria-current={active ? "true" : undefined}
                       className={`relative h-1.5 overflow-hidden rounded-full transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white motion-reduce:transition-none ${
                         active ? "w-10 bg-white/25" : "w-2.5 bg-white/35 hover:bg-white/70"
@@ -200,10 +213,10 @@ export default function FeaturedSlider({ items = [], className = "" }) {
             </div>
 
             <div className="pointer-events-auto flex shrink-0 gap-2">
-              <SliderButton onClick={prev} label="Previous featured exhibition">
+              <SliderButton onClick={prev} label={`Previous featured ${noun}`}>
                 <ChevronLeft size={18} aria-hidden="true" />
               </SliderButton>
-              <SliderButton onClick={next} label="Next featured exhibition">
+              <SliderButton onClick={next} label={`Next featured ${noun}`}>
                 <ChevronRight size={18} aria-hidden="true" />
               </SliderButton>
             </div>
@@ -217,20 +230,12 @@ export default function FeaturedSlider({ items = [], className = "" }) {
 /* ────────────────────────────────────────────────────────────────────────── */
 
 /**
- * One slide. `inert` on the inactive ones is what keeps their links out of the
- * tab order — without it, tabbing would walk into slides that are translated
- * off-screen and the browser would scroll the track sideways to chase focus.
+ * One slide's frame: its backdrop and the copy | media grid. `inert` on the
+ * inactive ones is what keeps their links out of the tab order — without it,
+ * tabbing would walk into slides that are translated off-screen and the
+ * browser would scroll the track sideways to chase focus.
  */
-function Slide({ exhibition, active, priority, position, total, id }) {
-  const { id: exhibitionId, name, startDate, endDate, category, venue, city, state, country, image } =
-    exhibition;
-
-  const dates = formatDateRange(startDate, endDate);
-  const place = formatLocation({ venue, city, state, country });
-  const href = exhibitionPath(name, exhibitionId);
-  const tile = dateTile(startDate, endDate);
-  const status = statusOf(startDate, endDate);
-
+function SlideFrame({ id, active, position, total, image, name, children }) {
   return (
     <div
       id={id}
@@ -278,108 +283,210 @@ function Slide({ exhibition, active, priority, position, total, id }) {
       />
 
       <div className="grid items-center gap-10 px-6 pt-10 pb-28 sm:px-10 sm:pt-12 lg:grid-cols-[1.2fr_1fr] lg:gap-14 lg:px-12 lg:pt-14 lg:pb-28">
-        {/* ── Copy ──────────────────────────────────────────────────────── */}
-        {/* `relative` is load-bearing: it is what the stretched link below
-            resolves its inset-0 against. Without it the overlay would size to
-            the slider root and swallow the whole component. */}
-        <div className="relative min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
-            <p className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-amber-300 to-amber-400 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-amber-950 shadow-sm">
-              <Sparkles size={12} aria-hidden="true" />
-              Featured
-            </p>
-            {status ? (
-              <p
-                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-semibold ring-1 backdrop-blur ${status.className}`}
-                // Days-to-go is computed against "now", which can differ by a day
-                // between the server render and hydration around midnight.
-                suppressHydrationWarning
-              >
-                {status.live ? (
-                  <span aria-hidden="true" className="relative flex h-2 w-2">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-400 opacity-75 motion-reduce:animate-none" />
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-rose-400" />
-                  </span>
-                ) : null}
-                {status.label}
-              </p>
-            ) : null}
-          </div>
-
-          {/* Categories in this data run to full sentences ("Natural fibers
-              (cotton, wool, silk…) and synthetic/blended yarns…"), so this is
-              clamped to one line rather than allowed to wrap into a block. */}
-          {category ? (
-            <p className="mt-5 line-clamp-1 text-xs font-semibold uppercase tracking-[0.14em] text-blue-200/80">
-              {category}
-            </p>
-          ) : null}
-
-          <h3 className="mt-2 line-clamp-3 text-3xl leading-[1.08] font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
-            <Link
-              href={href}
-              // Stretched link: the heading carries the href so the accessible
-              // name is the exhibition, while ::after makes the copy column
-              // clickable. Scoped to the column, so it never covers the controls.
-              className="rounded-sm after:absolute after:inset-0 after:content-[''] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
-            >
-              {name}
-            </Link>
-          </h3>
-
-          <dl className="mt-6 flex flex-wrap items-stretch gap-3">
-            {tile ? (
-              <div className="flex items-center gap-3 rounded-2xl bg-white/10 py-2 pr-4 pl-2 ring-1 ring-white/15 backdrop-blur">
-                <dt className="sr-only">Dates</dt>
-                {/* Calendar tile: month over day, the shape people already read
-                    as "a date" at a glance. */}
-                <span
-                  aria-hidden="true"
-                  className="flex min-w-12 flex-col overflow-hidden rounded-xl bg-white text-center shadow-sm"
-                >
-                  <span className="bg-rose-500 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
-                    {tile.month}
-                  </span>
-                  <span
-                    className={`px-1.5 py-1 leading-none font-extrabold whitespace-nowrap text-gray-900 ${
-                      tile.day.length > 2 ? "text-base" : "text-lg"
-                    }`}
-                  >
-                    {tile.day}
-                  </span>
-                </span>
-                <dd className="text-[15px] leading-snug font-medium text-white">
-                  <time dateTime={toIsoDate(startDate)}>{dates}</time>
-                </dd>
-              </div>
-            ) : null}
-
-            {place ? (
-              <div className="flex min-w-0 max-w-full items-center gap-2.5 rounded-2xl bg-white/10 px-4 py-3 ring-1 ring-white/15 backdrop-blur">
-                <dt className="sr-only">Location</dt>
-                <MapPin size={18} className="shrink-0 text-blue-200" aria-hidden="true" />
-                <dd className="line-clamp-2 text-[15px] leading-snug font-medium text-white">{place}</dd>
-              </div>
-            ) : null}
-          </dl>
-
-          {/* Visual affordance only — the stretched heading link above is the
-              real target, so this is aria-hidden to avoid a duplicate link. */}
-          <span
-            aria-hidden="true"
-            className="group/cta mt-8 inline-flex items-center gap-2 rounded-full bg-white py-3 pr-3 pl-6 text-[15px] font-semibold text-ox-navy shadow-lg shadow-black/20"
-          >
-            View exhibition
-            <span className="grid h-8 w-8 place-items-center rounded-full bg-ox-navy text-white">
-              <ArrowRight size={16} />
-            </span>
-          </span>
-        </div>
-
-        {/* ── Media ─────────────────────────────────────────────────────── */}
-        <SlideMedia image={image} name={name} priority={priority} active={active} />
+        {children}
       </div>
     </div>
+  );
+}
+
+/** "Featured" chip, the first thing on every slide. */
+function FeaturedChip() {
+  return (
+    <p className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-amber-300 to-amber-400 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-amber-950 shadow-sm">
+      <Sparkles size={12} aria-hidden="true" />
+      Featured
+    </p>
+  );
+}
+
+/**
+ * The slide's title, carrying its link. Stretched link: the heading carries the
+ * href so the accessible name is the record, while ::after makes the copy
+ * column clickable. Scoped to the column (which is `relative`), so it never
+ * covers the controls.
+ */
+function SlideTitle({ href, children }) {
+  return (
+    <h3 className="mt-2 line-clamp-3 text-3xl leading-[1.08] font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
+      <Link
+        href={href}
+        className="rounded-sm after:absolute after:inset-0 after:content-[''] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+      >
+        {children}
+      </Link>
+    </h3>
+  );
+}
+
+/**
+ * Visual affordance only — the stretched heading link is the real target, so
+ * this is aria-hidden to avoid a duplicate link.
+ */
+function SlideCta({ children }) {
+  return (
+    <span
+      aria-hidden="true"
+      className="group/cta mt-8 inline-flex items-center gap-2 rounded-full bg-white py-3 pr-3 pl-6 text-[15px] font-semibold text-ox-navy shadow-lg shadow-black/20"
+    >
+      {children}
+      <span className="grid h-8 w-8 place-items-center rounded-full bg-ox-navy text-white">
+        <ArrowRight size={16} />
+      </span>
+    </span>
+  );
+}
+
+/** A featured exhibition: status, category, name, date tile and place. */
+function ExhibitionSlide({ item: exhibition, active, priority, position, total, id }) {
+  const { id: exhibitionId, name, startDate, endDate, category, venue, city, state, country, image } =
+    exhibition;
+
+  const dates = formatDateRange(startDate, endDate);
+  const place = formatLocation({ venue, city, state, country });
+  const href = exhibitionPath(name, exhibitionId);
+  const tile = dateTile(startDate, endDate);
+  const status = statusOf(startDate, endDate);
+
+  return (
+    <SlideFrame id={id} active={active} position={position} total={total} image={image} name={name}>
+      {/* ── Copy ──────────────────────────────────────────────────────── */}
+      {/* `relative` is load-bearing: it is what the stretched link below
+          resolves its inset-0 against. Without it the overlay would size to
+          the slider root and swallow the whole component. */}
+      <div className="relative min-w-0">
+        <div className="flex flex-wrap items-center gap-2">
+          <FeaturedChip />
+          {status ? (
+            <p
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-semibold ring-1 backdrop-blur ${status.className}`}
+              // Days-to-go is computed against "now", which can differ by a day
+              // between the server render and hydration around midnight.
+              suppressHydrationWarning
+            >
+              {status.live ? (
+                <span aria-hidden="true" className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-400 opacity-75 motion-reduce:animate-none" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-rose-400" />
+                </span>
+              ) : null}
+              {status.label}
+            </p>
+          ) : null}
+        </div>
+
+        {/* Categories in this data run to full sentences ("Natural fibers
+            (cotton, wool, silk…) and synthetic/blended yarns…"), so this is
+            clamped to one line rather than allowed to wrap into a block. */}
+        {category ? (
+          <p className="mt-5 line-clamp-1 text-xs font-semibold uppercase tracking-[0.14em] text-blue-200/80">
+            {category}
+          </p>
+        ) : null}
+
+        <SlideTitle href={href}>{name}</SlideTitle>
+
+        <dl className="mt-6 flex flex-wrap items-stretch gap-3">
+          {tile ? (
+            <div className="flex items-center gap-3 rounded-2xl bg-white/10 py-2 pr-4 pl-2 ring-1 ring-white/15 backdrop-blur">
+              <dt className="sr-only">Dates</dt>
+              {/* Calendar tile: month over day, the shape people already read
+                  as "a date" at a glance. */}
+              <span
+                aria-hidden="true"
+                className="flex min-w-12 flex-col overflow-hidden rounded-xl bg-white text-center shadow-sm"
+              >
+                <span className="bg-rose-500 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+                  {tile.month}
+                </span>
+                <span
+                  className={`px-1.5 py-1 leading-none font-extrabold whitespace-nowrap text-gray-900 ${
+                    tile.day.length > 2 ? "text-base" : "text-lg"
+                  }`}
+                >
+                  {tile.day}
+                </span>
+              </span>
+              <dd className="text-[15px] leading-snug font-medium text-white">
+                <time dateTime={toIsoDate(startDate)}>{dates}</time>
+              </dd>
+            </div>
+          ) : null}
+
+          {place ? (
+            <div className="flex min-w-0 max-w-full items-center gap-2.5 rounded-2xl bg-white/10 px-4 py-3 ring-1 ring-white/15 backdrop-blur">
+              <dt className="sr-only">Location</dt>
+              <MapPin size={18} className="shrink-0 text-blue-200" aria-hidden="true" />
+              <dd className="line-clamp-2 text-[15px] leading-snug font-medium text-white">{place}</dd>
+            </div>
+          ) : null}
+        </dl>
+
+        <SlideCta>View exhibition</SlideCta>
+      </div>
+
+      {/* ── Media ─────────────────────────────────────────────────────── */}
+      <SlideMedia image={image} name={name} priority={priority} active={active} />
+    </SlideFrame>
+  );
+}
+
+/**
+ * A featured service provider: category, business name, a line of what they
+ * do, then speciality and place in the same glass tiles an exhibition uses for
+ * dates and venue. The category and speciality come from the taxonomy (see
+ * toPublicService), never from provider free text; the description is the
+ * provider's own words, rendered as plain text.
+ */
+function ServiceSlide({ item: service, active, priority, position, total, id }) {
+  const { id: serviceId, name, service: category, subcategory, description, city, state, country, image } = service;
+  const place = formatLocation({ city, state, country });
+  const href = servicePath(name, serviceId);
+
+  return (
+    <SlideFrame id={id} active={active} position={position} total={total} image={image} name={name}>
+      <div className="relative min-w-0">
+        <div className="flex flex-wrap items-center gap-2">
+          <FeaturedChip />
+          <p className="inline-flex items-center gap-1.5 rounded-full bg-sky-400/15 px-3 py-1 text-[11px] font-semibold text-sky-100 ring-1 ring-sky-300/30 backdrop-blur">
+            <BriefcaseBusiness size={12} aria-hidden="true" />
+            Exhibition service
+          </p>
+        </div>
+
+        {category ? (
+          <p className="mt-5 line-clamp-1 text-xs font-semibold uppercase tracking-[0.14em] text-blue-200/80">
+            {category}
+          </p>
+        ) : null}
+
+        <SlideTitle href={href}>{name}</SlideTitle>
+
+        {description ? (
+          <p className="mt-4 line-clamp-2 max-w-xl text-[15px] leading-relaxed text-white/75">{description}</p>
+        ) : null}
+
+        <dl className="mt-6 flex flex-wrap items-stretch gap-3">
+          {subcategory && subcategory !== category ? (
+            <div className="flex min-w-0 max-w-full items-center gap-2.5 rounded-2xl bg-white/10 px-4 py-3 ring-1 ring-white/15 backdrop-blur">
+              <dt className="sr-only">Speciality</dt>
+              <Wrench size={18} className="shrink-0 text-blue-200" aria-hidden="true" />
+              <dd className="line-clamp-1 text-[15px] leading-snug font-medium text-white">{subcategory}</dd>
+            </div>
+          ) : null}
+          {place ? (
+            <div className="flex min-w-0 max-w-full items-center gap-2.5 rounded-2xl bg-white/10 px-4 py-3 ring-1 ring-white/15 backdrop-blur">
+              <dt className="sr-only">Location</dt>
+              <MapPin size={18} className="shrink-0 text-blue-200" aria-hidden="true" />
+              <dd className="line-clamp-2 text-[15px] leading-snug font-medium text-white">{place}</dd>
+            </div>
+          ) : null}
+        </dl>
+
+        <SlideCta>View service</SlideCta>
+      </div>
+
+      <SlideMedia image={image} name={name} priority={priority} active={active} />
+    </SlideFrame>
   );
 }
 

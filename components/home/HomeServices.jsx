@@ -19,15 +19,17 @@ import { GENERAL_SUBCATEGORY } from "@/lib/service-taxonomy";
  * WHICH PROVIDERS. Round-robin across categories, listings with a picture
  * first, so the slider shows the range of services (stands, printing,
  * logistics...) rather than twelve printers in a row because printing happens
- * to be the biggest category.
+ * to be the biggest category. `excludeIds` (the featured providers, shown in
+ * their own section just above) are left out so no card appears twice.
  */
 const MAX_PROVIDERS = 12;
 
-function pickProviders(categories) {
+function pickProviders(categories, exclude = new Set()) {
   const queues = categories
     .filter((c) => c.count > 0 && c.slug)
     .map((c) =>
-      [...c.providers]
+      c.providers
+        .filter((p) => !exclude.has(p.id))
         .sort((a, b) => Number(Boolean(b.image)) - Number(Boolean(a.image)))
         // The card's speciality line: the provider's own speciality, or the
         // category when they have none ("General" on every card says nothing).
@@ -54,8 +56,8 @@ function pickProviders(categories) {
   return picked.sort((a, b) => Number(Boolean(b.image)) - Number(Boolean(a.image)));
 }
 
-export default function HomeServices({ directory, className = "" }) {
-  const providers = pickProviders(directory?.categories || []);
+export default function HomeServices({ directory, excludeIds = [], className = "" }) {
+  const providers = pickProviders(directory?.categories || [], new Set(excludeIds));
   // Nothing listed yet: no section, rather than an empty slider under a heading.
   if (!providers.length) return null;
 

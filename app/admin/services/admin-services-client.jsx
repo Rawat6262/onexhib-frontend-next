@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
 import {
@@ -10,16 +10,24 @@ import {
   MapPin,
   PhoneCall,
   Search,
+  Star,
   Trash2,
   UserRound,
   Users,
   X,
 } from "lucide-react";
 
-import { adminDeleteService, getAdminServicesPage } from "@/models/service.model";
+import {
+  adminDeleteService,
+  adminFeatureService,
+  adminUnfeatureService,
+  getAdminServicesPage,
+  refreshFeaturedServices,
+} from "@/models/service.model";
 import TablePagination from "@/components/dashboard/TablePagination";
 import { AdminHeader, AdminPage, StatCard, StatGrid } from "@/components/admin/AdminUI";
 import { btnRow, btnRowDanger, inputBase, pill } from "@/components/dashboard/ui";
+import { FeaturedBadge, ServiceFeaturePanel, featuredNow, fmtDay, untilFor } from "@/components/admin/ServiceFeature";
 import { servicePath } from "@/lib/routes";
 
 /**
@@ -31,6 +39,14 @@ import { servicePath } from "@/lib/routes";
  * Everything is filtered and paged on the server (/api/admin/services); the
  * summary cards and the two breakdowns describe the whole catalogue, not the
  * current filter, so they stay put while you narrow the table.
+ *
+ * FEATURING. "Feature" puts a listing in the "Featured services" slider
+ * section of the home page for a number of days (today is day 1, at most 365;
+ * the API checks the same rule). When the window runs out the listing leaves
+ * the home page by itself and shows here as "Feature over" until it is
+ * featured again or unfeatured. "Featured only" lists every featured listing;
+ * the admin Featured services page (app/admin/featured-services) is the full
+ * view of them. The shared pieces live in components/admin/ServiceFeature.jsx.
  */
 
 const SORTS = [
@@ -81,12 +97,15 @@ export default function AdminServicesClient() {
   const [country, setCountry] = useState("");
   const [owner, setOwner] = useState(null); // { id, name } | { id: "none", name } | null
   const [leadsOnly, setLeadsOnly] = useState(false);
+  const [featuredOnly, setFeaturedOnly] = useState(false);
   const [sort, setSort] = useState("newest");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
 
   const [confirmId, setConfirmId] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
+  const [featureId, setFeatureId] = useState(null); // the row whose feature panel is open
+  const [featureBusyId, setFeatureBusyId] = useState(null);
   const reqRef = useRef(0);
   const haveStats = useRef(false);
 
@@ -112,6 +131,7 @@ export default function AdminServicesClient() {
         ...(country ? { country } : {}),
         ...(owner ? { owner: owner.id } : {}),
         ...(leadsOnly ? { leads: "yes" } : {}),
+        ...(featuredOnly ? { featured: "yes" } : {}),
         // The catalogue stats do not change with the filters; fetch them once.
         ...(haveStats.current ? { stats: "0" } : {}),
       });
@@ -128,7 +148,7 @@ export default function AdminServicesClient() {
       if (id !== reqRef.current) return;
       setError(err?.response?.data?.message || "Could not load services.");
     }
-  }, [page, pageSize, sort, search, category, country, owner, leadsOnly]);
+  }, [page, pageSize, sort, search, category, country, owner, leadsOnly, featuredOnly]);
 
   useEffect(() => {
     load();
@@ -139,7 +159,7 @@ export default function AdminServicesClient() {
     load();
   };
 
-  const filtersOn = Boolean(search || category || country || owner || leadsOnly);
+  const filtersOn = Boolean(search || category || country || owner || leadsOnly || featuredOnly);
   const clearAll = () => {
     setSearchInput("");
     setSearch("");
@@ -147,6 +167,7 @@ export default function AdminServicesClient() {
     setCountry("");
     setOwner(null);
     setLeadsOnly(false);
+    setFeaturedOnly(false);
     setPage(1);
   };
   const apply = (fn) => {
@@ -167,6 +188,68 @@ export default function AdminServicesClient() {
       setDeletingId(null);
     }
   }
+
+  // The row is patched in place rather than reloaded, so it stays where it is.
+  const patchRow = (id, patch) => setRows((prev) => (prev || []).map((x) => (x._id === id ? { ...x, ...patch } : x)));
+
+  async function feature(r, days) {
+    setFeatureBusyId(r._id);
+    try {
+      const { data } = await adminFeatureService(r._id, days);
+      patchRow(r._id, { is_featured: true, featured_until: data?.data?.featured_until || untilFor(days) });
+      refreshFeaturedServices();
+      toast.success(`"${r.full_name}" is featured on the home page until ${fmtDay(untilFor(days))}.`);
+      setFeatureId(null);
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Could not feature this listing. Please try again.");
+    } finally {
+      setFeatureBusyId(null);
+    }
+  }
+
+  async function unfeature(r) {
+    setFeatureBusyId(r._id);
+    try {
+      await adminUnfeatureService(r._id);
+      if (featuredOnly) {
+        setRows((prev) => (prev || []).filter((x) => x._id !== r._id));
+        setTotal((t) => Math.max(0, t - 1));
+      } else {
+        patchRow(r._id, { is_featured: false, featured_until: null });
+      }
+      refreshFeaturedServices();
+      toast.success(`"${r.full_name}" is no longer featured.`);
+      setFeatureId(null);
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Could not unfeature this listing. Please try again.");
+    } finally {
+      setFeatureBusyId(null);
+    }
+  }
+
+  const featurePanel = (r) =>
+    featureId === r._id ? (
+      <ServiceFeaturePanel
+        r={r}
+        busy={featureBusyId === r._id}
+        onFeature={(n) => feature(r, n)}
+        onUnfeature={() => unfeature(r)}
+        onCancel={() => setFeatureId(null)}
+      />
+    ) : null;
+
+  const actionsFor = (r) => (
+    <Actions
+      r={r}
+      confirming={confirmId === r._id}
+      deleting={deletingId === r._id}
+      featureOpen={featureId === r._id}
+      onToggleFeature={() => setFeatureId((cur) => (cur === r._id ? null : r._id))}
+      onAsk={() => setConfirmId(r._id)}
+      onCancel={() => setConfirmId(null)}
+      onDelete={() => remove(r)}
+    />
+  );
 
   const maxCat = Math.max(1, ...(stats?.byCategory || []).map((c) => c.count));
 
@@ -278,7 +361,7 @@ export default function AdminServicesClient() {
       {/* Table */}
       <section className="mt-8 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm shadow-gray-900/[0.03] dark:border-gray-800 dark:bg-gray-900 dark:shadow-none">
         <div className="space-y-3 border-b border-gray-200 bg-gradient-to-b from-gray-50/80 to-white px-4 py-4 sm:px-5 dark:border-gray-800 dark:from-white/[0.02] dark:to-transparent">
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_0.8fr_auto]">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_0.8fr_auto_auto]">
             <div className="relative">
               <Search size={16} aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
@@ -313,6 +396,15 @@ export default function AdminServicesClient() {
                 className="h-4 w-4 accent-ox-blue"
               />
               Contacted only
+            </label>
+            <label className="inline-flex h-10 cursor-pointer items-center gap-2 whitespace-nowrap rounded-xl border border-gray-300 px-3 text-sm text-gray-700 dark:border-gray-700 dark:text-gray-300">
+              <input
+                type="checkbox"
+                checked={featuredOnly}
+                onChange={(e) => apply(() => setFeaturedOnly(e.target.checked))}
+                className="h-4 w-4 accent-ox-blue"
+              />
+              Featured only
             </label>
           </div>
 
@@ -357,8 +449,10 @@ export default function AdminServicesClient() {
           </div>
         ) : (
           <>
-            {/* Table — lg and up */}
-            <div className="hidden overflow-x-auto lg:block">
+            {/* Table — lg and up. `relative` keeps the sr-only header label
+                inside the scroll box; without it, a table wider than the box
+                pushed that label out and gave the whole page a sideways scroll. */}
+            <div className="relative hidden overflow-x-auto lg:block">
               <table className="w-full text-left text-sm">
                 <thead>
                   <tr className="border-b border-gray-200 text-[11px] uppercase tracking-wider text-gray-500 dark:border-gray-800 dark:text-gray-400">
@@ -372,44 +466,44 @@ export default function AdminServicesClient() {
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                   {rows.map((r) => (
-                    <tr key={r._id} className="align-top transition hover:bg-gray-50/70 dark:hover:bg-white/[0.02]">
-                      <td className="px-5 py-3.5">
-                        <ProviderCell r={r} />
-                      </td>
-                      <td className="px-4 py-3.5">
-                        <button
-                          type="button"
-                          onClick={() => apply(() => setCategory(r.service_name))}
-                          className="text-left text-[13px] font-medium text-gray-800 hover:text-ox-blue hover:underline dark:text-gray-200 dark:hover:text-blue-300"
-                          title="Filter by this category"
-                        >
-                          {r.service_name}
-                        </button>
-                        {r.service_subcategory && r.service_subcategory !== "General" ? (
-                          <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{r.service_subcategory}</p>
-                        ) : null}
-                      </td>
-                      <td className="px-4 py-3.5">
-                        <OwnerCell owner={r.owner} onPick={(o) => apply(() => setOwner(o))} />
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-3.5 text-[13px] text-gray-700 dark:text-gray-300">
-                        {fmtDate(r.createdAt)}
-                        <p className="text-xs text-gray-400">{ago(r.createdAt)}</p>
-                      </td>
-                      <td className="px-4 py-3.5 text-right">
-                        <Leads r={r} />
-                      </td>
-                      <td className="px-5 py-3.5">
-                        <Actions
-                          r={r}
-                          confirming={confirmId === r._id}
-                          deleting={deletingId === r._id}
-                          onAsk={() => setConfirmId(r._id)}
-                          onCancel={() => setConfirmId(null)}
-                          onDelete={() => remove(r)}
-                        />
-                      </td>
-                    </tr>
+                    <Fragment key={r._id}>
+                      <tr className="align-top transition hover:bg-gray-50/70 dark:hover:bg-white/[0.02]">
+                        <td className="px-5 py-3.5">
+                          <ProviderCell r={r} />
+                        </td>
+                        <td className="px-4 py-3.5">
+                          <button
+                            type="button"
+                            onClick={() => apply(() => setCategory(r.service_name))}
+                            className="text-left text-[13px] font-medium text-gray-800 hover:text-ox-blue hover:underline dark:text-gray-200 dark:hover:text-blue-300"
+                            title="Filter by this category"
+                          >
+                            {r.service_name}
+                          </button>
+                          {r.service_subcategory && r.service_subcategory !== "General" ? (
+                            <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{r.service_subcategory}</p>
+                          ) : null}
+                        </td>
+                        <td className="px-4 py-3.5">
+                          <OwnerCell owner={r.owner} onPick={(o) => apply(() => setOwner(o))} />
+                        </td>
+                        <td className="whitespace-nowrap px-4 py-3.5 text-[13px] text-gray-700 dark:text-gray-300">
+                          {fmtDate(r.createdAt)}
+                          <p className="text-xs text-gray-400">{ago(r.createdAt)}</p>
+                        </td>
+                        <td className="px-4 py-3.5 text-right">
+                          <Leads r={r} />
+                        </td>
+                        <td className="px-5 py-3.5">{actionsFor(r)}</td>
+                      </tr>
+                      {featureId === r._id ? (
+                        <tr className="bg-gray-50/60 dark:bg-white/[0.02]">
+                          <td colSpan={6} className="px-5 pb-4 pt-0">
+                            {featurePanel(r)}
+                          </td>
+                        </tr>
+                      ) : null}
+                    </Fragment>
                   ))}
                 </tbody>
               </table>
@@ -434,15 +528,9 @@ export default function AdminServicesClient() {
                       <OwnerCell owner={r.owner} onPick={(o) => apply(() => setOwner(o))} />
                       <p className="mt-1 text-xs text-gray-400">Added {fmtDate(r.createdAt)} · {ago(r.createdAt)}</p>
                     </div>
-                    <Actions
-                      r={r}
-                      confirming={confirmId === r._id}
-                      deleting={deletingId === r._id}
-                      onAsk={() => setConfirmId(r._id)}
-                      onCancel={() => setConfirmId(null)}
-                      onDelete={() => remove(r)}
-                    />
+                    {actionsFor(r)}
                   </div>
+                  {featurePanel(r)}
                 </li>
               ))}
             </ul>
@@ -506,6 +594,7 @@ function ProviderCell({ r }) {
           </p>
         ) : null}
         {r.mobile_number ? <p className="mt-0.5 text-xs tabular-nums text-gray-400">{r.mobile_number}</p> : null}
+        <FeaturedBadge r={r} />
       </div>
     </div>
   );
@@ -558,12 +647,27 @@ function Leads({ r }) {
   );
 }
 
-function Actions({ r, confirming, deleting, onAsk, onCancel, onDelete }) {
+function Actions({ r, confirming, deleting, featureOpen, onToggleFeature, onAsk, onCancel, onDelete }) {
+  const on = featuredNow(r);
   return (
     <div className="flex shrink-0 items-center justify-end gap-2">
       <Link href={servicePath(r.full_name, r._id)} target="_blank" rel="noopener" className={btnRow}>
         View
       </Link>
+      <button
+        type="button"
+        onClick={onToggleFeature}
+        aria-expanded={featureOpen}
+        aria-label={on ? `Change or remove the feature for ${r.full_name}` : `Feature ${r.full_name} on the home page`}
+        className={
+          on
+            ? "inline-flex items-center gap-1 rounded-lg bg-amber-50 px-3 py-1.5 text-[13px] font-semibold text-amber-700 ring-1 ring-amber-600/20 transition hover:bg-amber-100 dark:bg-amber-400/10 dark:text-amber-300 dark:ring-amber-400/25 dark:hover:bg-amber-400/15"
+            : btnRow
+        }
+      >
+        <Star size={14} aria-hidden="true" className={on ? "fill-current" : ""} />
+        {on ? "Featured" : "Feature"}
+      </button>
       {confirming ? (
         <>
           <button
@@ -587,3 +691,4 @@ function Actions({ r, confirming, deleting, onAsk, onCancel, onDelete }) {
     </div>
   );
 }
+

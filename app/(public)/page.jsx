@@ -29,6 +29,7 @@ import Faq from "@/components/public/Faq";
 import HomeJsonLd from "@/components/seo/HomeJsonLd";
 import { ComingUp, HowItWorks, OpenNow, PhotoCredits } from "@/components/home/HomeFeatureSections";
 import HomeServices from "@/components/home/HomeServices";
+import FeaturedServices from "@/components/home/FeaturedServices";
 import CentreCard from "@/components/exhibition-centres/CentreCard";
 
 import { PUBLIC_ROUTES, publicPageMetadata } from "@/lib/seo";
@@ -43,6 +44,7 @@ import {
   getCounts,
   getExhibitionCentres,
   getFeaturedForSlider,
+  getFeaturedServices,
   getOngoingExhibitions,
   getPreviousExhibitions,
   getProducts,
@@ -83,7 +85,7 @@ export const revalidate = 300;
 export default async function HomePage() {
   // One parallel round of requests. Every fetcher fails soft, so a slow or
   // unreachable backend degrades individual sections instead of the page.
-  const [featured, ongoing, upcoming, previous, locations, industries, companies, products, counts, banners, thisWeek, news, services, centres] = await Promise.all([
+  const [featured, ongoing, upcoming, previous, locations, industries, companies, products, counts, banners, thisWeek, news, services, centres, featuredServices] = await Promise.all([
     getFeaturedForSlider({ limit: 20 }),
     getOngoingExhibitions({ limit: 8 }),
     getUpcomingExhibitions({ limit: 8 }),
@@ -112,6 +114,9 @@ export default async function HomePage() {
     // The same cached call the /exhibition-centres directory makes. Fails soft
     // to an empty list, and the venues section then does not appear.
     getExhibitionCentres(),
+    // Admin-featured service providers. Fails soft to an empty list, and the
+    // section then does not appear.
+    getFeaturedServices({ limit: 12 }),
   ]);
 
   const cityCards = topCities(locations, 8);
@@ -150,6 +155,11 @@ export default async function HomePage() {
           <FeaturedSlider items={featured.items} />
         </Section>
       ) : null}
+
+      {/* ── Featured services ───────────────────────────────────────────── */}
+      {/* Directly under the exhibitions slider, same width and spacing.
+          Renders nothing while no service is featured (or the API is down). */}
+      <FeaturedServices items={featuredServices.items} className="mt-16 sm:mt-20" />
 
       {/* ── Near you ────────────────────────────────────────────────────── */}
       {/* A client island on an otherwise static page: it reads the signed-in
@@ -376,7 +386,13 @@ export default async function HomePage() {
       </Section>
 
       {/* ── Exhibition services ─────────────────────────────────────────── */}
-      <HomeServices directory={services} className="mt-16 sm:mt-20" />
+      {/* Leaves out the featured providers shown under the slider at the top,
+          so no provider appears twice on the page. */}
+      <HomeServices
+        directory={services}
+        excludeIds={featuredServices.items.map((s) => s.id)}
+        className="mt-16 sm:mt-20"
+      />
 
       <WhyOneXhib archiveTotal={previous.total} />
       <ForBusinesses />

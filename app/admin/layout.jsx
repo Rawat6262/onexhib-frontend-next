@@ -10,6 +10,7 @@ import {
   CalendarDays,
   LayoutDashboard,
   Package,
+  Sparkles,
   Star,
 } from "lucide-react";
 import AppShell from "@/components/layout/AppShell";
@@ -32,7 +33,8 @@ import { getAdminHotels } from "@/models/hotel.model";
 const ITEMS = [
   { group: "Overview", label: "Dashboard", href: "/admin/dashboard", icon: <LayoutDashboard size={16} /> },
   { group: "Catalogue", label: "Exhibitions", href: "/admin/organisers", icon: <CalendarDays size={16} /> },
-  { group: "Catalogue", label: "Featured", href: "/admin/featured", icon: <Star size={16} /> },
+  { group: "Catalogue", label: "Featured exhibitions", href: "/admin/featured", icon: <Star size={16} /> },
+  { group: "Catalogue", label: "Featured services", href: "/admin/featured-services", icon: <Sparkles size={16} /> },
   { group: "Catalogue", label: "Companies", href: "/admin/companies", icon: <Building2 size={16} /> },
   { group: "Catalogue", label: "Products", href: "/admin/products", icon: <Package size={16} /> },
   { group: "Catalogue", label: "Services", href: "/admin/services", icon: <BriefcaseBusiness size={16} /> },

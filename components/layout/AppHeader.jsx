@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ChevronDown, Menu, Sparkles } from "lucide-react";
 import ThemeToggle from "@/components/layout/ThemeToggle";
 import ThemePicker from "@/components/layout/ThemePicker";
+import LanguagePicker from "@/components/layout/LanguagePicker";
 import MegaNav from "@/components/layout/MegaNav";
 import { AI_LINK, DIRECTORY_MENU, EXHIBITIONS_MENU, NEWS_LINK } from "@/components/layout/nav-config";
 import { PUBLIC_ROUTES } from "@/lib/seo";
@@ -77,7 +78,11 @@ export default function AppHeader({ right = null, mobileExtra = null }) {
 
         <MegaNav />
 
-        <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
+        <div className="ms-auto flex items-center gap-1.5 sm:gap-2">
+          {/* Phones get the language picker as a row in the menu instead. */}
+          <div className="max-sm:hidden">
+            <LanguagePicker className="text-gray-500 dark:text-gray-400" />
+          </div>
           {/* Under 360px there is no room for it beside Sign up. */}
           <div className="max-[359px]:hidden">
             <ThemePicker className="text-gray-500 dark:text-gray-400" />
@@ -95,7 +100,7 @@ export default function AppHeader({ right = null, mobileExtra = null }) {
             </summary>
             <nav
               aria-label="Mobile"
-              className="absolute right-0 top-full mt-2 max-h-[calc(100vh-5rem)] w-72 overflow-y-auto rounded-2xl border border-gray-200 bg-white p-2 shadow-xl dark:border-gray-800 dark:bg-gray-900"
+              className="absolute right-0 top-full mt-2 max-h-[calc(100vh-5rem)] w-72 rtl:left-0 rtl:right-auto overflow-y-auto rounded-2xl border border-gray-200 bg-white p-2 shadow-xl dark:border-gray-800 dark:bg-gray-900"
             >
               <ul className="list-none space-y-0.5">
                 {[EXHIBITIONS_MENU, DIRECTORY_MENU].map((menu) => (
@@ -112,6 +117,7 @@ export default function AppHeader({ right = null, mobileExtra = null }) {
                     {AI_LINK.label}
                   </Link>
                 </li>
+                <LanguagePicker variant="row" />
                 {mobileExtra}
               </ul>
             </nav>

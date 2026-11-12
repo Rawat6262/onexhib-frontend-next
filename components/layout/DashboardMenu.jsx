@@ -133,7 +133,7 @@ export default function DashboardMenu() {
       {open ? (
         <div
           role="menu"
-          className="ox-menu-in absolute right-0 top-full z-50 mt-2 w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl shadow-ox-navy/10 dark:border-gray-800 dark:bg-gray-900 dark:shadow-black/40"
+          className="ox-menu-in absolute right-0 top-full z-50 mt-2 rtl:left-0 rtl:right-auto w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl shadow-ox-navy/10 dark:border-gray-800 dark:bg-gray-900 dark:shadow-black/40"
         >
           {/* Who and where to: the account, its role, and its home. */}
           <Link

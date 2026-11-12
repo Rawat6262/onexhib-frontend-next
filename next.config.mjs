@@ -34,6 +34,11 @@ const BACKEND_URL = (process.env.BACKEND_URL || "").replace(/\/+$/, "");
 //   img/media  blob:            URL.createObjectURL previews in the upload forms
 //   connect-src 'self'          every API call is a relative /api/* path that the
 //                               rewrite proxies, so no external origin is needed
+//   translate.google(apis).com  the header's language picker (lib/translate.js):
+//              www.gstatic.com  the Google Website Translator's loader script,
+//                               its main script and stylesheet, and the
+//                               translateHtml calls. Only requested once a
+//                               visitor picks a language other than English.
 //
 // script-src keeps 'unsafe-inline' because Next.js emits inline bootstrap and
 // RSC-payload scripts. Removing it requires per-request nonces from middleware,
@@ -55,8 +60,8 @@ const CSP_REPORT_ONLY = [
   // hundreds of report-only violations per page load and buried any real one.
   // A production build performs no eval, so production keeps the strict policy -
   // this is the one deliberate difference between the two environments.
-  `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : ""} https://www.googletagmanager.com https://maps.googleapis.com https://maps.gstatic.com`,
-  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : ""} https://www.googletagmanager.com https://maps.googleapis.com https://maps.gstatic.com https://translate.google.com https://translate.googleapis.com`,
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.gstatic.com",
   "font-src 'self' data: https://fonts.gstatic.com",
   "img-src 'self' data: blob: https:",
   "media-src 'self' blob: https://res.cloudinary.com",
@@ -64,7 +69,7 @@ const CSP_REPORT_ONLY = [
   // analytics.google.com are used for some consent-mode traffic.
   // Google Maps (the exhibition-centre map picker and venue maps): the Maps
   // JavaScript API script, its tiles and fonts, and the Places / Geocoding calls.
-  "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://www.googletagmanager.com https://maps.googleapis.com https://places.googleapis.com",
+  "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://www.googletagmanager.com https://maps.googleapis.com https://places.googleapis.com https://translate.googleapis.com https://translate-pa.googleapis.com",
   "worker-src 'self' blob:",
   "manifest-src 'self'",
 ].join("; ");

@@ -87,7 +87,7 @@ export default function AccountMenu() {
       {open ? (
         <div
           role="menu"
-          className="absolute right-0 top-full z-50 mt-2 w-60 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl dark:border-gray-800 dark:bg-gray-900"
+          className="absolute right-0 top-full z-50 mt-2 w-60 rtl:left-0 rtl:right-auto overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl dark:border-gray-800 dark:bg-gray-900"
         >
           <div className="border-b border-gray-100 px-4 py-3 dark:border-gray-800">
             <p className="truncate text-sm font-semibold text-gray-900 dark:text-gray-100">{name}</p>

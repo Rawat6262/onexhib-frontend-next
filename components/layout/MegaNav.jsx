@@ -238,7 +238,7 @@ function ExhibitionsPanel({ summary }) {
         ) : (
           <span className="text-[13px] text-gray-500 dark:text-gray-400">Exhibitions, trade shows and business events worldwide.</span>
         )}
-        <div className="ml-auto flex flex-wrap gap-2">
+        <div className="ms-auto flex flex-wrap gap-2">
           {ORGANISER_LINKS.map((l, i) => (
             <Link
               key={l.href}
@@ -308,7 +308,7 @@ function DirectoryPanel({ summary }) {
               <span aria-hidden="true" className="pointer-events-none absolute -right-8 -top-10 h-28 w-28 rounded-full bg-blue-400/30 blur-2xl" />
               <card.icon size={19} aria-hidden="true" className="relative" />
               <span className="relative text-[15px] font-semibold">{card.title}</span>
-              <span className="relative ml-auto text-[12px] text-blue-50/85">{n ? `${n}${card.statSuffix}` : ""}</span>
+              <span className="relative ms-auto text-[12px] text-blue-50/85">{n ? `${n}${card.statSuffix}` : ""}</span>
               <ArrowRight size={15} aria-hidden="true" className="relative transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none" />
             </Link>
             <ul className="list-none space-y-0.5 p-2">

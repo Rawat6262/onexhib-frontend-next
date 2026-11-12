@@ -137,7 +137,9 @@ export default function FeaturedSlider({ items = [], kind = "exhibition", classN
     >
       <div
         className={`flex ${reducedMotion ? "" : "transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"}`}
-        style={{ transform: `translateX(-${index * 100}%)` }}
+        // --ox-dir is -1 under dir="rtl" (globals.css): a flex row runs
+        // right-to-left there, so the track has to move the other way.
+        style={{ transform: `translateX(calc(var(--ox-dir, 1) * -${index * 100}%))` }}
       >
         {slides.map((item, i) => (
           <Slide

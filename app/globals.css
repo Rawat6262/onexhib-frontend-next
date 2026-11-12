@@ -671,3 +671,44 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .ox-menu-in { animation: none; }
 }
+
+/* ── Machine translation (lib/translate.js) ─────────────────────────────────
+   The Google Website Translator brings its own chrome: a toolbar iframe at
+   the top that pushes <body> down 40px, a hover tooltip with "rate this
+   translation", a loading spinner and a highlight on hovered text. The
+   header's language picker replaces all of it, so it is hidden here and the
+   body offset undone - otherwise every translated page would shift down
+   after load (CLS). Google's own class names (.goog-*) are paired with the
+   newer obfuscated ones (.VIpgJd-*) it has been moving to. */
+body > .skiptranslate,
+iframe.skiptranslate,
+.goog-te-banner-frame,
+.goog-te-balloon-frame,
+#goog-gt-tt,
+.goog-tooltip,
+.goog-te-spinner-pos,
+.VIpgJd-ZVi9od-ORHb-OEVmcd,
+.VIpgJd-ZVi9od-aZ2wEe-wOHMyf,
+.VIpgJd-yAWNEb-L7lbkb {
+  display: none !important;
+}
+body { top: 0 !important; }
+.goog-text-highlight,
+.VIpgJd-yAWNEb-VIpgJd-fmcmS-sn54Q {
+  background: none !important;
+  box-shadow: none !important;
+}
+/* The widget's own (unused) language <select>. Kept in the DOM, since
+   switching language drives it, but never shown. */
+#ox-translate-host {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+/* Sliders that move with translateX multiply by this, since a flex row runs
+   right-to-left under dir="rtl" (FeaturedSlider). */
+:root { --ox-dir: 1; }
+[dir="rtl"] { --ox-dir: -1; }

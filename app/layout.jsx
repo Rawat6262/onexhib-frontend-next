@@ -5,6 +5,8 @@ import ConsentGate from "@/components/analytics/ConsentGate";
 import ConsentBanner from "@/components/analytics/ConsentBanner";
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/seo";
 import { PALETTE_SCRIPT } from "@/lib/palettes";
+import { LANGUAGE_SCRIPT } from "@/lib/translate";
+import TranslateRuntime from "@/components/layout/TranslateRuntime";
 import "./globals.css";
 
 /**
@@ -98,12 +100,17 @@ export default function RootLayout({ children }) {
       <head>
         {/* Applies a saved colour palette before first paint (lib/palettes.js). */}
         <script dangerouslySetInnerHTML={{ __html: PALETTE_SCRIPT }} />
+        {/* Sets <html dir/lang> for a chosen translation language before first
+            paint, so right-to-left pages do not flip after load (lib/translate.js).
+            The server HTML stays lang="en" for crawlers. */}
+        <script dangerouslySetInnerHTML={{ __html: LANGUAGE_SCRIPT }} />
       </head>
       <body>
         {/* Consent defaults must be on the dataLayer before gtag.js loads, so
             ConsentGate is ordered ahead of GoogleAnalytics deliberately. */}
         {GA_ID ? <ConsentGate /> : null}
         <Providers>{children}</Providers>
+        <TranslateRuntime />
         {GA_ID ? (
           <>
             <ConsentBanner />

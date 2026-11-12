@@ -156,11 +156,6 @@ export default async function HomePage() {
         </Section>
       ) : null}
 
-      {/* ── Featured services ───────────────────────────────────────────── */}
-      {/* Directly under the exhibitions slider, same width and spacing.
-          Renders nothing while no service is featured (or the API is down). */}
-      <FeaturedServices items={featuredServices.items} className="mt-16 sm:mt-20" />
-
       {/* ── Near you ────────────────────────────────────────────────────── */}
       {/* A client island on an otherwise static page: it reads the signed-in
           user's own city/state/country and fills in after hydration. Guests see
@@ -385,8 +380,15 @@ export default async function HomePage() {
         )}
       </Section>
 
+      {/* ── Featured services ───────────────────────────────────────────── */}
+      {/* Near the bottom of the page, in the same slider as the featured
+          exhibitions at the top, right above the services rail so the two
+          services sections read together. Renders nothing while no service
+          is featured (or the API is down). */}
+      <FeaturedServices items={featuredServices.items} className="mt-16 sm:mt-20" />
+
       {/* ── Exhibition services ─────────────────────────────────────────── */}
-      {/* Leaves out the featured providers shown under the slider at the top,
+      {/* Leaves out the featured providers shown in the slider just above,
           so no provider appears twice on the page. */}
       <HomeServices
         directory={services}

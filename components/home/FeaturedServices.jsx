@@ -4,9 +4,9 @@ import { PUBLIC_ROUTES } from "@/lib/seo";
 import { GENERAL_SUBCATEGORY } from "@/lib/service-taxonomy";
 
 /**
- * Service providers an admin is featuring, on the home page, directly under
- * the featured exhibitions slider and in the same slider, so the two
- * spotlights read as one design.
+ * Service providers an admin is featuring, near the bottom of the home page
+ * just above the services rail, in the same slider as the featured
+ * exhibitions at the top, so the two spotlights read as one design.
  *
  * `items` is getFeaturedServices() from lib/public-api.js: only listings still
  * inside their feature window. Nothing featured (or the backend unreachable)

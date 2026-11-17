@@ -16,6 +16,7 @@ import Section from "@/components/public/Section";
 import Rail, { RailItem } from "@/components/public/Rail";
 import ExhibitionCard from "@/components/public/ExhibitionCard";
 import FeaturedSlider from "@/components/public/FeaturedSlider";
+import NewsSlider from "@/components/public/NewsSlider";
 import NearbyExhibitions from "@/components/public/NearbyExhibitions";
 import HeroShowcase from "@/components/public/HeroShowcase";
 import HeroVideo from "@/components/home/HeroVideo";
@@ -415,26 +416,8 @@ export default async function HomePage() {
           ctaHref="/news"
           className="mt-16 sm:mt-20"
         >
-          <ul className="grid list-none grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {news.items.slice(0, 3).map((article) => (
-              <li
-                key={article.id}
-                className="ox-card flex flex-col rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900"
-              >
-                {article.category ? (
-                  <span className="line-clamp-1 text-[11px] font-semibold uppercase tracking-wide text-ox-navy dark:text-blue-300">
-                    {article.category}
-                  </span>
-                ) : null}
-                <h3 className="mt-1.5 line-clamp-2 text-base font-semibold leading-snug text-gray-900 dark:text-gray-50">
-                  {article.title}
-                </h3>
-                <p className="mt-2 line-clamp-3 text-[15px] leading-relaxed text-gray-600 dark:text-gray-400">
-                  {article.description}
-                </p>
-              </li>
-            ))}
-          </ul>
+          {/* The six latest stories; /news has the full list. */}
+          <NewsSlider items={news.items.slice(0, 6)} />
         </Section>
       ) : null}
 

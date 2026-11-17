@@ -1,12 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useId } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, BriefcaseBusiness, ChevronLeft, ChevronRight, MapPin, Sparkles, Wrench } from "lucide-react";
+import { ArrowRight, BriefcaseBusiness, MapPin, Sparkles, Wrench } from "lucide-react";
 
 import { exhibitionPath, servicePath } from "@/lib/routes";
 import { formatDateRange, formatLocation, toIsoDate } from "@/lib/format";
+import { SliderControls, useSlider } from "@/components/public/SliderChrome";
 
 /**
  * Featured exhibitions - and featured service providers (kind="service") - as a slider.
@@ -42,7 +43,6 @@ import { formatDateRange, formatLocation, toIsoDate } from "@/lib/format";
  * plain manual pager rather than an animated one.
  */
 
-const AUTOPLAY_MS = 6000;
 const DAY_MS = 86_400_000;
 
 /*
@@ -61,60 +61,9 @@ export default function FeaturedSlider({ items = [], kind = "exhibition", classN
   const { label, noun, Slide } = KINDS[kind] || KINDS.exhibition;
   const slides = items.filter(Boolean);
   const count = slides.length;
-
-  const [index, setIndex] = useState(0);
-  const [paused, setPaused] = useState(false);
-  const [reducedMotion, setReducedMotion] = useState(false);
-  const rootRef = useRef(null);
+  const slider = useSlider(count);
+  const { index, reducedMotion, rootProps } = slider;
   const baseId = useId();
-
-  const go = useCallback(
-    (next) => {
-      if (count === 0) return;
-      setIndex(((next % count) + count) % count);
-    },
-    [count]
-  );
-  const prev = useCallback(() => go(index - 1), [go, index]);
-  const next = useCallback(() => go(index + 1), [go, index]);
-
-  // Honour the OS "reduce motion" setting, and keep honouring it if the user
-  // changes it while the page is open.
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const sync = () => setReducedMotion(mq.matches);
-    sync();
-    mq.addEventListener("change", sync);
-    return () => mq.removeEventListener("change", sync);
-  }, []);
-
-  // A background tab should not burn timers advancing a slider nobody sees.
-  useEffect(() => {
-    const sync = () => setPaused(document.hidden);
-    document.addEventListener("visibilitychange", sync);
-    return () => document.removeEventListener("visibilitychange", sync);
-  }, []);
-
-  // setTimeout keyed on `index`, not setInterval: a manual jump restarts the full
-  // interval, so the progress bar (which restarts on the same key) and the
-  // actual advance can never disagree about how long is left.
-  useEffect(() => {
-    if (reducedMotion || paused || count < 2) return undefined;
-    const t = setTimeout(() => setIndex((i) => (i + 1) % count), AUTOPLAY_MS);
-    return () => clearTimeout(t);
-  }, [reducedMotion, paused, count, index]);
-
-  // Arrow keys page the slider, but only while focus is inside it — a global
-  // listener would hijack arrow keys for the whole page.
-  const onKeyDown = (e) => {
-    if (e.key === "ArrowLeft") {
-      e.preventDefault();
-      prev();
-    } else if (e.key === "ArrowRight") {
-      e.preventDefault();
-      next();
-    }
-  };
 
   if (count === 0) return null;
 
@@ -122,17 +71,10 @@ export default function FeaturedSlider({ items = [], kind = "exhibition", classN
 
   return (
     <div
-      ref={rootRef}
+      {...rootProps}
       role="region"
       aria-roledescription="carousel"
       aria-label={label}
-      onKeyDown={onKeyDown}
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-      onFocusCapture={() => setPaused(true)}
-      onBlurCapture={(e) => {
-        if (!rootRef.current?.contains(e.relatedTarget)) setPaused(false);
-      }}
       className={`relative isolate overflow-hidden rounded-[var(--radius-feature)] bg-gradient-to-br from-ox-night via-ox-navy to-ox-royal shadow-[0_30px_80px_-30px_color-mix(in_oklab,var(--color-ox-navy)_65%,transparent)] ring-1 ring-white/10 ${className}`}
     >
       <div
@@ -166,65 +108,13 @@ export default function FeaturedSlider({ items = [], kind = "exhibition", classN
           middle of the slide — vertically centred arrows landed on top of the
           headline, which runs to three lines on the longer exhibition names.
           The bar itself is click-through; only the controls take pointer events. */}
-      {count > 1 ? (
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 border-t border-white/10 bg-gradient-to-t from-black/30 to-transparent px-6 py-4 sm:px-10 lg:px-12">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex min-w-0 items-center gap-5">
-              <p className="shrink-0 font-semibold tabular-nums text-white" aria-hidden="true">
-                <span className="text-lg">{pad(index + 1)}</span>
-                <span className="text-sm text-white/45"> / {pad(count)}</span>
-              </p>
-
-              {/* Many slides do not fit as dots on a phone; the counter says enough there. */}
-              <div className={`pointer-events-auto items-center gap-1.5 ${count > 8 ? "hidden sm:flex" : "flex"}`}>
-                {slides.map((item, i) => {
-                  const active = i === index;
-                  return (
-                    <button
-                      key={item.id}
-                      type="button"
-                      onClick={() => go(i)}
-                      aria-label={`Go to slide ${i + 1}: ${item.name}`}
-                      aria-current={active ? "true" : undefined}
-                      className={`relative h-1.5 overflow-hidden rounded-full transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white motion-reduce:transition-none ${
-                        active ? "w-10 bg-white/25" : "w-2.5 bg-white/35 hover:bg-white/70"
-                      }`}
-                    >
-                      {active ? (
-                        <span
-                          key={index}
-                          aria-hidden="true"
-                          className={`absolute inset-0 rounded-full bg-white ${reducedMotion ? "" : "ox-slide-progress"}`}
-                          style={{
-                            "--ox-slide-ms": `${AUTOPLAY_MS}ms`,
-                            animationPlayState: paused ? "paused" : "running",
-                          }}
-                        />
-                      ) : null}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {upNext ? (
-                <p className="hidden min-w-0 truncate text-sm text-white/55 md:block">
-                  <span className="text-white/40">Next up · </span>
-                  <span className="font-medium text-white/80">{upNext.name}</span>
-                </p>
-              ) : null}
-            </div>
-
-            <div className="pointer-events-auto flex shrink-0 gap-2">
-              <SliderButton onClick={prev} label={`Previous featured ${noun}`}>
-                <ChevronLeft size={18} aria-hidden="true" />
-              </SliderButton>
-              <SliderButton onClick={next} label={`Next featured ${noun}`}>
-                <ChevronRight size={18} aria-hidden="true" />
-              </SliderButton>
-            </div>
-          </div>
-        </div>
-      ) : null}
+      <SliderControls
+        slider={slider}
+        labels={slides.map((e) => e.name)}
+        upNext={upNext?.name}
+        prevLabel={`Previous featured ${noun}`}
+        nextLabel={`Next featured ${noun}`}
+      />
     </div>
   );
 }
@@ -588,8 +478,6 @@ function toDate(value) {
   return Number.isNaN(d.getTime()) ? null : d;
 }
 
-const pad = (n) => String(n).padStart(2, "0");
-
 /** Initials from a record name: "India Textile Expo" -> "IT". Mirrors CardMedia. */
 function initials(label) {
   const words = String(label || "")
@@ -602,17 +490,4 @@ function initials(label) {
     .slice(0, 2)
     .map((w) => w[0].toUpperCase())
     .join("");
-}
-
-function SliderButton({ onClick, label, children }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-label={label}
-      className="flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white backdrop-blur transition hover:scale-105 hover:bg-white hover:text-ox-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white motion-reduce:transition-none motion-reduce:hover:scale-100"
-    >
-      {children}
-    </button>
-  );
 }

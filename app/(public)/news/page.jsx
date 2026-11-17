@@ -3,6 +3,7 @@ import { ArrowUpRight, Newspaper } from "lucide-react";
 
 import Breadcrumbs from "@/components/public/Breadcrumbs";
 import EmptyState from "@/components/public/EmptyState";
+import NewsImage from "@/components/public/NewsImage";
 import JsonLd from "@/components/seo/JsonLd";
 
 import { PUBLIC_ROUTES, publicPageMetadata, pageMetadata, NOINDEX_FOLLOW } from "@/lib/seo";
@@ -81,33 +82,44 @@ export default async function NewsPage() {
           {items.map((article) => (
             <li
               key={article.id}
-              className="ox-card flex flex-col rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900"
+              className="ox-card flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900"
             >
-              {article.category ? (
-                <span className="line-clamp-1 text-[11px] font-semibold uppercase tracking-wide text-ox-navy dark:text-blue-300">
-                  {article.category}
-                </span>
-              ) : null}
-              <h2 className="mt-1.5 text-lg font-semibold leading-snug text-gray-900 dark:text-gray-50">
-                {article.title}
-              </h2>
-              <p className="mt-2 text-[15px] leading-relaxed text-gray-600 dark:text-gray-400">
-                {article.description}
-              </p>
-              {/* Rendered only for a public https destination — a link to a
-                  private inbox or an http URL is dropped upstream. */}
-              {article.link ? (
-                <a
-                  href={article.link}
-                  target="_blank"
-                  rel="noopener noreferrer nofollow"
-                  className="mt-4 inline-flex items-center gap-1.5 self-start text-sm font-semibold text-ox-navy underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:text-blue-300"
-                >
-                  Read the full story
-                  <ArrowUpRight size={15} aria-hidden="true" />
-                  <span className="sr-only"> (opens in a new tab)</span>
-                </a>
-              ) : null}
+              {/* Publisher photo, cropped to one landscape frame so the grid
+                  lines up; a failed hotlink falls back to a branded panel. */}
+              <div className="relative aspect-[16/9] w-full overflow-hidden bg-gray-100 dark:bg-gray-800">
+                <NewsImage
+                  src={article.image}
+                  alt={article.title}
+                  sizes="(min-width: 1024px) 480px, (min-width: 640px) 50vw, 100vw"
+                />
+              </div>
+              <div className="flex flex-1 flex-col p-5">
+                {article.category ? (
+                  <span className="line-clamp-1 text-[11px] font-semibold uppercase tracking-wide text-ox-navy dark:text-blue-300">
+                    {article.category}
+                  </span>
+                ) : null}
+                <h2 className="mt-1.5 text-lg font-semibold leading-snug text-gray-900 dark:text-gray-50">
+                  {article.title}
+                </h2>
+                <p className="mt-2 text-[15px] leading-relaxed text-gray-600 dark:text-gray-400">
+                  {article.description}
+                </p>
+                {/* Rendered only for a public https destination — a link to a
+                    private inbox or an http URL is dropped upstream. */}
+                {article.link ? (
+                  <a
+                    href={article.link}
+                    target="_blank"
+                    rel="noopener noreferrer nofollow"
+                    className="mt-auto inline-flex items-center gap-1.5 self-start pt-4 text-sm font-semibold text-ox-navy underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy dark:text-blue-300"
+                  >
+                    Read the full story
+                    <ArrowUpRight size={15} aria-hidden="true" />
+                    <span className="sr-only"> (opens in a new tab)</span>
+                  </a>
+                ) : null}
+              </div>
             </li>
           ))}
         </ul>

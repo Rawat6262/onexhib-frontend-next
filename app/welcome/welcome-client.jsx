@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -15,6 +15,7 @@ import {
   Building2,
   Compass,
   Loader2,
+  Lock,
   MessagesSquare,
   Presentation,
   Store,
@@ -23,9 +24,9 @@ import {
 import { toast } from "sonner";
 
 import { useAuth } from "@/components/auth/AuthProvider";
-import { changeMyRole } from "@/models/auth.model";
+import { changeMyRole, getMyRoleBlockers } from "@/models/auth.model";
 import { ROLES, homeRouteForRole } from "@/lib/auth";
-import { ACCOUNT_TYPES, accountTypeFor } from "@/lib/account-types";
+import { ACCOUNT_TYPES, accountTypeFor, describeRoleBlocker } from "@/lib/account-types";
 import { PUBLIC_ROUTES } from "@/lib/seo";
 
 const TYPE_ICONS = {
@@ -75,6 +76,12 @@ const QUICK_LINKS = [
  * different home, so a stray click should not do that. No confirm dialog either —
  * the change is reversible from this same page, and the shared ConfirmDialog is
  * styled for destructive actions.
+ *
+ * Locked types: an account that still owns listings (exhibitions, a company,
+ * services, hotels) cannot leave the role that manages them - the server refuses
+ * with a 409. GET /api/account/role/blockers tells us up front, so those cards are
+ * locked with the reason and a way to resolve it rather than failing on save. If
+ * that call fails nothing shows as locked and the server's 409 explains on save.
  */
 export default function WelcomeClient() {
   const router = useRouter();
@@ -82,12 +89,33 @@ export default function WelcomeClient() {
 
   const [selected, setSelected] = useState(role);
   const [saving, setSaving] = useState(false);
+  // null until loaded (or if loading failed): nothing is locked.
+  const [blockers, setBlockers] = useState(null);
 
   const current = accountTypeFor(role);
   const isAdmin = role === ROLES.ADMIN;
+  const signedIn = Boolean(user);
+
+  useEffect(() => {
+    if (!signedIn || isAdmin) return undefined;
+    let cancelled = false;
+    getMyRoleBlockers()
+      .then(({ data }) => {
+        if (!cancelled) setBlockers(Array.isArray(data?.blockers) ? data.blockers : []);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [signedIn, isAdmin]);
+
+  // A type is locked when anything the account owns belongs to a different role.
+  const isLocked = (value) => Boolean(blockers?.some((b) => b.role !== value));
+  const ownerType = blockers?.length ? accountTypeFor(blockers[0].role) : null;
+  const allLocked = Boolean(blockers?.length) && ACCOUNT_TYPES.every((t) => t.value === role || isLocked(t.value));
   const hasWorkspace = Boolean(current?.workspace) || isAdmin;
   const firstName = user?.first_name || user?.company_name || "";
-  const dirty = Boolean(selected) && selected !== role;
+  const dirty = Boolean(selected) && selected !== role && !isLocked(selected);
   const target = accountTypeFor(selected);
 
   const handleSave = async () => {
@@ -101,6 +129,11 @@ export default function WelcomeClient() {
       toast.success(`You're now set up as ${target?.label || "your new account type"}.`);
       router.push(homeRouteForRole(selected));
     } catch (error) {
+      const refused = error?.response?.data;
+      if (refused?.code === "ROLE_CHANGE_BLOCKED" && Array.isArray(refused.blockers)) {
+        setBlockers(refused.blockers);
+        setSelected(role);
+      }
       toast.error(error?.response?.data?.message || "Your account type could not be changed. Please try again.");
       setSaving(false);
     }
@@ -219,7 +252,8 @@ export default function WelcomeClient() {
           Your account type
         </h2>
         <p className="mt-1.5 max-w-2xl text-[15px] leading-relaxed text-gray-600 dark:text-gray-400">
-          Choose the one that best describes you. It decides which tools you see. You can change it again at any time.
+          Choose the one that best describes you. It decides which tools you see. You can change it again later, as long as
+          your account has no listings that only your current type can manage.
         </p>
 
         {isAdmin ? (
@@ -228,21 +262,65 @@ export default function WelcomeClient() {
           </p>
         ) : (
           <>
+            {blockers?.length ? (
+              <div
+                id="account-type-locked"
+                className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-900 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-100"
+              >
+                <p className="flex items-center gap-2 font-semibold">
+                  <Lock size={15} aria-hidden="true" />
+                  {ownerType ? `Your account is locked to ${ownerType.label} for now` : "Your account type is locked for now"}
+                </p>
+                <p className="mt-1 text-amber-800 dark:text-amber-200/90">
+                  Other account types can&rsquo;t manage these listings, so they&rsquo;d be left with no one to edit them.
+                  Sort these out first, then come back to switch.
+                </p>
+                <ul className="mt-3 list-none space-y-2">
+                  {blockers.map((b) => {
+                    const { text, fix, href, linkLabel } = describeRoleBlocker(b);
+                    return (
+                      <li key={b.kind} className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-2">
+                        <span>
+                          <strong className="font-semibold">{text}</strong> {fix}
+                        </span>
+                        {href ? (
+                          <Link
+                            href={href}
+                            className="inline-flex shrink-0 items-center gap-1 font-semibold text-amber-900 underline underline-offset-2 hover:no-underline dark:text-amber-100"
+                          >
+                            {linkLabel}
+                            <ArrowRight size={13} aria-hidden="true" />
+                          </Link>
+                        ) : null}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ) : null}
+
             <div role="radiogroup" aria-labelledby="account-type-heading" className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
               {ACCOUNT_TYPES.map((type) => {
                 const Icon = TYPE_ICONS[type.value];
                 const checked = selected === type.value;
                 const isCurrent = role === type.value;
+                const locked = !isCurrent && isLocked(type.value);
                 return (
                   <button
                     key={type.value}
                     type="button"
                     role="radio"
                     aria-checked={checked}
-                    onClick={() => setSelected(type.value)}
+                    aria-disabled={locked || undefined}
+                    aria-describedby={locked ? "account-type-locked" : undefined}
+                    onClick={() => {
+                      if (!locked) setSelected(type.value);
+                    }}
                     disabled={saving}
                     className={`relative flex h-full flex-col rounded-2xl border-2 p-5 text-left transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy disabled:opacity-70 motion-reduce:transition-none ${
-                      checked
+                      locked
+                        ? "cursor-not-allowed border-gray-200 bg-gray-50 opacity-60 dark:border-gray-800 dark:bg-gray-900/40"
+                        : checked
                         ? "border-ox-navy bg-ox-navy/[0.03] shadow-sm dark:border-blue-400 dark:bg-blue-400/[0.06]"
                         : "border-gray-200 bg-white hover:border-gray-300 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-gray-700"
                     }`}
@@ -263,6 +341,11 @@ export default function WelcomeClient() {
                           {isCurrent ? (
                             <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300">
                               Current
+                            </span>
+                          ) : null}
+                          {locked ? (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-800 dark:bg-amber-500/15 dark:text-amber-300">
+                              <Lock size={10} aria-hidden="true" /> Locked
                             </span>
                           ) : null}
                           {type.workspace ? (
@@ -307,6 +390,8 @@ export default function WelcomeClient() {
                     <strong className="text-gray-900 dark:text-gray-100">{target?.label}</strong>
                     {target?.workspace ? " — you'll be taken to your new dashboard." : "."}
                   </>
+                ) : allLocked ? (
+                  "Switching is locked until the listings above are sorted out."
                 ) : (
                   "Select a different type above to switch."
                 )}

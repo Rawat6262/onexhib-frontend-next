@@ -50,3 +50,10 @@ export const logout = () => axios.post("/api/logout");
  * Answers with the updated user, which the caller writes back through signIn().
  */
 export const changeMyRole = (role) => axios.put("/api/account/role", { role });
+
+/**
+ * What the signed-in user owns that ties them to an account type, and which
+ * types they may switch to now: { blockers: [{ kind, role, count }], allowed }.
+ * For explaining only - PUT /api/account/role re-checks and answers 409.
+ */
+export const getMyRoleBlockers = () => axios.get("/api/account/role/blockers");

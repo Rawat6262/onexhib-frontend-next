@@ -23,8 +23,8 @@ import { BRAND_NAME, CONTACT_EMAIL } from "@/lib/business";
  * about the business, its practices or its retention rules was invented here.
  */
 
-const LAST_UPDATED_ISO = "2026-09-09";
-const LAST_UPDATED_LABEL = "9 September 2026";
+const LAST_UPDATED_ISO = "2026-11-19";
+const LAST_UPDATED_LABEL = "19 November 2026";
 
 export const metadata = publicPageMetadata({
   title: "Privacy Policy",
@@ -94,7 +94,36 @@ export default function PrivacyPolicyPage() {
         <p>We do not sell your personal information to third parties.</p>
       </ProseSection>
 
-      <ProseSection id="cookies" title="4. Cookies &amp; Authentication">
+      <ProseSection id="mobile-app" title="4. The OneXhib App">
+        <p>
+          <span className="font-semibold text-gray-900 dark:text-gray-100">Leads:</span> when an
+          exhibitor scans a visitor&apos;s {BRAND_NAME} pass at their stand, the visitor&apos;s card
+          details (name, email, phone, company, role, city, state, country, website, industry and
+          what they are looking for) are saved in that exhibitor&apos;s {BRAND_NAME} account, so the
+          exhibitor can follow up. They are not shared with anyone else.
+        </p>
+        <p>
+          <span className="font-semibold text-gray-900 dark:text-gray-100">Gate check-in:</span>{" "}
+          when an organiser scans your pass at a show&apos;s entrance, {BRAND_NAME} records that you
+          attended that show on that day. Organisers see the totals, not a list of names.
+        </p>
+        <p>
+          <span className="font-semibold text-gray-900 dark:text-gray-100">Notifications:</span> if
+          you allow notifications, {BRAND_NAME} sends alerts about your meetings, enquiries,
+          Community activity, shows you saved, and a daily 11 am note about shows on that day. You
+          can switch each one off in Account.
+        </p>
+        <p>
+          <span className="font-semibold text-gray-900 dark:text-gray-100">
+            Deleting your account
+          </span>{" "}
+          removes your profile, leads, check-ins and notification settings. Copies of your card
+          that exhibitors have already scanned stay in their accounts as their leads; you can ask
+          an exhibitor to remove them.
+        </p>
+      </ProseSection>
+
+      <ProseSection id="cookies" title="5. Cookies &amp; Authentication">
         <p>
           <span className="font-semibold text-gray-900 dark:text-gray-100">Essential cookie:</span>{" "}
           we use an essential cookie to keep you signed in securely. It is httpOnly (not
@@ -120,7 +149,7 @@ export default function PrivacyPolicyPage() {
         </p>
       </ProseSection>
 
-      <ProseSection id="sharing" title="5. Sharing &amp; Third-Party Services">
+      <ProseSection id="sharing" title="6. Sharing &amp; Third-Party Services">
         <p>
           We use trusted third-party services to operate the platform, including cloud storage
           for images/media you upload (brochures, product images, exhibition photos), an email
@@ -134,7 +163,7 @@ export default function PrivacyPolicyPage() {
         </p>
       </ProseSection>
 
-      <ProseSection id="security" title="6. Data Security">
+      <ProseSection id="security" title="7. Data Security">
         <p>
           Passwords are stored using industry-standard hashing (bcrypt) and never stored in plain
           text. Access to administrative functions is restricted by role, and we take reasonable
@@ -143,7 +172,7 @@ export default function PrivacyPolicyPage() {
         </p>
       </ProseSection>
 
-      <ProseSection id="retention" title="7. Data Retention">
+      <ProseSection id="retention" title="8. Data Retention">
         <p>
           We retain your account and content data for as long as your account is active, or as
           needed to provide the service. You may request deletion of your account and associated
@@ -155,7 +184,7 @@ export default function PrivacyPolicyPage() {
         </p>
       </ProseSection>
 
-      <ProseSection id="your-rights" title="8. Your Rights">
+      <ProseSection id="your-rights" title="9. Your Rights">
         <p>Depending on your location, you may have the right to:</p>
         <ul className="list-disc space-y-1 pl-5">
           <li>Access the personal information we hold about you</li>
@@ -165,21 +194,21 @@ export default function PrivacyPolicyPage() {
         </ul>
       </ProseSection>
 
-      <ProseSection id="childrens-privacy" title="9. Children&apos;s Privacy">
+      <ProseSection id="childrens-privacy" title="10. Children&apos;s Privacy">
         <p>
           {BRAND_NAME} is intended for business use and is not directed at individuals under 18.
           We do not knowingly collect personal information from children.
         </p>
       </ProseSection>
 
-      <ProseSection id="changes" title="10. Changes to This Policy">
+      <ProseSection id="changes" title="11. Changes to This Policy">
         <p>
           We may update this Privacy Policy from time to time. Material changes will be reflected
           by updating the &quot;Last updated&quot; date above.
         </p>
       </ProseSection>
 
-      <ProseSection id="contact" title="11. Contact Us">
+      <ProseSection id="contact" title="12. Contact Us">
         <p>
           If you have questions about this Privacy Policy or wish to exercise any of the rights
           above, contact us at{" "}

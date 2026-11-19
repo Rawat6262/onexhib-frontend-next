@@ -24,6 +24,8 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { PageHeader, Panel, StatCard, btnPrimary, btnSecondary, pill } from "@/components/dashboard/ui";
 import { LoadingRows, Monogram, SearchField, btnRow, btnRowDanger, tbody, td, th, thead, timeAgo, tr } from "@/components/admin/AdminUI";
 import { servicePath } from "@/lib/routes";
+import { ROLES } from "@/lib/auth";
+import ClaimListingPanel from "@/components/claims/ClaimListingPanel";
 
 // Modals are only needed once opened, so their code (and for the location
 // forms, country-state-city's ~2.3 MB dataset) is split out of this page's
@@ -41,7 +43,7 @@ const ServiceEditPopup = dynamic(() => import("@/components/popups/ExhibitionSer
  * and the one number that tells a provider the listing is working.
  */
 export default function ServicesClient() {
-  const { user } = useAuth();
+  const { user, role } = useAuth();
   const [services, setServices] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showUpload, setShowUpload] = useState(false);
@@ -340,6 +342,18 @@ export default function ServicesClient() {
           </Panel>
         </>
       )}
+
+      {/* Only service-provider accounts can claim (the backend refuses others);
+          organisers who also list services do not see it. */}
+      {role === ROLES.EXHIBITION_SERVICE ? (
+        <div className="mt-8">
+          <ClaimListingPanel
+            listingType="service"
+            title="Is your business already listed?"
+            intro="Many service providers were added to the directory by the OneXhib team. Find your listing and request access; once we confirm it's yours, it moves to this dashboard and you can keep it up to date."
+          />
+        </div>
+      ) : null}
 
       {/* Mounted only while editing: the popup fetches on mount, so it must not
           render with a null id. */}

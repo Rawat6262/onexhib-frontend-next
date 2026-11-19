@@ -62,7 +62,7 @@ function dateRange(a, b) {
   return to && to !== from ? `${from} – ${to}` : from;
 }
 
-export default function AdminRequestsClient() {
+export default function AdminRequestsClient({ nav = null }) {
   const [tab, setTab] = useState("pending");
   const [rows, setRows] = useState(null);
   const [counts, setCounts] = useState({});
@@ -96,6 +96,7 @@ export default function AdminRequestsClient() {
         title="Access requests"
         description="Organisers asking to edit an exhibition already on OneXhib, usually one the team listed. Approving gives them the same edit access as “Give access” on the Exhibitions page."
       />
+      {nav}
 
       <StatGrid cols={3}>
         <StatCard icon={<Inbox size={16} />} tone="amber" label="Waiting for you" value={rows === null && counts.pending === undefined ? undefined : counts.pending || 0} warn={(counts.pending || 0) > 0} />

@@ -51,13 +51,14 @@ const WORKSPACE = {
   [ROLES.ADMIN]: [
     { href: "/admin/dashboard", label: "Admin console", hint: "Everything on OneXhib", icon: ShieldCheck },
     { href: "/admin/exhibition-centres", label: "Exhibition centres", hint: "All venues", icon: Landmark },
-    { href: "/admin/requests", label: "Access requests", hint: "Waiting for a decision", icon: KeyRound },
+    { href: "/admin/requests", label: "Requests", hint: "Access, claims and new venues", icon: KeyRound },
     { href: "/admin/hotels", label: "Hotels", hint: "Listings waiting for review", icon: BedDouble },
     { href: "/organiser/exhibitor-requests", label: "Exhibitor requests", hint: "Exhibitors waiting for approval", icon: UserCheck },
     { href: "/organiser", label: "My exhibitions", hint: "Organiser view", icon: CalendarDays },
   ],
   [ROLES.EXHIBITOR]: [{ href: "/exhibitor", label: "Exhibitor workspace", hint: "Company, products, shows", icon: Store }],
   [ROLES.HOTEL]: [{ href: "/hotel", label: "My hotels", hint: "Listings and review status", icon: BedDouble }],
+  [ROLES.EXHIBITION_CENTRE]: [{ href: "/centre", label: "My venues", hint: "Your venue page and its shows", icon: Landmark }],
   [ROLES.VISITOR]: [{ href: "/welcome", label: "Get started", hint: "Choose what you do on OneXhib", icon: Sparkles }],
 };
 
@@ -74,6 +75,7 @@ const ROLE_LABEL = {
   [ROLES.EXHIBITOR]: "Exhibitor",
   [ROLES.VISITOR]: "Visitor",
   [ROLES.HOTEL]: "Hotel",
+  [ROLES.EXHIBITION_CENTRE]: "Exhibition centre",
 };
 
 export default function DashboardMenu() {

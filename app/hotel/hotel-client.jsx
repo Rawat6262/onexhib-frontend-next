@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { AlertTriangle, BedDouble, Clock3, ExternalLink, MapPin, Pencil, Plus, Star, Trash2 } from "lucide-react";
 
 import HotelEditor from "@/components/hotels/HotelEditor";
+import ClaimListingPanel from "@/components/claims/ClaimListingPanel";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Badge, btnPrimary, btnRow, btnRowDanger } from "@/components/admin/AdminUI";
 import { deleteHotel, getMyHotels, refreshHotelPages } from "@/models/hotel.model";
@@ -120,6 +121,12 @@ export default function HotelClient() {
           ))}
         </ul>
       )}
+
+      <ClaimListingPanel
+        listingType="hotel"
+        title="Is your hotel already on OneXhib?"
+        intro="If your hotel was listed by someone else, find it and request access. Once the OneXhib team confirms it's yours, it moves to this dashboard."
+      />
 
       <Sheet open={Boolean(editor)} onOpenChange={(open) => !open && setEditor(null)}>
         <SheetContent side="right" className="w-full gap-0 overflow-y-auto p-0 sm:max-w-3xl">

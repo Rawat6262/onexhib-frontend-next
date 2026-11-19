@@ -14,6 +14,7 @@ import {
   Check,
   Building2,
   Compass,
+  Landmark,
   Loader2,
   Lock,
   MessagesSquare,
@@ -35,6 +36,7 @@ const TYPE_ICONS = {
   [ROLES.ORGANISER]: Presentation,
   [ROLES.EXHIBITION_SERVICE]: Briefcase,
   [ROLES.HOTEL]: BedDouble,
+  [ROLES.EXHIBITION_CENTRE]: Landmark,
 };
 
 const QUICK_LINKS = [

@@ -68,6 +68,7 @@ const ROLES = [
   { key: "EXHIBITION_SERVICE", label: "Service providers", one: "Service provider", tone: "sky" },
   { key: "VISITOR", label: "Visitors", one: "Visitor", tone: "emerald" },
   { key: "HOTEL", label: "Hotels", one: "Hotel", tone: "rose" },
+  { key: "EXHIBITION_CENTRE", label: "Exhibition centres", one: "Exhibition centre", tone: "sky" },
   { key: "ADMIN", label: "Admins", one: "Admin", tone: "amber" },
 ];
 const ROLE_BY_KEY = Object.fromEntries(ROLES.map((r) => [r.key, r]));

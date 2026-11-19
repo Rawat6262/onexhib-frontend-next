@@ -77,3 +77,24 @@ export const createMyCentre = (form, photo) => axios.post("/api/organiser/exhibi
 export const updateMyCentre = (id, form, photo) => axios.put(`/api/organiser/exhibition-centres/${id}`, toFormData(form, photo));
 
 export const deleteMyCentre = (id) => axios.delete(`/api/organiser/exhibition-centres/${id}`);
+
+/*
+ * VENUE ACCOUNT side (/api/centre, role EXHIBITION_CENTRE): the centres this
+ * account manages. A venue added here stays hidden ("pending") until an admin
+ * approves it; editing a rejected one sends it back for review. Linking a show
+ * is a request (models/listingRequest.model.js, kind "link").
+ */
+export const getMyVenues = () => axios.get("/api/centre/mine");
+
+export const createMyVenue = (form, photo) => axios.post("/api/centre", toFormData(form, photo));
+
+export const updateMyVenue = (id, form, photo) => axios.put(`/api/centre/${id}`, toFormData(form, photo));
+
+/** { upcoming, past } shows linked to one of my venues. */
+export const getMyVenueExhibitions = (id) => axios.get(`/api/centre/${id}/exhibitions`);
+
+/** Exhibitions to link, each with linkedHere / linkedElsewhere / requested. */
+export const searchShowsToLink = (id, q, signal) => axios.get(`/api/centre/${id}/exhibition-search`, { params: { q }, signal });
+
+/** Admin: approve or reject a venue a venue account added. */
+export const reviewCentre = (id, status, note) => axios.put(`/api/admin/exhibition-centres/${id}/review`, { status, note });

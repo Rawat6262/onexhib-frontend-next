@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { adminPendingChanged } from "@/lib/admin-pending";
 import { BedDouble, Check, CircleCheck, ExternalLink, Globe, Inbox, Loader2, Mail, MapPin, Phone, Star, Trash2, X } from "lucide-react";
 
 import { adminDeleteHotel, getAdminHotels, refreshHotelPages, reviewHotel } from "@/models/hotel.model";
@@ -68,6 +69,7 @@ export default function AdminHotelsClient() {
   const done = (id, from, to) => {
     setRows((prev) => prev.filter((r) => r._id !== id));
     setCounts((c) => ({ ...c, [from]: Math.max(0, (c[from] || 1) - 1), ...(to ? { [to]: (c[to] || 0) + 1 } : {}) }));
+    adminPendingChanged();
   };
 
   return (

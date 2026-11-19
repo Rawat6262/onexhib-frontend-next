@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import {
   BedDouble,
   BriefcaseBusiness,
@@ -17,8 +16,7 @@ import AppShell from "@/components/layout/AppShell";
 import RequireAuth from "@/components/auth/RequireAuth";
 import { ROLES } from "@/lib/auth";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { getAdminAccessRequests } from "@/models/exhibition.model";
-import { getAdminHotels } from "@/models/hotel.model";
+import { useAdminPending } from "@/lib/admin-pending";
 
 /*
  * Admin-only area. The Vite app rendered these screens to anyone who typed the
@@ -40,27 +38,16 @@ const ITEMS = [
   { group: "Catalogue", label: "Services", href: "/admin/services", icon: <BriefcaseBusiness size={16} /> },
   { group: "Catalogue", label: "Exhibition centres", href: "/admin/exhibition-centres", icon: <Landmark size={16} /> },
   { group: "Catalogue", label: "Hotels", href: "/admin/hotels", icon: <BedDouble size={16} /> },
-  { group: "People", label: "Access requests", href: "/admin/requests", icon: <KeyRound size={16} /> },
+  { group: "People", label: "Requests", href: "/admin/requests", icon: <KeyRound size={16} /> },
 ];
 
 export default function AdminLayout({ children }) {
   const { role } = useAuth();
-  const [pending, setPending] = useState(0);
-  const [hotelsPending, setHotelsPending] = useState(0);
-
-  // Pending counts ride on the "Access requests" and "Hotels" items, so a new
-  // request or hotel is visible from every admin page. Fetched once per visit.
-  useEffect(() => {
-    if (role !== ROLES.ADMIN) return;
-    getAdminAccessRequests("pending")
-      .then(({ data }) => setPending(data?.counts?.pending || 0))
-      .catch(() => setPending(0));
-    getAdminHotels({ status: "pending" })
-      .then(({ data }) => setHotelsPending(data?.counts?.pending || 0))
-      .catch(() => setHotelsPending(0));
-  }, [role]);
-
-  const badges = { "/admin/requests": pending, "/admin/hotels": hotelsPending };
+  // Waiting counts ride on "Requests" (organiser access, listing claims and
+  // new venues together) and "Hotels", so they are visible from every admin
+  // page. They refresh whenever an admin page records a decision.
+  const pending = useAdminPending(role === ROLES.ADMIN);
+  const badges = { "/admin/requests": pending.requests, "/admin/hotels": pending.hotels };
   const items = ITEMS.map((item) => (item.href in badges ? { ...item, badge: badges[item.href] } : item));
 
   return (

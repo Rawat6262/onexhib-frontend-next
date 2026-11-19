@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { adminPendingChanged } from "@/lib/admin-pending";
 import { ArrowRightLeft, BedDouble, Briefcase, Building2, Check, CircleCheck, Eye, Inbox, Landmark, Link2, Loader2, Mail, MapPin, Phone, ShieldCheck, X } from "lucide-react";
 
 import { approveListingRequest, getAdminListingRequests, rejectListingRequest } from "@/models/listingRequest.model";
@@ -23,7 +24,7 @@ import {
   fmtDate,
   timeAgo,
 } from "@/components/admin/AdminUI";
-import { exhibitionCentrePath, exhibitionPath, hotelPath } from "@/lib/routes";
+import { exhibitionCentrePath, exhibitionPath, hotelPath, servicePath } from "@/lib/routes";
 
 /**
  * Admin: listing claims and venue link requests (ListingRequest).
@@ -43,9 +44,9 @@ const TABS = [
   { key: "rejected", label: "Rejected" },
 ];
 const TYPE = {
-  centre: { label: "Exhibition centre", icon: Landmark, role: "EXHIBITION_CENTRE" },
-  service: { label: "Service listing", icon: Briefcase, role: "EXHIBITION_SERVICE" },
-  hotel: { label: "Hotel", icon: BedDouble, role: "HOTEL" },
+  centre: { label: "Exhibition centre", claim: "Claims an exhibition centre", icon: Landmark, role: "EXHIBITION_CENTRE" },
+  service: { label: "Service listing", claim: "Claims a service listing", icon: Briefcase, role: "EXHIBITION_SERVICE" },
+  hotel: { label: "Hotel", claim: "Claims a hotel", icon: BedDouble, role: "HOTEL" },
 };
 
 export default function ListingRequestsClient({ nav = null }) {
@@ -71,9 +72,12 @@ export default function ListingRequestsClient({ nav = null }) {
     load();
   }, [load]);
 
-  const decided = (id) => {
+  // Move the row's count from Pending to where it went, and tell the sidebar
+  // and section badges to refetch.
+  const decided = (id, to) => {
     setRows((prev) => prev.filter((r) => r._id !== id));
-    setCounts((c) => ({ ...c, pending: Math.max(0, (c.pending || 1) - 1) }));
+    setCounts((c) => ({ ...c, pending: Math.max(0, (c.pending || 1) - 1), [to]: (c[to] || 0) + 1 }));
+    adminPendingChanged();
   };
 
   return (
@@ -142,6 +146,7 @@ function listingHref(r) {
   if (!l) return null;
   if (r.listingType === "centre" && l.slug) return exhibitionCentrePath(l.slug);
   if (r.listingType === "hotel" && l.slug) return hotelPath(l.slug);
+  if (r.listingType === "service" && l._id) return servicePath(l.name, l._id);
   return null;
 }
 
@@ -166,7 +171,7 @@ function ClaimRow({ r, onDecided }) {
           ? `${r.exhibition?.name || "The show"} is now listed at ${r.listing?.name || "their venue"}${data?.emailed ? ". We emailed them." : "."}`
           : `${u?.name || "They"} now manage ${r.listing?.name || "the listing"}${data?.emailed ? ". We emailed them." : "."}`
       );
-      onDecided(r._id);
+      onDecided(r._id, "approved");
     } catch (err) {
       setError(err?.response?.data?.message || "Could not approve. Please try again.");
     } finally {
@@ -180,7 +185,7 @@ function ClaimRow({ r, onDecided }) {
     try {
       await rejectListingRequest(r._id, note.trim());
       toast.success("Request rejected. We let them know.");
-      onDecided(r._id);
+      onDecided(r._id, "rejected");
     } catch (err) {
       setError(err?.response?.data?.message || "Could not reject. Please try again.");
     } finally {
@@ -226,7 +231,7 @@ function ClaimRow({ r, onDecided }) {
         <div className="min-w-0">
           <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
             {isLink ? <Link2 size={12} aria-hidden="true" /> : <TypeIcon size={12} aria-hidden="true" />}
-            {isLink ? "Link a show to their venue" : `Claims a ${type.label.toLowerCase()}`}
+            {isLink ? "Link a show to their venue" : type.claim}
           </p>
           {isLink ? (
             <>

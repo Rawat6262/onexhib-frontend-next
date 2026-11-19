@@ -61,10 +61,10 @@ export default function ThemePicker({ className = "" }) {
   };
 
   return (
-    // Static below sm, so the menu anchors to the (sticky, so positioned)
-    // header's right edge rather than this button, which sits too far left on
-    // a phone for a menu this wide to open under it without being clipped.
-    <div ref={rootRef} className="relative max-sm:static">
+    // Below sm the picker lives in the header's menu (AppHeader), a scrolling
+    // panel that would clip a dropdown, so there the menu is a fixed sheet
+    // across the top of the screen instead.
+    <div ref={rootRef} className="relative">
       <button
         ref={buttonRef}
         type="button"
@@ -81,7 +81,7 @@ export default function ThemePicker({ className = "" }) {
         <div
           role="menu"
           aria-label="Colour theme"
-          className="ox-menu-in absolute right-0 top-full z-50 mt-2 w-64 max-sm:right-4 rtl:left-0 rtl:right-auto max-sm:rtl:left-4 rounded-2xl border border-gray-200 bg-white p-1.5 shadow-xl dark:border-gray-800 dark:bg-gray-900"
+          className="ox-menu-in absolute right-0 top-full z-50 mt-2 w-64 rtl:left-0 rtl:right-auto max-sm:fixed max-sm:inset-x-4 max-sm:top-16 max-sm:mt-0 max-sm:w-auto max-sm:rtl:left-4 max-sm:rtl:right-4 rounded-2xl border border-gray-200 bg-white p-1.5 shadow-xl dark:border-gray-800 dark:bg-gray-900"
         >
           <p className="px-2.5 pb-1 pt-1.5 text-[11px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
             Theme

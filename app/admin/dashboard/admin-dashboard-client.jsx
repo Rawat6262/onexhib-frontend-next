@@ -21,6 +21,7 @@ import {
 import { getOrganisers } from "@/models/organiser.model";
 import { getAdminAccessRequests, getFeaturedExhibitionsPage } from "@/models/exhibition.model";
 import { getAdminServicesPage } from "@/models/service.model";
+import { useAdminPending } from "@/lib/admin-pending";
 import TablePagination from "@/components/dashboard/TablePagination";
 import {
   AdminHeader,
@@ -91,6 +92,9 @@ export default function AdminDashboardClient() {
   const [pageSize, setPageSize] = useState(10);
   const [showOrganiser, setShowOrganiser] = useState(false);
   const [showExhibition, setShowExhibition] = useState(false);
+
+  // Claims, new venues and hotels waiting; shared with the sidebar badges.
+  const pending = useAdminPending();
 
   const load = useCallback(async () => {
     setError("");
@@ -167,6 +171,30 @@ export default function AdminDashboardClient() {
       text: `${pendingRequests} access ${pendingRequests === 1 ? "request is" : "requests are"} waiting`,
       sub: "Organisers asking to edit an exhibition. Approve or reject them.",
       href: "/admin/requests",
+      cta: "Review",
+    });
+  }
+  if (pending.claims) {
+    attention.push({
+      text: `${pending.claims} listing ${pending.claims === 1 ? "claim is" : "claims are"} waiting`,
+      sub: "Venues, service providers and hotels asking to manage a listing, or venues linking a show.",
+      href: "/admin/requests?section=claims",
+      cta: "Review",
+    });
+  }
+  if (pending.venues) {
+    attention.push({
+      text: `${pending.venues} new ${pending.venues === 1 ? "venue is" : "venues are"} waiting for approval`,
+      sub: "Exhibition centres added by venue accounts. Hidden from the public until you approve them.",
+      href: "/admin/requests?section=venues",
+      cta: "Review",
+    });
+  }
+  if (pending.hotels) {
+    attention.push({
+      text: `${pending.hotels} ${pending.hotels === 1 ? "hotel is" : "hotels are"} waiting for review`,
+      sub: "Hotels submitted by hotel accounts. They go live beside nearby centres once approved.",
+      href: "/admin/hotels",
       cta: "Review",
     });
   }

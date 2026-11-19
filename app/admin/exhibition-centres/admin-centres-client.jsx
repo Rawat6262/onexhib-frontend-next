@@ -269,7 +269,12 @@ export default function AdminCentresClient() {
                             <Monogram name={c.name} />
                           )}
                           <div className="min-w-0">
-                            <p className="truncate font-semibold text-gray-900 dark:text-white">{c.name}</p>
+                            <p className="flex items-center gap-1.5">
+                              <span className="truncate font-semibold text-gray-900 dark:text-white">{c.name}</span>
+                              {/* Added by a venue account and not public yet: decided on Requests → New venues. */}
+                              {c.status === "pending" ? <Badge tone="amber">Waiting for review</Badge> : null}
+                              {c.status === "rejected" ? <Badge tone="rose">Rejected</Badge> : null}
+                            </p>
                             <p className="max-w-xs truncate text-xs text-gray-500 dark:text-gray-400">{c.address}</p>
                           </div>
                         </div>
@@ -295,9 +300,15 @@ export default function AdminCentresClient() {
                       <td className={`${td} whitespace-nowrap text-gray-600 dark:text-gray-400`}>{fmtDate(c.createdAt)}</td>
                       <td className={`${td} text-right`}>
                         <div className="flex justify-end gap-2">
-                          <Link href={exhibitionCentrePath(c.slug)} target="_blank" className={btnRow} aria-label={`Open the public page for ${c.name}`}>
-                            <ExternalLink size={14} aria-hidden="true" /> Page
-                          </Link>
+                          {c.status === "pending" || c.status === "rejected" ? (
+                            <Link href="/admin/requests?section=venues" className={btnRow} aria-label={`Review ${c.name}`}>
+                              Review
+                            </Link>
+                          ) : (
+                            <Link href={exhibitionCentrePath(c.slug)} target="_blank" className={btnRow} aria-label={`Open the public page for ${c.name}`}>
+                              <ExternalLink size={14} aria-hidden="true" /> Page
+                            </Link>
+                          )}
                           <button type="button" className={btnRow} onClick={() => setEditor({ mode: "edit", centre: c })}>
                             <Pencil size={14} aria-hidden="true" /> Edit
                           </button>

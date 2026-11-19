@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { adminPendingChanged } from "@/lib/admin-pending";
 import {
   Building2,
   CalendarDays,
@@ -85,9 +86,12 @@ export default function AdminRequestsClient({ nav = null }) {
     load();
   }, [load]);
 
-  const decided = (id) => {
+  // Move the row's count from Pending to where it went, and tell the sidebar
+  // and section badges to refetch.
+  const decided = (id, to) => {
     setRows((prev) => prev.filter((r) => r._id !== id));
-    setCounts((c) => ({ ...c, pending: Math.max(0, (c.pending || 1) - 1) }));
+    setCounts((c) => ({ ...c, pending: Math.max(0, (c.pending || 1) - 1), [to]: (c[to] || 0) + 1 }));
+    adminPendingChanged();
   };
 
   return (
@@ -165,7 +169,7 @@ function RequestRow({ r, onDecided }) {
     try {
       const { data } = await approveAccessRequest(r._id);
       toast.success(`${u?.name || "They"} can now edit ${ex?.name || "the exhibition"}${data?.emailed ? ". We emailed them." : "."}`);
-      onDecided(r._id);
+      onDecided(r._id, "approved");
     } catch (err) {
       setError(err?.response?.data?.message || "Could not approve. Please try again.");
     } finally {
@@ -179,7 +183,7 @@ function RequestRow({ r, onDecided }) {
     try {
       await rejectAccessRequest(r._id, note.trim());
       toast.success("Request rejected. We let them know.");
-      onDecided(r._id);
+      onDecided(r._id, "rejected");
     } catch (err) {
       setError(err?.response?.data?.message || "Could not reject. Please try again.");
     } finally {

@@ -83,11 +83,14 @@ export default function AppHeader({ right = null, mobileExtra = null }) {
           <div className="max-sm:hidden">
             <LanguagePicker className="text-gray-500 dark:text-gray-400" />
           </div>
-          {/* Under 360px there is no room for it beside Sign up. */}
-          <div className="max-[359px]:hidden">
+          {/* Phones get both theme controls as a row in the menu instead: with a
+              signed-in account's bell, dashboard and account menus beside them
+              the bar ran 63px wider than a 375px screen and every page scrolled
+              sideways. */}
+          <div className="max-sm:hidden">
             <ThemePicker className="text-gray-500 dark:text-gray-400" />
           </div>
-          <ThemeToggle className="text-gray-500 dark:text-gray-400" />
+          <ThemeToggle className="text-gray-500 max-sm:hidden dark:text-gray-400" />
           {right}
 
           {/* Native disclosure: no JavaScript, no hydration, closes on Esc. */}
@@ -118,6 +121,13 @@ export default function AppHeader({ right = null, mobileExtra = null }) {
                   </Link>
                 </li>
                 <LanguagePicker variant="row" />
+                <li className="flex items-center justify-between gap-2 rounded-lg px-3 py-1 text-sm text-gray-700 sm:hidden dark:text-gray-200">
+                  Theme
+                  <span className="flex items-center gap-1">
+                    <ThemePicker className="text-gray-500 dark:text-gray-400" />
+                    <ThemeToggle className="text-gray-500 dark:text-gray-400" />
+                  </span>
+                </li>
                 {mobileExtra}
               </ul>
             </nav>

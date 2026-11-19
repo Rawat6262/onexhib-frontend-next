@@ -1,15 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { KeyRound, Landmark, ShieldCheck } from "lucide-react";
 
 import AdminRequestsClient from "./admin-requests-client";
 import ListingRequestsClient from "./listing-requests-client";
 import PendingVenuesClient from "./pending-venues-client";
-import { getAdminListingRequests } from "@/models/listingRequest.model";
-import { getAdminCentres } from "@/models/exhibitionCentre.model";
-import { getAdminAccessRequests } from "@/models/exhibition.model";
+import { useAdminPending } from "@/lib/admin-pending";
 
 /**
  * Admin: everything waiting for a decision, in three sections.
@@ -34,25 +31,9 @@ export default function AdminRequestsHub() {
   const pathname = usePathname();
   const params = useSearchParams();
   const section = SECTIONS.some((s) => s.key === params.get("section")) ? params.get("section") : "access";
-  const [waiting, setWaiting] = useState({});
-
-  // How many wait in each section, for the badges. Best effort.
-  useEffect(() => {
-    let cancelled = false;
-    Promise.allSettled([getAdminAccessRequests("pending"), getAdminListingRequests("pending"), getAdminCentres({ status: "pending", limit: 1 })]).then(
-      ([a, c, v]) => {
-        if (cancelled) return;
-        setWaiting({
-          access: a.status === "fulfilled" ? a.value.data?.counts?.pending ?? 0 : undefined,
-          claims: c.status === "fulfilled" ? c.value.data?.counts?.pending ?? 0 : undefined,
-          venues: v.status === "fulfilled" ? v.value.data?.total ?? 0 : undefined,
-        });
-      }
-    );
-    return () => {
-      cancelled = true;
-    };
-  }, [section]);
+  // How many wait in each section, for the badges. Shared with the sidebar and
+  // refreshed after every decision, so a badge never outlives its request.
+  const waiting = useAdminPending();
 
   const go = (key) => router.replace(key === "access" ? pathname : `${pathname}?section=${key}`, { scroll: false });
 

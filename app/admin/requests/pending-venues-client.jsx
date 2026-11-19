@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { adminPendingChanged } from "@/lib/admin-pending";
 import { Check, Globe, Landmark, Loader2, Mail, MapPin, Phone, X } from "lucide-react";
 
 import { getAdminCentres, refreshCentrePages, reviewCentre } from "@/models/exhibitionCentre.model";
@@ -52,7 +53,10 @@ export default function PendingVenuesClient({ nav = null }) {
     load();
   }, [load]);
 
-  const decided = (id) => setRows((prev) => prev.filter((r) => r._id !== id));
+  const decided = (id) => {
+    setRows((prev) => prev.filter((r) => r._id !== id));
+    adminPendingChanged();
+  };
 
   return (
     <AdminPage>

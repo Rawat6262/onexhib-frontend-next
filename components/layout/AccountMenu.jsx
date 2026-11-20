@@ -54,6 +54,11 @@ export default function AccountMenu() {
   const handleLogout = async () => {
     setBusy(true);
     try {
+      // First, while the session still works: stop pushes to this browser.
+      // Never blocks sign-out, whatever happens.
+      await import("@/lib/web-push")
+        .then(({ signOutWebPush }) => signOutWebPush())
+        .catch(() => {});
       await logout();
     } catch (err) {
       console.error("Logout request failed:", err);

@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Bell, CheckCheck } from "lucide-react";
 
 import NotificationRow from "@/components/social/NotificationRow";
+import WebPushCard from "@/components/social/WebPushCard";
 import { useNotifications } from "@/components/social/NotificationProvider";
 import { getNotifications, markNotificationRead, markAllNotificationsRead } from "@/models/social.model";
 import { emptyList, mergePage, canLoadMore, replaceItem } from "@/lib/social/cursor-list";
@@ -208,6 +209,8 @@ export default function NotificationsClient() {
           </button>
         ) : null}
       </div>
+
+      <WebPushCard />
 
       <div className="mt-8">
         {phase === "loading" ? (

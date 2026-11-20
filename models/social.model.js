@@ -212,6 +212,19 @@ export const markAllNotificationsRead = () =>
 export const markNotificationRead = (notificationId) =>
   axios.put(`/api/social/notifications/${id(notificationId)}/read`);
 
+// --- PUSH DEVICES (2) ----------------------------------------------------------
+
+/**
+ * Register this browser for push. Upserts on the token server-side, so a browser
+ * that signs into another account moves to it. See lib/web-push.js.
+ */
+export const registerPushDevice = (token) =>
+  axios.post("/api/social/device-tokens", { token, platform: "web" });
+
+/** Only removes the caller's own row; the answer is the same either way. */
+export const removePushDevice = (token) =>
+  axios.delete("/api/social/device-tokens", { data: { token } });
+
 // --- PEOPLE (1) --------------------------------------------------------------
 
 /**

@@ -34,6 +34,10 @@ const BACKEND_URL = (process.env.BACKEND_URL || "").replace(/\/+$/, "");
 //   img/media  blob:            URL.createObjectURL previews in the upload forms
 //   connect-src 'self'          every API call is a relative /api/* path that the
 //                               rewrite proxies, so no external origin is needed
+//   connect-src fcmregistrations / firebaseinstallations.googleapis.com
+//                               browser notifications (lib/web-push.js): getting
+//                               and deleting this browser's push token. Only
+//                               called after a visitor turns notifications on.
 //   translate.google(apis).com  the header's language picker (lib/translate.js):
 //              www.gstatic.com  the Google Website Translator's loader script,
 //                               its main script and stylesheet, and the
@@ -69,7 +73,7 @@ const CSP_REPORT_ONLY = [
   // analytics.google.com are used for some consent-mode traffic.
   // Google Maps (the exhibition-centre map picker and venue maps): the Maps
   // JavaScript API script, its tiles and fonts, and the Places / Geocoding calls.
-  "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://www.googletagmanager.com https://maps.googleapis.com https://places.googleapis.com https://translate.googleapis.com https://translate-pa.googleapis.com",
+  "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://www.googletagmanager.com https://maps.googleapis.com https://places.googleapis.com https://translate.googleapis.com https://translate-pa.googleapis.com https://fcmregistrations.googleapis.com https://firebaseinstallations.googleapis.com",
   "worker-src 'self' blob:",
   "manifest-src 'self'",
 ].join("; ");

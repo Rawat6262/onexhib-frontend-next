@@ -23,8 +23,8 @@ import { BRAND_NAME, CONTACT_EMAIL } from "@/lib/business";
  * about the business, its practices or its retention rules was invented here.
  */
 
-const LAST_UPDATED_ISO = "2026-11-19";
-const LAST_UPDATED_LABEL = "19 November 2026";
+const LAST_UPDATED_ISO = "2026-11-20";
+const LAST_UPDATED_LABEL = "20 November 2026";
 
 export const metadata = publicPageMetadata({
   title: "Privacy Policy",
@@ -112,6 +112,16 @@ export default function PrivacyPolicyPage() {
           you allow notifications, {BRAND_NAME} sends alerts about your meetings, enquiries,
           Community activity, shows you saved, and a daily 11 am note about shows on that day. You
           can switch each one off in Account.
+        </p>
+        <p>
+          <span className="font-semibold text-gray-900 dark:text-gray-100">
+            Browser notifications:
+          </span>{" "}
+          on the website, notifications are off until you turn them on under Notifications and
+          allow them in your browser. Your browser then gives {BRAND_NAME} a notification address
+          (a token issued through Google&apos;s Firebase Cloud Messaging), which we store with your
+          account so the same alerts reach that browser. Turning notifications off or signing out
+          deletes it.
         </p>
         <p>
           <span className="font-semibold text-gray-900 dark:text-gray-100">

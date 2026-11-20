@@ -78,6 +78,23 @@ export default function AuthProvider({ children }) {
     return () => axios.interceptors.response.eject(id);
   }, [router, signOutLocal]);
 
+  /*
+   * Browser notifications: keep this browser's push token current for an account
+   * that turned them on, and silence a token another account left behind. Never
+   * prompts. Delayed so it never competes with the page's own first requests, and
+   * imported on demand so signed-out visitors download none of it.
+   */
+  const userId = user?._id || user?.id || null;
+  useEffect(() => {
+    if (status !== "authed" || !userId) return undefined;
+    const timer = setTimeout(() => {
+      import("@/lib/web-push")
+        .then(({ syncWebPush }) => syncWebPush({ _id: userId }))
+        .catch((err) => console.warn("Browser notifications could not be refreshed:", err?.message || err));
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [status, userId]);
+
   const value = useMemo(
     () => ({ user, status, role: user?.designation ?? null, signIn, signOutLocal }),
     [user, status, signIn, signOutLocal]

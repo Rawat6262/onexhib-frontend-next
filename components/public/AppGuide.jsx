@@ -71,7 +71,7 @@ const STEPS = [
   {
     icon: Download,
     title: "Install the app",
-    body: "Tap iPhone or Android above. The store opens on OneXhib; install it like any other app.",
+    body: "Tap the App Store or Google Play badge above. The store opens on OneXhib; install it like any other app.",
   },
   {
     icon: LogIn,

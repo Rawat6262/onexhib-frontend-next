@@ -1,6 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, ArrowUpRight } from "lucide-react";
+import {
+  ArrowRight,
+  Bell,
+  Building2,
+  CalendarCheck,
+  QrCode,
+  Search,
+  Sparkles,
+  Ticket,
+} from "lucide-react";
 
 import AppGuide, { APP_FAQ } from "@/components/public/AppGuide";
 import Breadcrumbs from "@/components/public/Breadcrumbs";
@@ -15,27 +24,39 @@ import {
   iosApplicationNode,
   softwareApplicationNode,
 } from "@/lib/jsonld";
+import { getCounts } from "@/lib/public-api";
 import { APP_STORE_URL, BRAND_NAME, PLAY_STORE_URL } from "@/lib/business";
 
 /**
- * /get-app - choose iPhone or Android, then go to that store.
+ * /get-app - what the OneXhib app is, why to get it, and the two store links.
  *
- * Linked from the "Get the app" button in the site header. Each card is one
- * link straight to the store listing (new tab), so it is one tap from here to
- * the install page. The matching card gets a "Your device" tag on phones (see
- * DeviceTag), but both choices are always shown: guessing wrong and hiding the
- * other store would strand the visitor.
+ * WHY THE FIRST SCREEN CARRIES EVERYTHING
+ * This URL is shared on its own ("here's our app"), so someone opening it cold
+ * must see, without scrolling and on a phone too: the app's icon and name,
+ * what it is for, the main reasons to install it, and both store badges. The
+ * steps, benefits by role, notifications and FAQ (AppGuide) follow for anyone
+ * who wants more.
  *
- * Below the cards (which stay first and unchanged), AppGuide explains what the
- * app does for visitors, exhibitors and organisers, how to start, the
- * notifications and a short FAQ - see that file for where each fact comes
- * from. No ratings, download counts or prices: none of that is recorded here.
+ * WHERE THE WORDS COME FROM
+ * The benefit lines restate the app's own store listings (Google Play "About
+ * this app" and the App Store "What's New" for 1.1.0, both checked on
+ * 2026-11-21): find shows, ask AI, see who is exhibiting and request a
+ * meeting, register and keep the entry pass offline, meeting alerts and
+ * 15-minute reminders, lead scanning for exhibitors and gate check-in for
+ * organisers. "Free" is what both listings say. The exhibition count is the
+ * live catalogue figure (getCounts), not the listing's rounded "5,000+", and it
+ * simply drops out if the API is unavailable. No ratings or download counts.
+ *
+ * The app icon is drawn here (the white wordmark on a dark tile, as on both
+ * store listings) rather than hotlinked from a store CDN.
  */
+
+export const revalidate = 3600;
 
 export const metadata = publicPageMetadata({
   title: "Get the OneXhib app for iPhone and Android",
   description:
-    "Download the OneXhib exhibition discovery app from the App Store for iPhone or from Google Play for Android.",
+    "The OneXhib app: find exhibitions and trade shows, meet exhibitors, carry your entry pass and get meeting alerts. Free on the App Store and Google Play.",
   path: "/get-app",
 });
 
@@ -47,152 +68,209 @@ const trail = [
 const STORES = [
   {
     platform: "ios",
-    name: "iPhone",
-    store: "App Store",
     href: APP_STORE_URL,
     badge: "/badges/app-store.svg",
-    badgeAlt: "Download on the App Store",
-    Logo: AppleLogo,
-    glow: "from-sky-400/30 via-indigo-400/10",
+    alt: "Download OneXhib on the App Store",
   },
   {
     platform: "android",
-    name: "Android",
-    store: "Google Play",
     href: PLAY_STORE_URL,
     badge: "/badges/google-play.svg",
-    badgeAlt: "Get it on Google Play",
-    Logo: PlayLogo,
-    glow: "from-emerald-400/30 via-amber-300/10",
+    alt: "Get OneXhib on Google Play",
   },
 ];
 
-export default function GetAppPage() {
+const BENEFITS = [
+  {
+    icon: Search,
+    title: "Find the right shows",
+    body: "Live, upcoming and near you. Search by industry or city, or just ask AI.",
+    tone: "text-sky-600 bg-sky-500/10 dark:text-sky-300 dark:bg-sky-400/10",
+  },
+  {
+    icon: Building2,
+    title: "Meet the right companies",
+    body: "See who is exhibiting at each show and request a meeting.",
+    tone: "text-violet-600 bg-violet-500/10 dark:text-violet-300 dark:bg-violet-400/10",
+  },
+  {
+    icon: Ticket,
+    title: "Plan your visit",
+    body: "Save shows, register to visit and keep your entry pass in the app, even offline.",
+    tone: "text-emerald-600 bg-emerald-500/10 dark:text-emerald-300 dark:bg-emerald-400/10",
+  },
+  {
+    icon: Bell,
+    title: "Never miss a meeting",
+    body: "Alerts for requests, replies and enquiries, and a reminder 15 minutes before.",
+    tone: "text-amber-600 bg-amber-500/10 dark:text-amber-300 dark:bg-amber-400/10",
+  },
+];
+
+export default async function GetAppPage() {
+  const counts = await getCounts();
+  const shows = typeof counts?.exhibitions === "number" && counts.exhibitions > 0 ? counts.exhibitions.toLocaleString("en-US") : null;
+
   return (
     <>
       <JsonLd graph={graph(breadcrumbNode(trail), softwareApplicationNode(), iosApplicationNode(), faqNode(APP_FAQ))} />
 
-      <section className="relative mx-auto w-full max-w-5xl px-4 pb-20 pt-8 sm:px-6 sm:pt-12">
-        {/* Soft colour behind the heading; decorative. */}
+      {/* ------------------------------------------------------------ Hero */}
+      <section className="relative mx-auto w-full max-w-6xl px-4 pb-12 pt-5 sm:px-6 sm:pb-16 sm:pt-8 lg:pb-20">
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 top-0 -z-10 mx-auto h-80 max-w-3xl rounded-full bg-gradient-to-r from-sky-400/20 via-violet-400/20 to-emerald-400/20 blur-3xl"
+          className="pointer-events-none absolute inset-x-0 top-0 -z-10 mx-auto h-80 max-w-4xl rounded-full bg-gradient-to-r from-sky-400/20 via-violet-400/20 to-emerald-400/20 blur-3xl"
         />
 
         <Breadcrumbs trail={trail} />
 
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-ox-blue dark:text-blue-300">
-            iPhone and Android
-          </p>
-          <h1 className="mt-3 text-[2.1rem] font-extrabold leading-[1.05] tracking-tight text-gray-900 sm:text-5xl dark:text-white">
-            Get the{" "}
-            <span className="bg-gradient-to-r from-ox-navy via-ox-blue to-ox-violet bg-clip-text text-transparent dark:from-blue-300 dark:via-indigo-300 dark:to-violet-300">
-              {BRAND_NAME}
-            </span>{" "}
-            app
-          </h1>
-          <p className="mt-3 text-[16px] leading-relaxed text-gray-600 sm:mt-4 sm:text-[17px] dark:text-gray-400">
-            Choose your phone and we&rsquo;ll take you to the right store.
-          </p>
+        <div className="grid items-center gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:gap-12">
+          <div className="min-w-0">
+            {/* App identity: what this link is, at a glance. */}
+            <div className="flex items-center gap-3.5">
+              <AppIcon className="h-16 w-16 rounded-[1.1rem] sm:h-[72px] sm:w-[72px] sm:rounded-[1.25rem]" />
+              <div className="min-w-0">
+                <p className="text-lg font-extrabold leading-tight tracking-tight text-gray-900 dark:text-white">
+                  {BRAND_NAME}
+                </p>
+                <p className="text-[13.5px] text-gray-500 dark:text-gray-400">Exhibition &amp; trade show app</p>
+                <p className="mt-1 flex flex-wrap items-center gap-1.5 text-[11.5px] font-semibold">
+                  <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-emerald-700 dark:text-emerald-300">Free</span>
+                  <span className="rounded-full bg-gray-900/[0.06] px-2 py-0.5 text-gray-700 dark:bg-white/10 dark:text-gray-200">iPhone</span>
+                  <span className="rounded-full bg-gray-900/[0.06] px-2 py-0.5 text-gray-700 dark:bg-white/10 dark:text-gray-200">Android</span>
+                </p>
+              </div>
+            </div>
+
+            <h1 className="mt-5 text-[2rem] font-extrabold leading-[1.08] tracking-tight text-gray-900 sm:mt-6 sm:text-5xl dark:text-white">
+              Get the{" "}
+              <span className="bg-gradient-to-r from-ox-navy via-ox-blue to-ox-violet bg-clip-text text-transparent dark:from-blue-300 dark:via-indigo-300 dark:to-violet-300">
+                {BRAND_NAME}
+              </span>{" "}
+              app
+            </h1>
+            <p className="mt-3 max-w-xl text-[15.5px] leading-relaxed text-gray-600 sm:text-[17px] dark:text-gray-400">
+              Every trade show in one app. Discover {shows ? <strong className="font-semibold text-gray-900 dark:text-white">{shows} exhibitions</strong> : "exhibitions"}, meet
+              the companies exhibiting, and carry your entry pass on the day.
+            </p>
+
+            <ul className="mt-5 grid list-none gap-x-5 gap-y-3 sm:mt-6 sm:grid-cols-2 sm:gap-y-4">
+              {BENEFITS.map(({ icon: Icon, title, body, tone }) => (
+                <li key={title} className="flex gap-3">
+                  <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${tone}`}>
+                    <Icon size={17} aria-hidden="true" />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-[14.5px] font-bold leading-snug text-gray-900 dark:text-white">{title}</span>
+                    <span className="block text-[13.5px] leading-snug text-gray-600 dark:text-gray-400">{body}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+
+            {/* The two store links: the point of the page. */}
+            <ul className="mt-6 flex list-none flex-wrap items-start gap-3 sm:mt-8">
+              {STORES.map(({ platform, href, badge, alt }) => (
+                <li key={platform} className="flex flex-col items-center gap-1.5">
+                  <a
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block rounded-[10px] transition-transform duration-200 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ox-navy motion-reduce:transition-none motion-reduce:hover:translate-y-0 dark:focus-visible:outline-blue-300"
+                  >
+                    <Image src={badge} alt={alt} width={180} height={54} priority className="h-[46px] w-auto sm:h-[54px]" />
+                  </a>
+                  <DeviceTag platform={platform} />
+                </li>
+              ))}
+            </ul>
+
+            <p className="mt-4 flex items-start gap-2 text-[13px] leading-snug text-gray-500 dark:text-gray-400">
+              <Sparkles size={14} aria-hidden="true" className="mt-0.5 shrink-0 text-ox-blue dark:text-blue-300" />
+              <span>
+                Exhibiting or organising? Scan visitor passes to collect leads at your stand, or check
+                visitors in at the gate.
+              </span>
+            </p>
+          </div>
+
+          <PhoneArt />
         </div>
-
-        {/* Phones: each store is a compact row (logo, name, small badge, arrow)
-            so both choices fit on one screen. From sm up: the tall centred
-            cards. Same link, same badge, one markup for both. */}
-        <ul className="mx-auto mt-8 grid max-w-4xl list-none gap-3 sm:mt-12 sm:grid-cols-2 sm:gap-5">
-          {STORES.map(({ platform, name, store, href, badge, badgeAlt, Logo, glow }) => (
-            <li key={platform}>
-              <a
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`${BRAND_NAME} for ${name} on the ${store} (opens in a new tab)`}
-                className="group relative flex h-full items-center gap-4 overflow-hidden rounded-2xl border border-gray-200 bg-white p-4 text-left shadow-sm transition duration-300 hover:border-gray-300 hover:shadow-xl hover:shadow-ox-navy/10 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ox-navy active:scale-[0.99] motion-reduce:transition-none sm:flex-col sm:gap-0 sm:rounded-[2rem] sm:px-6 sm:pb-8 sm:pt-10 sm:text-center sm:hover:-translate-y-1 sm:hover:shadow-2xl motion-reduce:sm:hover:translate-y-0 dark:border-white/10 dark:bg-gray-900 dark:hover:border-white/20 dark:hover:shadow-black/50 dark:focus-visible:outline-blue-300"
-              >
-                <div
-                  aria-hidden="true"
-                  className={`pointer-events-none absolute -left-16 -top-16 h-44 w-44 rounded-full bg-gradient-to-b ${glow} to-transparent blur-2xl transition-transform duration-500 group-hover:scale-125 motion-reduce:transition-none sm:-top-24 sm:left-1/2 sm:h-64 sm:w-64 sm:-translate-x-1/2`}
-                />
-
-                <span className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gray-950 shadow-lg shadow-black/20 ring-1 ring-white/10 transition-transform duration-300 group-hover:scale-105 group-hover:rotate-[-4deg] motion-reduce:transition-none motion-reduce:group-hover:transform-none sm:h-24 sm:w-24 sm:rounded-[1.75rem] sm:shadow-xl dark:bg-black">
-                  <span className="scale-[0.6] sm:scale-100">
-                    <Logo />
-                  </span>
-                </span>
-
-                <div className="min-w-0 flex-1 sm:flex sm:flex-col sm:items-center">
-                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1 sm:absolute sm:right-4 sm:top-4">
-                    <h2 className="relative text-lg font-extrabold tracking-tight text-gray-900 sm:hidden dark:text-white">
-                      {name}
-                    </h2>
-                    <DeviceTag platform={platform} />
-                  </div>
-                  <h2 className="relative mt-6 hidden text-2xl font-extrabold tracking-tight text-gray-900 sm:block dark:text-white">
-                    {name}
-                  </h2>
-                  <p className="relative mt-0.5 hidden text-[15px] text-gray-500 sm:mt-1 sm:block dark:text-gray-400">
-                    Download from {platform === "ios" ? "the App Store" : "Google Play"}
-                  </p>
-
-                  <Image
-                    src={badge}
-                    alt={badgeAlt}
-                    width={180}
-                    height={54}
-                    className="relative mt-2 h-9 w-auto sm:mt-7 sm:h-[52px]"
-                  />
-
-                  <span className="relative mt-5 hidden items-center gap-1 text-[13px] font-semibold text-ox-navy opacity-80 transition group-hover:opacity-100 motion-reduce:transition-none sm:inline-flex dark:text-blue-300">
-                    Open {platform === "ios" ? "the App Store" : "Google Play"}
-                    <ArrowUpRight size={14} aria-hidden="true" className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 motion-reduce:transition-none" />
-                  </span>
-                </div>
-
-                {/* Phones only: the row's affordance. */}
-                <span
-                  aria-hidden="true"
-                  className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gray-100 text-gray-700 transition group-hover:bg-ox-navy group-hover:text-white motion-reduce:transition-none sm:hidden dark:bg-white/10 dark:text-gray-200"
-                >
-                  <ArrowUpRight size={17} />
-                </span>
-              </a>
-            </li>
-          ))}
-        </ul>
-
-        <p className="mt-8 text-center text-[15px] text-gray-600 sm:mt-12 dark:text-gray-400">
-          Prefer the website?{" "}
-          <Link
-            href={PUBLIC_ROUTES.exhibitions}
-            className="inline-flex items-center gap-1 font-semibold text-ox-navy underline-offset-4 hover:underline dark:text-blue-300"
-          >
-            Browse exhibitions
-            <ArrowRight size={14} aria-hidden="true" />
-          </Link>
-        </p>
       </section>
 
       <AppGuide />
+
+      <p className="mx-auto w-full max-w-5xl px-4 pb-16 text-center text-[15px] text-gray-600 sm:px-6 dark:text-gray-400">
+        Prefer the website?{" "}
+        <Link
+          href={PUBLIC_ROUTES.exhibitions}
+          className="inline-flex items-center gap-1 font-semibold text-ox-navy underline-offset-4 hover:underline dark:text-blue-300"
+        >
+          Browse exhibitions
+          <ArrowRight size={14} aria-hidden="true" />
+        </Link>
+      </p>
     </>
   );
 }
 
-function AppleLogo() {
+/**
+ * The app icon as both stores show it: the white OneXhib wordmark on a dark
+ * tile. Decorative next to the visible name, so the image has empty alt.
+ */
+function AppIcon({ className = "" }) {
   return (
-    <svg viewBox="0 0 24 24" width="46" height="46" fill="#fff" aria-hidden="true">
-      <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701" />
-    </svg>
+    <span
+      className={`relative flex shrink-0 items-center justify-center overflow-hidden bg-gradient-to-br from-gray-700 via-gray-900 to-black shadow-lg shadow-black/25 ring-1 ring-black/10 dark:ring-white/15 ${className}`}
+    >
+      <span aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.18),transparent_60%)]" />
+      <Image src="/Untitled-2-01 1.png" alt="" width={124} height={42} className="relative w-[78%] h-auto" />
+    </span>
   );
 }
 
-function PlayLogo() {
+/**
+ * Desktop-only illustration: a phone showing the app icon, with chips naming
+ * real features. Hidden below lg so the phone layout keeps the badges in the
+ * first screen. Not a mock of the app's screens.
+ */
+function PhoneArt() {
+  const chips = [
+    { icon: QrCode, label: "Entry pass ready", pos: "-left-10 top-24" },
+    { icon: CalendarCheck, label: "Meeting in 15 min", pos: "-right-8 top-48" },
+    { icon: Building2, label: "Lead saved", pos: "-left-6 bottom-20" },
+  ];
   return (
-    <svg viewBox="0 0 24 24" width="44" height="44" aria-hidden="true">
-      <path fill="#00a0ff" d="M1.337.924a1.486 1.486 0 0 0-.112.568v21.017c0 .217.045.419.124.6l11.155-11.087L1.337.924z" />
-      <path fill="#00d26a" d="M13.544 10.989l3.258-3.238L3.45.195a1.466 1.466 0 0 0-.946-.179l11.04 10.973z" />
-      <path fill="#ffc400" d="M22.018 13.298l-3.919 2.218-3.515-3.493 3.543-3.521 3.891 2.202a1.49 1.49 0 0 1 0 2.594z" />
-      <path fill="#ff3a44" d="M13.544 13.056l-11 10.933c.298.036.612-.016.906-.183l13.324-7.54-3.23-3.21z" />
-    </svg>
+    <div aria-hidden="true" className="relative mx-auto hidden h-[480px] w-full max-w-[340px] lg:block">
+      <div className="absolute inset-0 -z-10 rounded-full bg-gradient-to-br from-ox-blue/25 via-ox-violet/15 to-emerald-400/20 blur-3xl" />
+      <div className="absolute left-1/2 top-0 h-[470px] w-[232px] -translate-x-1/2 overflow-hidden rounded-[2.6rem] border-[9px] border-gray-950 bg-gray-950 shadow-2xl shadow-black/40 ring-1 ring-white/10">
+        <div className="absolute left-1/2 top-2.5 z-10 h-5 w-20 -translate-x-1/2 rounded-full bg-black" />
+        <div className="absolute inset-0 bg-gradient-to-b from-ox-navy via-ox-royal to-ox-night" />
+        <div className="absolute inset-0 opacity-[0.12] [background-image:linear-gradient(to_right,white_1px,transparent_1px),linear-gradient(to_bottom,white_1px,transparent_1px)] [background-size:28px_28px]" />
+        <div className="relative flex h-full flex-col items-center justify-center gap-4 px-6 text-center">
+          <AppIcon className="h-20 w-20 rounded-[1.4rem]" />
+          <p className="text-[15px] font-bold text-white">Every trade show in one app</p>
+          <div className="mt-2 w-full space-y-2">
+            <div className="h-9 rounded-xl bg-white/90" />
+            <div className="grid grid-cols-2 gap-2">
+              <div className="h-16 rounded-xl bg-white/15" />
+              <div className="h-16 rounded-xl bg-white/15" />
+            </div>
+            <div className="h-16 rounded-xl bg-white/15" />
+          </div>
+        </div>
+      </div>
+      {chips.map(({ icon: Icon, label, pos }) => (
+        <div
+          key={label}
+          className={`absolute ${pos} flex items-center gap-2 rounded-2xl border border-gray-200 bg-white/95 px-3 py-2 text-[12.5px] font-semibold text-gray-900 shadow-xl shadow-black/10 backdrop-blur dark:border-white/10 dark:bg-gray-900/95 dark:text-white`}
+        >
+          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-300">
+            <Icon size={15} />
+          </span>
+          {label}
+        </div>
+      ))}
+    </div>
   );
 }

@@ -85,19 +85,22 @@ export default function GetAppPage() {
           <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-ox-blue dark:text-blue-300">
             iPhone and Android
           </p>
-          <h1 className="mt-3 text-4xl font-extrabold leading-[1.05] tracking-tight text-gray-900 sm:text-5xl dark:text-white">
+          <h1 className="mt-3 text-[2.1rem] font-extrabold leading-[1.05] tracking-tight text-gray-900 sm:text-5xl dark:text-white">
             Get the{" "}
             <span className="bg-gradient-to-r from-ox-navy via-ox-blue to-ox-violet bg-clip-text text-transparent dark:from-blue-300 dark:via-indigo-300 dark:to-violet-300">
               {BRAND_NAME}
             </span>{" "}
             app
           </h1>
-          <p className="mt-4 text-[17px] leading-relaxed text-gray-600 dark:text-gray-400">
+          <p className="mt-3 text-[16px] leading-relaxed text-gray-600 sm:mt-4 sm:text-[17px] dark:text-gray-400">
             Choose your phone and we&rsquo;ll take you to the right store.
           </p>
         </div>
 
-        <ul className="mx-auto mt-12 grid max-w-4xl list-none gap-5 sm:grid-cols-2">
+        {/* Phones: each store is a compact row (logo, name, small badge, arrow)
+            so both choices fit on one screen. From sm up: the tall centred
+            cards. Same link, same badge, one markup for both. */}
+        <ul className="mx-auto mt-8 grid max-w-4xl list-none gap-3 sm:mt-12 sm:grid-cols-2 sm:gap-5">
           {STORES.map(({ platform, name, store, href, badge, badgeAlt, Logo, glow }) => (
             <li key={platform}>
               <a
@@ -105,46 +108,60 @@ export default function GetAppPage() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={`${BRAND_NAME} for ${name} on the ${store} (opens in a new tab)`}
-                className="group relative flex h-full flex-col items-center overflow-hidden rounded-[2rem] border border-gray-200 bg-white px-6 pb-8 pt-10 text-center shadow-sm transition duration-300 hover:-translate-y-1 hover:border-gray-300 hover:shadow-2xl hover:shadow-ox-navy/10 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ox-navy motion-reduce:transition-none motion-reduce:hover:translate-y-0 dark:border-white/10 dark:bg-gray-900 dark:hover:border-white/20 dark:hover:shadow-black/50 dark:focus-visible:outline-blue-300"
+                className="group relative flex h-full items-center gap-4 overflow-hidden rounded-2xl border border-gray-200 bg-white p-4 text-left shadow-sm transition duration-300 hover:border-gray-300 hover:shadow-xl hover:shadow-ox-navy/10 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ox-navy active:scale-[0.99] motion-reduce:transition-none sm:flex-col sm:gap-0 sm:rounded-[2rem] sm:px-6 sm:pb-8 sm:pt-10 sm:text-center sm:hover:-translate-y-1 sm:hover:shadow-2xl motion-reduce:sm:hover:translate-y-0 dark:border-white/10 dark:bg-gray-900 dark:hover:border-white/20 dark:hover:shadow-black/50 dark:focus-visible:outline-blue-300"
               >
                 <div
                   aria-hidden="true"
-                  className={`pointer-events-none absolute -top-24 left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-gradient-to-b ${glow} to-transparent blur-2xl transition-transform duration-500 group-hover:scale-125 motion-reduce:transition-none`}
+                  className={`pointer-events-none absolute -left-16 -top-16 h-44 w-44 rounded-full bg-gradient-to-b ${glow} to-transparent blur-2xl transition-transform duration-500 group-hover:scale-125 motion-reduce:transition-none sm:-top-24 sm:left-1/2 sm:h-64 sm:w-64 sm:-translate-x-1/2`}
                 />
 
-                <div className="absolute right-4 top-4">
-                  <DeviceTag platform={platform} />
-                </div>
-
-                <span className="relative flex h-24 w-24 items-center justify-center rounded-[1.75rem] bg-gray-950 shadow-xl shadow-black/20 ring-1 ring-white/10 transition-transform duration-300 group-hover:scale-105 group-hover:rotate-[-4deg] motion-reduce:transition-none motion-reduce:group-hover:transform-none dark:bg-black">
-                  <Logo />
+                <span className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gray-950 shadow-lg shadow-black/20 ring-1 ring-white/10 transition-transform duration-300 group-hover:scale-105 group-hover:rotate-[-4deg] motion-reduce:transition-none motion-reduce:group-hover:transform-none sm:h-24 sm:w-24 sm:rounded-[1.75rem] sm:shadow-xl dark:bg-black">
+                  <span className="scale-[0.6] sm:scale-100">
+                    <Logo />
+                  </span>
                 </span>
 
-                <h2 className="relative mt-6 text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">
-                  {name}
-                </h2>
-                <p className="relative mt-1 text-[15px] text-gray-500 dark:text-gray-400">
-                  Download from {platform === "ios" ? "the App Store" : "Google Play"}
-                </p>
+                <div className="min-w-0 flex-1 sm:flex sm:flex-col sm:items-center">
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1 sm:absolute sm:right-4 sm:top-4">
+                    <h2 className="relative text-lg font-extrabold tracking-tight text-gray-900 sm:hidden dark:text-white">
+                      {name}
+                    </h2>
+                    <DeviceTag platform={platform} />
+                  </div>
+                  <h2 className="relative mt-6 hidden text-2xl font-extrabold tracking-tight text-gray-900 sm:block dark:text-white">
+                    {name}
+                  </h2>
+                  <p className="relative mt-0.5 hidden text-[15px] text-gray-500 sm:mt-1 sm:block dark:text-gray-400">
+                    Download from {platform === "ios" ? "the App Store" : "Google Play"}
+                  </p>
 
-                <Image
-                  src={badge}
-                  alt={badgeAlt}
-                  width={180}
-                  height={54}
-                  className="relative mt-7 h-[52px] w-auto"
-                />
+                  <Image
+                    src={badge}
+                    alt={badgeAlt}
+                    width={180}
+                    height={54}
+                    className="relative mt-2 h-9 w-auto sm:mt-7 sm:h-[52px]"
+                  />
 
-                <span className="relative mt-5 inline-flex items-center gap-1 text-[13px] font-semibold text-ox-navy opacity-80 transition group-hover:opacity-100 motion-reduce:transition-none dark:text-blue-300">
-                  Open {platform === "ios" ? "the App Store" : "Google Play"}
-                  <ArrowUpRight size={14} aria-hidden="true" className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 motion-reduce:transition-none" />
+                  <span className="relative mt-5 hidden items-center gap-1 text-[13px] font-semibold text-ox-navy opacity-80 transition group-hover:opacity-100 motion-reduce:transition-none sm:inline-flex dark:text-blue-300">
+                    Open {platform === "ios" ? "the App Store" : "Google Play"}
+                    <ArrowUpRight size={14} aria-hidden="true" className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 motion-reduce:transition-none" />
+                  </span>
+                </div>
+
+                {/* Phones only: the row's affordance. */}
+                <span
+                  aria-hidden="true"
+                  className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gray-100 text-gray-700 transition group-hover:bg-ox-navy group-hover:text-white motion-reduce:transition-none sm:hidden dark:bg-white/10 dark:text-gray-200"
+                >
+                  <ArrowUpRight size={17} />
                 </span>
               </a>
             </li>
           ))}
         </ul>
 
-        <p className="mt-12 text-center text-[15px] text-gray-600 dark:text-gray-400">
+        <p className="mt-8 text-center text-[15px] text-gray-600 sm:mt-12 dark:text-gray-400">
           Prefer the website?{" "}
           <Link
             href={PUBLIC_ROUTES.exhibitions}

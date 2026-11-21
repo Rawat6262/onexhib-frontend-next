@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 
+import AppGuide, { APP_FAQ } from "@/components/public/AppGuide";
 import Breadcrumbs from "@/components/public/Breadcrumbs";
 import DeviceTag from "@/components/public/DeviceTag";
 import JsonLd from "@/components/seo/JsonLd";
@@ -9,6 +10,7 @@ import JsonLd from "@/components/seo/JsonLd";
 import { PUBLIC_ROUTES, publicPageMetadata } from "@/lib/seo";
 import {
   breadcrumbNode,
+  faqNode,
   graph,
   iosApplicationNode,
   softwareApplicationNode,
@@ -24,8 +26,10 @@ import { APP_STORE_URL, BRAND_NAME, PLAY_STORE_URL } from "@/lib/business";
  * DeviceTag), but both choices are always shown: guessing wrong and hiding the
  * other store would strand the visitor.
  *
- * Same facts as the About page and nothing more: no feature list, ratings or
- * download counts, because none of that is recorded here.
+ * Below the cards (which stay first and unchanged), AppGuide explains what the
+ * app does for visitors, exhibitors and organisers, how to start, the
+ * notifications and a short FAQ - see that file for where each fact comes
+ * from. No ratings, download counts or prices: none of that is recorded here.
  */
 
 export const metadata = publicPageMetadata({
@@ -66,7 +70,7 @@ const STORES = [
 export default function GetAppPage() {
   return (
     <>
-      <JsonLd graph={graph(breadcrumbNode(trail), softwareApplicationNode(), iosApplicationNode())} />
+      <JsonLd graph={graph(breadcrumbNode(trail), softwareApplicationNode(), iosApplicationNode(), faqNode(APP_FAQ))} />
 
       <section className="relative mx-auto w-full max-w-5xl px-4 pb-20 pt-8 sm:px-6 sm:pt-12">
         {/* Soft colour behind the heading; decorative. */}
@@ -151,6 +155,8 @@ export default function GetAppPage() {
           </Link>
         </p>
       </section>
+
+      <AppGuide />
     </>
   );
 }

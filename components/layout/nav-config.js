@@ -134,6 +134,8 @@ export const COMMUNITY_MENU = {
 
 export const NEWS_LINK = { href: "/news", label: "News" };
 export const AI_LINK = { href: "/ai-search", label: "AI Search" };
+/** The app chooser page (iPhone or Android). Highlighted in the bar. */
+export const APP_LINK = { href: "/get-app", label: "Get the app" };
 
 export const ORGANISER_LINKS = [
   { href: "/organiser", label: "List your exhibition", hint: "Free, takes a few minutes", icon: Plus },

@@ -6,6 +6,7 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { ArrowRight, ChevronDown, Search, Sparkles } from "lucide-react";
 
 import { useAuth } from "@/components/auth/AuthProvider";
+import AppPill from "@/components/layout/AppPill";
 import { PUBLIC_ROUTES } from "@/lib/seo";
 import {
   AI_LINK,
@@ -171,6 +172,11 @@ export default function MegaNav() {
               <Sparkles size={14} aria-hidden="true" className="shrink-0" />
               {AI_LINK.label}
             </Link>
+          </li>
+          {/* Signed in, the right-hand controls (Dashboard, account name) take
+              the room the labelled pill needs, so it shrinks to the icon. */}
+          <li className="ml-1.5">
+            <AppPill variant={authed ? "icon" : "pill"} />
           </li>
         </ul>
       </nav>

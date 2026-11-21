@@ -712,3 +712,45 @@ body { top: 0 !important; }
    right-to-left under dir="rtl" (FeaturedSlider). */
 :root { --ox-dir: 1; }
 [dir="rtl"] { --ox-dir: -1; }
+
+/* "Get the app" pill in the header (components/layout/AppPill.jsx).
+
+   A spinning conic-gradient ring behind an inset fill, so the border itself
+   moves while the label stays still and readable. The fill follows the
+   palette's night colour in light mode and turns white in dark mode. With
+   reduced motion the ring is still drawn, it just does not turn, and the
+   phone icon does not wiggle. */
+.ox-app-pill {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.ox-app-pill::before {
+  content: "";
+  position: absolute;
+  inset: -200% -40%;
+  z-index: -2;
+  background: conic-gradient(from 0deg, #22c55e, #38bdf8, #8b5cf6, #f472b6, #f59e0b, #22c55e);
+}
+.ox-app-pill::after {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--color-ox-night);
+}
+:where(.dark) .ox-app-pill::after { background: #fff; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .ox-app-pill::before { animation: ox-app-spin 3.5s linear infinite; }
+  .ox-app-pill .ox-app-icon { animation: ox-app-wiggle 4s ease-in-out infinite; transform-origin: 50% 80%; }
+}
+@keyframes ox-app-spin { to { transform: rotate(1turn); } }
+@keyframes ox-app-wiggle {
+  0%, 82%, 100% { transform: rotate(0); }
+  85% { transform: rotate(-14deg); }
+  88% { transform: rotate(12deg); }
+  91% { transform: rotate(-8deg); }
+  94% { transform: rotate(4deg); }
+}

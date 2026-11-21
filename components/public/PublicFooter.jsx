@@ -162,6 +162,7 @@ export default function PublicFooter({ locations }) {
             <FooterColumn title="Company">
               <FooterLink href="/about">About {SITE_NAME}</FooterLink>
               <FooterLink href="/contact">Contact</FooterLink>
+              <FooterLink href="/get-app">Get the app</FooterLink>
               <FooterLink href="/terms">Terms of use</FooterLink>
               <FooterLink href="/privacy-policy">Privacy policy</FooterLink>
             </FooterColumn>

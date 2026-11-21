@@ -5,6 +5,7 @@ import ThemeToggle from "@/components/layout/ThemeToggle";
 import ThemePicker from "@/components/layout/ThemePicker";
 import LanguagePicker from "@/components/layout/LanguagePicker";
 import MegaNav from "@/components/layout/MegaNav";
+import AppPill from "@/components/layout/AppPill";
 import { AI_LINK, DIRECTORY_MENU, EXHIBITIONS_MENU, NEWS_LINK } from "@/components/layout/nav-config";
 import { PUBLIC_ROUTES } from "@/lib/seo";
 
@@ -91,6 +92,10 @@ export default function AppHeader({ right = null, mobileExtra = null }) {
             <ThemePicker className="text-gray-500 dark:text-gray-400" />
           </div>
           <ThemeToggle className="text-gray-500 max-sm:hidden dark:text-gray-400" />
+          {/* Between sm and xl the bar has room for the app button but not its
+              label; xl and up show the full pill in MegaNav, phones get the
+              highlighted first row of the menu. */}
+          <AppPill variant="icon" className="max-sm:hidden xl:hidden" />
           {right}
 
           {/* Native disclosure: no JavaScript, no hydration, closes on Esc. */}
@@ -106,6 +111,9 @@ export default function AppHeader({ right = null, mobileExtra = null }) {
               className="absolute right-0 top-full mt-2 max-h-[calc(100vh-5rem)] w-72 rtl:left-0 rtl:right-auto overflow-y-auto rounded-2xl border border-gray-200 bg-white p-2 shadow-xl dark:border-gray-800 dark:bg-gray-900"
             >
               <ul className="list-none space-y-0.5">
+                <li>
+                  <AppPill variant="row" />
+                </li>
                 {[EXHIBITIONS_MENU, DIRECTORY_MENU].map((menu) => (
                   <MobileGroup key={menu.key} label={menu.label} links={mobileLinksOf(menu)} />
                 ))}

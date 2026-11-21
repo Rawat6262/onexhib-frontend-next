@@ -2,6 +2,7 @@ import Link from "next/link";
 import {
   BadgeCheck,
   Bell,
+  Bookmark,
   Building2,
   CalendarDays,
   ChevronDown,
@@ -10,14 +11,13 @@ import {
   LogIn,
   MessageSquare,
   QrCode,
-  ScanLine,
   Ticket,
   Users,
 } from "lucide-react";
 
 /**
- * The explanation under the store cards on /get-app: benefits by role, how to
- * use it, notifications and a short FAQ.
+ * The explanation under the store cards on /get-app: how to use it (first,
+ * written for a visitor), benefits by role, notifications and a short FAQ.
  *
  * Every statement describes something the app and backend actually do - the
  * QR pass (Service/qrCode.js), exhibitor lead scanning with hot/warm/cold and
@@ -70,23 +70,23 @@ const ROLES = [
 const STEPS = [
   {
     icon: Download,
-    title: "Download",
-    body: "Pick iPhone or Android above and install OneXhib from the App Store or Google Play.",
+    title: "Install the app",
+    body: "Tap iPhone or Android above. The store opens on OneXhib; install it like any other app.",
   },
   {
     icon: LogIn,
     title: "Sign in",
-    body: "Use the same OneXhib account as the website, or create one in the app.",
+    body: "Use the account you already have on the OneXhib website, or create one in the app in a minute.",
+  },
+  {
+    icon: Bookmark,
+    title: "Save your shows",
+    body: "Save the exhibitions you plan to visit. You get reminders, and an 11 am note on the day they are on.",
   },
   {
     icon: QrCode,
-    title: "Open your pass",
-    body: "Your pass is your QR code. Keep it ready for the entrance and the stands you visit.",
-  },
-  {
-    icon: ScanLine,
-    title: "Scan and follow up",
-    body: "Exhibitors and organisers scan passes at the show; leads and check-ins land in their account.",
+    title: "Show your pass",
+    body: "At the show, open your QR pass: it checks you in at the entrance and shares your details with the exhibitors you choose.",
   },
 ];
 
@@ -125,6 +125,48 @@ const EYEBROW = "text-[12px] font-semibold uppercase tracking-[0.14em] text-ox-b
 export default function AppGuide() {
   return (
     <>
+      {/* ---------------------------------------------------- How to use it */}
+      <section aria-labelledby="app-how" className={`${WRAP} py-16 sm:py-20`}>
+        <div className="ox-reveal mx-auto max-w-2xl text-center">
+          <p aria-hidden="true" className={EYEBROW}>
+            How to use it
+          </p>
+          <h2 id="app-how" className={H2}>
+            From download to the show floor in four steps
+          </h2>
+          <p className="mt-3 text-[15.5px] leading-relaxed text-gray-600 dark:text-gray-400">
+            Everything you need on the day, in your pocket.
+          </p>
+        </div>
+
+        <div className="relative mt-12">
+          {/* The line joining the steps, desktop only; decorative. */}
+          <div
+            aria-hidden="true"
+            className="absolute left-[12.5%] right-[12.5%] top-7 hidden h-px bg-gradient-to-r from-sky-400/60 via-violet-400/60 to-emerald-400/60 lg:block"
+          />
+          <ol className="relative grid list-none gap-8 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
+            {STEPS.map(({ icon: Icon, title, body }, i) => (
+              <li key={title} className="ox-reveal text-center">
+                <span className="relative mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-ox-navy to-ox-royal text-white shadow-lg shadow-ox-navy/25 ring-4 ring-white dark:ring-gray-950">
+                  <Icon size={22} aria-hidden="true" />
+                  <span
+                    aria-hidden="true"
+                    className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-[12px] font-bold text-white ring-2 ring-white dark:ring-gray-950"
+                  >
+                    {i + 1}
+                  </span>
+                </span>
+                <h3 className="mt-4 text-base font-bold text-gray-900 dark:text-white">{title}</h3>
+                <p className="mx-auto mt-1.5 max-w-[30ch] text-[14.5px] leading-relaxed text-gray-600 dark:text-gray-400">
+                  {body}
+                </p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
       {/* ------------------------------------------------- Why use the app */}
       <section
         aria-labelledby="app-benefits"
@@ -171,45 +213,6 @@ export default function AppGuide() {
               </li>
             ))}
           </ul>
-        </div>
-      </section>
-
-      {/* ---------------------------------------------------- How to use it */}
-      <section aria-labelledby="app-how" className={`${WRAP} py-16 sm:py-20`}>
-        <div className="ox-reveal mx-auto max-w-2xl text-center">
-          <p aria-hidden="true" className={EYEBROW}>
-            How to use it
-          </p>
-          <h2 id="app-how" className={H2}>
-            Up and running in four steps
-          </h2>
-        </div>
-
-        <div className="relative mt-12">
-          {/* The line joining the steps, desktop only; decorative. */}
-          <div
-            aria-hidden="true"
-            className="absolute left-[12.5%] right-[12.5%] top-7 hidden h-px bg-gradient-to-r from-sky-400/60 via-violet-400/60 to-emerald-400/60 lg:block"
-          />
-          <ol className="relative grid list-none gap-8 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
-            {STEPS.map(({ icon: Icon, title, body }, i) => (
-              <li key={title} className="ox-reveal text-center">
-                <span className="relative mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-ox-navy to-ox-royal text-white shadow-lg shadow-ox-navy/25 ring-4 ring-white dark:ring-gray-950">
-                  <Icon size={22} aria-hidden="true" />
-                  <span
-                    aria-hidden="true"
-                    className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-[12px] font-bold text-white ring-2 ring-white dark:ring-gray-950"
-                  >
-                    {i + 1}
-                  </span>
-                </span>
-                <h3 className="mt-4 text-base font-bold text-gray-900 dark:text-white">{title}</h3>
-                <p className="mx-auto mt-1.5 max-w-[30ch] text-[14.5px] leading-relaxed text-gray-600 dark:text-gray-400">
-                  {body}
-                </p>
-              </li>
-            ))}
-          </ol>
         </div>
       </section>
 
